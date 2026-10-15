@@ -1,0 +1,43 @@
+{
+  "status": "UNVERIFIED",
+  "verified": false,
+  "reason": "Hypothetical commitment-aware replay; actual kitchen allocations and snapshot completeness unverified",
+  "serviceDate": "2026-10-14",
+  "reservations": 3,
+  "counts": {
+    "GREEN": 3,
+    "AMBER": 0,
+    "UNVERIFIED": 0
+  },
+  "evidenceBasis": "HYPOTHETICAL_PLANS_NOT_COOKING_ACTIVITY",
+  "chronologyBasis": "CREATED_AT_WITH_FINAL_EFFECTIVE_TIMES_NOT_DECISION_HISTORY",
+  "observations": [
+    {
+      "orderId": "0",
+      "placedAt": "2026-10-13T10:00:00.000Z",
+      "readyMinute": 1050,
+      "asOfMinute": 990,
+      "status": "GREEN",
+      "conservative": "FIT",
+      "raw": "FIT"
+    },
+    {
+      "orderId": "1",
+      "placedAt": "2026-10-13T10:01:00.000Z",
+      "readyMinute": 1080,
+      "asOfMinute": 990,
+      "status": "GREEN",
+      "conservative": "FIT",
+      "raw": "FIT"
+    },
+    {
+      "orderId": "2",
+      "placedAt": "2026-10-13T10:02:00.000Z",
+      "readyMinute": 1110,
+      "asOfMinute": 990,
+      "status": "GREEN",
+      "conservative": "FIT",
+      "raw": "FIT"
+    }
+  ]
+}

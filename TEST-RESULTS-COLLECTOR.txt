@@ -1,0 +1,27 @@
+test_committed_sqlite_sample_survives_process_exit_without_close (test_collector.BoundaryTests.test_committed_sqlite_sample_survives_process_exit_without_close) ... ok
+test_disabled_entrypoint_ignores_invalid_live_configuration (test_collector.BoundaryTests.test_disabled_entrypoint_ignores_invalid_live_configuration) ... ok
+test_http_transport_is_get_only (test_collector.BoundaryTests.test_http_transport_is_get_only) ... ok
+test_absence_is_recorded_without_inventing_cancellation (test_collector.PresenceTests.test_absence_is_recorded_without_inventing_cancellation) ... ok
+test_build_or_key_change_rejected (test_collector.Tests.test_build_or_key_change_rejected) ... ok
+test_cancelled_rejected_proposal_and_different_day_not_replayed (test_collector.Tests.test_cancelled_rejected_proposal_and_different_day_not_replayed) ... ok
+test_changed_page_count_duplicate_and_missing_page_fail (test_collector.Tests.test_changed_page_count_duplicate_and_missing_page_fail) ... ok
+test_disabled_has_no_calls (test_collector.Tests.test_disabled_has_no_calls) ... ok
+test_london_dst_day_bounds (test_collector.Tests.test_london_dst_day_bounds) ... ok
+test_missing_count_and_unsafe_origins_fail (test_collector.Tests.test_missing_count_and_unsafe_origins_fail) ... ok
+test_model_failure_still_records_observed_state_without_green (test_collector.Tests.test_model_failure_still_records_observed_state_without_green) ... ok
+test_no_naive_timestamps_and_invalid_qty (test_collector.Tests.test_no_naive_timestamps_and_invalid_qty) ... ok
+test_no_partial_sample_when_source_changes (test_collector.Tests.test_no_partial_sample_when_source_changes) ... ok
+test_normalization_minimizes_and_pseudonymizes (test_collector.Tests.test_normalization_minimizes_and_pseudonymizes) ... ok
+test_paging_query_projection_and_item_batches (test_collector.Tests.test_paging_query_projection_and_item_batches) ... ok
+test_real_node_bridge_on_synthetic_data (test_collector.Tests.test_real_node_bridge_on_synthetic_data) ... ok
+test_redirection_is_refused (test_collector.Tests.test_redirection_is_refused) ... ok
+test_restart_and_unchanged_poll_dedup (test_collector.Tests.test_restart_and_unchanged_poll_dedup) ... ok
+test_source_partial_order_without_items_unverified (test_collector.Tests.test_source_partial_order_without_items_unverified) ... ok
+test_state_cycle_is_preserved (test_collector.Tests.test_state_cycle_is_preserved) ... ok
+test_storage_failure_returns_uncertainty (test_collector.Tests.test_storage_failure_returns_uncertainty) ... ok
+test_unknown_menu_item_never_produces_green (test_collector.Tests.test_unknown_menu_item_never_produces_green) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.524s
+
+OK

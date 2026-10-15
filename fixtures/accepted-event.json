@@ -1,0 +1,19 @@
+{
+  "eventKey": "synthetic_decision_0001",
+  "serviceDate": "2026-10-14",
+  "outcome": "ACCEPTED",
+  "requestedMinute": 1080,
+  "decidedMinute": 1080,
+  "decisionAt": "2026-10-14T15:00:00Z",
+  "snapshot": {
+    "complete": true,
+    "basis": "PRE_DECISION_HISTORY",
+    "decisionAt": "2026-10-14T15:00:00Z",
+    "reservations": [],
+    "proposed": {
+      "orderId": "synthetic_order_1",
+      "readyMinute": 1080,
+      "lines": [{"itemId": "pad-thai", "qty": 1, "mods": []}]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "orderId": "2",
+    "placedAt": "2026-10-13T10:02:00Z",
+    "readyMinute": 1110,
+    "lines": [
+      {
+        "itemId": "pad-thai",
+        "qty": 1,
+        "mods": []
+      }
+    ]
+  },
+  {
+    "orderId": "1",
+    "placedAt": "2026-10-13T10:01:00Z",
+    "readyMinute": 1080,
+    "lines": [
+      {
+        "itemId": "pad-thai",
+        "qty": 1,
+        "mods": []
+      }
+    ]
+  },
+  {
+    "orderId": "0",
+    "placedAt": "2026-10-13T10:00:00Z",
+    "readyMinute": 1050,
+    "lines": [
+      {
+        "itemId": "pad-thai",
+        "qty": 1,
+        "mods": []
+      }
+    ]
+  }
+]

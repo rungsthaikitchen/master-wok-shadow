@@ -1,0 +1,62 @@
+✔ only explicit boolean true enables observer; null event isolated (3.058618ms)
+✔ throwing logger cannot reject observer (3.60543ms)
+✔ stalled assessment persists uncertainty with bounded wait (11.058075ms)
+✔ stalled persistence returns without changing decision (10.660267ms)
+✔ assessment receives a private snapshot copy (2.18147ms)
+✔ durable store survives reopen, deduplicates concurrent retries and refuses conflicts (38.574025ms)
+✔ corrupt record is detected, never silently omitted (2.060348ms)
+✔ server adapter requires decision history, rejects invalid menu data and isolates engine (13.898946ms)
+✔ replay rejects malformed dates, null rows, duplicate IDs and times outside production day (4.446936ms)
+✔ throwing event properties and asynchronous logger failures are isolated (0.458209ms)
+✔ hypothetical jobs crossing decision time remain blocked, without claiming actual activity (1.858754ms)
+✔ chronological replay deterministic across shuffled input (10.857865ms)
+✔ disabled observer never calls assessment or persistence (3.591699ms)
+✔ enabled observer persists only allowlisted metadata after authoritative outcome (2.101079ms)
+✔ assessment exception records uncertainty, never changes booking outcome (0.750719ms)
+✔ persistence failure is isolated (1.272403ms)
+✔ invalid event is fail-open and does not call persistence (0.30597ms)
+✔ invalid assessment and unsafe reason become safe unverified record (0.562406ms)
+✔ strict date parser rejects malformed and impossible dates (0.200041ms)
+PASS: Two Pad Thai orders with 10-minute holding
+PASS: Two Pad Thai orders without holding
+PASS: Three Pad Thai orders at the same ready time
+PASS: Blackout overlapping every cooking slot is rejected
+PASS: Cooking can finish exactly when blackout begins
+PASS: Already-started cooking remains protected
+PASS: Future cooking rearranged without delaying customers
+PASS: Overlapping existing commitments rejected
+PASS: Incomplete existing plan rejected
+PASS: Excessive food holding rejected
+PASS: Three simultaneous mixed orders rejected
+PASS: Staggered mixed orders accommodated
+All Master Wok regression tests passed.
+PASS: Previous-day preorder can be cooked on service date
+PASS: Same-day late order cannot bypass placement time
+PASS: Order placed after service date rejected
+✔ master-wok/master-wok-regression.test.js (207.579804ms)
+PASS: advance booking and chronological protected commitments
+PASS: unplannable historical acceptance does not fabricate a plan
+PASS: post-service order rejected
+✔ master-wok/master-wok-replay.test.js (212.666731ms)
+PASS: Validated data reaches hypothetical scheduler
+PASS: Complete two-page retrieval
+PASS: Duplicate order ID rejected
+PASS: Changing database count rejected
+PASS: Missing page rejected
+PASS: Database error rejected
+PASS: Three item-count batches verified
+PASS: Failed item-count batch rejected
+PASS: Incorrect combined item count rejected
+Shadow integration tests passed.
+✔ master-wok/master-wok-shadow.test.js (179.580793ms)
+✔ worker disabled by default makes no queue calls (0.912471ms)
+✔ worker acknowledges only after durable observer success (0.833072ms)
+✔ persistence failure retries; ack failure stays unacknowledged for lease expiry (1.585349ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 286.828751
