@@ -12,6 +12,7 @@ import re
 import sqlite3
 import subprocess
 import time
+import uuid
 from datetime import date, datetime, timedelta, timezone
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
@@ -26,7 +27,8 @@ STARTUP_PHASE = 'ARGUMENTS'
 SAFE_STARTUP_REASONS = {
     'PSEUDONYM_KEY_REQUIRED', 'INVALID_SUPABASE_ORIGIN', 'INVALID_SOURCE_CONFIG',
     'ABSOLUTE_PERSISTENT_DB_PATH_REQUIRED', 'MONITOR_IDENTITY_CHANGED',
-    'INVALID_POLL_INTERVAL', 'SERVICE_DATE_LIMIT', 'INVALID_SERVICE_DATE'
+    'INVALID_POLL_INTERVAL', 'SERVICE_DATE_LIMIT', 'INVALID_SERVICE_DATE',
+    'UNSUPPORTED_MONITOR_SCHEMA', 'LEGACY_BUILD_REQUIRED', 'MONITOR_CHANGED_DURING_UPGRADE'
 }
 
 class ShadowError(Exception):
@@ -197,33 +199,72 @@ def run_replay(service_date, rows):
     return result
 
 class MonitorStore:
-    def __init__(self, filename, identity):
+    def __init__(self, filename, identity, build_hash='test-build',
+                 legacy_identity=None, legacy_build=None):
         target = Path(filename)
         if not target.is_absolute():
             raise ShadowError('ABSOLUTE_PERSISTENT_DB_PATH_REQUIRED')
         target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         self.db = sqlite3.connect(str(target), timeout=10)
+        self.build_hash = build_hash
         os.chmod(target, 0o600)
-        self.db.execute('PRAGMA journal_mode=WAL')
-        self.db.execute('PRAGMA synchronous=FULL')
-        self.db.executescript('''
-          CREATE TABLE IF NOT EXISTS metadata(key TEXT PRIMARY KEY,value TEXT NOT NULL);
-          CREATE TABLE IF NOT EXISTS polls(id INTEGER PRIMARY KEY, observed_at TEXT NOT NULL,
-            service_date TEXT NOT NULL, result TEXT NOT NULL, reason TEXT NOT NULL, snapshot_hash TEXT);
-          CREATE TABLE IF NOT EXISTS states(id INTEGER PRIMARY KEY,poll_id INTEGER NOT NULL,
-            service_date TEXT NOT NULL,order_key TEXT NOT NULL,fingerprint TEXT NOT NULL,payload TEXT NOT NULL,
-            model_hint TEXT NOT NULL,prediction TEXT NOT NULL DEFAULT 'UNVERIFIED',
-            evidence_basis TEXT NOT NULL DEFAULT 'POLLED_STATE_NOT_DECISION_HISTORY');
-          CREATE TABLE IF NOT EXISTS presence(poll_id INTEGER NOT NULL,order_key TEXT NOT NULL,
-            PRIMARY KEY(poll_id,order_key));
-          CREATE INDEX IF NOT EXISTS states_latest ON states(service_date,order_key,id);
-        ''')
         try:
+            version = self.db.execute('PRAGMA user_version').fetchone()[0]
+            if version not in (0, 2):
+                raise ShadowError('UNSUPPORTED_MONITOR_SCHEMA')
+            has_metadata = self.db.execute("SELECT 1 FROM sqlite_master WHERE name='metadata'").fetchone()
+            previous = self.db.execute("SELECT value FROM metadata WHERE key='identity'").fetchone() if has_metadata else None
+            migrating = bool(previous and version == 0)
+            expected = legacy_identity if migrating else identity
+            if previous and previous[0] != expected:
+                raise ShadowError('MONITOR_IDENTITY_CHANGED')
+            if migrating:
+                if not legacy_build:
+                    raise ShadowError('LEGACY_BUILD_REQUIRED')
+                # SQLite backup includes committed WAL contents. Exclusive creation
+                # prevents overwrite; failed backup aborts before schema mutation.
+                backup = target.with_name(target.name + '.pre-v2-' + uuid.uuid4().hex + '.sqlite3')
+                fd = os.open(backup, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+                os.close(fd)
+                destination = sqlite3.connect(str(backup))
+                try:
+                    self.db.backup(destination)
+                finally:
+                    destination.close()
+                directory_fd = os.open(target.parent, os.O_RDONLY | os.O_DIRECTORY)
+                try:
+                    os.fsync(directory_fd)
+                finally:
+                    os.close(directory_fd)
+            self.db.execute('PRAGMA journal_mode=WAL')
+            self.db.execute('PRAGMA synchronous=FULL')
             with self.db:
-                previous = self.db.execute("SELECT value FROM metadata WHERE key='identity'").fetchone()
-                if previous and previous[0] != identity:
-                    raise ShadowError('MONITOR_IDENTITY_CHANGED')
-                self.db.execute("INSERT OR IGNORE INTO metadata VALUES('identity',?)", (identity,))
+                self.db.execute('BEGIN IMMEDIATE')
+                # Recheck after acquiring the write lock, before any schema writes.
+                current = self.db.execute("SELECT value FROM metadata WHERE key='identity'").fetchone() if has_metadata else None
+                if current != previous or self.db.execute('PRAGMA user_version').fetchone()[0] != version:
+                    raise ShadowError('MONITOR_CHANGED_DURING_UPGRADE')
+                statements = [
+                  'CREATE TABLE IF NOT EXISTS metadata(key TEXT PRIMARY KEY,value TEXT NOT NULL)',
+                  '''CREATE TABLE IF NOT EXISTS polls(id INTEGER PRIMARY KEY, observed_at TEXT NOT NULL,
+                    service_date TEXT NOT NULL, result TEXT NOT NULL, reason TEXT NOT NULL, snapshot_hash TEXT,
+                    build_hash TEXT NOT NULL)''',
+                  '''CREATE TABLE IF NOT EXISTS states(id INTEGER PRIMARY KEY,poll_id INTEGER NOT NULL,
+                    service_date TEXT NOT NULL,order_key TEXT NOT NULL,fingerprint TEXT NOT NULL,payload TEXT NOT NULL,
+                    model_hint TEXT NOT NULL,prediction TEXT NOT NULL DEFAULT 'UNVERIFIED',
+                    evidence_basis TEXT NOT NULL DEFAULT 'POLLED_STATE_NOT_DECISION_HISTORY')''',
+                  '''CREATE TABLE IF NOT EXISTS presence(poll_id INTEGER NOT NULL,order_key TEXT NOT NULL,
+                    PRIMARY KEY(poll_id,order_key))''',
+                  'CREATE INDEX IF NOT EXISTS states_latest ON states(service_date,order_key,id)']
+                for statement in statements:
+                    self.db.execute(statement)
+                if migrating:
+                    self.db.execute("ALTER TABLE polls ADD COLUMN build_hash TEXT NOT NULL DEFAULT ''")
+                    self.db.execute('UPDATE polls SET build_hash=?', (legacy_build,))
+                    self.db.execute("INSERT INTO metadata VALUES('legacyIdentity',?)", (previous[0],))
+                    self.db.execute("INSERT INTO metadata VALUES('preV2Backup',?)", (backup.name,))
+                self.db.execute("INSERT OR REPLACE INTO metadata VALUES('identity',?)", (identity,))
+                self.db.execute('PRAGMA user_version=2')
         except Exception:
             self.db.close()
             raise
@@ -232,17 +273,17 @@ class MonitorStore:
         hints = {row['orderId']: row['status'] for row in replay.get('observations', [])}
         now = datetime.now(timezone.utc).isoformat()
         with self.db:
-            cursor = self.db.execute('INSERT INTO polls(observed_at,service_date,result,reason,snapshot_hash) VALUES(?,?,?,?,?)',
-                (now, day, 'OBSERVED', reason, digest(rows)))
+            cursor = self.db.execute('INSERT INTO polls(observed_at,service_date,result,reason,snapshot_hash,build_hash) VALUES(?,?,?,?,?,?)',
+                (now, day, 'OBSERVED', reason, digest(rows), self.build_hash))
             for row in rows:
                 self.db.execute('INSERT INTO presence VALUES(?,?)', (cursor.lastrowid,row['orderId']))
                 fingerprint = digest(row)
-                prior = self.db.execute('SELECT fingerprint,model_hint FROM states WHERE service_date=? AND order_key=? ORDER BY id DESC LIMIT 1',
+                prior = self.db.execute('SELECT fingerprint,model_hint,p.build_hash FROM states s JOIN polls p ON p.id=s.poll_id WHERE s.service_date=? AND s.order_key=? ORDER BY s.id DESC LIMIT 1',
                     (day, row['orderId'])).fetchone()
                 hint = hints.get(row['orderId'], 'UNVERIFIED')
                 if hint not in ('GREEN', 'AMBER', 'UNVERIFIED'):
                     hint = 'UNVERIFIED'
-                if prior == (fingerprint, hint):
+                if prior == (fingerprint, hint, self.build_hash):
                     continue
                 # B->A recurrence is retained; no global UNIQUE(order,fingerprint).
                 self.db.execute('INSERT INTO states(poll_id,service_date,order_key,fingerprint,payload,model_hint) VALUES(?,?,?,?,?,?)',
@@ -250,10 +291,11 @@ class MonitorStore:
 
     def failure(self, day, code):
         with self.db:
-            self.db.execute('INSERT INTO polls(observed_at,service_date,result,reason) VALUES(?,?,?,?)',
-                (datetime.now(timezone.utc).isoformat(), day, 'UNVERIFIED', code))
+            self.db.execute('INSERT INTO polls(observed_at,service_date,result,reason,build_hash) VALUES(?,?,?,?,?)',
+                (datetime.now(timezone.utc).isoformat(), day, 'UNVERIFIED', code, self.build_hash))
 
-    def summary(self):
+    def summary(self, now=None, max_age_seconds=180):
+        now = now or datetime.now(timezone.utc)
         latest = self.db.execute('''SELECT service_date,payload,model_hint FROM states s WHERE id IN
           (SELECT MAX(id) FROM states GROUP BY service_date,order_key) AND EXISTS
           (SELECT 1 FROM presence p WHERE p.order_key=s.order_key AND p.poll_id=
@@ -269,8 +311,22 @@ class MonitorStore:
               SELECT service_date,observed_at,result,reason FROM polls WHERE id IN
               (SELECT MAX(id) FROM polls GROUP BY service_date)''')}
         identity = self.db.execute("SELECT value FROM metadata WHERE key='identity'").fetchone()[0]
-        return {'buildAndSourceIdentity': identity, 'perServiceDayHealth': health, 'latestOrderStates': len(latest), 'observedStatusVsHypotheticalHint': matrix,
-            'lastPoll': last, 'stale': any(day['result'] != 'OBSERVED' for day in health.values()), 'prediction': 'UNVERIFIED', 'verified': False,
+        for day in health.values():
+            age = (now - timestamp(day['observedAt'])).total_seconds()
+            day['ageSeconds'] = round(age, 3)
+            day['stale'] = day['result'] != 'OBSERVED' or age < 0 or age > max_age_seconds
+        audit = self.db.execute('SELECT COUNT(*),COUNT(DISTINCT order_key) FROM states').fetchone()
+        audit_statuses = {}
+        for payload, in self.db.execute('SELECT payload FROM states'):
+            status = json.loads(payload)['status']
+            audit_statuses[status] = audit_statuses.get(status, 0) + 1
+        polls = self.db.execute('SELECT COUNT(*) FROM polls').fetchone()[0]
+        return {'sourceIdentity': identity, 'schemaVersion': 2, 'currentBuildHash': self.build_hash,
+            'recordedBuilds': [r[0] for r in self.db.execute('SELECT DISTINCT build_hash FROM polls ORDER BY build_hash')], 'perServiceDayHealth': health, 'latestOrderStates': len(latest), 'observedStatusVsHypotheticalHint': matrix,
+            'audit': {'stateRecords': audit[0], 'distinctOrders': audit[1], 'pollRecords': polls,
+                      'observedStatusRecords': audit_statuses},
+            'lastPoll': last, 'staleAfterSeconds': max_age_seconds,
+            'stale': not health or any(day['stale'] for day in health.values()), 'prediction': 'UNVERIFIED', 'verified': False,
             'evidenceBasis': 'POLLED_STATE_NOT_DECISION_HISTORY'}
 
     def close(self):
@@ -334,9 +390,12 @@ def main():
     build_root = Path(__file__).resolve().parent.parent
     build_hash = digest({name: hashlib.sha256((build_root / name).read_bytes()).hexdigest()
         for name in ('master-wok.js', 'master-wok-model-bundle.js', 'master-wok-shadow.js', 'railway-shadow/poll-replay.js', 'railway-shadow/shadow_collector.py')})
-    identity = digest({'url': url, 'pseudonymKeyHash': digest(secret), 'buildHash': build_hash})
+    identity = digest({'url': source.url, 'pseudonymKeyHash': digest(secret)})
+    legacy_build = json.loads(Path(__file__).with_name('legacy-build.json').read_text())['buildHash']
+    legacy_identity = digest({'url': url, 'pseudonymKeyHash': digest(secret), 'buildHash': legacy_build})
     STARTUP_PHASE = 'DATABASE'
-    store = MonitorStore(os.environ.get('MASTER_WOK_MONITOR_DB', ''), identity)
+    store = MonitorStore(os.environ.get('MASTER_WOK_MONITOR_DB', ''), identity, build_hash,
+                         legacy_identity, legacy_build)
     try:
         if args.summary:
             print(canonical(store.summary()))
