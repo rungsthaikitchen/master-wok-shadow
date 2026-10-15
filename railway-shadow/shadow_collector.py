@@ -130,6 +130,62 @@ class ReadOnlySource:
                 'order_id': 'in.(' + ','.join(ids[offset:offset+50]) + ')'})
         return {'orders': orders, 'items': items}
 
+class ManagementReadOnlySource:
+    """Optional beta Management API read-only endpoint. Never the write-query API.
+    A project-scoped database-read-only PAT is required; no database DDL.
+    """
+    def __init__(self, url, token, transport=None, max_rows=5000):
+        # Reuse strict project origin validation; never accept a supplied API host.
+        validated = ReadOnlySource(url, token)
+        self.url = validated.url
+        self.token, self.transport, self.max_rows = token, transport or self._query, max_rows
+        ref = urlsplit(self.url).hostname.split('.')[0]
+        self.endpoint = 'https://api.supabase.com/v1/projects/' + ref + '/database/query/read-only'
+
+    def _query(self, payload):
+        request = Request(self.endpoint, data=canonical(payload).encode(), method='POST',
+            headers={'Authorization': 'Bearer ' + self.token, 'Content-Type': 'application/json'})
+        with build_opener(NoRedirect).open(request, timeout=15) as response:
+            if response.status not in (200, 201):
+                raise ShadowError('SOURCE_HTTP_ERROR')
+            body = response.read(5_000_001)
+            if len(body) > 5_000_000:
+                raise ShadowError('SOURCE_RESPONSE_TOO_LARGE')
+            return json.loads(body)
+
+    def snapshot(self, service_date):
+        start, end = day_bounds(service_date)
+        # Bounded, fixed SELECT projection; all values go through API parameters.
+        # One aggregate result row avoids API result-row truncation of baskets.
+        query = """WITH selected_orders AS (
+          SELECT id,created_at,preferred_time,proposed_time,confirmed_time,status,is_test
+          FROM public.orders WHERE is_test=false AND (
+            (preferred_time >= $1::timestamptz AND preferred_time < $2::timestamptz) OR
+            (proposed_time >= $1::timestamptz AND proposed_time < $2::timestamptz) OR
+            (confirmed_time >= $1::timestamptz AND confirmed_time < $2::timestamptz))
+          ORDER BY id LIMIT $3
+        ), selected_items AS (
+          SELECT i.id,i.order_id,i.item_id,i.qty,i.modifiers FROM public.order_items i
+          JOIN selected_orders o ON o.id=i.order_id ORDER BY i.id LIMIT $3
+        ) SELECT current_user AS source_role,
+          (SELECT coalesce(pg_catalog.jsonb_agg(o ORDER BY o.id),'[]'::jsonb) FROM selected_orders o) AS orders,
+          (SELECT coalesce(pg_catalog.jsonb_agg(i ORDER BY i.id),'[]'::jsonb) FROM selected_items i) AS items"""
+        result = self.transport({'query': query, 'parameters': [start, end, self.max_rows + 1]})
+        if (not isinstance(result, list) or len(result) != 1 or
+            result[0].get('source_role') != 'supabase_read_only_user'):
+            raise ShadowError('SOURCE_READ_ONLY_ROLE_UNPROVEN')
+        data = {name: result[0].get(name) for name in ('orders', 'items')}
+        for rows in data.values():
+            if not isinstance(rows, list) or len(rows) > self.max_rows:
+                raise ShadowError('SOURCE_COUNT_CHANGED_OR_LIMIT')
+            seen = set()
+            for row in rows:
+                if not isinstance(row, dict) or not isinstance(row.get('id'), str) or row['id'] in seen:
+                    raise ShadowError('DUPLICATE_OR_MISSING_SOURCE_ID')
+                seen.add(row['id'])
+        return data
+
+
 def normalize(snapshot, secret):
     if not isinstance(secret, str) or len(secret) < 32:
         raise ShadowError('PSEUDONYM_KEY_REQUIRED')
@@ -385,17 +441,26 @@ def main():
     secret = os.environ.get('MASTER_WOK_PSEUDONYM_KEY', '')
     if len(secret) < 32:
         raise ShadowError('PSEUDONYM_KEY_REQUIRED')
-    source = ReadOnlySource(url, token)
+    source_kind = os.environ.get('MASTER_WOK_SOURCE_KIND', 'rest')
+    if source_kind == 'rest':
+        source = ReadOnlySource(url, token)
+    elif source_kind == 'management_read_only':
+        source = ManagementReadOnlySource(url, os.environ.get('MASTER_WOK_MANAGEMENT_READ_TOKEN', ''))
+    else:
+        raise ShadowError('INVALID_SOURCE_CONFIG')
     STARTUP_PHASE = 'ENGINE_FILES'
     build_root = Path(__file__).resolve().parent.parent
     build_hash = digest({name: hashlib.sha256((build_root / name).read_bytes()).hexdigest()
         for name in ('master-wok.js', 'master-wok-model-bundle.js', 'master-wok-shadow.js', 'railway-shadow/poll-replay.js', 'railway-shadow/shadow_collector.py')})
-    identity = digest({'url': source.url, 'pseudonymKeyHash': digest(secret)})
+    identity_fields = {'url': source.url, 'pseudonymKeyHash': digest(secret)}
+    if source_kind != 'rest':
+        identity_fields['sourceKind'] = source_kind
+    identity = digest(identity_fields)
     legacy_build = json.loads(Path(__file__).with_name('legacy-build.json').read_text())['buildHash']
     legacy_identity = digest({'url': url, 'pseudonymKeyHash': digest(secret), 'buildHash': legacy_build})
     STARTUP_PHASE = 'DATABASE'
     store = MonitorStore(os.environ.get('MASTER_WOK_MONITOR_DB', ''), identity, build_hash,
-                         legacy_identity, legacy_build)
+                         legacy_identity if source_kind == 'rest' else None, legacy_build)
     try:
         if args.summary:
             print(canonical(store.summary()))
