@@ -158,14 +158,16 @@ class DeliveryWorkerTests(unittest.TestCase):
         try:
             for route,status in [('/healthz',401),('/other',404)]:
                 with self.assertRaises(urllib.error.HTTPError) as err:urllib.request.urlopen(url+route)
-                self.assertEqual(err.exception.code,status)
+                try:self.assertEqual(err.exception.code,status)
+                finally:err.exception.close()
             request=urllib.request.Request(url+'/healthz',headers={'Authorization':'Bearer '+'x'*32})
             with urllib.request.urlopen(request) as response:
                 self.assertEqual(json.load(response),{'status':'HEALTHY','verified':False,'dataOrigin':'SYNTHETIC_STAGING'})
             self.assertEqual(w.verify_private_health(server,'x'*32),{'authenticatedHealthStatus':200,'unauthenticatedHealthStatus':401})
             state['okay']=False
             with self.assertRaises(urllib.error.HTTPError) as err:urllib.request.urlopen(request)
-            self.assertEqual(err.exception.code,503)
+            try:self.assertEqual(err.exception.code,503)
+            finally:err.exception.close()
         finally:server.shutdown();server.server_close()
 
 if __name__=='__main__':unittest.main()

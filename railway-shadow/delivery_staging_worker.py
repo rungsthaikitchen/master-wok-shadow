@@ -238,9 +238,12 @@ def verify_private_health(server, token):
         if response.status != 200 or json.loads(response.read(1024)).get('status') != 'HEALTHY':
             raise WorkerError('PRIVATE_HEALTH_FAILED')
     try:
-        opener.open(url, timeout=3)
+        with opener.open(url, timeout=3):
+            pass
     except HTTPError as error:
-        if error.code == 401:
+        code = error.code
+        error.close()
+        if code == 401:
             return {'authenticatedHealthStatus':200, 'unauthenticatedHealthStatus':401}
     raise WorkerError('PRIVATE_HEALTH_AUTH_FAILED')
 
