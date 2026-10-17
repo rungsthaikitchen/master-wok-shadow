@@ -67,6 +67,7 @@ class DeliveryWorkerTests(unittest.TestCase):
         def failed():raise RuntimeError('secret-token-and-private-address')
         self.assertFalse(w.run_once(self.journal,failed,clock=lambda:110))
         self.assertFalse(w.health(self.path,111))
+        self.assertEqual(self.journal.last_failure,'SOURCE_FAILED')
         self.assertEqual(self.count('observations'),12)
         self.assertTrue(w.run_once(self.journal,lambda:self.source,clock=lambda:120))
         self.assertTrue(w.health(self.path,121))
@@ -123,6 +124,8 @@ class DeliveryWorkerTests(unittest.TestCase):
             self.assertEqual(request.full_url,w.ENDPOINT)
             self.assertEqual(json.loads(request.data),{'query':w.QUERY})
             self.assertNotIn('private',request.full_url)
+            response.status=201
+            self.assertEqual(w.fetch_source('private'),self.source)
             response.body=b'[{"source_role":"postgres"}]'
             with self.assertRaises(w.WorkerError):w.fetch_source('private')
             response.body=b'x'*5_000_001

@@ -58,7 +58,7 @@ def fetch_source(token):
     request = Request(ENDPOINT, data=encoded({'query': QUERY}).encode(), method='POST',
                       headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'})
     with build_opener(NoRedirect).open(request, timeout=15) as response:
-        if response.status != 200:
+        if response.status not in (200, 201):
             raise WorkerError('SOURCE_HTTP_ERROR')
         body = response.read(5_000_001)
         if len(body) > 5_000_000:
@@ -182,11 +182,24 @@ def health(path, at=None):
 
 
 def run_once(journal, source, assessor=compare, clock=now):
+    phase = 'SOURCE'
+    journal.last_failure = None
     try:
-        batch = assessor(source())
+        snapshot = source()
+        phase = 'COMPARISON'
+        batch = assessor(snapshot)
+        phase = 'JOURNAL'
         journal.commit(batch, clock())
         return True
-    except Exception:
+    except Exception as error:
+        safe_codes = {'SOURCE_REDIRECT_REFUSED','SOURCE_HTTP_ERROR','SOURCE_SIZE_LIMIT',
+                      'SOURCE_READ_ONLY_ROLE_UNPROVEN','COMPARISON_FAILED','INVALID_COMPARISON',
+                      'INVALID_RECORD','RECORD_IDENTITY_MISMATCH','INCOMPLETE_COMPARISON',
+                      'JOURNAL_CONTENT_CONFLICT'}
+        reason = str(error) if isinstance(error, WorkerError) and str(error) in safe_codes else phase + '_FAILED'
+        if isinstance(error, HTTPError) and isinstance(error.code, int) and 100 <= error.code <= 599:
+            reason = 'SOURCE_HTTP_' + str(error.code)
+        journal.last_failure = reason
         # No exception strings: transport failures can include tokens or SQL payloads.
         try:
             journal.failure(clock())
@@ -255,6 +268,8 @@ def main():
             state['okay'] = run_once(journal, lambda: fetch_source(token))
             event = {'status':'OBSERVED' if state['okay'] else 'POLL_FAILED',
                      'dataOrigin':'SYNTHETIC_STAGING','verified':False}
+            if not state['okay']:
+                event['reasonCode'] = journal.last_failure
             if state['okay']:
                 event.update({
                     'caseCount': journal.db.execute('SELECT count(DISTINCT case_key) FROM presence').fetchone()[0],
