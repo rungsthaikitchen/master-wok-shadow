@@ -1,0 +1,156 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> master-wok-shadow-review@0.2.0 test
+> node --test --test-reporter=spec *.test.js
+
+✔ dated assessment is disabled by default (1.915643ms)
+✔ real kitchen and route calculations produce a bounded hypothetical recommendation (53.875712ms)
+✔ fixed collections and delivery return trips constrain the integrated assessment (87.188023ms)
+✔ plan manifest requires explicit kitchen allocation and every delivery journey (5.39683ms)
+✔ trip membership is complete and unique; existing one-driver conflicts fail closed (72.94315ms)
+✔ snapshots cannot be silently reused across dates or assessment instants (1.071913ms)
+✔ London summer, winter, preopening, next-day and fractional clock boundaries (156.368712ms)
+✔ missing or stale journey data cannot authorize a result (10.737516ms)
+✔ immutable integrated assessment omits source PII (32.512899ms)
+✔ route capture connects to real offline assessment without checkout or pricing (31.180414ms)
+✔ two-drop integration accounts for real cooking holding time, not just shared departure (151.128271ms)
+✔ offline runner is disabled without reading the supplied missing file (161.169966ms)
+✔ offline runner contains file errors without exposing paths or stack traces (99.909263ms)
+✔ offline runner reproduces integrated two-delivery fixture (235.8903ms)
+✔ two independent fits cannot pass a joint ten-minute kitchen window (18.867587ms)
+✔ fixed collection allocation blocks cooking; exact boundary is allowed (18.495745ms)
+✔ complete snapshot, valid menu, coverage and disjoint identities are required (6.354892ms)
+✔ incomplete and duplicate joint proposals fail closed (5.003599ms)
+✔ actual hypothetical finish is returned and inputs and later calls are isolated (13.163405ms)
+✔ delivery search runs through the real kitchen model offline (61.727865ms)
+✔ route capture is disabled by default without invoking callback (3.30941ms)
+✔ free and paid deliveries receive independent outbound and return estimates (4.428062ms)
+✔ two deliveries require six directional legs including cross-customer journeys (0.730469ms)
+✔ strict duration parsing preserves fractions and explicit zero (5.506145ms)
+✔ failed, wrongly directed, future and traffic-incompatible evidence returns no partial matrix (2.23324ms)
+✔ throw, rejection and stalled evidence are contained (14.602491ms)
+✔ timed-out route work receives cancellation and late rejection is handled (7.982941ms)
+✔ callback and provider extras cannot leak PII into route evidence (0.670238ms)
+✔ malformed aliases, duplicate orders and collections do not trigger route calls (0.268514ms)
+✔ combines nearby stops and compares complete trips with asymmetric return (27.546487ms)
+✔ both visit orders evaluated; B-first can win (12.830354ms)
+✔ window search shifts single delivery to fit driver return; touching boundaries allowed (0.643398ms)
+✔ 20 minutes allowed with warning; over 20 excluded (0.676888ms)
+✔ under 15 preferred, exactly 15 flagged (0.879423ms)
+✔ earlier kitchen finish adds holding to food age and can rule out trip (29.454437ms)
+✔ separate trips preferred when only they keep food under 15 (9.079201ms)
+✔ explicit minimum saving prevents combining for insufficient benefit (3.378374ms)
+✔ combined may be only feasible driver plan; no invented savings baseline (11.755378ms)
+✔ every directional leg required, including both return and inter-customer legs (8.757797ms)
+✔ joint kitchen assessment includes both orders and may reject combined departure (2.126439ms)
+✔ missing, throwing, async, incomplete kitchen evidence stays unverified (19.500751ms)
+✔ invalid identifiers, allowances, coverage, dates, estimates never yield recommendation (1.164843ms)
+✔ driver return conflicts apply after delivery arrival (1.461709ms)
+✔ deterministic and immutable, with callback mutation isolated (17.659911ms)
+✔ THE_NIGHT_DAVID_DELIVERED_TO_HALF_OF_MORLEY: long inter-stop detour excluded (8.807832ms)
+✔ window endpoint is included, eleven-minute delay is not silently offered (0.553083ms)
+✔ seconds round up; stale reverse legs and duplicate legs fail closed (0.868957ms)
+✔ rejected async kitchen callback is isolated (49.516622ms)
+✔ joint loading and quality limits hold across deterministic varied route matrices (40.422109ms)
+✔ explicit zero-time inter-stop estimate is allowed, missing duration is not zero (8.271626ms)
+✔ arrival is converted to food-ready and asymmetric return without claiming fit (3.500597ms)
+✔ driver overlap flags AMBER and touching endpoints do not overlap (0.29211ms)
+✔ unknown time meaning, duration and coverage stay unverified (0.315465ms)
+✔ stale estimates, timezone ambiguity and early food-ready are unverified (0.258218ms)
+✔ collections need no route or driver, plans remain hypothetical and input immutable (4.557117ms)
+✔ unknown distance-only routes and malformed driver plans cannot generate green (0.234142ms)
+✔ exact-time helper also enforces agreed food age and exports run search (0.197787ms)
+✔ Google capture requires separate enable, live-request and staging gates (1.664365ms)
+✔ Google request body uses directed coordinates and duration-only response, no fee gate (2.607263ms)
+✔ two deliveries reserve all six calls before making a request (0.867886ms)
+✔ all locations must validate before any billable request (5.38321ms)
+✔ public-landmark addresses use provider waypoints without customer records (1.333997ms)
+✔ HTTP errors, malformed duration and provider errors stop without retries or partial evidence (5.572124ms)
+✔ capture timestamps are generated after response and assessment follows the whole batch (4.683756ms)
+✔ provider evidence feeds the dated RTK assessment entirely in memory (235.653203ms)
+✔ HTTPS transport fixes destination and field mask and does not follow redirects (1.461098ms)
+✔ HTTPS transport bounds response size and rejects malformed JSON (1.119885ms)
+✔ HTTPS transport has a wall-clock timeout and honours cancellation (8.165957ms)
+✔ only explicit boolean true enables observer; null event isolated (1.668501ms)
+✔ throwing logger cannot reject observer (1.246987ms)
+✔ stalled assessment persists uncertainty with bounded wait (12.130072ms)
+✔ stalled persistence returns without changing decision (22.013311ms)
+✔ assessment receives a private snapshot copy (0.688726ms)
+✔ durable store survives reopen, deduplicates concurrent retries and refuses conflicts (40.535219ms)
+✔ corrupt record is detected, never silently omitted (7.465683ms)
+✔ server adapter requires decision history, rejects invalid menu data and isolates engine (30.051785ms)
+✔ replay rejects malformed dates, null rows, duplicate IDs and times outside production day (20.360485ms)
+✔ throwing event properties and asynchronous logger failures are isolated (0.604129ms)
+✔ hypothetical jobs crossing decision time remain blocked, without claiming actual activity (2.938982ms)
+✔ chronological replay deterministic across shuffled input (28.954003ms)
+✔ disabled observer never calls assessment or persistence (2.089303ms)
+✔ enabled observer persists only allowlisted metadata after authoritative outcome (1.20265ms)
+✔ assessment exception records uncertainty, never changes booking outcome (0.546172ms)
+✔ persistence failure is isolated (0.454744ms)
+✔ invalid event is fail-open and does not call persistence (0.258579ms)
+✔ invalid assessment and unsafe reason become safe unverified record (0.46574ms)
+✔ strict date parser rejects malformed and impossible dates (0.204537ms)
+PASS: Two Pad Thai orders with 10-minute holding
+PASS: Two Pad Thai orders without holding
+PASS: Three Pad Thai orders at the same ready time
+PASS: Blackout overlapping every cooking slot is rejected
+PASS: Cooking can finish exactly when blackout begins
+PASS: Already-started cooking remains protected
+PASS: Future cooking rearranged without delaying customers
+PASS: Overlapping existing commitments rejected
+PASS: Incomplete existing plan rejected
+PASS: Excessive food holding rejected
+PASS: Three simultaneous mixed orders rejected
+PASS: Staggered mixed orders accommodated
+All Master Wok regression tests passed.
+PASS: Previous-day preorder can be cooked on service date
+PASS: Same-day late order cannot bypass placement time
+PASS: Order placed after service date rejected
+✔ master-wok-regression.test.js (196.561405ms)
+PASS: advance booking and chronological protected commitments
+PASS: unplannable historical acceptance does not fabricate a plan
+PASS: post-service order rejected
+✔ master-wok-replay.test.js (165.68522ms)
+✔ RTK profile stays disabled by default (7.605433ms)
+✔ approved RTK allowances are applied without mutating or trusting stale fixture values (104.125988ms)
+✔ RTK profile retains unknown evidence instead of bypassing source requirements (0.75091ms)
+✔ combined-only feasibility cannot invent the required five-minute saving (5.060955ms)
+PASS: Validated data reaches hypothetical scheduler
+PASS: Complete two-page retrieval
+PASS: Duplicate order ID rejected
+PASS: Changing database count rejected
+PASS: Missing page rejected
+PASS: Database error rejected
+PASS: Three item-count batches verified
+PASS: Failed item-count batch rejected
+PASS: Incorrect combined item count rejected
+Shadow integration tests passed.
+✔ master-wok-shadow.test.js (191.693212ms)
+✔ staging source and comparison are disabled without input by default (2.599802ms)
+✔ six source scenarios exercise real RTK cooking, driver and combination policy (245.211084ms)
+✔ production source, non-test rows and incomplete snapshots fail closed (1.476932ms)
+✔ existing orders cannot be omitted from fixed kitchen/driver plan membership (0.390949ms)
+✔ confirmed times override preferred and proposed, but invalid evidence is not substituted (89.878602ms)
+✔ cancelled candidates and unacknowledged suggested times cannot authorize planning (0.43167ms)
+✔ service-day mismatches and future placement timestamps fail closed (1.106254ms)
+✔ comparison keys are deterministic, build-bound and revision-sensitive (101.393867ms)
+✔ comparison records omit locations, route durations, baskets and free text (25.296361ms)
+✔ Postgres timezone formatting binds the same instant without permitting stale evidence (25.057911ms)
+✔ staging runner is disabled by default and rejects production environments (1.2095ms)
+✔ six-request runner reports evidence presence without route contents or secrets (2.430137ms)
+✔ staging runner fails closed on missing key or input without requesting routes (0.648766ms)
+✔ staging batch runs all six expected scenarios and emits only comparisons (209.458351ms)
+✔ batch rejects missing, duplicated, excessive and production sources (29.314351ms)
+✔ expected-outcome mismatch and duplicate candidate cannot report healthy rehearsal (25.48535ms)
+✔ a missing registered fixture cannot silently shrink the rehearsal (124.303472ms)
+✔ worker disabled by default makes no queue calls (0.761306ms)
+✔ worker acknowledges only after durable observer success (0.668776ms)
+✔ persistence failure retries; ack failure stays unacknowledged for lease expiry (0.313993ms)
+ℹ tests 114
+ℹ suites 0
+ℹ pass 114
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1224.30146
