@@ -159,6 +159,7 @@ class DeliveryWorkerTests(unittest.TestCase):
             request=urllib.request.Request(url+'/healthz',headers={'Authorization':'Bearer '+'x'*32})
             with urllib.request.urlopen(request) as response:
                 self.assertEqual(json.load(response),{'status':'HEALTHY','verified':False,'dataOrigin':'SYNTHETIC_STAGING'})
+            self.assertEqual(w.verify_private_health(server,'x'*32),{'authenticatedHealthStatus':200,'unauthenticatedHealthStatus':401})
             state['okay']=False
             with self.assertRaises(urllib.error.HTTPError) as err:urllib.request.urlopen(request)
             self.assertEqual(err.exception.code,503)

@@ -13,7 +13,8 @@ import threading
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import hmac
-from urllib.request import Request, build_opener, HTTPRedirectHandler
+from urllib.request import Request, build_opener, HTTPRedirectHandler, ProxyHandler
+from urllib.error import HTTPError
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = 'hvrqgufqjslvgiohgkvu'
@@ -216,6 +217,21 @@ def serve_health(path, token, state, port):
     return server
 
 
+def verify_private_health(server, token):
+    # Probe our own listener only; no public domain or external request.
+    opener = build_opener(ProxyHandler({}))
+    url = 'http://127.0.0.1:' + str(server.server_address[1]) + '/healthz'
+    with opener.open(Request(url, headers={'Authorization':'Bearer ' + token}), timeout=3) as response:
+        if response.status != 200 or json.loads(response.read(1024)).get('status') != 'HEALTHY':
+            raise WorkerError('PRIVATE_HEALTH_FAILED')
+    try:
+        opener.open(url, timeout=3)
+    except HTTPError as error:
+        if error.code == 401:
+            return {'authenticatedHealthStatus':200, 'unauthenticatedHealthStatus':401}
+    raise WorkerError('PRIVATE_HEALTH_AUTH_FAILED')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--once', action='store_true')
@@ -234,6 +250,7 @@ def main():
         state = {'okay': False}
         if not args.once:
             server = serve_health(path, health_token, state, int(os.environ.get('PORT', '8080')))
+        health_verified = False
         while not stop.is_set():
             state['okay'] = run_once(journal, lambda: fetch_source(token))
             event = {'status':'OBSERVED' if state['okay'] else 'POLL_FAILED',
@@ -244,6 +261,14 @@ def main():
                     'currentComparisons': journal.db.execute('SELECT count(*) FROM presence').fetchone()[0],
                     'durableObservations': journal.db.execute('SELECT count(*) FROM observations').fetchone()[0],
                     'pollRecords': journal.db.execute('SELECT count(*) FROM polls').fetchone()[0]})
+            if state['okay'] and server and not health_verified:
+                try:
+                    event.update(verify_private_health(server, health_token))
+                    health_verified = True
+                except Exception:
+                    state['okay'] = False
+                    event['status'] = 'PRIVATE_HEALTH_FAILED'
+                    journal.failure(now())
             print(encoded(event), flush=True)
             if args.once:
                 return 0 if state['okay'] else 1
