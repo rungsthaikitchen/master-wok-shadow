@@ -1,0 +1,11 @@
+{
+  "orders": [
+    {"orderId": "test_A", "orderType": "delivery", "deliveryFee": 0},
+    {"orderId": "test_B", "orderType": "delivery", "deliveryFee": 0}
+  ],
+  "points": {
+    "KITCHEN": {"address": "Morley Town Hall, Morley, Leeds, UK"},
+    "test_A": {"address": "Morley Leisure Centre, Morley, Leeds, UK"},
+    "test_B": {"address": "Morley Railway Station, Morley, Leeds, UK"}
+  }
+}

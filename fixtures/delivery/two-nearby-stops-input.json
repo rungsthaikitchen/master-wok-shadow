@@ -1,0 +1,66 @@
+{
+  "timeBasis": "CUSTOMER_ARRIVAL",
+  "orders": [
+    {
+      "orderId": "A",
+      "targetMinute": 1140,
+      "handoverMinutes": 1
+    },
+    {
+      "orderId": "B",
+      "targetMinute": 1140,
+      "handoverMinutes": 1
+    }
+  ],
+  "loadingMinutes": 2,
+  "earliestFoodReadyMinute": 990,
+  "minCombinedSavingMinutes": 1,
+  "driverPlanCoverage": "COMPLETE_FOR_PLANNING_WINDOW",
+  "existingDriverPlans": [],
+  "assessedAt": "2026-10-17T16:00:00Z",
+  "maxEstimateAgeMinutes": 15,
+  "legs": [
+    {
+      "from": "KITCHEN",
+      "to": "A",
+      "durationSeconds": 480,
+      "basis": "ROUTE_DURATION_ESTIMATE",
+      "estimatedAt": "2026-10-17T15:59:00Z"
+    },
+    {
+      "from": "A",
+      "to": "KITCHEN",
+      "durationSeconds": 540,
+      "basis": "ROUTE_DURATION_ESTIMATE",
+      "estimatedAt": "2026-10-17T15:59:00Z"
+    },
+    {
+      "from": "KITCHEN",
+      "to": "B",
+      "durationSeconds": 480,
+      "basis": "ROUTE_DURATION_ESTIMATE",
+      "estimatedAt": "2026-10-17T15:59:00Z"
+    },
+    {
+      "from": "B",
+      "to": "KITCHEN",
+      "durationSeconds": 420,
+      "basis": "ROUTE_DURATION_ESTIMATE",
+      "estimatedAt": "2026-10-17T15:59:00Z"
+    },
+    {
+      "from": "A",
+      "to": "B",
+      "durationSeconds": 180,
+      "basis": "ROUTE_DURATION_ESTIMATE",
+      "estimatedAt": "2026-10-17T15:59:00Z"
+    },
+    {
+      "from": "B",
+      "to": "A",
+      "durationSeconds": 300,
+      "basis": "ROUTE_DURATION_ESTIMATE",
+      "estimatedAt": "2026-10-17T15:59:00Z"
+    }
+  ]
+}

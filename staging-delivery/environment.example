@@ -1,0 +1,11 @@
+# NEW isolated staging-only one-shot service, not either existing collector.
+# Leave disabled until deployment and a maximum-six-request live test are approved.
+MASTER_WOK_ROUTE_TEST_ENABLED=false
+MASTER_WOK_ROUTE_TEST_LIVE_REQUESTS=false
+MASTER_WOK_ROUTE_TEST_INPUT=/app/master-wok/staging-delivery/route-test-input.json
+# Set server-side only. Never put a real key or private coordinates in git/chat.
+MASTER_WOK_STAGING_GOOGLE_ROUTES_KEY=
+# Railway supplies RAILWAY_ENVIRONMENT_NAME; runner requires master-wok-staging.
+# Start: node staging-delivery/route_test.js
+# Restart policy: Never. No cron or health monitor for this one-shot job.
+# No Supabase tokens, production variables or persistent volume required.

@@ -1,0 +1,11 @@
+{
+  "orders": [
+    {"orderId": "test_A", "orderType": "delivery", "deliveryFee": 0},
+    {"orderId": "test_B", "orderType": "delivery", "deliveryFee": 0}
+  ],
+  "points": {
+    "KITCHEN": {"lat": null, "lng": null},
+    "test_A": {"lat": null, "lng": null},
+    "test_B": {"lat": null, "lng": null}
+  }
+}

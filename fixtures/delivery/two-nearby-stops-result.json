@@ -1,0 +1,171 @@
+{
+  "status": "SHADOW_RECOMMENDATION",
+  "reasonCode": "COMBINED_SAVES_DRIVER_TIME",
+  "verified": false,
+  "evidenceBasis": "HYPOTHETICAL_DELIVERY_PLANS_NOT_DRIVER_OR_COOKING_ACTIVITY",
+  "arrivalToleranceMinutes": 10,
+  "maxFoodToDoorMinutes": 20,
+  "preferredFoodToDoorMinutesExclusive": 15,
+  "recommendation": {
+    "kind": "COMBINED",
+    "trips": [
+      {
+        "stopOrder": [
+          "A",
+          "B"
+        ],
+        "startMinute": 1126,
+        "departureMinute": 1128,
+        "endMinute": 1148,
+        "arrivals": [
+          {
+            "orderId": "A",
+            "arrivalMinute": 1136
+          },
+          {
+            "orderId": "B",
+            "arrivalMinute": 1140
+          }
+        ],
+        "waitingMinutes": 0,
+        "drivingMinutes": 18
+      }
+    ],
+    "deliveries": [
+      {
+        "orderId": "A",
+        "arrivalMinute": 1136,
+        "foodReadyMinute": 1126,
+        "foodToDoorMinutes": 10,
+        "deviationMinutes": -4,
+        "quality": "PREFERRED"
+      },
+      {
+        "orderId": "B",
+        "arrivalMinute": 1140,
+        "foodReadyMinute": 1126,
+        "foodToDoorMinutes": 14,
+        "deviationMinutes": 0,
+        "quality": "PREFERRED"
+      }
+    ],
+    "allUnder15": true,
+    "maxFoodToDoorMinutes": 14,
+    "totalDeviationMinutes": 4,
+    "totalDriverMinutes": 22,
+    "totalDrivingMinutes": 18
+  },
+  "separateAlternative": {
+    "kind": "SEPARATE",
+    "trips": [
+      {
+        "stopOrder": [
+          "A"
+        ],
+        "startMinute": 1138,
+        "departureMinute": 1140,
+        "endMinute": 1158,
+        "arrivals": [
+          {
+            "orderId": "A",
+            "arrivalMinute": 1148
+          }
+        ],
+        "waitingMinutes": 0,
+        "drivingMinutes": 17
+      },
+      {
+        "stopOrder": [
+          "B"
+        ],
+        "startMinute": 1120,
+        "departureMinute": 1122,
+        "endMinute": 1138,
+        "arrivals": [
+          {
+            "orderId": "B",
+            "arrivalMinute": 1130
+          }
+        ],
+        "waitingMinutes": 0,
+        "drivingMinutes": 15
+      }
+    ],
+    "deliveries": [
+      {
+        "orderId": "A",
+        "arrivalMinute": 1148,
+        "foodReadyMinute": 1138,
+        "foodToDoorMinutes": 10,
+        "deviationMinutes": 8,
+        "quality": "PREFERRED"
+      },
+      {
+        "orderId": "B",
+        "arrivalMinute": 1130,
+        "foodReadyMinute": 1120,
+        "foodToDoorMinutes": 10,
+        "deviationMinutes": -10,
+        "quality": "PREFERRED"
+      }
+    ],
+    "allUnder15": true,
+    "maxFoodToDoorMinutes": 10,
+    "totalDeviationMinutes": 18,
+    "totalDriverMinutes": 38,
+    "totalDrivingMinutes": 32
+  },
+  "combinedAlternative": {
+    "kind": "COMBINED",
+    "trips": [
+      {
+        "stopOrder": [
+          "A",
+          "B"
+        ],
+        "startMinute": 1126,
+        "departureMinute": 1128,
+        "endMinute": 1148,
+        "arrivals": [
+          {
+            "orderId": "A",
+            "arrivalMinute": 1136
+          },
+          {
+            "orderId": "B",
+            "arrivalMinute": 1140
+          }
+        ],
+        "waitingMinutes": 0,
+        "drivingMinutes": 18
+      }
+    ],
+    "deliveries": [
+      {
+        "orderId": "A",
+        "arrivalMinute": 1136,
+        "foodReadyMinute": 1126,
+        "foodToDoorMinutes": 10,
+        "deviationMinutes": -4,
+        "quality": "PREFERRED"
+      },
+      {
+        "orderId": "B",
+        "arrivalMinute": 1140,
+        "foodReadyMinute": 1126,
+        "foodToDoorMinutes": 14,
+        "deviationMinutes": 0,
+        "quality": "PREFERRED"
+      }
+    ],
+    "allUnder15": true,
+    "maxFoodToDoorMinutes": 14,
+    "totalDeviationMinutes": 4,
+    "totalDriverMinutes": 22,
+    "totalDrivingMinutes": 18
+  },
+  "combinedDriverMinutesSaved": 16,
+  "alternativesFullyAssessed": true,
+  "considered": 714,
+  "kitchenAssessments": 170
+}

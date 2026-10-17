@@ -1,0 +1,177 @@
+{
+  "status": "SHADOW_RECOMMENDATION",
+  "reasonCode": "COMBINED_SAVES_DRIVER_TIME",
+  "verified": false,
+  "evidenceBasis": "HYPOTHETICAL_DELIVERY_PLANS_NOT_DRIVER_OR_COOKING_ACTIVITY",
+  "arrivalToleranceMinutes": 10,
+  "maxFoodToDoorMinutes": 20,
+  "preferredFoodToDoorMinutesExclusive": 15,
+  "recommendation": {
+    "kind": "COMBINED",
+    "trips": [
+      {
+        "stopOrder": [
+          "A",
+          "B"
+        ],
+        "startMinute": 1125,
+        "departureMinute": 1127,
+        "endMinute": 1149,
+        "arrivals": [
+          {
+            "orderId": "A",
+            "arrivalMinute": 1135
+          },
+          {
+            "orderId": "B",
+            "arrivalMinute": 1140
+          }
+        ],
+        "waitingMinutes": 0,
+        "drivingMinutes": 18
+      }
+    ],
+    "deliveries": [
+      {
+        "orderId": "A",
+        "arrivalMinute": 1135,
+        "foodReadyMinute": 1115,
+        "foodToDoorMinutes": 20,
+        "deviationMinutes": -5,
+        "quality": "ACCEPTABLE_FLAGGED"
+      },
+      {
+        "orderId": "B",
+        "arrivalMinute": 1140,
+        "foodReadyMinute": 1125,
+        "foodToDoorMinutes": 15,
+        "deviationMinutes": 0,
+        "quality": "ACCEPTABLE_FLAGGED"
+      }
+    ],
+    "allUnder15": false,
+    "maxFoodToDoorMinutes": 20,
+    "totalDeviationMinutes": 5,
+    "totalDriverMinutes": 24,
+    "totalDrivingMinutes": 18
+  },
+  "separateAlternative": {
+    "kind": "SEPARATE",
+    "trips": [
+      {
+        "stopOrder": [
+          "A"
+        ],
+        "startMinute": 1139,
+        "departureMinute": 1141,
+        "endMinute": 1160,
+        "arrivals": [
+          {
+            "orderId": "A",
+            "arrivalMinute": 1149
+          }
+        ],
+        "waitingMinutes": 0,
+        "drivingMinutes": 17
+      },
+      {
+        "stopOrder": [
+          "B"
+        ],
+        "startMinute": 1120,
+        "departureMinute": 1122,
+        "endMinute": 1139,
+        "arrivals": [
+          {
+            "orderId": "B",
+            "arrivalMinute": 1130
+          }
+        ],
+        "waitingMinutes": 0,
+        "drivingMinutes": 15
+      }
+    ],
+    "deliveries": [
+      {
+        "orderId": "A",
+        "arrivalMinute": 1149,
+        "foodReadyMinute": 1129,
+        "foodToDoorMinutes": 20,
+        "deviationMinutes": 9,
+        "quality": "ACCEPTABLE_FLAGGED"
+      },
+      {
+        "orderId": "B",
+        "arrivalMinute": 1130,
+        "foodReadyMinute": 1110,
+        "foodToDoorMinutes": 20,
+        "deviationMinutes": -10,
+        "quality": "ACCEPTABLE_FLAGGED"
+      }
+    ],
+    "allUnder15": false,
+    "maxFoodToDoorMinutes": 20,
+    "totalDeviationMinutes": 19,
+    "totalDriverMinutes": 40,
+    "totalDrivingMinutes": 32
+  },
+  "combinedAlternative": {
+    "kind": "COMBINED",
+    "trips": [
+      {
+        "stopOrder": [
+          "A",
+          "B"
+        ],
+        "startMinute": 1125,
+        "departureMinute": 1127,
+        "endMinute": 1149,
+        "arrivals": [
+          {
+            "orderId": "A",
+            "arrivalMinute": 1135
+          },
+          {
+            "orderId": "B",
+            "arrivalMinute": 1140
+          }
+        ],
+        "waitingMinutes": 0,
+        "drivingMinutes": 18
+      }
+    ],
+    "deliveries": [
+      {
+        "orderId": "A",
+        "arrivalMinute": 1135,
+        "foodReadyMinute": 1115,
+        "foodToDoorMinutes": 20,
+        "deviationMinutes": -5,
+        "quality": "ACCEPTABLE_FLAGGED"
+      },
+      {
+        "orderId": "B",
+        "arrivalMinute": 1140,
+        "foodReadyMinute": 1125,
+        "foodToDoorMinutes": 15,
+        "deviationMinutes": 0,
+        "quality": "ACCEPTABLE_FLAGGED"
+      }
+    ],
+    "allUnder15": false,
+    "maxFoodToDoorMinutes": 20,
+    "totalDeviationMinutes": 5,
+    "totalDriverMinutes": 24,
+    "totalDrivingMinutes": 18
+  },
+  "combinedDriverMinutesSaved": 16,
+  "alternativesFullyAssessed": true,
+  "considered": 682,
+  "kitchenAssessments": 134,
+  "serviceDate": "2026-10-17",
+  "assessedAt": "2026-10-17T16:00:00Z",
+  "asOfMinute": 1020,
+  "snapshotBasis": "CALLER_ASSERTED_COMPLETE_HYPOTHETICAL_PLANS",
+  "policyId": "rtk-delivery-shadow-2026-10-17-v1",
+  "policyScope": "OFFLINE_AND_STAGING_ONLY"
+}

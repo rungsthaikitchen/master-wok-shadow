@@ -1,0 +1,10 @@
+{
+  "policyId": "rtk-delivery-shadow-2026-10-17-v1",
+  "scope": "OFFLINE_AND_STAGING_ONLY",
+  "loadingMinutes": 2,
+  "handoverMinutes": 2,
+  "minCombinedSavingMinutes": 5,
+  "loadingBasis": "Food ready through final bagging, receipts, insulated bag, address/navigation preparation and walk to car",
+  "sharedRunLoadingBasis": "Single shared loading allowance; larger runs requiring longer handling must be reviewed separately",
+  "approvedOn": "2026-10-17"
+}
