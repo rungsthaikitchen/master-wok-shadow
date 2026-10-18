@@ -1,0 +1,916 @@
+{
+  "serviceDate": "2026-09-18",
+  "timezone": "Europe/London",
+  "evidenceBasis": "SAVED_STATE_PLUS_RETROSPECTIVE_OWNER_RECOLLECTION_NOT_DECISION_HISTORY",
+  "recordedOn": "2026-10-18",
+  "verified": false,
+  "savedState": {
+    "orders": [
+      {
+        "status": "completed",
+        "orderType": "collection",
+        "createdAt": "2026-09-17T17:41:47.612688+00:00",
+        "preferred_time": "2026-09-18T16:30:00+00:00",
+        "proposed_time": null,
+        "confirmed_time": null,
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "massaman-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "pad-thai",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-1"
+      },
+      {
+        "status": "completed",
+        "orderType": "delivery",
+        "createdAt": "2026-09-18T09:10:43.052836+00:00",
+        "preferred_time": "2026-09-18T17:00:00+00:00",
+        "proposed_time": null,
+        "confirmed_time": null,
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chicken",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "chicken-spring-rolls",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "prawn-crackers",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "sticky-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "green-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chips",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-2"
+      },
+      {
+        "status": "completed",
+        "orderType": "collection",
+        "createdAt": "2026-09-18T14:43:00.901355+00:00",
+        "preferred_time": "2026-09-18T16:20:00+00:00",
+        "proposed_time": null,
+        "confirmed_time": null,
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "green-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "massaman-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "prawn-crackers",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "sticky-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chips",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-3"
+      },
+      {
+        "status": "completed",
+        "orderType": "delivery",
+        "createdAt": "2026-09-18T15:23:44.410826+00:00",
+        "preferred_time": "2026-09-18T16:00:00+00:00",
+        "proposed_time": null,
+        "confirmed_time": null,
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "pork"
+              }
+            ],
+            "itemId": "pad-kee-mao",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "batter-chicken"
+              }
+            ],
+            "itemId": "stir-cashew",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-4"
+      },
+      {
+        "status": "completed",
+        "orderType": "collection",
+        "createdAt": "2026-09-18T15:28:32.164102+00:00",
+        "preferred_time": "2026-09-18T18:00:00+00:00",
+        "proposed_time": null,
+        "confirmed_time": null,
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "prawn"
+              }
+            ],
+            "itemId": "tom-yum",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chicken",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "sticky-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "beef"
+              }
+            ],
+            "itemId": "panang-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "beef"
+              }
+            ],
+            "itemId": "massaman-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "pork-dumplings",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chips",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "coconut-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-5"
+      },
+      {
+        "status": "completed",
+        "orderType": "delivery",
+        "createdAt": "2026-09-18T16:22:09.018014+00:00",
+        "preferred_time": "2026-09-18T19:00:00+00:00",
+        "proposed_time": null,
+        "confirmed_time": null,
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "fried-prawns",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "veg-spring-rolls",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "prawn"
+              },
+              {
+                "id": "extra-chicken"
+              }
+            ],
+            "itemId": "pad-see-ew",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chicken",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              },
+              {
+                "id": "extra-chicken"
+              }
+            ],
+            "itemId": "panang-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-6"
+      },
+      {
+        "status": "completed",
+        "orderType": "delivery",
+        "createdAt": "2026-09-18T17:09:15.337027+00:00",
+        "preferred_time": "2026-09-18T17:25:00+00:00",
+        "proposed_time": "2026-09-18T17:40:00+00:00",
+        "confirmed_time": "2026-09-18T17:40:00+00:00",
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "prawn"
+              }
+            ],
+            "itemId": "massaman-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chicken",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              },
+              {
+                "id": "extra-chicken"
+              }
+            ],
+            "itemId": "pad-see-ew",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-7"
+      },
+      {
+        "status": "completed",
+        "orderType": "collection",
+        "createdAt": "2026-09-18T17:12:38.610174+00:00",
+        "preferred_time": "2026-09-18T18:15:00+00:00",
+        "proposed_time": null,
+        "confirmed_time": null,
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chicken",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "prawn-crackers",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "pad-kee-mao",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-8"
+      },
+      {
+        "status": "completed",
+        "orderType": "collection",
+        "createdAt": "2026-09-18T17:16:07.569421+00:00",
+        "preferred_time": "2026-09-18T18:25:00+00:00",
+        "proposed_time": "2026-09-18T18:30:00+00:00",
+        "confirmed_time": "2026-09-18T18:30:00+00:00",
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "fried-tofu",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "fish-cakes",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              },
+              {
+                "id": "extra-veg"
+              }
+            ],
+            "itemId": "stir-chilli",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "beef"
+              },
+              {
+                "id": "extra-egg"
+              }
+            ],
+            "itemId": "stir-basil",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-9"
+      },
+      {
+        "status": "completed",
+        "orderType": "collection",
+        "createdAt": "2026-09-18T17:22:43.699193+00:00",
+        "preferred_time": "2026-09-18T18:35:00+00:00",
+        "proposed_time": "2026-09-18T18:45:00+00:00",
+        "confirmed_time": "2026-09-18T18:45:00+00:00",
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "prawn-crackers",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 2,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "pad-thai",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "veg-spring-rolls",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "pork-dumplings",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-10"
+      },
+      {
+        "status": "completed",
+        "orderType": "delivery",
+        "createdAt": "2026-09-18T17:55:12.982179+00:00",
+        "preferred_time": "2026-09-18T19:15:00+00:00",
+        "proposed_time": null,
+        "confirmed_time": null,
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "fried-tofu",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chicken",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "massaman-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "beef"
+              }
+            ],
+            "itemId": "stir-basil",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "prawn-crackers",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "chicken-spring-rolls",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "coconut-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-11"
+      },
+      {
+        "status": "completed",
+        "orderType": "delivery",
+        "createdAt": "2026-09-18T17:57:15.984430+00:00",
+        "preferred_time": "2026-09-18T19:30:00+00:00",
+        "proposed_time": null,
+        "confirmed_time": null,
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "chicken-spring-rolls",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "beef-salad",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chips",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chickenchips",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-12"
+      },
+      {
+        "status": "completed",
+        "orderType": "delivery",
+        "createdAt": "2026-09-18T18:00:12.992089+00:00",
+        "preferred_time": "2026-09-18T18:45:00+00:00",
+        "proposed_time": "2026-09-18T20:00:00+00:00",
+        "confirmed_time": "2026-09-18T20:00:00+00:00",
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "egg-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "massaman-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "spare-ribs",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "stir-ginger",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "pork-dumplings",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-13"
+      },
+      {
+        "status": "completed",
+        "orderType": "delivery",
+        "createdAt": "2026-09-18T18:06:25.173220+00:00",
+        "preferred_time": "2026-09-18T19:40:00+00:00",
+        "proposed_time": null,
+        "confirmed_time": null,
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "stir-pepper",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 2,
+            "mods": [],
+            "itemId": "jasmine-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "stir-crispy",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-14"
+      },
+      {
+        "status": "completed",
+        "orderType": "delivery",
+        "createdAt": "2026-09-18T18:18:07.614748+00:00",
+        "preferred_time": "2026-09-18T20:00:00+00:00",
+        "proposed_time": null,
+        "confirmed_time": null,
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "green-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chicken",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "rung-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "fried-egg",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "chicken-spring-rolls",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "egg-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-15"
+      },
+      {
+        "status": "completed",
+        "orderType": "delivery",
+        "createdAt": "2026-09-18T19:19:17.398735+00:00",
+        "preferred_time": "2026-09-18T20:15:00+00:00",
+        "proposed_time": "2026-09-18T20:20:00+00:00",
+        "confirmed_time": "2026-09-18T20:20:00+00:00",
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "salt-chips",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "beef"
+              }
+            ],
+            "itemId": "massaman-curry",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "sticky-rice",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "spare-ribs",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          },
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "stir-ginger",
+            "modifierShape": "array",
+            "invalidModifierCount": 0
+          }
+        ],
+        "orderId": "sample-16"
+      }
+    ]
+  },
+  "ownerReportedCorrections": {
+    "source": "OWNER_RECOLLECTION_RECORDED_2026_10_18",
+    "deliveryOrderIds": [
+      "sample-2",
+      "sample-13"
+    ],
+    "lateOrder": {
+      "orderId": "sample-13",
+      "originalRequestedMinute": 1185,
+      "agreedArrival": {
+        "kind": "LOWER_BOUND_ONLY",
+        "earliestMinute": 1260,
+        "latestMinute": null,
+        "precisePromise": false
+      },
+      "approximateArrivalMinute": 1290,
+      "arrivalPrecision": "APPROXIMATE_RECOLLECTION",
+      "phoneCallTiming": "IMMEDIATELY_AFTER_ORDER_SEEN_EXACT_TIMESTAMP_UNKNOWN"
+    },
+    "combinedJourney": {
+      "dropOrder": [
+        "sample-15",
+        "sample-13"
+      ],
+      "foodReadyMinutes": null,
+      "departureMinute": null,
+      "arrivalMinutes": null,
+      "returnMinute": null,
+      "directionalTravelSeconds": null,
+      "verifiedRoutePlan": false
+    }
+  },
+  "usageLimits": [
+    "Delivery targets are customer arrival times, not food-ready times.",
+    "Saved confirmed times may include retrospective edits.",
+    "The combined drop sequence does not prove transit limits or driver availability.",
+    "No actual cooking allocations or decision-time chronology are established."
+  ]
+}
