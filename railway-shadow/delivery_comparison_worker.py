@@ -70,7 +70,9 @@ def run_once(journal,monitor,*,assessor=fixture_batch,snapshot=backup,clock=time
         return {'status':'UNVERIFIED','reasonCode':'COMPARISON_CYCLE_FAILED','verified':False}
 
 
-def serve_health(monitor,token,port,extra_health=lambda:True):
+def serve_health(monitor,token,port,extra_health=lambda:True,*,data_origin='SYNTHETIC_STAGING'):
+    if data_origin not in {'SYNTHETIC_STAGING','CONDITIONAL_RETROSPECTIVE'}:
+        raise ComparisonError('EXPLICIT_HEALTH_EVIDENCE_REQUIRED')
     class Handler(BaseHTTPRequestHandler):
         def log_message(self,*args):pass
         def do_GET(self):
@@ -78,7 +80,7 @@ def serve_health(monitor,token,port,extra_health=lambda:True):
             if not hmac.compare_digest(self.headers.get('Authorization','').encode(),('Bearer '+token).encode()):
                 self.send_error(401);return
             okay=monitor.healthy() and extra_health()
-            body=json.dumps({'status':'HEALTHY' if okay else 'UNHEALTHY','verified':False,'dataOrigin':'SYNTHETIC_STAGING'}).encode()
+            body=json.dumps({'status':'HEALTHY' if okay else 'UNHEALTHY','verified':False,'dataOrigin':data_origin}).encode()
             self.send_response(200 if okay else 503);self.send_header('Content-Type','application/json')
             self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body)
     server=ThreadingHTTPServer(('0.0.0.0',port),Handler);server.daemon_threads=True
