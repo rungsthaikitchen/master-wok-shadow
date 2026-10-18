@@ -40,3 +40,5 @@ Concrete proposed staging rollout: commit this reviewed package to delivery-rout
 Validation: 151 Python tests passed with ResourceWarning treated as error, including 17 new persistence/worker/recovery tests. The unchanged JavaScript suite previously passed 135 entries. Actual local entrypoint execution confirmed durable records, a verified local backup, authenticated 200/unauthenticated 401, and clean shutdown. Container build and Railway runtime acceptance remain untested.
 
 Rollout observability: worker logs include only aggregate previousEvents, eventRecords and latestRecords counts to verify persistence across the approved restart. Full Python suite rerun: 151 tests passed.
+
+Railway acceptance found the mounted /data directory is root-owned. The dedicated container entrypoint now validates the exact staging journal path, prepares only /data/master-wok-comparison as UID/GID 10001, refuses a symlink directory and drops all supplementary groups/root privileges before starting the worker. Disabled startup does not touch the volume. Two additional tests cover the bootstrap; full suite: 153 tests.

@@ -9,5 +9,5 @@ COPY --from=node_runtime /usr/local/bin/node /usr/local/bin/node
 WORKDIR /app/master-wok
 COPY . .
 ENV PYTHONUNBUFFERED=1 TZ=Europe/London MASTER_WOK_COLLECTOR_ENABLED=false MASTER_WOK_COMPARISON_STAGING_ENABLED=false
-USER masterwok
-CMD ["python", "railway-shadow/delivery_comparison_worker.py"]
+USER root
+ENTRYPOINT ["python", "railway-shadow/comparison_entrypoint.py"]
