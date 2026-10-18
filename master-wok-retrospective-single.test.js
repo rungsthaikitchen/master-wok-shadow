@@ -35,3 +35,11 @@ test('twenty-minute limit and driver return are enforced through the real planne
  assert.ok(plan.trips[0].endMinute>plan.deliveries[0].arrivalMinute);
  assert.equal(assess(source(),{...journey,outboundSeconds:1260},{enabled:true}).status,'UNVERIFIED');
 });
+
+test('minimal first-order input retains explicit coverage without claiming full-day contents',()=>{
+ const s=source();s.completeForServiceDate=false;s.coverageBasis='FIRST_SAVED_ORDER_WITH_PRIOR_COVERAGE';
+ s.totalSavedOrderCount=6;s.earlierSavedOrderCount=0;s.candidateCreationTieCount=1;s.sourceSnapshotHash='a'.repeat(64);
+ assert.equal(assess(s,journey,{enabled:true}).status,'SHADOW_RECOMMENDATION');
+ s.earlierSavedOrderCount=1;assert.equal(assess(s,journey,{enabled:true}).status,'UNVERIFIED');
+ s.earlierSavedOrderCount=0;s.candidateCreationTieCount=2;assert.equal(assess(s,journey,{enabled:true}).status,'UNVERIFIED');
+});

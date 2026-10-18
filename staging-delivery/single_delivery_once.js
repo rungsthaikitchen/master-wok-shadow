@@ -16,7 +16,9 @@ async function run(env=process.env,{transport,clock=()=>new Date().toISOString()
  try{
   const text=env.MASTER_WOK_SINGLE_DELIVERY_PRIVATE_INPUT;
   if(typeof text!=='string'||Buffer.byteLength(text)>500000)return failure('PRIVATE_INPUT_UNVERIFIED');
-  const input=JSON.parse(text),scenario=prepareScenario(input.source);
+  const input=JSON.parse(text);
+  if(input.source?.orders?.length!==1)return failure('SINGLE_ORDER_PRIVATE_INPUT_REQUIRED');
+  const scenario=prepareScenario(input.source);
   // Reject malformed menus or infeasible best-case kitchen inputs before quota.
   const preflight=assessRetrospectiveSingle(input.source,{basis:'SIMULATED_SENSITIVITY',outboundSeconds:0,returnSeconds:0},{enabled:true});
   if(preflight.status!=='SHADOW_RECOMMENDATION')return failure('PRE_PROVIDER_PREFLIGHT_UNVERIFIED');

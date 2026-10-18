@@ -11,9 +11,14 @@ function local(value){
 }
 function prepareScenario(source){
  const s=structuredClone(source);
- if(!s||!validServiceDate(s.serviceDate)||s.timezone!=='Europe/London'||s.completeForServiceDate!==true||
+ if(!s||!validServiceDate(s.serviceDate)||s.timezone!=='Europe/London'||
     s.evidenceBasis!=='CURRENT_SAVED_STATE_NOT_DECISION_HISTORY'||!Array.isArray(s.orders)||!s.orders.length||
     s.orders.length>500||s.orderCount!==s.orders.length)throw Error();
+ const fullCoverage=s.completeForServiceDate===true;
+ const minimalCoverage=s.completeForServiceDate===false&&s.coverageBasis==='FIRST_SAVED_ORDER_WITH_PRIOR_COVERAGE'&&
+  s.orders.length===1&&Number.isSafeInteger(s.totalSavedOrderCount)&&s.totalSavedOrderCount>=1&&s.totalSavedOrderCount<=500&&
+  s.earlierSavedOrderCount===0&&s.candidateCreationTieCount===1&&/^[a-f0-9]{64}$/.test(s.sourceSnapshotHash||'');
+ if(!fullCoverage&&!minimalCoverage)throw Error();
  const ids=new Set();
  for(const o of s.orders){
   if(!o||typeof o.orderId!=='string'||!/^[A-Za-z0-9_-]{1,80}$/.test(o.orderId)||o.orderId==='KITCHEN'||ids.has(o.orderId)||
