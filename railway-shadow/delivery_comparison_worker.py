@@ -70,14 +70,14 @@ def run_once(journal,monitor,*,assessor=fixture_batch,snapshot=backup,clock=time
         return {'status':'UNVERIFIED','reasonCode':'COMPARISON_CYCLE_FAILED','verified':False}
 
 
-def serve_health(monitor,token,port):
+def serve_health(monitor,token,port,extra_health=lambda:True):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self,*args):pass
         def do_GET(self):
             if self.path!='/healthz':self.send_error(404);return
             if not hmac.compare_digest(self.headers.get('Authorization','').encode(),('Bearer '+token).encode()):
                 self.send_error(401);return
-            okay=monitor.healthy()
+            okay=monitor.healthy() and extra_health()
             body=json.dumps({'status':'HEALTHY' if okay else 'UNHEALTHY','verified':False,'dataOrigin':'SYNTHETIC_STAGING'}).encode()
             self.send_response(200 if okay else 503);self.send_header('Content-Type','application/json')
             self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body)
@@ -92,13 +92,20 @@ def main():
         print(json.dumps({'status':'DISABLED','verified':False,'networkRequests':0}),flush=True);return
     path,token=config
     journal=DeliveryComparisonJournal(path,IDENTITY,'SYNTHETIC_STAGING',enabled=True)
-    monitor=Monitor();server=None;stop=threading.Event()
+    monitor=Monitor();server=None;remote=None;stop=threading.Event()
+    from delivery_comparison_offvolume import configuration as backup_configuration, ComparisonBackup
+    backup_config=backup_configuration(os.environ)
+    if backup_config is not None:remote=ComparisonBackup(backup_config)
+    backup_started=False
     for sig in (signal.SIGTERM,signal.SIGINT):signal.signal(sig,lambda *_:stop.set())
     try:
-        server=serve_health(monitor,token,int(os.environ.get('PORT','8080')))
+        server=serve_health(monitor,token,int(os.environ.get('PORT','8080')),
+                            extra_health=(remote.healthy if remote else lambda:True))
         while not stop.is_set():
             result=run_once(journal,monitor)
-            if result['status']=='OBSERVED':
+            if result['status']=='OBSERVED' and remote and not backup_started:
+                remote.start(lambda event:print(json.dumps(event),flush=True));backup_started=True
+            if result['status']=='OBSERVED' and (not remote or remote.healthy()):
                 try:result.update(verify_private_health(server,token))
                 except Exception:
                     monitor.failed=True
@@ -106,6 +113,7 @@ def main():
             print(json.dumps(result),flush=True)
             stop.wait(60)
     finally:
+        if remote:remote.close()
         if server:server.shutdown();server.server_close()
         journal.close()
 
