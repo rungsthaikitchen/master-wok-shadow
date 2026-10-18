@@ -9,13 +9,14 @@ import json
 import os
 from pathlib import Path
 import sqlite3
+from datetime import date
 from delivery_evidence_journal import validate_audit, is_hash, finite
 from shadow_collector import timestamp
 from delivery_staging_worker import validate as validate_synthetic
 
 APP_ID = 0x4D574443
 VERSION = 1
-SCOPES = {'SAVED_STATE_ONLY', 'SYNTHETIC_STAGING'}
+SCOPES = {'SAVED_STATE_ONLY', 'SYNTHETIC_STAGING', 'RETROSPECTIVE_CONDITIONAL'}
 
 def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
@@ -102,6 +103,53 @@ class DeliveryComparisonJournal:
         records = [dict(r, evidenceBasis='SYNTHETIC_HYPOTHETICAL_PLANS', sourceIdentity=self.identity)
                    for r in batch['records']]
         return self._append(next(iter(days)), records, at, digest(batch), None)
+
+    def append_retrospective(self, result, *, source_hash, build_hash,
+                             observed_status, captured_at, at):
+        """Persist aggregate evidence only, never routes or a detailed plan.
+
+        This method does not call a provider or enable the one-shot runner.
+        Source/build hashes and observed status must be bound by the caller.
+        """
+        if self.scope != 'RETROSPECTIVE_CONDITIONAL':
+            raise ComparisonError('COMPARISON_SCOPE_MISMATCH')
+        fields = {'status','reasonCode','networkRequests','verified','evidenceBasis',
+                  'journeyBasis','clockMapping','serviceDate','persistence','provider','attribution'}
+        if not isinstance(result,dict) or set(result) != fields:
+            raise ComparisonError('AGGREGATE_RESULT_REQUIRED')
+        if (result['status'] not in {'SHADOW_RECOMMENDATION','UNVERIFIED'} or
+            result['reasonCode'] not in {'SEPARATE_TRIPS_PREFERRED','NO_FEASIBLE_PLAN_IN_ARRIVAL_WINDOWS','KITCHEN_ASSESSMENT_UNVERIFIED'} or
+            result['verified'] is not False or type(result['networkRequests']) is not int or
+            result['networkRequests'] != 2 or result['persistence'] != 'NONE' or
+            result['evidenceBasis'] != 'RETROSPECTIVE_CONDITIONAL_SCENARIO_NOT_DECISION_HISTORY' or
+            result['journeyBasis'] != 'CURRENT_ESTIMATES_APPLIED_RETROSPECTIVELY' or
+            result['clockMapping'] != 'DURATIONS_APPLIED_TO_HYPOTHETICAL_HISTORICAL_CLOCK_NOT_BACKDATED_MEASUREMENTS' or
+            result['provider'] != 'GOOGLE_ROUTES' or result['attribution'] != 'Google Maps'):
+            raise ComparisonError('RETROSPECTIVE_EVIDENCE_REQUIRED')
+        if ((result['status']=='SHADOW_RECOMMENDATION') !=
+            (result['reasonCode']=='SEPARATE_TRIPS_PREFERRED')):
+            raise ComparisonError('INCONSISTENT_RETROSPECTIVE_RESULT')
+        try:
+            day=date.fromisoformat(result['serviceDate'])
+            if day.isoformat()!=result['serviceDate']:
+                raise ValueError()
+            captured=timestamp(captured_at).timestamp()
+        except (ValueError,TypeError,KeyError,AttributeError):
+            raise ComparisonError('RETROSPECTIVE_CLOCK_REQUIRED') from None
+        if not finite(at) or not -5 <= at-captured <= 180:
+            raise ComparisonError('SOURCE_CLOCK_UNVERIFIED')
+        if not is_hash(source_hash) or not is_hash(build_hash):
+            raise ComparisonError('BUILD_AND_SOURCE_IDENTITY_REQUIRED')
+        if observed_status not in {'confirmed','completed'}:
+            raise ComparisonError('SAVED_COMMITMENT_REQUIRED')
+        record=dict(schemaVersion=1,sourceIdentity=self.identity,sourceHash=source_hash,
+                    buildHash=build_hash,serviceDate=result['serviceDate'],assessedAt=captured_at,
+                    observedStatus=observed_status,prediction='CONDITIONAL_RECOMMENDATION'
+                    if result['status']=='SHADOW_RECOMMENDATION' else 'UNVERIFIED',
+                    verified=False,evidenceBasis=result['evidenceBasis'],
+                    journeyBasis=result['journeyBasis'],clockMapping=result['clockMapping'],
+                    reasonCode=result['reasonCode'],networkRequests=2)
+        return self._append(result['serviceDate'],[record],at,source_hash,captured_at)
 
     def _append(self, day, records, at, source_hash, assessed_at):
         if not finite(at):

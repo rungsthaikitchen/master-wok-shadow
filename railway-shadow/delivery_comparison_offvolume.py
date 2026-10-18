@@ -10,7 +10,8 @@ import time
 import uuid
 from delivery_evidence_backup import storage_configuration, s3_client
 from delivery_comparison_backup import verify
-from delivery_comparison_journal import ComparisonError
+from delivery_comparison_journal import ComparisonError, SCOPES
+from delivery_evidence_journal import is_hash
 from delivery_comparison_worker import IDENTITY
 
 SOURCE=Path('/data/master-wok-comparison/delivery-comparison.sqlite3')
@@ -29,7 +30,11 @@ def configuration(env):
 
 
 class ComparisonBackup:
-    def __init__(self,config,*,source=SOURCE,client_factory=s3_client,clock=time.time):
+    def __init__(self,config,*,source=SOURCE,client_factory=s3_client,clock=time.time,
+                 identity=IDENTITY,scope='SYNTHETIC_STAGING'):
+        if not is_hash(identity) or scope not in SCOPES:
+            raise ComparisonError('BACKUP_IDENTITY_REQUIRED')
+        self.identity,self.scope=identity,scope
         self.config,self.source,self.client_factory,self.clock=config,Path(source),client_factory,clock
         self.last_success=None;self.failed=False;self.lock=threading.Lock()
         self.stop=threading.Event();self.thread=None
@@ -45,18 +50,20 @@ class ComparisonBackup:
             with tempfile.TemporaryDirectory(prefix='mw-comparison-backup-') as folder:
                 path=Path(folder)/'snapshot.sqlite3'
                 reader=sqlite3.connect(self.source.as_uri()+'?mode=ro',uri=True,timeout=2)
-                reader.execute('PRAGMA query_only=ON');verify(reader,IDENTITY,'SYNTHETIC_STAGING')
+                reader.execute('PRAGMA query_only=ON');verify(reader,self.identity,self.scope)
                 target=sqlite3.connect(path)
                 deadline=time.monotonic()+30
                 def progress(*_):
                     if time.monotonic()>deadline:raise ComparisonError('SNAPSHOT_TIMEOUT')
                 reader.backup(target,pages=256,progress=progress,sleep=0.01)
-                counts=verify(target,IDENTITY,'SYNTHETIC_STAGING')
+                counts=verify(target,self.identity,self.scope)
                 target.close();target=None;reader.close();reader=None
                 if not counts['observation_events'] or path.stat().st_size>MAX_BYTES:raise ComparisonError('SNAPSHOT_SIZE_UNVERIFIED')
                 data=path.read_bytes();sha=hashlib.sha256(data).hexdigest()
                 stamp=datetime.fromtimestamp(self.clock(),timezone.utc).strftime('%Y%m%dT%H%M%SZ')
-                key='delivery-comparison/v1/'+IDENTITY+'/'+stamp+'-'+uuid.uuid4().hex+'.sqlite3'
+                prefix='delivery-comparison/v1/'
+                if self.scope!='SYNTHETIC_STAGING':prefix+=self.scope+'/'
+                key=prefix+self.identity+'/'+stamp+'-'+uuid.uuid4().hex+'.sqlite3'
                 client=self.client_factory(self.config)
                 client.put_object(Bucket=self.config.bucket,Key=key,Body=data,ContentType='application/vnd.sqlite3')
                 body=client.get_object(Bucket=self.config.bucket,Key=key)['Body']
@@ -66,10 +73,10 @@ class ComparisonBackup:
                 restored=Path(folder)/'restored.sqlite3';restored.write_bytes(downloaded)
                 check=sqlite3.connect(restored.as_uri()+'?mode=ro',uri=True)
                 try:
-                    if verify(check,IDENTITY,'SYNTHETIC_STAGING')!=counts:raise ComparisonError('READBACK_COUNTS_MISMATCH')
+                    if verify(check,self.identity,self.scope)!=counts:raise ComparisonError('READBACK_COUNTS_MISMATCH')
                 finally:check.close()
-                manifest={'format':'master-wok-comparison-v1','key':key,'sha256':sha,'sourceIdentity':IDENTITY,
-                          'scope':'SYNTHETIC_STAGING','bytes':len(data),'counts':counts}
+                manifest={'format':'master-wok-comparison-v1','key':key,'sha256':sha,'sourceIdentity':self.identity,
+                          'scope':self.scope,'bytes':len(data),'counts':counts}
                 client.put_object(Bucket=self.config.bucket,Key=key+'.json',Body=json.dumps(manifest,sort_keys=True).encode(),ContentType='application/json')
                 with self.lock:self.last_success=self.clock();self.failed=False
                 return {'status':'BACKUP_VERIFIED','verifiedRestore':True,'bytes':len(data)}
