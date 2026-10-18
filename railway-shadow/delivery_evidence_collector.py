@@ -65,6 +65,7 @@ class EvidenceCollector:
         self.config,self.clock,self.assessor=config,clock,assessor
         self.reader=reader or self.fetch
         self.stopping=threading.Event()
+        self.backups=None
         self.journal=DeliveryEvidenceJournal(config.db,source_identity(config.alias_key),PROJECT,enabled=True)
         self.collector_build=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
@@ -79,6 +80,7 @@ class EvidenceCollector:
     def health(self):
         try:
             healthy=not self.stopping.is_set() and self.journal.health(service_dates(self.clock()),at=self.clock())['healthy']
+            if self.backups is not None:healthy=healthy and self.backups.healthy()
         except Exception:healthy=False
         return {'status':'HEALTHY' if healthy else 'UNHEALTHY',
                 'scope':'SAVED_STATE_EVIDENCE_ONLY','prediction':'UNVERIFIED','verified':False}
@@ -108,7 +110,9 @@ class EvidenceCollector:
         return events
 
     def close(self):
-        self.stopping.set();self.journal.close()
+        self.stopping.set()
+        if self.backups is not None:self.backups.close()
+        self.journal.close()
 
 class HealthServer(HTTPServer):
     def get_request(self):
@@ -146,13 +150,22 @@ def main():
         collector=EvidenceCollector(config)
         phase='HEALTH_BIND'
         server=serve_health(collector,config.port)
+        phase='BACKUP_CONFIGURATION'
+        from delivery_evidence_backup import configuration as backup_configuration,BackupWorker
+        backup_config=backup_configuration(os.environ)
+        if backup_config is not None:
+            collector.backups=BackupWorker(backup_config,collector.journal.identity,
+                emit=lambda value:print(json.dumps(value,separators=(',',':')),flush=True))
         def stop(*args):collector.stopping.set()
         previous={sig:signal.signal(sig,stop) for sig in (signal.SIGTERM,signal.SIGINT)}
         phase='COLLECTOR'
         def emit(value):print(json.dumps(value,separators=(',',':')),flush=True)
+        # Complete one source cycle before backing up: never bless an empty new journal.
+        collector.cycle(emit)
+        if collector.backups is not None and not collector.stopping.is_set():collector.backups.start()
         while not collector.stopping.is_set():
-            collector.cycle(emit)
             collector.stopping.wait(60)
+            if not collector.stopping.is_set():collector.cycle(emit)
         return 0
     except Exception:
         print(json.dumps({'status':'EVIDENCE_START_OR_RUNTIME_FAILED','reasonCode':phase+'_FAILED','verified':False}),flush=True)

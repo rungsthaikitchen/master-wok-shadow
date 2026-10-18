@@ -167,4 +167,17 @@ class DeliveryEvidenceCollectorTests(unittest.TestCase):
             self.assertIn('HEALTH_BIND_FAILED',output.call_args.args[0])
         self.collector=c.EvidenceCollector(self.cfg,reader=self.reader,clock=lambda:self.clock[0])
 
+    def test_enabled_backup_failure_is_visible_to_existing_private_health(self):
+        from unittest.mock import Mock
+        self.collector.cycle()
+        backup=Mock();backup.healthy.return_value=False;self.collector.backups=backup
+        server=c.serve_health(self.collector,0)
+        try:
+            self.assertEqual(self.request(server)[0],503)
+            backup.healthy.return_value=True
+            self.assertEqual(self.request(server)[0],200)
+            self.failed_days.add('2026-10-18');self.collector.cycle()
+            self.assertEqual(self.request(server)[0],503)
+        finally:server.shutdown();server.server_close()
+
 if __name__=='__main__':unittest.main()
