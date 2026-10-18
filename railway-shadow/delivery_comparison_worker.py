@@ -71,7 +71,7 @@ def run_once(journal,monitor,*,assessor=fixture_batch,snapshot=backup,clock=time
 
 
 def serve_health(monitor,token,port,extra_health=lambda:True,*,data_origin='SYNTHETIC_STAGING'):
-    if data_origin not in {'SYNTHETIC_STAGING','CONDITIONAL_RETROSPECTIVE'}:
+    if data_origin not in {'SYNTHETIC_STAGING','CONDITIONAL_RETROSPECTIVE','PREPARED_SAVED_STATE'}:
         raise ComparisonError('EXPLICIT_HEALTH_EVIDENCE_REQUIRED')
     class Handler(BaseHTTPRequestHandler):
         def log_message(self,*args):pass

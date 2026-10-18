@@ -16,7 +16,7 @@ from delivery_staging_worker import validate as validate_synthetic
 
 APP_ID = 0x4D574443
 VERSION = 1
-SCOPES = {'SAVED_STATE_ONLY', 'SYNTHETIC_STAGING', 'RETROSPECTIVE_CONDITIONAL'}
+SCOPES = {'SAVED_STATE_ONLY', 'SYNTHETIC_STAGING', 'RETROSPECTIVE_CONDITIONAL', 'PREPARED_ONLY'}
 
 def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
@@ -73,6 +73,35 @@ class DeliveryComparisonJournal:
         if hasattr(self,'db'):
             self.db.close()
         self.lock.close()
+
+    def append_prepared_empty(self, day, at):
+        if self.scope != 'PREPARED_ONLY':
+            raise ComparisonError('COMPARISON_SCOPE_MISMATCH')
+        if date.fromisoformat(day).isoformat() != day:
+            raise ComparisonError('SERVICE_DATE_REQUIRED')
+        return self._append(day, [], at, digest({'state':'EMPTY','day':day}), None)
+
+    def append_prepared(self, candidate, at):
+        """Preparation evidence is never a route or capacity recommendation."""
+        if self.scope != 'PREPARED_ONLY':
+            raise ComparisonError('COMPARISON_SCOPE_MISMATCH')
+        fields = {'sourceIdentity','sourceHash','buildHash','observedStatus','serviceDate'}
+        if not isinstance(candidate,dict) or set(candidate) != fields:
+            raise ComparisonError('MINIMAL_CANDIDATE_REQUIRED')
+        if (candidate['sourceIdentity'] != self.identity or
+            not is_hash(candidate['sourceHash']) or not is_hash(candidate['buildHash']) or
+            candidate['observedStatus'] not in {'confirmed','completed'}):
+            raise ComparisonError('CANDIDATE_BINDING_REQUIRED')
+        try:
+            if date.fromisoformat(candidate['serviceDate']).isoformat() != candidate['serviceDate']:
+                raise ValueError()
+        except (ValueError,TypeError):
+            raise ComparisonError('SERVICE_DATE_REQUIRED') from None
+        record = dict(candidate, schemaVersion=1, preparation='PREPARED',
+            prediction='UNVERIFIED', verified=False,
+            evidenceBasis='CURRENT_SAVED_STATE_NOT_DECISION_HISTORY', networkRequests=0)
+        return self._append(candidate['serviceDate'], [record], at,
+                            candidate['sourceHash'], None)
 
     def append_saved_audit(self, audit, build_hash, at):
         if self.scope != 'SAVED_STATE_ONLY':
