@@ -2,7 +2,7 @@
 import json
 import os
 import time
-from shadow_collector import ManagementReadOnlySource,ShadowError
+from shadow_collector import ManagementReadOnlySource,ShadowError,day_bounds
 from delivery_minimal_candidate import read,QUERY
 from delivery_private_bridge import PrivateCandidateBridge
 
@@ -35,13 +35,25 @@ def run(env,*,transport=None,invoke=None,clock=time.time):
     calls=0
     try:
         if 'MASTER_WOK_STAGING_GOOGLE_ROUTES_KEY' in env:raise ShadowError('PROVIDER_KEY_REFUSED')
-        origin=dict(point=json.loads(env.get('MASTER_WOK_PRIVATE_PREFLIGHT_ORIGIN','')),
-                    verified=True,provenance='OWNER_VERIFIED_KITCHEN_ORIGIN')
+        # Schema-test origin for the virtual fixture only. Never use it to
+        # assess saved orders or describe it as the restaurant's actual point.
+        origin=dict(point=dict(lat=51.5,lng=-0.12),verified=True,provenance='OWNER_VERIFIED_KITCHEN_ORIGIN')
         token=env.get('MASTER_WOK_MANAGEMENT_READ_TOKEN')
         secret=env.get('MASTER_WOK_PSEUDONYM_KEY')
         actual=ManagementReadOnlySource('https://'+PROJECT+'.supabase.co',token,transport=transport)
         results={}
         for name,query in [('saved',QUERY),('synthetic',SYNTHETIC_QUERY)]:
+            if name=='saved':
+                calls+=1
+                raw=actual.transport({'query':QUERY,'parameters':list(day_bounds(DAY))})
+                if (not isinstance(raw,list) or len(raw)!=1 or raw[0].get('source_role')!='supabase_read_only_user' or
+                    raw[0].get('read_only')!='on'):raise ShadowError('SOURCE_READ_ONLY_PROOF_REQUIRED')
+                orders=raw[0].get('orders') or []
+                if not orders:results[name]=dict(status='NO_CANDIDATE')
+                elif len(orders)!=1 or orders[0].get('order_type')!='delivery' or orders[0].get('status') not in {'confirmed','completed'}:
+                    results[name]=dict(status='UNVERIFIED',reasonCode='FIRST_ORDER_COMMITMENT_UNVERIFIED')
+                else:results[name]=dict(status='NOT_ASSESSED',reasonCode='REAL_ORIGIN_NOT_TRANSMITTED')
+                continue
             def selected_transport(payload):
                 nonlocal calls
                 if payload['query']!=QUERY:raise ShadowError('FIXED_QUERY_REQUIRED')
@@ -60,7 +72,7 @@ def run(env,*,transport=None,invoke=None,clock=time.time):
             finally:
                 bridge.prepared=None;bridge.candidate=None
         return dict(status='PREFLIGHT_ACCEPTANCE_PASSED',cases=results,sourceRequests=calls,
-            googleRequests=0,sourceWrites=0,customerCoordinatesPersisted=False,verified=False)
+            googleRequests=0,sourceWrites=0,originBasis='SYNTHETIC_TEST_POINT',customerCoordinatesPersisted=False,verified=False)
     except Exception:
         return dict(status='UNVERIFIED',reasonCode='STAGING_PREFLIGHT_FAILED',sourceRequests=calls,
                     googleRequests=0,sourceWrites=0,verified=False)

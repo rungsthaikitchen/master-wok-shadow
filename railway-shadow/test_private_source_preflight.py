@@ -6,8 +6,7 @@ from test_delivery_minimal_candidate import fixture
 class PreflightTests(unittest.TestCase):
     def env(self):
         env=role_tests.RoleCheckTests().env()
-        env.update(MASTER_WOK_PRIVATE_PREFLIGHT_ENABLED='true',MASTER_WOK_PSEUDONYM_KEY='synthetic-secret-'*3,
-                   MASTER_WOK_PRIVATE_PREFLIGHT_ORIGIN='{"lat":51.5,"lng":-0.12}')
+        env.update(MASTER_WOK_PRIVATE_PREFLIGHT_ENABLED='true',MASTER_WOK_PSEUDONYM_KEY='synthetic-secret-'*3)
         return env
     def test_default_off_and_wrong_scope_make_no_calls(self):
         def refuse(*args):raise AssertionError('called')
@@ -34,8 +33,8 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(queries,[QUERY,SYNTHETIC_QUERY]);self.assertEqual(result['googleRequests'],0)
         self.assertNotIn('public.orders',SYNTHETIC_QUERY)
         self.assertNotIn('public.order_items',SYNTHETIC_QUERY)
-    def test_provider_key_and_malformed_origin_refused_before_source(self):
-        for change in [dict(MASTER_WOK_STAGING_GOOGLE_ROUTES_KEY='private'),dict(MASTER_WOK_PRIVATE_PREFLIGHT_ORIGIN='bad')]:
+    def test_provider_key_refused_before_source(self):
+        for change in [dict(MASTER_WOK_STAGING_GOOGLE_ROUTES_KEY='private')]:
             env=self.env();env.update(change);calls=[]
             result=run(env,transport=lambda p:calls.append(p))
             self.assertEqual(result['status'],'UNVERIFIED');self.assertFalse(calls)
