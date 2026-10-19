@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import signal
+import re
 import sqlite3
 import threading
 import time
@@ -58,6 +59,11 @@ def cycle(journal,stream_id,reader,monitor,directory,*,recovery=None):
   result=journal.run_once(enabled=True);summary=journal.summary()
   if result['status'] not in ('RECORDED','IDLE') or summary['failed'] or any(summary['batchStates'].get(k,0) for k in ('PENDING','LEASED')):raise EventCaptureError('COMPARISON_INCOMPLETE')
   snapshot(journal,Path(directory)/('event-snapshot-'+uuid.uuid4().hex+'.sqlite3'))
+  # Only generated snapshots in this dedicated event directory are eligible.
+  snapshots=sorted((p for p in Path(directory).iterdir() if
+      re.fullmatch(r'event-snapshot-[a-f0-9]{32}\.sqlite3',p.name) and p.is_file() and not p.is_symlink()),
+      key=lambda p:(p.stat().st_mtime_ns,p.name))
+  for old in snapshots[:-3]:old.unlink()
   backup=recovery.run(journal) if recovery else None
   if backup is not None and not backup.get('restored'):raise EventCaptureError('CLOUD_RECOVERY_REQUIRED')
   monitor.last=monitor.clock();monitor.failed=False

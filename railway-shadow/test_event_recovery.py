@@ -46,3 +46,35 @@ class RecoveryTests(unittest.TestCase):
   reader=lambda _:[dict(stream_id=ID,scope='SYNTHETIC_STAGING_EVENTS',event_count=4,batch=fixture(4))]
   result=cycle(self.j,ID,reader,monitor,self.root,recovery=self.recovery)
   self.assertEqual(result['status'],'UNVERIFIED');self.assertFalse(monitor.healthy())
+
+class IndependentRecoveryTests(unittest.TestCase):
+ setUp=RecoveryTests.setUp
+ tearDown=RecoveryTests.tearDown
+ def test_new_process_restores_without_source_access_and_rejects_overwrite(self):
+  import subprocess,sys
+  self.assertTrue(self.recovery.run(self.j)['restored'])
+  receipt=json.loads((self.root/'receipt.json').read_text())
+  snapshot_path=self.root/'download.sqlite3';snapshot_path.write_bytes(self.storage.objects[receipt['key']])
+  manifest_path=self.root/'manifest.json';manifest_path.write_bytes(self.storage.objects[receipt['key']+'.json'])
+  directory=self.root/'independent';directory.mkdir()
+  destination=directory/'event-capture.sqlite3'
+  command=[sys.executable,str(Path(__file__).with_name('event_recovery_check.py')),str(snapshot_path),str(manifest_path),str(destination)]
+  result=subprocess.run(command,capture_output=True,text=True,timeout=20)
+  self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+  self.assertEqual(json.loads(result.stdout)['status'],'OFFLINE_RECOVERY_VERIFIED')
+  before=destination.read_bytes()
+  result=subprocess.run(command,capture_output=True,text=True,timeout=20)
+  self.assertNotEqual(result.returncode,0)
+  self.assertEqual(destination.read_bytes(),before)
+ def test_hundred_unchanged_polls_keep_comparisons_and_snapshots_bounded(self):
+  monitor=Monitor()
+  reader=lambda _:[dict(stream_id=ID,scope='SYNTHETIC_STAGING_EVENTS',event_count=4,batch=fixture(4))]
+  protected=self.root/'event-snapshot-manual.sqlite3';protected.write_bytes(b'keep')
+  baseline=self.j.summary()['counts']['observations']
+  for _ in range(100):
+   result=cycle(self.j,ID,reader,monitor,self.root,recovery=self.recovery)
+   self.assertEqual(result['status'],'OBSERVED')
+   self.assertEqual(result['observations'],baseline)
+  self.assertEqual(len(self.storage.calls),4)
+  self.assertEqual(len(list(self.root.glob('event-snapshot-*.sqlite3'))),4)
+  self.assertEqual(protected.read_bytes(),b'keep')
