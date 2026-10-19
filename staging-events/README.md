@@ -39,3 +39,5 @@ This rehearsal accepts explicit historical fixture timestamps and synthetic alia
 All current production checkout decisions, polling services and live availability remain unchanged. No kitchen plan or synthetic state establishes actual cooking or driver activity.
 
 Validation: all 18 Python event inbox/source/export tests passed in 22.815 seconds. The live staging SQL acceptance block completed successfully, followed by verified export/import and permission checks described above.
+
+The subsequent private handler/reader rehearsal is documented in HANDLER-RESULTS.md. It adds server-stamped synthetic lifecycle handling and actual restricted-role read/write-denial evidence; authenticated runtime endpoints and standalone reader transport remain outstanding.
