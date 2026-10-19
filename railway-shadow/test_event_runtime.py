@@ -111,3 +111,13 @@ class RuntimeTests(unittest.TestCase):
   with self.assertRaises(EventCaptureError) as result:
    DatabaseTransport(dsn('reader'),'reader',connect=fail)(dict(query=QUERY,parameters=[ID]))
   self.assertEqual(str(result.exception),'DATABASE_TLS_CERTIFICATE_UNVERIFIED')
+
+ def test_pinned_ca_is_trusted_and_offer_only_mode_preserves_budget(self):
+  import ssl
+  params=connection_parameters(dsn('reader'),'reader')
+  ssl.create_default_context(cafile=params['sslrootcert'])
+  calls=[];server,thread=serve_api(ID,'o'*32,'h'*32,lambda p:(calls.append(p) or [dict(result='RECORDED')]),lambda:False)
+  try:
+   trial_commands(server,'o'*32,'2026-10-19T17:00:00Z',offer_only=True)
+   self.assertEqual(len(calls),1);self.assertEqual(calls[0]['parameters'][2]['action'],'offer')
+  finally:server.shutdown();server.server_close();thread.join(timeout=2)

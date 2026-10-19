@@ -1,5 +1,8 @@
 """Pinned staging-only DB transports. Credentials are never logged or inferred."""
 import json
+import hashlib
+import ssl
+from pathlib import Path
 from urllib.parse import urlsplit,unquote
 from event_capture_journal import EventCaptureError
 from event_postgres_export import PROJECT,QUERY as EXPORT_QUERY
@@ -9,12 +12,14 @@ ROLES={'reader':'master_wok_event_reader_login','writer':'master_wok_event_write
 
 def connection_parameters(dsn,kind):
  try:
+  certificate=Path(__file__).with_name('supabase-root-2021.crt')
+  if hashlib.sha256(ssl.PEM_cert_to_DER_cert(certificate.read_text())).hexdigest()!='807025ad50d4ed219d2c9c7d299c004f824eb00cf7f65afef607d07b72e6cafa':raise ValueError()
   u=urlsplit(dsn)
   if (kind not in ROLES or u.scheme!='postgresql' or u.hostname!='db.'+PROJECT+'.supabase.co' or
       u.port not in (None,5432) or u.path!='/postgres' or u.query or u.fragment or
       unquote(u.username or '')!=ROLES[kind] or not u.password):raise ValueError()
   return dict(host=u.hostname,port=5432,dbname='postgres',user=ROLES[kind],password=unquote(u.password),
-              sslmode='verify-full',sslrootcert='/etc/ssl/certs/ca-certificates.crt',connect_timeout=5,
+              sslmode='verify-full',sslrootcert=str(certificate),connect_timeout=5,
               options='-c statement_timeout=8000 -c lock_timeout=2000')
  except Exception:raise EventCaptureError('STAGING_DATABASE_CONNECTION_REQUIRED') from None
 

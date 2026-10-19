@@ -24,6 +24,10 @@ class Budget:
    if rows and rows!=[(identity,)]:raise EventCaptureError('BUDGET_IDENTITY_MISMATCH')
    db.execute('INSERT OR IGNORE INTO budget VALUES (?,0,0)',(identity,))
   os.chmod(self.path,0o600)
+ def summary(self):
+  with sqlite3.connect(self.path) as db:
+   reads,writes=db.execute('SELECT reads,writes FROM budget').fetchone()
+   return dict(exportAttempts=reads,mutationAttempts=writes)
  def take(self,kind):
   column,limit=('reads',2) if kind=='reader' else ('writes',3)
   with sqlite3.connect(self.path,timeout=5) as db:
@@ -71,11 +75,11 @@ def probe_health(server,token,expected):
  if code!=expected:raise EventCaptureError('PRIVATE_RUNTIME_HEALTH_FAILED')
  return code
 
-def trial_commands(server,token,target):
+def trial_commands(server,token,target,*,offer_only=False):
  # Fixed synthetic case, fixed IDs: never accepts arbitrary orders or baskets.
  commands=[('/staging/admin-action',dict(requestId='runtime-offer-v1',orderId='synthetic-runtime',action='offer',targetAt=target)),
            ('/staging/customer-response',dict(requestId='runtime-accept-v1',orderId='synthetic-runtime',response='accept',proposalEventId='runtime-offer-v1'))]
- for path,body in commands:
+ for path,body in commands[:1] if offer_only else commands:
   try:
    response=urlopen(Request('http://127.0.0.1:'+str(server.server_port)+path,data=json.dumps(body).encode(),headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'}),timeout=20)
   except HTTPError as error:
@@ -96,17 +100,18 @@ def main(env=None):
  server=None;stop=threading.Event();monitor=Monitor()
  try:
   budget=Budget(directory/'runtime-budget.sqlite3',source_identity(stream))
+  print(json.dumps(dict(status='BUDGET',**budget.summary(),verified=False)),flush=True)
   reader=budget.transport('reader',reader);writer=budget.transport('writer',writer)
   server,thread=serve_api(stream,*tokens,writer,monitor.healthy,host='0.0.0.0',port=int(env.get('PORT','8080')))
   for sig in (signal.SIGTERM,signal.SIGINT):signal.signal(sig,lambda *_:stop.set())
   probe_health(server,tokens[1],503);probe_health(server,'invalid-token',401)
   if env.get('MASTER_WOK_EVENT_RUNTIME_TRIAL_ENABLED')=='true':
-   trial_commands(server,tokens[0],env.get('MASTER_WOK_EVENT_RUNTIME_TRIAL_TARGET'))
+   trial_commands(server,tokens[0],env.get('MASTER_WOK_EVENT_RUNTIME_TRIAL_TARGET'),offer_only=env.get('MASTER_WOK_EVENT_RUNTIME_TRIAL_OFFER_ONLY')=='true')
   for index in range(2):
    if stop.is_set():break
    result=cycle(journal,stream,reader,monitor,directory)
    if result['status']=='OBSERVED':
-    result.update(authenticatedHealth=probe_health(server,tokens[1],200),unauthenticatedHealth=probe_health(server,'invalid-token',401))
+    result.update(authenticatedHealth=probe_health(server,tokens[1],200),unauthenticatedHealth=probe_health(server,'invalid-token',401),**budget.summary())
    print(json.dumps(result),flush=True)
    if result['status']!='OBSERVED':break
    if index==0:stop.wait(60)
