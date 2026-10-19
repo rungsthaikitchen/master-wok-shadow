@@ -1,0 +1,46 @@
+"""Pinned staging-only DB transports. Credentials are never logged or inferred."""
+import json
+from urllib.parse import urlsplit,unquote
+from event_capture_journal import EventCaptureError
+from event_postgres_export import PROJECT,QUERY as EXPORT_QUERY
+from event_staging_handlers import QUERY as HANDLER_QUERY
+
+ROLES={'reader':'master_wok_event_reader_login','writer':'master_wok_event_writer_login'}
+
+def connection_parameters(dsn,kind):
+ try:
+  u=urlsplit(dsn)
+  if (kind not in ROLES or u.scheme!='postgresql' or u.hostname!='db.'+PROJECT+'.supabase.co' or
+      u.port not in (None,5432) or u.path!='/postgres' or u.query or u.fragment or
+      unquote(u.username or '')!=ROLES[kind] or not u.password):raise ValueError()
+  return dict(host=u.hostname,port=5432,dbname='postgres',user=ROLES[kind],password=unquote(u.password),
+              sslmode='verify-full',sslrootcert='/etc/ssl/certs/ca-certificates.crt',connect_timeout=5,
+              options='-c statement_timeout=8000 -c lock_timeout=2000')
+ except Exception:raise EventCaptureError('STAGING_DATABASE_CONNECTION_REQUIRED') from None
+
+class DatabaseTransport:
+ def __init__(self,dsn,kind,*,connect=None):
+  self.parameters=connection_parameters(dsn,kind);self.kind=kind;self.connect=connect
+ def __call__(self,payload):
+  query=EXPORT_QUERY if self.kind=='reader' else HANDLER_QUERY
+  if not isinstance(payload,dict) or set(payload)!={'query','parameters'} or payload['query']!=query:raise EventCaptureError('FIXED_DATABASE_QUERY_REQUIRED')
+  params=payload['parameters']
+  if not isinstance(params,list) or len(params)!=(1 if self.kind=='reader' else 3):raise EventCaptureError('DATABASE_PARAMETERS_REQUIRED')
+  try:
+   connect=self.connect
+   if connect is None:
+    import psycopg
+    connect=psycopg.connect
+   with connect(**self.parameters) as conn:
+    with conn.cursor() as cur:
+     if self.kind=='reader':cur.execute('SET TRANSACTION READ ONLY')
+     cur.execute('SELECT current_user,rolsuper,rolbypassrls FROM pg_roles WHERE rolname=current_user')
+     if cur.fetchone()!=(ROLES[self.kind],False,False):raise EventCaptureError('DATABASE_ROLE_UNPROVEN')
+     if self.kind=='reader':
+      cur.execute("SELECT has_function_privilege(current_user,'master_wok_event_test.handle(uuid,text,jsonb)','EXECUTE'),has_table_privilege(current_user,'master_wok_event_test.events','INSERT')")
+      if cur.fetchone()!=(False,False):raise EventCaptureError('READER_WRITE_PRIVILEGES_REFUSED')
+      cur.execute('SELECT id::text,scope,event_count,master_wok_event_test.export(id) FROM master_wok_event_test.streams WHERE id=%s::uuid',params)
+      return [dict(zip(('stream_id','scope','event_count','batch'),row)) for row in cur.fetchall()]
+     cur.execute('SELECT master_wok_event_test.handle(%s::uuid,%s::text,%s::jsonb)',[params[0],params[1],json.dumps(params[2],allow_nan=False)])
+     return [dict(result=row[0]) for row in cur.fetchall()]
+  except Exception:raise EventCaptureError('STAGING_DATABASE_REQUEST_FAILED') from None
