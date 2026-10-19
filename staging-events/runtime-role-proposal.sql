@@ -1,5 +1,6 @@
--- REVIEW ONLY. Not applied. Staging project hvrqgufqjslvgiohgkvu only.
--- Login activation and generated SCRAM password verifiers require explicit approval.
+-- Approved grant definition, applied 19 October 2026 in staging hvrqgufqjslvgiohgkvu only.
+-- User explicitly approved separate reader/writer logins and Railway credential storage.
+-- Login/password activation happened privately after these grants; no credentials are recorded here.
 CREATE ROLE master_wok_event_reader_login NOLOGIN NOSUPERUSER NOBYPASSRLS NOINHERIT CONNECTION LIMIT 2;
 GRANT USAGE ON SCHEMA master_wok_event_test TO master_wok_event_reader_login;
 GRANT SELECT ON master_wok_event_test.streams,master_wok_event_test.events TO master_wok_event_reader_login;

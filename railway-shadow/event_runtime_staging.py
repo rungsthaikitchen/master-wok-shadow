@@ -7,6 +7,8 @@ import sqlite3
 import threading
 import time
 import uuid
+from urllib.request import Request,urlopen
+from urllib.error import HTTPError
 from event_capture_journal import EventCaptureJournal,EventCaptureError,snapshot
 from event_postgres_export import poll,source_identity
 from event_runtime_transport import DatabaseTransport
@@ -62,8 +64,25 @@ def configuration(env):
  writer=DatabaseTransport(env.get('MASTER_WOK_EVENT_WRITER_DSN'),'writer')
  return directory,stream,tokens,reader,writer
 
+def probe_health(server,token,expected):
+ try:
+  with urlopen(Request('http://127.0.0.1:'+str(server.server_port)+'/healthz',headers={'Authorization':'Bearer '+token}),timeout=5) as response:code=response.status
+ except HTTPError as error:code=error.code
+ if code!=expected:raise EventCaptureError('PRIVATE_RUNTIME_HEALTH_FAILED')
+ return code
+
+def trial_commands(server,token,target):
+ # Fixed synthetic case, fixed IDs: never accepts arbitrary orders or baskets.
+ commands=[('/staging/admin-action',dict(requestId='runtime-offer-v1',orderId='synthetic-runtime',action='offer',targetAt=target)),
+           ('/staging/customer-response',dict(requestId='runtime-accept-v1',orderId='synthetic-runtime',response='accept',proposalEventId='runtime-offer-v1'))]
+ for path,body in commands:
+  with urlopen(Request('http://127.0.0.1:'+str(server.server_port)+path,data=json.dumps(body).encode(),headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'}),timeout=20) as response:
+   result=json.loads(response.read(4096))
+   if response.status!=200 or result.get('status') not in ('RECORDED','ALREADY_RECORDED'):raise EventCaptureError('PRIVATE_RUNTIME_TRIAL_FAILED')
+
 def main(env=None):
- config=configuration(os.environ if env is None else env)
+ env=os.environ if env is None else env
+ config=configuration(env)
  if config is None:print(json.dumps(dict(status='DISABLED',verified=False,sourceRequests=0)),flush=True);return
  directory,stream,tokens,reader,writer=config
  directory.mkdir(parents=True,exist_ok=True,mode=0o700)
@@ -72,11 +91,17 @@ def main(env=None):
  try:
   budget=Budget(directory/'runtime-budget.sqlite3',source_identity(stream))
   reader=budget.transport('reader',reader);writer=budget.transport('writer',writer)
-  server,thread=serve_api(stream,*tokens,writer,monitor.healthy,host='0.0.0.0',port=int(os.environ.get('PORT','8080')))
+  server,thread=serve_api(stream,*tokens,writer,monitor.healthy,host='0.0.0.0',port=int(env.get('PORT','8080')))
   for sig in (signal.SIGTERM,signal.SIGINT):signal.signal(sig,lambda *_:stop.set())
+  probe_health(server,tokens[1],503);probe_health(server,'invalid-token',401)
+  if env.get('MASTER_WOK_EVENT_RUNTIME_TRIAL_ENABLED')=='true':
+   trial_commands(server,tokens[0],env.get('MASTER_WOK_EVENT_RUNTIME_TRIAL_TARGET'))
   for index in range(2):
    if stop.is_set():break
-   result=cycle(journal,stream,reader,monitor,directory);print(json.dumps(result),flush=True)
+   result=cycle(journal,stream,reader,monitor,directory)
+   if result['status']=='OBSERVED':
+    result.update(authenticatedHealth=probe_health(server,tokens[1],200),unauthenticatedHealth=probe_health(server,'invalid-token',401))
+   print(json.dumps(result),flush=True)
    if result['status']!='OBSERVED':break
    if index==0:stop.wait(60)
  finally:

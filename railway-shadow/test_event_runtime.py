@@ -7,7 +7,7 @@ from urllib.error import HTTPError
 from event_capture_journal import EventCaptureJournal,EventCaptureError
 from event_runtime_transport import DatabaseTransport,connection_parameters,ROLES
 from event_runtime_http import serve_api
-from event_runtime_staging import Budget,Monitor,cycle,configuration
+from event_runtime_staging import Budget,Monitor,cycle,configuration,trial_commands,probe_health
 from event_postgres_export import source_identity,QUERY,PROJECT
 from event_staging_handlers import QUERY as WRITE_QUERY
 from event_source_staging import StagingEventSource,SCOPE
@@ -92,3 +92,15 @@ class RuntimeTests(unittest.TestCase):
      self.assertEqual(result['status'],'UNVERIFIED');self.assertFalse(monitor.healthy())
     finally:j.close()
    finally:server.shutdown();server.server_close();thread.join(timeout=2);source.close()
+
+ def test_private_trial_commands_and_health_probes_use_real_http(self):
+  calls=[];healthy=[False]
+  server,thread=serve_api(ID,'o'*32,'h'*32,lambda p:(calls.append(p) or [dict(result='RECORDED')]),lambda:healthy[0])
+  try:
+   self.assertEqual(probe_health(server,'h'*32,503),503)
+   self.assertEqual(probe_health(server,'invalid',401),401)
+   trial_commands(server,'o'*32,'2026-10-19T17:00:00Z')
+   self.assertEqual([p['parameters'][2]['action'] for p in calls],['offer','accept'])
+   self.assertTrue(all(p['parameters'][2]['orderId']=='synthetic-runtime' for p in calls))
+   healthy[0]=True;self.assertEqual(probe_health(server,'h'*32,200),200)
+  finally:server.shutdown();server.server_close();thread.join(timeout=2)
