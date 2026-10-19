@@ -16,7 +16,7 @@ from delivery_staging_worker import validate as validate_synthetic
 
 APP_ID = 0x4D574443
 VERSION = 1
-SCOPES = {'SAVED_STATE_ONLY', 'SYNTHETIC_STAGING', 'RETROSPECTIVE_CONDITIONAL', 'PREPARED_ONLY'}
+SCOPES = {'SAVED_STATE_ONLY', 'SYNTHETIC_STAGING', 'RETROSPECTIVE_CONDITIONAL', 'PREPARED_ONLY', 'PREPARED_SYNTHETIC'}
 
 def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
@@ -75,7 +75,7 @@ class DeliveryComparisonJournal:
         self.lock.close()
 
     def append_prepared_empty(self, day, at):
-        if self.scope != 'PREPARED_ONLY':
+        if self.scope not in {'PREPARED_ONLY','PREPARED_SYNTHETIC'}:
             raise ComparisonError('COMPARISON_SCOPE_MISMATCH')
         if date.fromisoformat(day).isoformat() != day:
             raise ComparisonError('SERVICE_DATE_REQUIRED')
@@ -83,7 +83,7 @@ class DeliveryComparisonJournal:
 
     def append_prepared(self, candidate, at):
         """Preparation evidence is never a route or capacity recommendation."""
-        if self.scope != 'PREPARED_ONLY':
+        if self.scope not in {'PREPARED_ONLY','PREPARED_SYNTHETIC'}:
             raise ComparisonError('COMPARISON_SCOPE_MISMATCH')
         fields = {'sourceIdentity','sourceHash','buildHash','observedStatus','serviceDate'}
         if not isinstance(candidate,dict) or set(candidate) != fields:
@@ -99,7 +99,7 @@ class DeliveryComparisonJournal:
             raise ComparisonError('SERVICE_DATE_REQUIRED') from None
         record = dict(candidate, schemaVersion=1, preparation='PREPARED',
             prediction='UNVERIFIED', verified=False,
-            evidenceBasis='CURRENT_SAVED_STATE_NOT_DECISION_HISTORY', networkRequests=0)
+            evidenceBasis='SYNTHETIC_SQL_FIXTURE_NOT_REAL_ORDERS' if self.scope=='PREPARED_SYNTHETIC' else 'CURRENT_SAVED_STATE_NOT_DECISION_HISTORY', networkRequests=0)
         return self._append(candidate['serviceDate'], [record], at,
                             candidate['sourceHash'], None)
 

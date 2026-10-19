@@ -11,7 +11,7 @@ class PrivateCandidateBridge:
     def __init__(self,reader,*,enabled=False,allow_capture=False,api_key=None,staging=False,invoke=None):
         self.reader=reader;self.enabled=enabled is True;self.allow_capture=allow_capture is True
         self.api_key=api_key;self.staging=staging is True;self.invoke=invoke or self._invoke
-        self.prepared=None;self.candidate=None
+        self.prepared=None;self.candidate=None;self.last_stage='DISABLED'
 
     def _invoke(self,payload,capture=False):
         env={k:v for k,v in os.environ.items() if k in ('PATH','LANG','TZ')}
@@ -28,11 +28,13 @@ class PrivateCandidateBridge:
     def read_candidate(self):
         self.prepared=None;self.candidate=None
         if not self.enabled:return None
+        self.last_stage='SOURCE_READ'
         private=self.reader()
         if private is None:return None
         if not isinstance(private,dict) or set(private)!={'privateJson','bindingHash','sourceIdentity','observedStatus','serviceDate','sourceObservedAt'}:
             raise ComparisonError('MINIMAL_READER_CONTRACT_REQUIRED')
         payload={k:private[k] for k in ('privateJson','bindingHash','sourceIdentity')}
+        self.last_stage='NODE_PREPARE'
         result=self.invoke(dict(payload,mode='PREPARE'),False)
         candidate=result.get('candidate')
         if (result.get('status')!='PREPARED' or not isinstance(candidate,dict) or

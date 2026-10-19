@@ -79,6 +79,61 @@ class PreparedStagingTests(unittest.TestCase):
             with self.assertRaises(Exception):run(env,**kwargs)
             self.assertEqual(len(calls),1)
 
+    def test_sql_fixture_uses_separate_identity_scope_and_fixed_query(self):
+        from private_source_preflight import SYNTHETIC_QUERY
+        env=self.env();env.update(MASTER_WOK_PREPARED_INPUT_BASIS='SYNTHETIC_SQL_FIXTURE',
+            MASTER_WOK_PREPARED_SERVICE_DATE='2026-10-15')
+        saved=configuration(self.env());synthetic=configuration(env)
+        self.assertNotEqual(saved['identity'],synthetic['identity'])
+        queries=[];events=[]
+        def transport(payload):
+            queries.append(payload['query']);raw=fixture()
+            for field in ['created_at','preferred_time','proposed_time','confirmed_time']:
+                raw[0]['orders'][0][field]=raw[0]['orders'][0][field].replace('2026-10-17','2026-10-15')
+            return raw
+        with tempfile.TemporaryDirectory() as folder:
+            def factory(j):
+                self.assertEqual(j.scope,'PREPARED_SYNTHETIC')
+                def save():
+                    payload=json.loads(j.db.execute('SELECT payload FROM observations').fetchone()[0])
+                    self.assertEqual(payload['evidenceBasis'],'SYNTHETIC_SQL_FIXTURE_NOT_REAL_ORDERS')
+                    p=Path(folder)/'snapshot.sqlite3';meta=backup(j,p)
+                    restore(p,Path(folder)/'restored.sqlite3',j.identity,j.scope,meta['sha256'])
+                    return dict(status='BACKUP_VERIFIED',verifiedRestore=True,verifiedAt=time.time())
+                return save
+            run(env,directory=Path(folder)/'journal',transport=transport,backup_factory=factory,emit=events.append)
+            self.assertEqual(queries,[SYNTHETIC_QUERY])
+            self.assertNotIn('public.orders',queries[0]);self.assertNotIn('public.order_items',queries[0])
+            self.assertEqual(events[0]['sourceRequests'],1)
+            self.assertEqual(events[0]['inputBasis'],'SYNTHETIC_SQL_FIXTURE')
+            self.assertEqual(events[0]['preparation'],'PREPARED')
+        for change in [dict(MASTER_WOK_PREPARED_INPUT_BASIS='arbitrary'),dict(MASTER_WOK_PREPARED_SERVICE_DATE='2026-10-16')]:
+            bad=dict(env,**change)
+            with self.assertRaises(Exception):configuration(bad)
+
+    def test_safe_failure_diagnostics_distinguish_source_node_and_backup(self):
+        from shadow_collector import ShadowError
+        with tempfile.TemporaryDirectory() as folder:
+            c=configuration(self.env())
+            j=DeliveryComparisonJournal(Path(folder)/'delivery-comparison.sqlite3',c['identity'],'PREPARED_ONLY',enabled=True)
+            def refuse():raise ShadowError('SOURCE_COVERAGE_UNVERIFIED')
+            bridge=PrivateCandidateBridge(refuse,enabled=True)
+            monitor=PreparedMonitor(j,bridge,lambda:None,'2026-10-17')
+            try:
+                r=monitor.cycle()
+                self.assertEqual(r['failureStage'],'SOURCE_READ');self.assertEqual(r['failureReason'],'SOURCE_COVERAGE_UNVERIFIED')
+                bridge.reader=lambda:prepared()
+                def bad_node(*args):raise ValueError('PRIVATE_ADDRESS_SECRET')
+                bridge.invoke=bad_node;r=monitor.cycle()
+                self.assertEqual(r['failureStage'],'NODE_PREPARE');self.assertEqual(r['failureReason'],'DETAILS_REDACTED')
+                self.assertNotIn('PRIVATE_ADDRESS_SECRET',json.dumps(r))
+                bridge.invoke=bridge._invoke
+                monitor.backup=lambda:dict(status='BACKUP_FAILED')
+                r=monitor.cycle();self.assertEqual(r['failureStage'],'BACKUP_VERIFY')
+                self.assertEqual(r['failureReason'],'BACKUP_UNVERIFIED')
+                self.assertIsNone(bridge.prepared);self.assertFalse(monitor.healthy())
+            finally:j.close()
+
     def test_prepared_cloud_backup_roundtrip_and_scope_separation(self):
         from delivery_comparison_offvolume import ComparisonBackup
         from test_delivery_comparison_offvolume import Client
