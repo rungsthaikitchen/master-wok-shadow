@@ -16,7 +16,7 @@ from event_runtime_http import serve_api
 
 class Budget:
  def __init__(self,path,identity):
-  self.path=Path(path)
+  self.path=Path(path);self.identity=identity
   if self.path.is_symlink():raise EventCaptureError('BUDGET_PATH_REFUSED')
   with sqlite3.connect(self.path) as db:
    db.execute('CREATE TABLE IF NOT EXISTS budget(identity TEXT PRIMARY KEY,reads INTEGER CHECK(reads BETWEEN 0 AND 2),writes INTEGER CHECK(writes BETWEEN 0 AND 3))')
@@ -24,6 +24,15 @@ class Budget:
    if rows and rows!=[(identity,)]:raise EventCaptureError('BUDGET_IDENTITY_MISMATCH')
    db.execute('INSERT OR IGNORE INTO budget VALUES (?,0,0)',(identity,))
   os.chmod(self.path,0o600)
+ def take_cloud(self):
+  with sqlite3.connect(self.path,timeout=5) as db:
+   db.execute('BEGIN IMMEDIATE')
+   db.execute('CREATE TABLE IF NOT EXISTS cloud_budget(identity TEXT PRIMARY KEY,used INTEGER CHECK(used BETWEEN 0 AND 1))')
+   rows=db.execute('SELECT identity FROM cloud_budget').fetchall()
+   if rows and rows!=[(self.identity,)]:raise EventCaptureError('BUDGET_IDENTITY_MISMATCH')
+   db.execute('INSERT OR IGNORE INTO cloud_budget VALUES (?,0)',(self.identity,))
+   if db.execute('SELECT used FROM cloud_budget').fetchone()[0]>=1:raise EventCaptureError('CLOUD_BUDGET_EXHAUSTED')
+   db.execute('UPDATE cloud_budget SET used=1')
  def summary(self):
   with sqlite3.connect(self.path) as db:
    reads,writes=db.execute('SELECT reads,writes FROM budget').fetchone()
@@ -43,14 +52,16 @@ class Monitor:
  def __init__(self,clock=time.monotonic):self.clock=clock;self.last=None;self.failed=True
  def healthy(self):return not self.failed and self.last is not None and 0<=self.clock()-self.last<=180
 
-def cycle(journal,stream_id,reader,monitor,directory):
+def cycle(journal,stream_id,reader,monitor,directory,*,recovery=None):
  try:
   intake=poll(journal,stream_id,enabled=True,transport=reader)
   result=journal.run_once(enabled=True);summary=journal.summary()
   if result['status'] not in ('RECORDED','IDLE') or summary['failed'] or any(summary['batchStates'].get(k,0) for k in ('PENDING','LEASED')):raise EventCaptureError('COMPARISON_INCOMPLETE')
   snapshot(journal,Path(directory)/('event-snapshot-'+uuid.uuid4().hex+'.sqlite3'))
+  backup=recovery.run(journal) if recovery else None
+  if backup is not None and not backup.get('restored'):raise EventCaptureError('CLOUD_RECOVERY_REQUIRED')
   monitor.last=monitor.clock();monitor.failed=False
-  return dict(status='OBSERVED',intake=intake['status'],worker=result['status'],observations=summary['counts']['observations'],verified=False)
+  return dict(status='OBSERVED',intake=intake['status'],worker=result['status'],observations=summary['counts']['observations'],verified=False,**({'recovery':backup['status']} if backup else {}))
  except Exception:
   monitor.failed=True
   return dict(status='UNVERIFIED',reasonCode='EVENT_RUNTIME_CYCLE_FAILED',verified=False)
@@ -101,6 +112,11 @@ def main(env=None):
  try:
   budget=Budget(directory/'runtime-budget.sqlite3',source_identity(stream))
   print(json.dumps(dict(status='BUDGET',**budget.summary(),verified=False)),flush=True)
+  recovery=None
+  if env.get('MASTER_WOK_EVENT_CLOUD_BACKUP_ENABLED')=='true':
+   from event_recovery import EventRecovery
+   from delivery_evidence_backup import storage_configuration
+   recovery=EventRecovery(storage_configuration(env),budget,directory/'cloud-recovery-receipt.json')
   reader=budget.transport('reader',reader);writer=budget.transport('writer',writer)
   server,thread=serve_api(stream,*tokens,writer,monitor.healthy,host='0.0.0.0',port=int(env.get('PORT','8080')))
   for sig in (signal.SIGTERM,signal.SIGINT):signal.signal(sig,lambda *_:stop.set())
@@ -109,7 +125,7 @@ def main(env=None):
    trial_commands(server,tokens[0],env.get('MASTER_WOK_EVENT_RUNTIME_TRIAL_TARGET'),offer_only=env.get('MASTER_WOK_EVENT_RUNTIME_TRIAL_OFFER_ONLY')=='true')
   for index in range(2):
    if stop.is_set():break
-   result=cycle(journal,stream,reader,monitor,directory)
+   result=cycle(journal,stream,reader,monitor,directory,recovery=recovery)
    if result['status']=='OBSERVED':
     result.update(authenticatedHealth=probe_health(server,tokens[1],200),unauthenticatedHealth=probe_health(server,'invalid-token',401),**budget.summary())
    print(json.dumps(result),flush=True)

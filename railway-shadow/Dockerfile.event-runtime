@@ -5,7 +5,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends libstdc++6 ca-c
 RUN groupadd --gid 10001 mwevent && useradd --uid 10001 --gid 10001 --create-home mwevent
 WORKDIR /app
 COPY railway-shadow/requirements-event-runtime.txt /app/requirements-event-runtime.txt
-RUN pip install --no-cache-dir -r /app/requirements-event-runtime.txt
+COPY railway-shadow/requirements-backup.txt /app/requirements-backup.txt
+RUN pip install --no-cache-dir -r /app/requirements-event-runtime.txt -r /app/requirements-backup.txt
 COPY . /app
 ENV PYTHONUNBUFFERED=1
 CMD ["python", "railway-shadow/event_runtime_staging.py"]
