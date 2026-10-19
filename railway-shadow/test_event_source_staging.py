@@ -38,3 +38,30 @@ class SourceTests(unittest.TestCase):
         self.assertEqual(self.source.db.execute('SELECT count(*) FROM outbox').fetchone()[0],1)
     def test_default_off(self):
         with self.assertRaises(EventCaptureError):StagingEventSource(self.path,'2026-10-17')
+    def test_versioned_responses_are_atomic_and_stale_responses_rollback(self):
+        def offer(eid,at,target):
+            e=self.events()[0];e.update(eventId=eid,at=at);e['order']['targetAt']=target;return e
+        self.source.record(offer('offer1','2026-10-17T15:00:00Z','2026-10-17T18:00:00Z'))
+        self.source.record(offer('offer2','2026-10-17T15:01:00Z','2026-10-17T19:00:00Z'))
+        answer=dict(eventId='answer',at='2026-10-17T15:02:00Z',kind='PROPOSAL_RESPONSE',orderId='synthetic-a',proposalEventId='offer1',response='ACCEPTED')
+        with self.assertRaises(EventCaptureError):self.source.record(answer)
+        self.assertEqual(self.source.db.execute('SELECT count(*) FROM outbox').fetchone()[0],2)
+        answer['proposalEventId']='offer2'
+        def fail():raise OSError('forced commit failure')
+        with self.assertRaises(OSError):self.source.record(answer,before_commit=fail)
+        self.assertEqual(self.source.db.execute('SELECT count(*) FROM outbox').fetchone()[0],2)
+        self.assertEqual(self.source.record(answer),'RECORDED')
+        self.assertEqual(self.source.record(answer),'ALREADY_RECORDED')
+        import json
+        state=json.loads(self.source.db.execute('SELECT payload FROM bookings').fetchone()[0])
+        self.assertEqual(state['commitment'],'CONFIRMED');self.assertEqual(state['order']['targetAt'],'2026-10-17T19:00:00Z')
+        self.source.record(offer('offer3','2026-10-17T15:03:00Z','2026-10-17T19:30:00Z'))
+        answer.update(eventId='reject',at='2026-10-17T15:04:00Z',proposalEventId='offer3',response='REJECTED')
+        self.source.record(answer)
+        self.assertEqual(self.source.db.execute('SELECT count(*) FROM bookings').fetchone()[0],0)
+        batch=self.source.export('2026-10-17T22:00:00Z')
+        self.assertEqual(len(batch['events']),5)
+        j=EventCaptureJournal(self.root/'event-capture.sqlite3',self.source.identity,enabled=True)
+        try:
+            j.enqueue(batch);self.assertEqual(j.run_once(enabled=True)['status'],'RECORDED')
+        finally:j.close()

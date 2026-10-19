@@ -50,7 +50,17 @@ class StagingEventSource:
             invoke_node(batch,validate_only=True)
             # Synthetic action state: retained separately from kitchen/driver activity.
             order_id=event.get('orderId') or event['order']['orderId']
-            self.db.execute('INSERT OR REPLACE INTO bookings VALUES (?,?)',(order_id,canonical(event)))
+            if event['kind']=='PROPOSAL_RESPONSE':
+                previous=json.loads(self.db.execute('SELECT payload FROM bookings WHERE order_id=?',(order_id,)).fetchone()[0])
+                if event['response']=='REJECTED':self.db.execute('DELETE FROM bookings WHERE order_id=?',(order_id,))
+                else:
+                    previous['kind']='RESERVATION_SET';previous['commitment']='CONFIRMED'
+                    previous.pop('actualDecision',None)
+                    self.db.execute('UPDATE bookings SET payload=? WHERE order_id=?',(canonical(previous),order_id))
+            elif event['kind']=='RESERVATION_RELEASED':
+                self.db.execute('DELETE FROM bookings WHERE order_id=?',(order_id,))
+            elif event.get('actualDecision')!='DECLINED':
+                self.db.execute('INSERT OR REPLACE INTO bookings VALUES (?,?)',(order_id,canonical(event)))
             before_commit();self.db.commit();return 'RECORDED'
         except Exception:self.db.rollback();raise
     def export(self,through_at):

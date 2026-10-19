@@ -103,15 +103,15 @@ test('delivery food transit has an inclusive twenty-minute cap and rejects futur
  const d=decision(1,'a','15:00');d.order=order('a','18:00',{orderType:'delivery',deliveryReadyEstimate:{foodReadyAt:at('17:45'),estimatedAt:at('15:01'),basis:'DELIVERY_PLANNER_ESTIMATE'}});
  assert.equal(replay(input([d]),{enabled:true,assess:()=>assert.fail('future evidence')}).reasonCode,'DELIVERY_ESTIMATE_CONTRACT_REQUIRED');
 });
-test('a new suggestion cannot erase an existing confirmed time before customer confirmation',()=>{
+test('a new suggestion immediately replaces an existing confirmation',()=>{
  const seen=[];
  const source=input([reserve(1,'a','15:00','18:00'),reserve(2,'a','15:05','19:00','PROPOSED'),
   decision(3,'b','15:10'),reserve(4,'a','15:15','19:00','CONFIRMED'),decision(5,'c','15:20')]);
  const result=replay(source,{enabled:true,assess:x=>(seen.push(x),green())});
  assert.equal(result.status,'REPLAYED');
- assert.equal(seen[0].snapshot.reservations[0].readyMinute,1140);
+ assert.equal(seen[0].snapshot.reservations[0].readyMinute,1200);
  assert.equal(seen[1].snapshot.reservations.find(r=>r.orderId==='a').readyMinute,1200);
- assert.equal(result.observations[0].priorProposed,0);
+ assert.equal(result.observations[0].priorProposed,1);
 });
 test('CLI stays disabled by default and replays the full anonymous service fixture when enabled',()=>{
  const cli=require('node:path').join(__dirname,'master-wok-chronological-replay.js');
@@ -142,4 +142,27 @@ test('validation-only ingress returns a cloned ordered batch without running kit
  const child=spawnSync(process.execPath,[require('node:path').join(__dirname,'master-wok-chronological-replay.js')],{
   input:JSON.stringify(source),encoding:'utf8',env:{PATH:process.env.PATH,MASTER_WOK_EVENT_REPLAY_ENABLED:'true',MASTER_WOK_EVENT_VALIDATE_ONLY:'true',TZ:'UTC'},timeout:5000});
  assert.equal(child.status,0);assert.deepEqual(JSON.parse(child.stdout),{status:'VALIDATED',eventCount:2,serviceDate:'2026-10-17'});
+});
+
+const response=(sequence,id,time,proposalEventId,answer='ACCEPTED')=>({eventId:'e'+sequence,sequence,at:at(time),kind:'PROPOSAL_RESPONSE',orderId:id,proposalEventId,response:answer});
+test('repeat offers replace once; acceptance confirms the same reservation; rejection releases without fallback',()=>{
+ const seen=[];
+ const events=[reserve(1,'a','15:00','18:00'),decision(2,'b','15:01','DECLINED'),
+ reserve(3,'a','15:02','18:30','PROPOSED'),decision(4,'c','15:03','DECLINED'),
+ reserve(5,'a','15:04','19:00','PROPOSED'),response(6,'a','15:05','e5'),decision(7,'d','15:06','DECLINED'),
+ reserve(8,'a','15:07','19:30','PROPOSED'),response(9,'a','15:08','e8','REJECTED'),decision(10,'f','15:09','DECLINED')];
+ const result=replay(input(events),{enabled:true,assess:x=>(seen.push(x),green())});
+ assert.equal(result.status,'REPLAYED');
+ assert.deepEqual(seen.map(x=>x.snapshot.reservations.length),[1,1,1,0]);
+ assert.deepEqual(seen.slice(0,3).map(x=>x.snapshot.reservations[0].readyMinute),[1140,1170,1200]);
+ assert.deepEqual(result.observations.map(x=>x.priorProposed),[0,1,0,0]);
+});
+test('old or duplicate customer responses cannot affect newer offers or cancelled reservations',()=>{
+ for(const ending of [response(3,'a','15:02','e1'),response(3,'a','15:02','e1','REJECTED')]){
+  const result=replay(input([reserve(1,'a','15:00','18:00','PROPOSED'),reserve(2,'a','15:01','19:00','PROPOSED'),ending]),{enabled:true,assess:()=>assert.fail('stale input assessed')});
+  assert.equal(result.reasonCode,'STALE_PROPOSAL_RESPONSE');assert.deepEqual(result.observations,[]);
+ }
+ for(const middle of [response(2,'a','15:01','e1'),release(2,'a','15:01','CANCELLED')]){
+  assert.equal(replay(input([reserve(1,'a','15:00','18:00','PROPOSED'),middle,response(3,'a','15:02','e1')]),{enabled:true}).reasonCode,'STALE_PROPOSAL_RESPONSE');
+ }
 });

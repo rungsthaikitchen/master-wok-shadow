@@ -60,10 +60,13 @@ function validateEventBatch(input){
   const ids=new Set();let prior=-Infinity;
   for(const [index,event] of events.entries()){
    if(!event||!id(event.eventId)||ids.has(event.eventId)||event.sequence!==index+1||
-    !['RESERVATION_SET','RESERVATION_RELEASED','BOOKING_DECISION'].includes(event.kind)||
+    !['RESERVATION_SET','RESERVATION_RELEASED','BOOKING_DECISION','PROPOSAL_RESPONSE'].includes(event.kind)||
     stamp(event.at)<prior||stamp(event.at)>through||local(event.at).day>input.serviceDate)throw Error('EVENT_SEQUENCE_UNVERIFIED');
    prior=stamp(event.at);ids.add(event.eventId);
-   if(event.kind==='RESERVATION_RELEASED'){
+   if(event.kind==='PROPOSAL_RESPONSE'){
+    if(!exact(event,['eventId','sequence','at','kind','orderId','proposalEventId','response'])||
+     !id(event.orderId)||!id(event.proposalEventId)||!['ACCEPTED','REJECTED'].includes(event.response))throw Error('PROPOSAL_RESPONSE_REQUIRED');
+   }else if(event.kind==='RESERVATION_RELEASED'){
     if(!exact(event,['eventId','sequence','at','kind','orderId','reason'])||!id(event.orderId)||
      !['CANCELLED','COMPLETED'].includes(event.reason))throw Error('RELEASE_CONTRACT_REQUIRED');
    }else{
@@ -72,6 +75,17 @@ function validateEventBatch(input){
      !(event.kind==='RESERVATION_SET'?['PROPOSED','CONFIRMED']:['ACCEPTED','DECLINED','SUGGESTED']).includes(event[extra]))throw Error('EVENT_CONTRACT_REQUIRED');
     validateOrder(event.order,input.serviceDate,event.at);
    }
+  }
+  // Reject stale responses at ingress, before persistence or any assessment.
+  const proposals=new Map();
+  for(const event of events){
+   const orderId=event.orderId||event.order.orderId;
+   if(event.kind==='PROPOSAL_RESPONSE'){
+    if(proposals.get(orderId)!==event.proposalEventId)throw Error('STALE_PROPOSAL_RESPONSE');
+    proposals.delete(orderId);
+   }else if(event.kind==='RESERVATION_RELEASED')proposals.delete(orderId);
+   else if(event.commitment==='PROPOSED'||event.actualDecision==='SUGGESTED')proposals.set(orderId,event.eventId);
+   else if(event.commitment==='CONFIRMED'||event.actualDecision==='ACCEPTED')proposals.delete(orderId);
   }
   return events;
 }
@@ -85,14 +99,17 @@ function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElaps
   const events=validateEventBatch(input);
   const active=new Map(),observations=[];
   function reserve(order,at,commitment){
-   // A new suggestion must not erase the customer's existing confirmation.
-   const previous=active.get(order.orderId);
-   if(commitment==='PROPOSED'&&previous?.commitment==='CONFIRMED')return;
+   // An offer replaces the prior target immediately, even before acceptance.
    active.set(order.orderId,{order,at,commitment});
   }
   for(const event of events){
    const elapsed=clock()-started;
    if(!Number.isFinite(elapsed)||elapsed<0||elapsed>maxElapsedMs)throw Error('REPLAY_TIME_BUDGET_EXHAUSTED');
+   if(event.kind==='PROPOSAL_RESPONSE'){
+    if(event.response==='REJECTED')active.delete(event.orderId);
+    else active.get(event.orderId).commitment='CONFIRMED';
+    continue;
+   }
    if(event.kind==='RESERVATION_RELEASED'){
     if(!active.delete(event.orderId))throw Error('UNKNOWN_RESERVATION_RELEASE');
     continue;
@@ -132,7 +149,7 @@ function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElaps
   const safe=['COMPLETE_EVENT_COVERAGE_REQUIRED','EVENT_SEQUENCE_UNVERIFIED','EVENT_TIME_REQUIRED',
    'ORDER_CONTRACT_REQUIRED','SERVICE_TARGET_REQUIRED','BASKET_CONTRACT_REQUIRED','COLLECTION_ESTIMATE_REFUSED',
    'DELIVERY_ESTIMATE_CONTRACT_REQUIRED','RELEASE_CONTRACT_REQUIRED','EVENT_CONTRACT_REQUIRED',
-   'UNKNOWN_RESERVATION_RELEASE','ASSESSOR_CONTRACT_REQUIRED','REPLAY_BUDGET_REQUIRED','REPLAY_TIME_BUDGET_EXHAUSTED','EVENT_INPUT_TOO_LARGE'];
+   'PROPOSAL_RESPONSE_REQUIRED','STALE_PROPOSAL_RESPONSE','UNKNOWN_RESERVATION_RELEASE','ASSESSOR_CONTRACT_REQUIRED','REPLAY_BUDGET_REQUIRED','REPLAY_TIME_BUDGET_EXHAUSTED','EVENT_INPUT_TOO_LARGE'];
   return fail(safe.includes(error.message)?error.message:'CHRONOLOGICAL_REPLAY_FAILED');
  }
 }

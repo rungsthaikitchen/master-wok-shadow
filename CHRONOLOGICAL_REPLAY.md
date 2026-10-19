@@ -17,8 +17,8 @@ Each event has a pseudonymous `eventId`, contiguous positive `sequence`, explici
 
 | Kind | Additional fields | Effect |
 | --- | --- | --- |
-| `RESERVATION_SET` | `order`, `commitment: PROPOSED or CONFIRMED` | Update the effective commitment. Existing confirmation takes precedence over an unconfirmed new suggestion. |
-| `BOOKING_DECISION` | `order`, `actualDecision: ACCEPTED, DECLINED or SUGGESTED` | Assess against other then-known commitments, then apply the recorded decision. ACCEPTED confirms; SUGGESTED creates a provisional reservation only if no confirmation exists; DECLINED retains any previous commitment. |
+| `RESERVATION_SET` | `order`, `commitment: PROPOSED or CONFIRMED` | Update the effective commitment. A new proposal replaces the previous target immediately, including a prior confirmation. |
+| `BOOKING_DECISION` | `order`, `actualDecision: ACCEPTED, DECLINED or SUGGESTED` | Assess against other then-known commitments, then apply the recorded decision. ACCEPTED confirms; SUGGESTED replaces the previous reservation with a provisional reservation; DECLINED retains any previous commitment. |
 | `RESERVATION_RELEASED` | `orderId`, `reason: CANCELLED or COMPLETED` | Release a known commitment only when a recorded cancellation/completion says so. |
 
 An `order` has exactly `orderId`, `orderType`, `targetAt`, `lines`, `deliveryReadyEstimate`. Lines have exactly `itemId`, positive integer `qty`, `mods`; each modifier has only `id`. Use the existing pseudonym mechanism before export. No customer names, addresses, coordinates or contact details belong in this input or output. The sample fixture uses invented identifiers and menu baskets only.
@@ -57,3 +57,13 @@ This command is documentation, not a request for the owner to run diagnostics. T
 The existing server-side observer and event/outbox components need concrete backend integration review before this module receives live events. No production deployment, schema update or instrumentation was performed as part of this offline replay work. Existing deployed staging fixtures remain disabled.
 
 For the new receiving inbox and background comparison worker, see EVENT_CAPTURE_INTEGRATION.md. This remains synthetic staging integration; it does not create the authoritative source event log.
+
+## Offer responses (staging contract)
+
+`PROPOSAL_RESPONSE` has exactly `eventId`, `sequence`, `at`, `kind`, `orderId`, `proposalEventId`, and `response` (`ACCEPTED` or `REJECTED`). The referenced event must be that order's current `PROPOSED` reservation or `SUGGESTED` decision. Acceptance changes only its commitment to confirmed, retaining the offered target and reservation clock. Rejection removes it without restoring any superseded target. A stale, unknown, duplicate or already-cancelled response invalidates the batch before assessment. Source retries with the same event ID/content are deduplicated before append.
+
+An offer event ID is the minimal proposal revision token; no extra mutable proposal record is needed in this synthetic contract. Repeat offers supersede earlier IDs. `BOOKING_DECISION: DECLINED` remains an admission decision, not a customer's rejection of an offer. Explicit `RESERVATION_SET: CONFIRMED` remains available for authoritative admin events; customer responses must use `PROPOSAL_RESPONSE`. No automatic expiry or inferred release is implemented. A future expiry policy requires its own version-bound event and explicit expiry evidence.
+
+These changes affect only offline replay and the local synthetic source. Existing production checkout, Supabase functions and polling adapters retain their current behaviour pending separately reviewed integration. Replay build hashes distinguish new assessments from prior persisted results; captured source events remain immutable.
+
+Validation, 19 October 2026: 166 Node tests pass with TZ=Europe/London and 166 with TZ=UTC. All 240 Python tests pass on the final full run (79.899s). The first parallel run had one unchanged delivery-worker shutdown test exceed its five-second shutdown allowance; it passed in isolation and on the full rerun. Four source tests include response rollback and export into the durable inbox/replay worker. No remote deployment or production database mutation was performed.
