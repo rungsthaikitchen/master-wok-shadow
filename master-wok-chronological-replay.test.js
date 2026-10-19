@@ -133,3 +133,13 @@ test('missing initial coverage and events beyond the source watermark reject bef
   assert.equal(r.status,'UNVERIFIED');assert.deepEqual(r.observations,[]);
  }
 });
+test('validation-only ingress returns a cloned ordered batch without running kitchen assessment',()=>{
+ const {validateEventBatch}=require('./master-wok-chronological-replay');
+ const source=input([decision(1,'a','15:00'),decision(2,'b','15:10')]);
+ const ordered=validateEventBatch({...source,events:[...source.events].reverse()});
+ assert.deepEqual(ordered.map(e=>e.sequence),[1,2]);ordered[0].order.lines[0].qty=99;
+ assert.equal(source.events[0].order.lines[0].qty,1);
+ const child=spawnSync(process.execPath,[require('node:path').join(__dirname,'master-wok-chronological-replay.js')],{
+  input:JSON.stringify(source),encoding:'utf8',env:{PATH:process.env.PATH,MASTER_WOK_EVENT_REPLAY_ENABLED:'true',MASTER_WOK_EVENT_VALIDATE_ONLY:'true',TZ:'UTC'},timeout:5000});
+ assert.equal(child.status,0);assert.deepEqual(JSON.parse(child.stdout),{status:'VALIDATED',eventCount:2,serviceDate:'2026-10-17'});
+});

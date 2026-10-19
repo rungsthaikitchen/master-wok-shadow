@@ -55,3 +55,5 @@ This command is documentation, not a request for the owner to run diagnostics. T
 6. Persist redacted per-decision comparisons only in the shadow store, bound to engine/source revisions and coverage. A live decision stays live regardless of the hypothetical recommendation.
 
 The existing server-side observer and event/outbox components need concrete backend integration review before this module receives live events. No production deployment, schema update or instrumentation was performed as part of this offline replay work. Existing deployed staging fixtures remain disabled.
+
+For the new receiving inbox and background comparison worker, see EVENT_CAPTURE_INTEGRATION.md. This remains synthetic staging integration; it does not create the authoritative source event log.

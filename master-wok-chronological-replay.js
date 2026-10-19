@@ -46,13 +46,7 @@ function ready(order,at){
  const minute=local(e.foodReadyAt).minute;
  return minute>=990&&minute<=1320?minute:null;
 }
-function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElapsedMs=30000}={}){
- if(enabled!==true)return {status:'DISABLED',verified:false,networkRequests:0};
- const fail=reasonCode=>({status:'UNVERIFIED',reasonCode,verified:false,networkRequests:0,observations:[]});
- try{
-  if(!Number.isSafeInteger(maxElapsedMs)||maxElapsedMs<1||maxElapsedMs>60000)throw Error('REPLAY_BUDGET_REQUIRED');
-  const started=clock();
-  if(!Number.isFinite(started))throw Error('REPLAY_BUDGET_REQUIRED');
+function validateEventBatch(input){
   if(!exact(input,['serviceDate','coverage','events'])||!validServiceDate(input.serviceDate)||
    !Array.isArray(input.events)||input.events.length>1000||
    !exact(input.coverage,['basis','complete','eventCount','firstSequence','lastSequence','initialState','throughAt'])||
@@ -79,6 +73,16 @@ function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElaps
     validateOrder(event.order,input.serviceDate,event.at);
    }
   }
+  return events;
+}
+function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElapsedMs=30000}={}){
+ if(enabled!==true)return {status:'DISABLED',verified:false,networkRequests:0};
+ const fail=reasonCode=>({status:'UNVERIFIED',reasonCode,verified:false,networkRequests:0,observations:[]});
+ try{
+  if(!Number.isSafeInteger(maxElapsedMs)||maxElapsedMs<1||maxElapsedMs>60000)throw Error('REPLAY_BUDGET_REQUIRED');
+  const started=clock();
+  if(!Number.isFinite(started))throw Error('REPLAY_BUDGET_REQUIRED');
+  const events=validateEventBatch(input);
   const active=new Map(),observations=[];
   function reserve(order,at,commitment){
    // A new suggestion must not erase the customer's existing confirmation.
@@ -132,7 +136,7 @@ function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElaps
   return fail(safe.includes(error.message)?error.message:'CHRONOLOGICAL_REPLAY_FAILED');
  }
 }
-module.exports={replay};
+module.exports={replay,validateEventBatch};
 if(require.main===module){
  if(process.env.MASTER_WOK_EVENT_REPLAY_ENABLED!=='true'){
   process.stdout.write(JSON.stringify(replay(null)));
@@ -141,10 +145,12 @@ if(require.main===module){
   process.stdin.on('data',chunk=>{bytes+=chunk.length;if(bytes>5000000){refused=true;text='';}else if(!refused)text+=chunk;});
   process.stdin.on('end',()=>{
    let result;
-   try{if(refused)throw Error();result=replay(JSON.parse(text),{enabled:true});}
+   try{if(refused)throw Error();const input=JSON.parse(text);
+    if(process.env.MASTER_WOK_EVENT_VALIDATE_ONLY==='true'){const events=validateEventBatch(input);result={status:'VALIDATED',eventCount:events.length,serviceDate:input.serviceDate};}
+    else result=replay(input,{enabled:true});}
    catch(_){result={status:'UNVERIFIED',reasonCode:'EVENT_INPUT_REFUSED',verified:false,networkRequests:0,observations:[]};}
    process.stdout.write(JSON.stringify(result));
-   if(result.status!=='REPLAYED')process.exitCode=1;
+   if(!['REPLAYED','VALIDATED'].includes(result.status))process.exitCode=1;
   });
  }
 }
