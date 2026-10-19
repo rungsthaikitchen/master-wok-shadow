@@ -76,7 +76,13 @@ def trial_commands(server,token,target):
  commands=[('/staging/admin-action',dict(requestId='runtime-offer-v1',orderId='synthetic-runtime',action='offer',targetAt=target)),
            ('/staging/customer-response',dict(requestId='runtime-accept-v1',orderId='synthetic-runtime',response='accept',proposalEventId='runtime-offer-v1'))]
  for path,body in commands:
-  with urlopen(Request('http://127.0.0.1:'+str(server.server_port)+path,data=json.dumps(body).encode(),headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'}),timeout=20) as response:
+  try:
+   response=urlopen(Request('http://127.0.0.1:'+str(server.server_port)+path,data=json.dumps(body).encode(),headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'}),timeout=20)
+  except HTTPError as error:
+   result=json.loads(error.read(4096))
+   safe={'DATABASE_AUTH_REFUSED','DATABASE_PERMISSION_REFUSED','DATABASE_READ_ONLY_REFUSED','DATABASE_TIMEOUT','DATABASE_LOCK_TIMEOUT','DATABASE_TLS_CERTIFICATE_UNVERIFIED','DATABASE_DNS_UNVERIFIED','DATABASE_NETWORK_UNREACHABLE','DATABASE_CONNECTION_UNVERIFIED','STAGING_DATABASE_REQUEST_FAILED','DATABASE_ROLE_UNPROVEN','STAGING_REQUEST_BUDGET_EXHAUSTED'}
+   raise EventCaptureError(result.get('reasonCode') if result.get('reasonCode') in safe else 'PRIVATE_RUNTIME_TRIAL_FAILED') from None
+  with response:
    result=json.loads(response.read(4096))
    if response.status!=200 or result.get('status') not in ('RECORDED','ALREADY_RECORDED'):raise EventCaptureError('PRIVATE_RUNTIME_TRIAL_FAILED')
 
@@ -111,6 +117,8 @@ def main(env=None):
 
 if __name__=='__main__':
  try:main()
- except Exception:
-  print(json.dumps(dict(status='UNVERIFIED',reasonCode='EVENT_RUNTIME_START_FAILED',verified=False)),flush=True)
+ except Exception as error:
+  safe={'EXPLICIT_STAGING_RUNTIME_REQUIRED','DEDICATED_EVENT_DIRECTORY_REQUIRED','STREAM_ID_REQUIRED','DISTINCT_STAGING_TOKENS_REQUIRED','STAGING_DATABASE_CONNECTION_REQUIRED','BUDGET_PATH_REFUSED','BUDGET_IDENTITY_MISMATCH','DATABASE_AUTH_REFUSED','DATABASE_PERMISSION_REFUSED','DATABASE_READ_ONLY_REFUSED','DATABASE_TIMEOUT','DATABASE_LOCK_TIMEOUT','DATABASE_TLS_CERTIFICATE_UNVERIFIED','DATABASE_DNS_UNVERIFIED','DATABASE_NETWORK_UNREACHABLE','DATABASE_CONNECTION_UNVERIFIED','STAGING_DATABASE_REQUEST_FAILED','DATABASE_ROLE_UNPROVEN','STAGING_REQUEST_BUDGET_EXHAUSTED','PRIVATE_RUNTIME_HEALTH_FAILED','PRIVATE_RUNTIME_TRIAL_FAILED'}
+  detail=str(error) if isinstance(error,EventCaptureError) and str(error) in safe else type(error).__name__
+  print(json.dumps(dict(status='UNVERIFIED',reasonCode='EVENT_RUNTIME_START_FAILED',diagnostic=detail,verified=False)),flush=True)
   raise SystemExit(1)

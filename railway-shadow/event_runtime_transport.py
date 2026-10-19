@@ -43,4 +43,14 @@ class DatabaseTransport:
       return [dict(zip(('stream_id','scope','event_count','batch'),row)) for row in cur.fetchall()]
      cur.execute('SELECT master_wok_event_test.handle(%s::uuid,%s::text,%s::jsonb)',[params[0],params[1],json.dumps(params[2],allow_nan=False)])
      return [dict(result=row[0]) for row in cur.fetchall()]
-  except Exception:raise EventCaptureError('STAGING_DATABASE_REQUEST_FAILED') from None
+  except EventCaptureError:raise
+  except Exception as error:
+   code=getattr(error,'sqlstate',None)
+   reason={'28P01':'DATABASE_AUTH_REFUSED','42501':'DATABASE_PERMISSION_REFUSED','25006':'DATABASE_READ_ONLY_REFUSED','57014':'DATABASE_TIMEOUT','55P03':'DATABASE_LOCK_TIMEOUT'}.get(code,'STAGING_DATABASE_REQUEST_FAILED')
+   if type(error).__name__=='OperationalError' and code is None:
+    reason='DATABASE_CONNECTION_UNVERIFIED'
+    message=str(error).lower()
+    if 'certificate verify failed' in message or 'certificate verification' in message:reason='DATABASE_TLS_CERTIFICATE_UNVERIFIED'
+    elif 'translate host name' in message or 'resolve' in message:reason='DATABASE_DNS_UNVERIFIED'
+    elif 'network is unreachable' in message:reason='DATABASE_NETWORK_UNREACHABLE'
+   raise EventCaptureError(reason) from None

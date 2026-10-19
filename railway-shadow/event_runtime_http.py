@@ -4,6 +4,7 @@ from http.server import HTTPServer,BaseHTTPRequestHandler
 import json
 import threading
 from event_staging_handlers import admin_action,customer_response
+from event_capture_journal import EventCaptureError
 
 def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.0.1',port=0):
  if any(not isinstance(t,str) or len(t)<32 for t in (operator_token,health_token)) or operator_token==health_token:raise ValueError('DISTINCT_STAGING_TOKENS_REQUIRED')
@@ -36,7 +37,10 @@ def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.
      if set(body)!={'requestId','orderId','response','proposalEventId'}:raise ValueError()
      result=customer_response(stream_id,body['requestId'],body['orderId'],body['response'],body['proposalEventId'],enabled=True,transport=writer)
     self.send(200,result)
-   except Exception:self.send(409,dict(status='UNVERIFIED',reasonCode='STAGING_ACTION_REFUSED',verified=False))
+   except Exception as error:
+    safe={'DATABASE_AUTH_REFUSED','DATABASE_PERMISSION_REFUSED','DATABASE_READ_ONLY_REFUSED','DATABASE_TIMEOUT','DATABASE_LOCK_TIMEOUT','DATABASE_TLS_CERTIFICATE_UNVERIFIED','DATABASE_DNS_UNVERIFIED','DATABASE_NETWORK_UNREACHABLE','DATABASE_CONNECTION_UNVERIFIED','STAGING_DATABASE_REQUEST_FAILED','DATABASE_ROLE_UNPROVEN','READER_WRITE_PRIVILEGES_REFUSED','STAGING_REQUEST_BUDGET_EXHAUSTED'}
+    reason=str(error) if isinstance(error,EventCaptureError) and str(error) in safe else 'STAGING_ACTION_REFUSED'
+    self.send(409,dict(status='UNVERIFIED',reasonCode=reason,verified=False))
  class BoundedServer(HTTPServer):
   def get_request(self):
    sock,address=super().get_request();sock.settimeout(5);return sock,address

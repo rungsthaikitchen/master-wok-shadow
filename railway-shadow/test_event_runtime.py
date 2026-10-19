@@ -104,3 +104,10 @@ class RuntimeTests(unittest.TestCase):
    self.assertTrue(all(p['parameters'][2]['orderId']=='synthetic-runtime' for p in calls))
    healthy[0]=True;self.assertEqual(probe_health(server,'h'*32,200),200)
   finally:server.shutdown();server.server_close();thread.join(timeout=2)
+
+ def test_database_diagnostics_classify_without_exposing_connection_text(self):
+  OperationalError=type('OperationalError',(Exception,),{})
+  def fail(**_):raise OperationalError('certificate verify failed PRIVATE-PASSWORD')
+  with self.assertRaises(EventCaptureError) as result:
+   DatabaseTransport(dsn('reader'),'reader',connect=fail)(dict(query=QUERY,parameters=[ID]))
+  self.assertEqual(str(result.exception),'DATABASE_TLS_CERTIFICATE_UNVERIFIED')
