@@ -1,0 +1,190 @@
+{
+  "serviceDate": "2026-10-17",
+  "coverage": {
+    "basis": "DECISION_EVENT_LOG",
+    "complete": true,
+    "eventCount": 8,
+    "firstSequence": 1,
+    "lastSequence": 8,
+    "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+    "throughAt": "2026-10-17T22:00:00Z"
+  },
+  "events": [
+    {
+      "eventId": "event-1",
+      "sequence": 1,
+      "at": "2026-10-16T12:00:00Z",
+      "kind": "RESERVATION_SET",
+      "commitment": "PROPOSED",
+      "order": {
+        "orderId": "synthetic-a",
+        "orderType": "collection",
+        "targetAt": "2026-10-17T17:00:00Z",
+        "lines": [
+          {
+            "itemId": "panang-curry",
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ]
+          }
+        ],
+        "deliveryReadyEstimate": null
+      }
+    },
+    {
+      "eventId": "event-2",
+      "sequence": 2,
+      "at": "2026-10-17T15:00:00Z",
+      "kind": "BOOKING_DECISION",
+      "actualDecision": "ACCEPTED",
+      "order": {
+        "orderId": "synthetic-b",
+        "orderType": "collection",
+        "targetAt": "2026-10-17T18:00:00Z",
+        "lines": [
+          {
+            "itemId": "panang-curry",
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ]
+          }
+        ],
+        "deliveryReadyEstimate": null
+      }
+    },
+    {
+      "eventId": "event-3",
+      "sequence": 3,
+      "at": "2026-10-17T15:05:00Z",
+      "kind": "RESERVATION_SET",
+      "commitment": "CONFIRMED",
+      "order": {
+        "orderId": "synthetic-a",
+        "orderType": "collection",
+        "targetAt": "2026-10-17T18:20:00Z",
+        "lines": [
+          {
+            "itemId": "panang-curry",
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ]
+          }
+        ],
+        "deliveryReadyEstimate": null
+      }
+    },
+    {
+      "eventId": "event-4",
+      "sequence": 4,
+      "at": "2026-10-17T15:10:00Z",
+      "kind": "BOOKING_DECISION",
+      "actualDecision": "DECLINED",
+      "order": {
+        "orderId": "synthetic-c",
+        "orderType": "collection",
+        "targetAt": "2026-10-17T18:10:00Z",
+        "lines": [
+          {
+            "itemId": "panang-curry",
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ]
+          }
+        ],
+        "deliveryReadyEstimate": null
+      }
+    },
+    {
+      "eventId": "event-5",
+      "sequence": 5,
+      "at": "2026-10-17T15:15:00Z",
+      "kind": "BOOKING_DECISION",
+      "actualDecision": "ACCEPTED",
+      "order": {
+        "orderId": "synthetic-d",
+        "orderType": "delivery",
+        "targetAt": "2026-10-17T18:30:00Z",
+        "lines": [
+          {
+            "itemId": "panang-curry",
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ]
+          }
+        ],
+        "deliveryReadyEstimate": null
+      }
+    },
+    {
+      "eventId": "event-6",
+      "sequence": 6,
+      "at": "2026-10-17T15:20:00Z",
+      "kind": "RESERVATION_RELEASED",
+      "orderId": "synthetic-d",
+      "reason": "CANCELLED"
+    },
+    {
+      "eventId": "event-7",
+      "sequence": 7,
+      "at": "2026-10-17T15:25:00Z",
+      "kind": "BOOKING_DECISION",
+      "actualDecision": "SUGGESTED",
+      "order": {
+        "orderId": "synthetic-e",
+        "orderType": "collection",
+        "targetAt": "2026-10-17T18:30:00Z",
+        "lines": [
+          {
+            "itemId": "panang-curry",
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ]
+          }
+        ],
+        "deliveryReadyEstimate": null
+      }
+    },
+    {
+      "eventId": "event-8",
+      "sequence": 8,
+      "at": "2026-10-17T15:30:00Z",
+      "kind": "BOOKING_DECISION",
+      "actualDecision": "ACCEPTED",
+      "order": {
+        "orderId": "synthetic-f",
+        "orderType": "collection",
+        "targetAt": "2026-10-17T19:00:00Z",
+        "lines": [
+          {
+            "itemId": "panang-curry",
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ]
+          }
+        ],
+        "deliveryReadyEstimate": null
+      }
+    }
+  ]
+}
