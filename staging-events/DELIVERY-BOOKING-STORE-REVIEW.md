@@ -1,6 +1,6 @@
 # Delivery booking-store candidate
 
-20 October 2026. Tested inside a rolled-back private staging transaction. Not installed, deployed or granted to a runtime login. Production unchanged.
+20 October 2026. Initial candidate tested inside a rolled-back private staging transaction. Subsequently installed and exercised with the restricted staging login; see DELIVERY-HTTP-TRIAL.md for that later result and cleanup. Production unchanged.
 
 ## Smallest change implemented
 

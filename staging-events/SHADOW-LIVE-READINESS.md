@@ -6,7 +6,7 @@ Read-only production polling, persistent evidence and monitoring are in place fr
 
 | Remaining work | Relative effort | Completion evidence |
 |---|---|---|
-| Delivery metadata and per-offer food-ready/arrival estimates in the transactional staging store | Medium; candidate SQL now passes rolled-back acceptance | Real planner -> restricted authenticated backend -> event store -> replay, with missing evidence remaining unverified |
+| Delivery metadata and per-offer food-ready/arrival estimates in the transactional staging store | Medium; restricted authenticated real-planner trial now passes | Real planner -> restricted authenticated backend -> event store -> replay, with missing evidence remaining unverified |
 | Cross-service-date changes | Medium | Atomic removal/addition, deterministic locks, retry/rollback and replay coverage tests |
 | Capture all active order-changing paths and initial commitments | Largest uncertainty | Creation, proposals, customer/admin responses, cancellations and completion all accounted for; inaccessible/uncertain legacy paths resolved |
 | Bounded end-to-end staging rehearsal and production observation rollout | Medium | Matching code/source identity, restricted access, persistent ACK/recovery, health/failure checks and verified default-off rollback |
@@ -16,4 +16,4 @@ Expect several further focused development/test cycles, followed by representati
 
 Live shadow does not require enabling Master Wok booking decisions, automatic delivery grouping or public checkout changes. Those remain later decisions after evidence review. Historical services without event history remain limited evidence; later manual corrections must not be backdated as if known when orders arrived.
 
-Latest progress: delivery-event projection and arrival-based food-age handling are committed; private delivery-store SQL passed rolled-back database acceptance. The runtime remains at its previous disabled staging revision. Next concrete gate is the authenticated real-planner delivery-store trial, followed by cross-date work and remaining writer integration.
+Latest progress: delivery-event projection, arrival-based food-age handling and the authenticated private delivery-store trial pass. The trial used the actual planner with synthetic route fixtures; missing estimates remained unverified. Source fixture is disabled with zero reservations. Next concrete work is cross-date consistency, live evidence binding/recovery coverage, and remaining writer integration. Production booking behaviour remains unchanged.

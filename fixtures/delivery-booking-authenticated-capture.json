@@ -1,0 +1,142 @@
+{
+  "events": [
+    {
+      "at": "2026-10-20T09:52:07.350203Z",
+      "kind": "RESERVATION_SET",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          }
+        ],
+        "orderId": "synthetic-delivery-trial",
+        "targetAt": "2026-10-20T17:00:00.000000Z",
+        "orderType": "delivery",
+        "deliveryReadyEstimate": {
+          "basis": "DELIVERY_PLANNER_ESTIMATE",
+          "arrivalAt": "2026-10-20T17:00:00.000Z",
+          "estimatedAt": "2026-10-20T09:52:05.621621+00:00",
+          "foodReadyAt": "2026-10-20T16:43:00.000Z"
+        }
+      },
+      "eventId": "delivery-create",
+      "sequence": 1,
+      "commitment": "PROPOSED"
+    },
+    {
+      "at": "2026-10-20T09:52:08.980258Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          }
+        ],
+        "orderId": "synthetic-delivery-trial",
+        "targetAt": "2026-10-20T18:00:00.000000Z",
+        "orderType": "delivery",
+        "deliveryReadyEstimate": {
+          "basis": "DELIVERY_PLANNER_ESTIMATE",
+          "arrivalAt": "2026-10-20T18:00:00.000Z",
+          "estimatedAt": "2026-10-20T09:52:05.621621+00:00",
+          "foodReadyAt": "2026-10-20T17:43:00.000Z"
+        }
+      },
+      "eventId": "delivery-offer-1",
+      "sequence": 2,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T09:52:10.561180Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          }
+        ],
+        "orderId": "synthetic-delivery-trial",
+        "targetAt": "2026-10-20T18:30:00.000000Z",
+        "orderType": "delivery",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "delivery-offer-2",
+      "sequence": 3,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T09:52:13.747792Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          }
+        ],
+        "orderId": "synthetic-delivery-trial",
+        "targetAt": "2026-10-20T19:00:00.000000Z",
+        "orderType": "delivery",
+        "deliveryReadyEstimate": {
+          "basis": "DELIVERY_PLANNER_ESTIMATE",
+          "arrivalAt": "2026-10-20T19:00:00.000Z",
+          "estimatedAt": "2026-10-20T09:52:05.621621+00:00",
+          "foodReadyAt": "2026-10-20T18:43:00.000Z"
+        }
+      },
+      "eventId": "delivery-offer-3",
+      "sequence": 4,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T09:52:15.317710Z",
+      "kind": "PROPOSAL_RESPONSE",
+      "eventId": "reply_b64a292359b0e0669a191f0bacd1da5d15e3a51dcffa5ed1c200c68dcea9e1b1",
+      "orderId": "synthetic-delivery-trial",
+      "response": "ACCEPTED",
+      "sequence": 5,
+      "proposalEventId": "delivery-offer-3"
+    },
+    {
+      "at": "2026-10-20T09:52:18.585887Z",
+      "kind": "RESERVATION_RELEASED",
+      "reason": "COMPLETED",
+      "eventId": "delivery-complete",
+      "orderId": "synthetic-delivery-trial",
+      "sequence": 6
+    }
+  ],
+  "coverage": {
+    "basis": "DECISION_EVENT_LOG",
+    "complete": true,
+    "throughAt": "2026-10-20T09:52:18.585887Z",
+    "eventCount": 6,
+    "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+    "lastSequence": 6,
+    "firstSequence": 1
+  },
+  "serviceDate": "2026-10-20"
+}
