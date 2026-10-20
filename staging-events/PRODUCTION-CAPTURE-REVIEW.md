@@ -1,0 +1,61 @@
+# Production event capture review — 20 October 2026
+
+Review only. No production writes, migrations, deployments, scheduling or checkout changes. The new helper snapshot and four characterization tests are isolated review artifacts; no runtime imports them. Passing tests reproduce observed discrepancies; they do not mean live behaviour is corrected.
+
+## Evidence and limits
+
+- Supabase production hyper-worker / order-action v30, bundle hash 789e186428a61cc9d1a197d0bb6afa1bd9e718f07d4b1ebbcf183074f474abfb, fetched read-only.
+- review-order v11, bundle hash 386b29458973ba9fa09d335d813b053c56cf2af4e91ba94e305edc3e53d482d3, fetched read-only. Deployed presence does not prove it is currently called.
+- Website repository index.html at cb39250cc2d1d6de03b090a8183db4ae5ba30c62, blob 1102ab8c713a0dba5a0a5df8745871ca8a2ef688. This proves repository content, not the currently served Cloudflare deployment revision.
+- admin.html blob a5e5aeaad1244a69bc6e5f52dbb02122691f2b11 and order-confirm.html blob 16ff06758d560dc2207ccc0491c86fe2d6ee819f fetched from repository default branch.
+- Cloudflare proxy functions/admin-api/order-action.js blob 88964efb8f384cdada1b9af600581865f81a066a forwards to Railway /admin-order-action.
+- Railway order-backend reports deployment 7fb18840-8d11-441a-8c40-13abf60ee5b9 at commit 51616be77f92fcfd99958e8d784361eb232073a5, repository rungsthaikitchen/order-backend. GitHub fetch returned 404 for both default and deployed refs. Current backend source remains unverified; the uploaded server.py is reference evidence only.
+- Supabase lists order-confirm ACTIVE v18. Source retrieval returned UNAVAILABLE; it must not be described as empty or assumed to match the uploaded code. The repository order-confirm.html calls it with token/decision.
+- Read-only metadata found no non-internal triggers on public.orders/order_items. The current columns include three time fields but no proposal revision, offered timestamp, response timestamp or immutable event history. No customer rows were read for this review.
+
+## Current paths and discrepancies
+
+| Path | Observed behaviour | Capture implication |
+|---|---|---|
+| Website checkout | Browser upserts orders and inserts order_items separately; another insert path exists in the file, whose reachability is not established | An order INSERT alone cannot prove a complete basket or successful checkout |
+| Admin action proxy | Website -> Cloudflare -> Railway -> configured Edge action; uploaded Railway code uses hyper-worker | A callback here misses direct writes and customer responses; deployed Railway target configuration still needs verification |
+| hyper-worker accept | Sets status=confirmed and clears confirm_token; does not populate confirmed_time | Capture actual effective target and action, rather than equating status with a timestamp |
+| hyper-worker suggest_time, non-ASAP | Sets status=proposed, proposed_time and a new token; leaves confirmed_time intact | A previously confirmed order can retain a stale confirmed target in the website helper |
+| hyper-worker suggest_time, ASAP branch | Writes preferred_time, clears proposed_time, uses status=accepted | Keep this separate legacy transition; ASAP being unused does not remove deployed code |
+| hyper-worker decline/complete | Sets cancelled/completed; decline clears token | Distinguish admission decline/cancellation from rejection of an offer |
+| review-order | Uses review_status, time fields and payment-link operations | A second mutation contract exists; do not silently treat it as the active admin path |
+| Admin direct status helper | Repository has direct orders UPDATE, including completion handling | Must be covered or proven unreachable before claiming complete capture |
+| Customer responses | order-confirm Edge route plus separate Railway routes in uploaded server.py | Both need current-source/auth/version mapping; notification calls are not proof of a committed response |
+
+The current website helper chooses confirmed_time before any proposal. Example: confirmed 18:30, new offer 19:00 -> still reserves 18:30. Your rule requires moving to 19:00 immediately. The helper releases a rejected offer only for status=pending with proposed_time and no confirmed_time. The uploaded Railway helper instead writes customer_declined_time, which the website helper can reserve at the rejected proposed time. This latter cross-component discrepancy is conditional on the uploaded backend matching deployed behaviour.
+
+The website schedule query filters only the original preferred_time date. Moving an order across service dates can therefore omit it from the destination day. An empty result on fetch failure is also not evidence of available capacity. None of these are changed here.
+
+## Smallest safe integration recommendation
+
+1. Keep existing read-only saved-state monitoring running as limited evidence. Do not label polled rows as complete historical decisions or backdate revised saved times.
+2. Reuse the tested private staging transaction/outbox pattern, adapting it to a production-shaped staging fixture. Use one shared, authorized database command for each lifecycle mutation: lock current order, validate request ID and expected proposal revision, update order and provisional reservation, append immutable event, then commit. Engine replay, provider calls and notifications run outside this transaction.
+3. A new offer replaces the one active reservation immediately at its server event timestamp. Acceptance references that exact offer and changes commitment only; rejection/cancellation releases it. Repeat proposals invalidate earlier response revisions. Matching retries return the original result; changed payloads with the same request ID fail. Define expiry explicitly before implementing it; no default timeout is inferred.
+4. Store original requested time separately from effective reservation target. A confirmed_time left on a row is not enough to identify the latest commitment. Preserve offer IDs/revisions and ordered event times. Serialize service-stream sequence/watermark assignment with commit-safe locking, including an explicit policy for cross-day moves; do not use a sequence number alone as proof that all earlier transactions committed.
+5. Route every active writer through the shared transaction, or add a separately labelled row-change audit for uninstrumented writers. An audit can record that a row changed; it cannot invent who accepted, which engine decision occurred, or what basket was known earlier. Avoid a trigger that calls a remote observer or schedules food.
+6. Capture order creation only after its basket is complete. Prefer atomic order+items persistence in a staging-tested submission command; until then mark partial submission evidence incomplete. Persisted bookings also omit customer attempts rejected in the browser, so comparisons with *every* live-engine evaluation need a separate decision-input/outcome capture boundary. Do not claim that lifecycle events alone cover those attempts.
+7. Start coverage at an explicit cutover baseline: outstanding and advance bookings, complete basket snapshots and effective targets, identity/build version and watermark. Mark baseline rows as saved-state at cutover, not reconstructed creation events. Export pseudonymous allowlisted fields only; keep addresses, tokens, notes and customer identifiers out of replay/observations.
+
+## Required regression checks before integration
+
+- confirmed -> offer -> acceptance: target moves at offer time; one reservation throughout.
+- offer A -> offer B -> late accept/reject A: no mutation/event; B remains current.
+- concurrent accept/reject/cancel and repeat requests: one legal result and atomic outbox.
+- transaction failure: neither reservation nor event commits; notification failure does not roll back an already committed booking.
+- rejection with an old confirmed_time: releases latest provisional reservation without resurrecting the original target.
+- cross-day offer: both source and destination service streams retain correct coverage.
+- partial basket/failed item insert, item edits, completion without reservation, advance orders and cutover baseline remain explicit.
+- delivery arrival targets require supported food-ready estimates; no hypothetical plan becomes actual cooking/driver activity.
+
+Four local characterization tests passed (node --test staging-events/production-capture-review.test.cjs). They cover the first proposal, stale confirmed-time precedence and two rejection-status variants. No new live endpoint was exercised.
+
+## Outstanding access and next change
+
+Current deployed Railway server.py and order-confirm v18 source are needed to finish the exact handler diff. Existing credentials need not be disclosed; repository access or those source files is sufficient. Also verify the website's served revision and active call paths before retiring any legacy handler.
+
+Next implementation: production-shaped staging fixtures and a reviewed shared transaction/adapter covering these lifecycle cases. Production mutation/capture activation remains outside this review. No additional service, bucket or paid provider is required for the next local/staging code work.

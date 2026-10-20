@@ -1,5 +1,7 @@
 # Durable staging event capture and replay worker
 
+Current status: this document records the earlier local prototype. Deployed private synthetic staging, cloud recovery and the bounded polling trial are documented under staging-events/BOUNDED-CLOUD-SOAK.md. The current production lifecycle review and remaining access gaps are in staging-events/PRODUCTION-CAPTURE-REVIEW.md. Production event capture is still not integrated.
+
 This is the receiving inbox and comparison worker for complete event batches. It is **not yet a live backend hook, authoritative source outbox, remote API or deployed monitoring service**. The fixed integration runner accepts only the committed synthetic service fixture and refuses Railway context and source/provider credentials. No booking or Supabase client exists in these modules.
 
 ## Files and flow
