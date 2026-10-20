@@ -31,8 +31,9 @@ function validateOrder(order,day,at){
  if(order.orderType==='collection'&&order.deliveryReadyEstimate!==null)throw Error('COLLECTION_ESTIMATE_REFUSED');
  if(order.orderType==='delivery'&&order.deliveryReadyEstimate!==null){
   const e=order.deliveryReadyEstimate;
-  if(!exact(e,['foodReadyAt','estimatedAt','basis'])||e.basis!=='DELIVERY_PLANNER_ESTIMATE'||
-    stamp(e.estimatedAt)>stamp(at)||stamp(e.foodReadyAt)>=stamp(order.targetAt)||
+  if(!(exact(e,['foodReadyAt','estimatedAt','basis'])||exact(e,['foodReadyAt','estimatedAt','basis','arrivalAt']))||e.basis!=='DELIVERY_PLANNER_ESTIMATE'||
+    stamp(e.estimatedAt)>stamp(at)||stamp(e.foodReadyAt)>=stamp(e.arrivalAt||order.targetAt)||
+    (e.arrivalAt!==undefined&&(Math.abs(stamp(e.arrivalAt)-stamp(order.targetAt))>10*60000||local(e.arrivalAt).day!==day))||
     local(e.foodReadyAt).day!==day)throw Error('DELIVERY_ESTIMATE_CONTRACT_REQUIRED');
  }
 }
@@ -41,7 +42,7 @@ function ready(order,at){
  const e=order.deliveryReadyEstimate;
  if(!e)return null;
  if(stamp(at)-stamp(e.estimatedAt)>30*60000)return null;
- const elapsed=stamp(order.targetAt)-stamp(e.foodReadyAt);
+ const elapsed=stamp(e.arrivalAt||order.targetAt)-stamp(e.foodReadyAt);
  if(elapsed>20*60000||elapsed<2*60000)return null;
  const minute=local(e.foodReadyAt).minute;
  return minute>=990&&minute<=1320?minute:null;
