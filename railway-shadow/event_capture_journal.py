@@ -94,6 +94,7 @@ class EventCaptureJournal:
         return now
 
     def enqueue(self,batch):
+        if isinstance(batch,dict) and isinstance(batch.get('events'),list) and any(isinstance(e,dict) and e.get('kind') in ('RESERVATION_TRANSFERRED_IN','RESERVATION_TRANSFERRED_OUT') for e in batch['events']):raise EventCaptureError('TRANSFER_BUNDLE_REQUIRED')
         # Validation only: no kitchen assessment in the intake path. The caller
         # must run this in a background staging adapter, never await in checkout.
         if len(canonical(batch).encode())>5_000_000:raise EventCaptureError('BATCH_TOO_LARGE')
@@ -137,7 +138,9 @@ class EventCaptureJournal:
         return dict(key=row[0],batch=batch,buildHash=row[2],token=token)
 
     def complete(self,message,result,*,before_commit=lambda:None):
-        batch=message['batch'];decisions=[e for e in batch['events'] if e['kind'] in ('BOOKING_DECISION','RESERVATION_TRANSFERRED_IN')]
+        batch=message['batch']
+        if any(e['kind'] in ('RESERVATION_TRANSFERRED_IN','RESERVATION_TRANSFERRED_OUT') for e in batch['events']):raise EventCaptureError('TRANSFER_BUNDLE_REQUIRED')
+        decisions=[e for e in batch['events'] if e['kind'] in ('BOOKING_DECISION','RESERVATION_TRANSFERRED_IN')]
         if (not isinstance(result,dict) or result.get('status')!='REPLAYED' or result.get('verified') is not False or
             result.get('networkRequests')!=0 or result.get('serviceDate')!=batch['serviceDate'] or
             result.get('evidenceBasis')!='RECORDED_EVENTS_WITH_HYPOTHETICAL_KITCHEN_ASSESSMENTS' or

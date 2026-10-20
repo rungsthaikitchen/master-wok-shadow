@@ -1,0 +1,148 @@
+{
+  "basis": "CONSISTENT_TRANSFER_SNAPSHOT",
+  "project": "hvrqgufqjslvgiohgkvu",
+  "streams": [
+    {
+      "batch": {
+        "events": [
+          {
+            "at": "2026-10-20T10:00:00Z",
+            "kind": "RESERVATION_SET",
+            "order": {
+              "lines": [
+                {
+                  "qty": 1,
+                  "mods": [],
+                  "itemId": "jasmine-rice"
+                }
+              ],
+              "orderId": "synthetic-cross-date",
+              "targetAt": "2026-10-20T18:00:00Z",
+              "orderType": "collection",
+              "deliveryReadyEstimate": null
+            },
+            "eventId": "bundle-create",
+            "sequence": 1,
+            "commitment": "PROPOSED"
+          },
+          {
+            "at": "2026-10-20T10:01:00.000000Z",
+            "kind": "RESERVATION_TRANSFERRED_OUT",
+            "eventId": "bundle-forward_out",
+            "orderId": "synthetic-cross-date",
+            "sequence": 2,
+            "transferId": "bundle-forward",
+            "toServiceDate": "2026-10-21"
+          },
+          {
+            "at": "2026-10-20T10:02:00.000000Z",
+            "kind": "RESERVATION_TRANSFERRED_IN",
+            "order": {
+              "lines": [
+                {
+                  "qty": 1,
+                  "mods": [],
+                  "itemId": "jasmine-rice"
+                }
+              ],
+              "orderId": "synthetic-cross-date",
+              "targetAt": "2026-10-20T19:00:00Z",
+              "orderType": "collection",
+              "deliveryReadyEstimate": null
+            },
+            "eventId": "bundle-back_in",
+            "sequence": 3,
+            "transferId": "bundle-back",
+            "actualDecision": "SUGGESTED",
+            "fromServiceDate": "2026-10-21"
+          },
+          {
+            "at": "2026-10-20T10:03:00Z",
+            "kind": "RESERVATION_RELEASED",
+            "reason": "COMPLETED",
+            "eventId": "bundle-complete",
+            "orderId": "synthetic-cross-date",
+            "sequence": 4
+          }
+        ],
+        "coverage": {
+          "basis": "DECISION_EVENT_LOG",
+          "complete": true,
+          "throughAt": "2026-10-20T10:03:00.000000Z",
+          "eventCount": 4,
+          "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+          "lastSequence": 4,
+          "firstSequence": 1
+        },
+        "serviceDate": "2026-10-20"
+      },
+      "streamId": "006c357b-7af5-4907-a3b7-26b2e095ea9b"
+    },
+    {
+      "batch": {
+        "events": [
+          {
+            "at": "2026-10-20T10:01:00.000000Z",
+            "kind": "RESERVATION_TRANSFERRED_IN",
+            "order": {
+              "lines": [
+                {
+                  "qty": 1,
+                  "mods": [],
+                  "itemId": "jasmine-rice"
+                }
+              ],
+              "orderId": "synthetic-cross-date",
+              "targetAt": "2026-10-21T18:00:00Z",
+              "orderType": "collection",
+              "deliveryReadyEstimate": null
+            },
+            "eventId": "bundle-forward_in",
+            "sequence": 1,
+            "transferId": "bundle-forward",
+            "actualDecision": "SUGGESTED",
+            "fromServiceDate": "2026-10-20"
+          },
+          {
+            "at": "2026-10-20T10:02:00.000000Z",
+            "kind": "RESERVATION_TRANSFERRED_OUT",
+            "eventId": "bundle-back_out",
+            "orderId": "synthetic-cross-date",
+            "sequence": 2,
+            "transferId": "bundle-back",
+            "toServiceDate": "2026-10-20"
+          }
+        ],
+        "coverage": {
+          "basis": "DECISION_EVENT_LOG",
+          "complete": true,
+          "throughAt": "2026-10-20T10:02:00.000000Z",
+          "eventCount": 2,
+          "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+          "lastSequence": 2,
+          "firstSequence": 1
+        },
+        "serviceDate": "2026-10-21"
+      },
+      "streamId": "c0f5e398-d59b-4a96-af2e-39d7f8f2fc2f"
+    }
+  ],
+  "transfers": [
+    {
+      "eventAt": "2026-10-20T10:02:00.000000Z",
+      "orderId": "synthetic-cross-date",
+      "targetAt": "2026-10-20T19:00:00Z",
+      "transferId": "bundle-back",
+      "sourceStream": "c0f5e398-d59b-4a96-af2e-39d7f8f2fc2f",
+      "destinationStream": "006c357b-7af5-4907-a3b7-26b2e095ea9b"
+    },
+    {
+      "eventAt": "2026-10-20T10:01:00.000000Z",
+      "orderId": "synthetic-cross-date",
+      "targetAt": "2026-10-21T18:00:00Z",
+      "transferId": "bundle-forward",
+      "sourceStream": "006c357b-7af5-4907-a3b7-26b2e095ea9b",
+      "destinationStream": "c0f5e398-d59b-4a96-af2e-39d7f8f2fc2f"
+    }
+  ]
+}

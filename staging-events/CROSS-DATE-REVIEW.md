@@ -36,3 +36,5 @@ validateTransferPair() is default-off. It checks complete individual histories, 
 5. Resolve current-stream routing and every live writer/initial-baseline requirement before production capture. This private schema does not change website date filters or public order lifecycle behaviour.
 
 Candidate SQL files: cross-date-booking.sql plus matching record(), apply_booking() and apply_delivery_booking() definitions. Acceptance: cross-date-acceptance.sql and cross-date-record-guards.sql, each used with candidate definitions inside BEGIN/ROLLBACK. New record() and moved-row guards are not installed by committing these files.
+
+Subsequent gate work: TRANSFER-BUNDLE-REVIEW.md supersedes the initial single-stream journal handling for new transfers. Intake/completion now refuse transfers outside the atomic bundle path. Consistent pair export and bundle snapshots pass initial acceptance; authenticated concurrency and broader live integration remain outstanding.
