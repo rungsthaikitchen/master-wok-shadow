@@ -1,0 +1,185 @@
+{
+  "events": [
+    {
+      "at": "2026-10-20T06:45:03.876147Z",
+      "kind": "RESERVATION_SET",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice"
+          }
+        ],
+        "orderId": "synthetic-booking",
+        "targetAt": "2026-10-20T17:00:00.000000Z",
+        "orderType": "collection",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "create-1",
+      "sequence": 1,
+      "commitment": "PROPOSED"
+    },
+    {
+      "at": "2026-10-20T06:45:03.887845Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice"
+          }
+        ],
+        "orderId": "synthetic-booking",
+        "targetAt": "2026-10-20T17:00:00.000000Z",
+        "orderType": "collection",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "confirm-1",
+      "sequence": 2,
+      "actualDecision": "ACCEPTED"
+    },
+    {
+      "at": "2026-10-20T06:45:03.903345Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice"
+          }
+        ],
+        "orderId": "synthetic-booking",
+        "targetAt": "2026-10-20T18:00:00.000000Z",
+        "orderType": "collection",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "offer-1",
+      "sequence": 3,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T06:45:03.905214Z",
+      "kind": "PROPOSAL_RESPONSE",
+      "eventId": "accept-1",
+      "orderId": "synthetic-booking",
+      "response": "ACCEPTED",
+      "sequence": 4,
+      "proposalEventId": "offer-1"
+    },
+    {
+      "at": "2026-10-20T06:45:03.908417Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice"
+          }
+        ],
+        "orderId": "synthetic-booking",
+        "targetAt": "2026-10-20T18:30:00.000000Z",
+        "orderType": "collection",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "offer-2",
+      "sequence": 5,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T06:45:03.909996Z",
+      "kind": "PROPOSAL_RESPONSE",
+      "eventId": "reject-2",
+      "orderId": "synthetic-booking",
+      "response": "REJECTED",
+      "sequence": 6,
+      "proposalEventId": "offer-2"
+    },
+    {
+      "at": "2026-10-20T06:45:03.911871Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          },
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice"
+          }
+        ],
+        "orderId": "synthetic-booking",
+        "targetAt": "2026-10-20T19:00:00.000000Z",
+        "orderType": "collection",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "offer-3",
+      "sequence": 7,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T06:45:03.912715Z",
+      "kind": "RESERVATION_RELEASED",
+      "reason": "CANCELLED",
+      "eventId": "cancel-3",
+      "orderId": "synthetic-booking",
+      "sequence": 8
+    }
+  ],
+  "coverage": {
+    "basis": "DECISION_EVENT_LOG",
+    "complete": true,
+    "throughAt": "2026-10-20T06:45:03.912715Z",
+    "eventCount": 8,
+    "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+    "lastSequence": 8,
+    "firstSequence": 1
+  },
+  "serviceDate": "2026-10-20"
+}
