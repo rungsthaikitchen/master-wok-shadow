@@ -25,3 +25,9 @@ test('actual rolled-back staging capture replays both terminal status changes',(
  assert.equal(validateEventBatch(input).length,8);
  const result=replay(input,{enabled:true});assert.equal(result.status,'REPLAYED');assert.equal(result.decisionCount,2);assert.equal(result.remainingCommitments,0);assert.equal(result.verified,false);
 });
+test('restricted-login authenticated capture replays both terminal paths',()=>{
+ const input=require('../fixtures/order-state-change-authenticated-capture.json');
+ assert.equal(validateEventBatch(input).length,8);
+ const result=replay(input,{enabled:true});assert.equal(result.status,'REPLAYED');assert.equal(result.decisionCount,2);assert.equal(result.remainingCommitments,0);assert.equal(result.verified,false);
+ assert.deepEqual(input.events.filter(e=>e.kind==='ORDER_STATE_CHANGED').map(e=>e.status),['CANCELLED','COMPLETED']);
+});

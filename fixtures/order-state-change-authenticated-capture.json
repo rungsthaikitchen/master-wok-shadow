@@ -1,0 +1,128 @@
+{
+  "events": [
+    {
+      "at": "2026-10-20T07:17:58.955945Z",
+      "kind": "RESERVATION_SET",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice"
+          }
+        ],
+        "orderId": "synthetic-terminal-1",
+        "targetAt": "2026-10-20T17:00:00.000000Z",
+        "orderType": "collection",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "terminal-create-1",
+      "sequence": 1,
+      "commitment": "PROPOSED"
+    },
+    {
+      "at": "2026-10-20T07:18:00.825688Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice"
+          }
+        ],
+        "orderId": "synthetic-terminal-1",
+        "targetAt": "2026-10-20T18:00:00.000000Z",
+        "orderType": "collection",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "terminal-offer-1",
+      "sequence": 2,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T07:18:03.055937Z",
+      "kind": "PROPOSAL_RESPONSE",
+      "eventId": "reply_146ffe0718d2ac03c61af85084ee4d0571b0c89e5bb6f2153384bd7baafd46eb",
+      "orderId": "synthetic-terminal-1",
+      "response": "REJECTED",
+      "sequence": 3,
+      "proposalEventId": "terminal-offer-1"
+    },
+    {
+      "at": "2026-10-20T07:18:06.329149Z",
+      "kind": "ORDER_STATE_CHANGED",
+      "status": "CANCELLED",
+      "eventId": "terminal-close-1",
+      "orderId": "synthetic-terminal-1",
+      "sequence": 4
+    },
+    {
+      "at": "2026-10-20T07:18:17.404800Z",
+      "kind": "RESERVATION_SET",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice"
+          }
+        ],
+        "orderId": "synthetic-terminal-2",
+        "targetAt": "2026-10-20T17:00:00.000000Z",
+        "orderType": "collection",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "terminal-create-2",
+      "sequence": 5,
+      "commitment": "PROPOSED"
+    },
+    {
+      "at": "2026-10-20T07:18:19.701832Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [],
+            "itemId": "jasmine-rice"
+          }
+        ],
+        "orderId": "synthetic-terminal-2",
+        "targetAt": "2026-10-20T18:00:00.000000Z",
+        "orderType": "collection",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "terminal-offer-2",
+      "sequence": 6,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T07:18:21.405697Z",
+      "kind": "PROPOSAL_RESPONSE",
+      "eventId": "reply_9198d8bea3e48bc211b641acfd38c571af7065d380c2a7080a810abd34c74c96",
+      "orderId": "synthetic-terminal-2",
+      "response": "REJECTED",
+      "sequence": 7,
+      "proposalEventId": "terminal-offer-2"
+    },
+    {
+      "at": "2026-10-20T07:18:25.947094Z",
+      "kind": "ORDER_STATE_CHANGED",
+      "status": "COMPLETED",
+      "eventId": "terminal-close-2",
+      "orderId": "synthetic-terminal-2",
+      "sequence": 8
+    }
+  ],
+  "coverage": {
+    "basis": "DECISION_EVENT_LOG",
+    "complete": true,
+    "throughAt": "2026-10-20T07:18:25.947094Z",
+    "eventCount": 8,
+    "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+    "lastSequence": 8,
+    "firstSequence": 1
+  },
+  "serviceDate": "2026-10-20"
+}
