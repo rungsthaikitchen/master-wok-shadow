@@ -1,0 +1,14 @@
+--- a/server.py
++++ b/server.py
+@@ -23,6 +23,11 @@
+     raise
+ 
+ app = Flask(__name__)
++
++# Review-only integration: disabled unless explicitly enabled in synthetic staging.
++if os.getenv("MASTER_WOK_BACKEND_EVENT_STAGING_ENABLED") == "true":
++    from master_wok_customer_routes import register_staging_routes
++    register_staging_routes(app, os.environ)
+ 
+ SUPABASE_URL = os.getenv("SUPABASE_URL")
+ SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")

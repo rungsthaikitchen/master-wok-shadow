@@ -1,0 +1,2 @@
+# Local Flask backend-patch review tests only; not added to deployed image.
+Flask==3.1.2
