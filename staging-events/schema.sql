@@ -47,6 +47,7 @@ BEGIN
  IF k='RESERVATION_SET' THEN expected_keys:=ARRAY['eventId','at','kind','order','commitment'];
  ELSIF k='BOOKING_DECISION' THEN expected_keys:=ARRAY['eventId','at','kind','order','actualDecision'];
  ELSIF k='RESERVATION_RELEASED' THEN expected_keys:=ARRAY['eventId','at','kind','orderId','reason'];
+ ELSIF k='ORDER_STATE_CHANGED' THEN expected_keys:=ARRAY['eventId','at','kind','orderId','status'];
  ELSIF k='PROPOSAL_RESPONSE' THEN expected_keys:=ARRAY['eventId','at','kind','orderId','proposalEventId','response'];
  ELSE RAISE EXCEPTION 'EVENT_KIND_REQUIRED'; END IF;
  SELECT array_agg(x ORDER BY x) INTO actual_keys FROM jsonb_object_keys(p_event) x;
@@ -68,7 +69,10 @@ BEGIN
  END IF;
  IF s.event_count>=1000 OR pg_column_size(p_event)>100000 THEN RAISE EXCEPTION 'SOURCE_LIMIT'; END IF;
  SELECT * INTO r FROM master_wok_event_test.reservations WHERE stream_id=p_stream AND order_id=oid;
- IF k='PROPOSAL_RESPONSE' THEN
+ IF EXISTS(SELECT 1 FROM master_wok_event_test.events WHERE stream_id=p_stream AND coalesce(payload->>'orderId',payload->'order'->>'orderId')=oid AND payload->>'kind' IN ('ORDER_STATE_CHANGED','RESERVATION_RELEASED')) THEN RAISE EXCEPTION 'ORDER_ALREADY_CLOSED'; END IF;
+ IF k='ORDER_STATE_CHANGED' THEN
+  IF coalesce(p_event->>'status','') NOT IN ('CANCELLED','COMPLETED') OR r.order_id IS NOT NULL OR NOT EXISTS(SELECT 1 FROM master_wok_event_test.events WHERE stream_id=p_stream AND coalesce(payload->>'orderId',payload->'order'->>'orderId')=oid) THEN RAISE EXCEPTION 'ORDER_STATE_CHANGE_REQUIRED'; END IF;
+ ELSIF k='PROPOSAL_RESPONSE' THEN
   IF r.commitment IS DISTINCT FROM 'PROPOSED' OR r.proposal_event_id IS DISTINCT FROM p_event->>'proposalEventId' THEN RAISE EXCEPTION 'STALE_PROPOSAL_RESPONSE'; END IF;
   IF p_event->>'response'='ACCEPTED' THEN
    UPDATE master_wok_event_test.reservations SET commitment='CONFIRMED',proposal_event_id=NULL WHERE stream_id=p_stream AND order_id=oid;

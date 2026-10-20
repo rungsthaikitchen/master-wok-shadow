@@ -65,3 +65,18 @@ class SourceTests(unittest.TestCase):
         try:
             j.enqueue(batch);self.assertEqual(j.run_once(enabled=True)['status'],'RECORDED')
         finally:j.close()
+    def test_status_after_rejection_is_atomic_and_never_reserves(self):
+        offer=self.events()[0];self.source.record(offer)
+        self.source.record(dict(eventId='reject',at='2026-10-17T15:02:00Z',kind='PROPOSAL_RESPONSE',orderId=offer['order']['orderId'],proposalEventId=offer['eventId'],response='REJECTED'))
+        terminal=dict(eventId='cancel',at='2026-10-17T15:03:00Z',kind='ORDER_STATE_CHANGED',orderId=offer['order']['orderId'],status='CANCELLED')
+        def fail():raise OSError('forced rollback')
+        with self.assertRaises(OSError):self.source.record(terminal,before_commit=fail)
+        self.assertEqual(self.source.db.execute('SELECT count(*) FROM outbox').fetchone()[0],2)
+        self.assertEqual(self.source.record(terminal),'RECORDED')
+        self.assertEqual(self.source.record(terminal),'ALREADY_RECORDED')
+        self.assertEqual(self.source.db.execute('SELECT count(*) FROM bookings').fetchone()[0],0)
+        j=EventCaptureJournal(self.root/'event-capture.sqlite3',self.source.identity,enabled=True)
+        try:
+            j.enqueue(self.source.export('2026-10-17T22:00:00Z'))
+            self.assertEqual(j.run_once(enabled=True)['status'],'RECORDED')
+        finally:j.close()

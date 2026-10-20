@@ -60,12 +60,15 @@ function validateEventBatch(input){
   const ids=new Set();let prior=-Infinity;
   for(const [index,event] of events.entries()){
    if(!event||!id(event.eventId)||ids.has(event.eventId)||event.sequence!==index+1||
-    !['RESERVATION_SET','RESERVATION_RELEASED','BOOKING_DECISION','PROPOSAL_RESPONSE'].includes(event.kind)||
+    !['RESERVATION_SET','RESERVATION_RELEASED','BOOKING_DECISION','PROPOSAL_RESPONSE','ORDER_STATE_CHANGED'].includes(event.kind)||
     stamp(event.at)<prior||stamp(event.at)>through||local(event.at).day>input.serviceDate)throw Error('EVENT_SEQUENCE_UNVERIFIED');
    prior=stamp(event.at);ids.add(event.eventId);
    if(event.kind==='PROPOSAL_RESPONSE'){
     if(!exact(event,['eventId','sequence','at','kind','orderId','proposalEventId','response'])||
      !id(event.orderId)||!id(event.proposalEventId)||!['ACCEPTED','REJECTED'].includes(event.response))throw Error('PROPOSAL_RESPONSE_REQUIRED');
+   }else if(event.kind==='ORDER_STATE_CHANGED'){
+    if(!exact(event,['eventId','sequence','at','kind','orderId','status'])||!id(event.orderId)||
+     !['CANCELLED','COMPLETED'].includes(event.status))throw Error('ORDER_STATE_CONTRACT_REQUIRED');
    }else if(event.kind==='RESERVATION_RELEASED'){
     if(!exact(event,['eventId','sequence','at','kind','orderId','reason'])||!id(event.orderId)||
      !['CANCELLED','COMPLETED'].includes(event.reason))throw Error('RELEASE_CONTRACT_REQUIRED');
@@ -77,9 +80,21 @@ function validateEventBatch(input){
    }
   }
   // Reject stale responses at ingress, before persistence or any assessment.
-  const proposals=new Map();
+  const proposals=new Map(), held=new Set(), known=new Set(), closed=new Set();
   for(const event of events){
    const orderId=event.orderId||event.order.orderId;
+   if(event.kind==='PROPOSAL_RESPONSE'&&proposals.get(orderId)!==event.proposalEventId)throw Error('STALE_PROPOSAL_RESPONSE');
+   if(closed.has(orderId))throw Error('ORDER_ALREADY_CLOSED');
+   if(event.kind==='ORDER_STATE_CHANGED'){
+    if(!known.has(orderId)||held.has(orderId))throw Error('ORDER_STATE_CHANGE_REQUIRED');
+    closed.add(orderId);continue;
+   }
+   known.add(orderId);
+   if(event.kind==='RESERVATION_RELEASED'){
+    if(!held.delete(orderId))throw Error('UNKNOWN_RESERVATION_RELEASE');
+    closed.add(orderId);
+   }else if(event.kind==='PROPOSAL_RESPONSE'&&event.response==='REJECTED')held.delete(orderId);
+   else if(event.kind==='RESERVATION_SET'||['ACCEPTED','SUGGESTED'].includes(event.actualDecision))held.add(orderId);
    if(event.kind==='PROPOSAL_RESPONSE'){
     if(proposals.get(orderId)!==event.proposalEventId)throw Error('STALE_PROPOSAL_RESPONSE');
     proposals.delete(orderId);
@@ -110,6 +125,7 @@ function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElaps
     else active.get(event.orderId).commitment='CONFIRMED';
     continue;
    }
+   if(event.kind==='ORDER_STATE_CHANGED')continue;
    if(event.kind==='RESERVATION_RELEASED'){
     if(!active.delete(event.orderId))throw Error('UNKNOWN_RESERVATION_RELEASE');
     continue;
@@ -149,7 +165,7 @@ function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElaps
   const safe=['COMPLETE_EVENT_COVERAGE_REQUIRED','EVENT_SEQUENCE_UNVERIFIED','EVENT_TIME_REQUIRED',
    'ORDER_CONTRACT_REQUIRED','SERVICE_TARGET_REQUIRED','BASKET_CONTRACT_REQUIRED','COLLECTION_ESTIMATE_REFUSED',
    'DELIVERY_ESTIMATE_CONTRACT_REQUIRED','RELEASE_CONTRACT_REQUIRED','EVENT_CONTRACT_REQUIRED',
-   'PROPOSAL_RESPONSE_REQUIRED','STALE_PROPOSAL_RESPONSE','UNKNOWN_RESERVATION_RELEASE','ASSESSOR_CONTRACT_REQUIRED','REPLAY_BUDGET_REQUIRED','REPLAY_TIME_BUDGET_EXHAUSTED','EVENT_INPUT_TOO_LARGE'];
+   'ORDER_STATE_CONTRACT_REQUIRED','ORDER_STATE_CHANGE_REQUIRED','ORDER_ALREADY_CLOSED','PROPOSAL_RESPONSE_REQUIRED','STALE_PROPOSAL_RESPONSE','UNKNOWN_RESERVATION_RELEASE','ASSESSOR_CONTRACT_REQUIRED','REPLAY_BUDGET_REQUIRED','REPLAY_TIME_BUDGET_EXHAUSTED','EVENT_INPUT_TOO_LARGE'];
   return fail(safe.includes(error.message)?error.message:'CHRONOLOGICAL_REPLAY_FAILED');
  }
 }

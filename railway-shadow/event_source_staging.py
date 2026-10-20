@@ -59,7 +59,7 @@ class StagingEventSource:
                     self.db.execute('UPDATE bookings SET payload=? WHERE order_id=?',(canonical(previous),order_id))
             elif event['kind']=='RESERVATION_RELEASED':
                 self.db.execute('DELETE FROM bookings WHERE order_id=?',(order_id,))
-            elif event.get('actualDecision')!='DECLINED':
+            elif event['kind']!='ORDER_STATE_CHANGED' and event.get('actualDecision')!='DECLINED':
                 self.db.execute('INSERT OR REPLACE INTO bookings VALUES (?,?)',(order_id,canonical(event)))
             before_commit();self.db.commit();return 'RECORDED'
         except Exception:self.db.rollback();raise

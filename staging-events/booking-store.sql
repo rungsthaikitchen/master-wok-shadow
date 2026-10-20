@@ -94,7 +94,11 @@ BEGIN
   IF b.status<>'proposed' OR b.current_proposal_event_id IS DISTINCT FROM p_proposal THEN RAISE EXCEPTION 'STALE_PROPOSAL_RESPONSE'; END IF;
   e:=e||jsonb_build_object('kind','PROPOSAL_RESPONSE','orderId',b.order_alias,'proposalEventId',p_proposal,'response',CASE p_action WHEN 'accept' THEN 'ACCEPTED' ELSE 'REJECTED' END);
  ELSE
-  e:=e||jsonb_build_object('kind','RESERVATION_RELEASED','orderId',b.order_alias,'reason',CASE p_action WHEN 'cancel' THEN 'CANCELLED' ELSE 'COMPLETED' END);
+  IF EXISTS(SELECT 1 FROM master_wok_event_test.reservations WHERE stream_id=p_stream AND order_id=b.order_alias) THEN
+   e:=e||jsonb_build_object('kind','RESERVATION_RELEASED','orderId',b.order_alias,'reason',CASE p_action WHEN 'cancel' THEN 'CANCELLED' ELSE 'COMPLETED' END);
+  ELSE
+   e:=e||jsonb_build_object('kind','ORDER_STATE_CHANGED','orderId',b.order_alias,'status',CASE p_action WHEN 'cancel' THEN 'CANCELLED' ELSE 'COMPLETED' END);
+  END IF;
  END IF;
  PERFORM master_wok_event_test.record(p_stream,e);
  UPDATE master_wok_event_test.booking_rows SET
