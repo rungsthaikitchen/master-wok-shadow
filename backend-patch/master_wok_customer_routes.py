@@ -20,7 +20,13 @@ def register_staging_routes(app,env,*,transport=None):
     secret=env.get('MASTER_WOK_BACKEND_EVENT_SIGNING_KEY','')
     if not re.fullmatch('[a-f0-9]{64}',secret):raise ValueError('STAGING_SIGNING_KEY_REQUIRED')
     secret=bytes.fromhex(secret)
-    writer=transport if transport is not None else DatabaseTransport(env.get('MASTER_WOK_EVENT_WRITER_DSN'),'writer')
+    mode=env.get('MASTER_WOK_BACKEND_EVENT_STORE','synthetic')
+    if mode not in ('synthetic','booking_rows'):raise ValueError('STAGING_BOOKING_STORE_REQUIRED')
+    if transport is not None:writer=transport
+    elif mode=='booking_rows':
+        from event_booking_transport import BookingTransport
+        writer=BookingTransport(env.get('MASTER_WOK_EVENT_WRITER_DSN'))
+    else:writer=DatabaseTransport(env.get('MASTER_WOK_EVENT_WRITER_DSN'),'writer')
     routes=Blueprint('master_wok_staging_response',__name__)
     def response(body,status):
         result=jsonify(body);result.status_code=status

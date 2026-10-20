@@ -6,7 +6,7 @@ import threading
 from event_staging_handlers import admin_action,customer_response
 from event_capture_journal import EventCaptureError
 
-def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.0.1',port=0,response_secret=None):
+def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.0.1',port=0,response_secret=None,creation_transport=None):
  if any(not isinstance(t,str) or len(t)<32 for t in (operator_token,health_token)) or operator_token==health_token:raise ValueError('DISTINCT_STAGING_TOKENS_REQUIRED')
  class Handler(BaseHTTPRequestHandler):
   def log_message(self,*args):pass
@@ -22,6 +22,7 @@ def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.
    self.connection.settimeout(5)
    if not self.authorized(operator_token):return self.send(401,dict(status='UNAUTHORIZED'))
    allowed=('/staging/admin-action','/staging/customer-response')+ (('/staging/proposal-response',) if response_secret is not None else ())
+   if creation_transport is not None:allowed+=('/staging/create-booking',)
    if self.path not in allowed:return self.send(404,dict(status='NOT_FOUND'))
    try:
     if self.headers.get('Transfer-Encoding'):raise ValueError()
@@ -31,7 +32,13 @@ def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.
     if len(data)!=size:raise ValueError()
     body=json.loads(data)
     if not isinstance(body,dict):raise ValueError()
-    if self.path=='/staging/proposal-response':
+    if self.path=='/staging/create-booking':
+     from event_booking_transport import CREATE_QUERY
+     if set(body)!={'requestId','orderId','orderAlias','preferredTime','lines'}:raise ValueError()
+     rows=creation_transport(dict(query=CREATE_QUERY,parameters=[stream_id,body['requestId'],body['orderId'],body['orderAlias'],body['preferredTime'],body['lines']]))
+     if not isinstance(rows,list) or len(rows)!=1 or set(rows[0])!={'result'} or rows[0]['result'] not in ('RECORDED','ALREADY_RECORDED'):raise ValueError()
+     result=dict(status=rows[0]['result'],sourceRequests=1,verified=False)
+    elif self.path=='/staging/proposal-response':
      from event_customer_response_staging import respond
      result=respond('POST',body,stream_id,enabled=True,secret=response_secret,transport=writer)
     elif self.path=='/staging/admin-action':

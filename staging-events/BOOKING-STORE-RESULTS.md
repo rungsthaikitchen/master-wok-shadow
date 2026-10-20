@@ -45,3 +45,5 @@ The staging security advisor returned informational RLS-enabled/no-policy notice
 - Basket structure/quantity/modifier IDs are checked; this is not a trusted live price/menu catalog validator. Unsupported items must remain UNVERIFIED in replay. Creation does not claim a capacity-engine approval or capture browser-rejected checkout attempts.
 - No expiry policy, token issuer, notification change or public API was added.
 - Next: adapt the default-off backend transport to these new transaction signatures in staging with explicit narrowly scoped privileges, then test the full creation/offer/response path. No production activation is implied. These SQL files are staging development artifacts, not production migrations or instructions to run against production.
+
+Follow-up: BOOKING-BACKEND-INTEGRATION.md records the subsequent reviewed staging-only writer grants and fixed-query adapter. The earlier no-execution-access statement describes the initial isolated schema stage.

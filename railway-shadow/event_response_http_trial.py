@@ -16,6 +16,7 @@ STREAM='72c0464b-9fa7-4947-82d2-0ac4dbd42438'
 DIRECTORY=Path('/data/customer-http-pg-72c0464b')
 
 class TrialBudget:
+ WRITER_LIMIT=8
  def __init__(self,path):
   self.path=Path(path)
   if self.path.is_symlink():raise EventCaptureError('TRIAL_PATH_REFUSED')
@@ -29,14 +30,14 @@ class TrialBudget:
    with sqlite3.connect(self.path,timeout=5) as db:
     db.execute('BEGIN IMMEDIATE')
     used=db.execute('SELECT used FROM attempts WHERE kind=?',(kind,)).fetchone()[0]
-    if used >= (1 if kind=='reader' else 8):raise EventCaptureError('TRIAL_BUDGET_EXHAUSTED')
+    if used >= (1 if kind=='reader' else self.WRITER_LIMIT):raise EventCaptureError('TRIAL_BUDGET_EXHAUSTED')
     db.execute('UPDATE attempts SET used=used+1 WHERE kind=?',(kind,))
    return transport(payload)
   return call
  def summary(self):
   with sqlite3.connect(self.path) as db:return dict(db.execute('SELECT kind,used FROM attempts'))
 
-def exercise(server,operator_token,secret):
+def exercise(server,operator_token,secret,*,stream_id=STREAM):
  base='http://127.0.0.1:'+str(server.server_port)
  def post(path,body,expected):
   request=Request(base+path,data=json.dumps(body).encode(),headers={'Authorization':'Bearer '+operator_token,'Content-Type':'application/json'})
@@ -50,7 +51,7 @@ def exercise(server,operator_token,secret):
  def offer(number):
   return post('/staging/admin-action',dict(requestId='signed-offer-'+str(number),orderId='synthetic-runtime',action='offer',targetAt='2026-10-20T'+str(16+number)+':00:00Z'),200)
  def answer(number,decision='accept',expected=200):
-  token=issue_token(STREAM,'synthetic-runtime','signed-offer-'+str(number),enabled=True,secret=secret)
+  token=issue_token(stream_id,'synthetic-runtime','signed-offer-'+str(number),enabled=True,secret=secret)
   return post('/staging/proposal-response',dict(token=token,decision=decision),expected)
  offer(1);offer(2);answer(1,expected=409)
  if answer(2)['status']!='RECORDED' or answer(2)['status']!='ALREADY_RECORDED':raise EventCaptureError('TRIAL_RETRY_REFUSED')
