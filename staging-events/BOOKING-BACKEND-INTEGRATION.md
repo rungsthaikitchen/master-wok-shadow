@@ -13,3 +13,13 @@ The trial creates a two-line basket through HTTP, then issues two proposals, ref
 Local validation: all 52 event-related Python tests passed in 11.952 seconds, including supplied-backend patch startup, fixed SQL binding/redaction, optional creation HTTP route, combined local transaction lifecycle and nine-call persistent budget. These local tests inject database connections/transports; they do not themselves prove the new PostgreSQL role execution.
 
 Cleanup: disable the synthetic source, set the new trial flag false and restore the default-off runtime command. Preserve all evidence and budgets. Production-shaped store remains collection/same-day only. No automatic expiry, cross-day migration, live catalog/pricing checks or complete legacy writer integration is claimed. The existing production shadow observer and live booking engine are unchanged.
+
+## Actual deployed acceptance — 20 October 2026
+
+Deployment 152f3f29-7a32-4657-9f94-c4566013ebc0, pinned bb9cd6617abd10b617e54fdeb410d22b6415069c, reached SUCCESS. At 06:57:22 UTC it logged OBSERVED / QUEUED / RECORDED, observations=3, attempts={reader:1,writer:9}, httpCalls=9 and verified:false. This uses the actual restricted PostgreSQL login, not an admin SET ROLE session.
+
+Separate read-only DB verification confirmed two item rows and six source events: initial requested-time hold; offers 1 and 2; ACCEPTED response to signed-offer-2; offer 3; REJECTED response to signed-offer-3. Final status customer_declined_time, original preferred_time 17:00 UTC unchanged, retained proposed_time 19:00 UTC, confirmed_time null, current_proposal_event_id null and zero reservations. The stream was then disabled with all evidence preserved. No stale/conflicting response or identical retry added an event.
+
+The security advisor reported no finding on the new booking tables after the scoped policies were added. Two previous informational RLS/no-policy notices remain on isolated delivery-test tables; see https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy. No unrelated policy change was made.
+
+Cleanup deployment fa74f454-dc0e-489a-87a8-63e56e2c178a reached SUCCESS and logged DISABLED / sourceRequests=0 at 06:58:39 UTC. The new trial flag is false, default-off runtime command restored and no Railway changes remain staged. Previous budgets, fixture histories and production are unchanged.
