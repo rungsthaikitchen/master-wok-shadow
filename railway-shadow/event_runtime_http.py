@@ -6,7 +6,7 @@ import threading
 from event_staging_handlers import admin_action,customer_response
 from event_capture_journal import EventCaptureError
 
-def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.0.1',port=0):
+def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.0.1',port=0,response_secret=None):
  if any(not isinstance(t,str) or len(t)<32 for t in (operator_token,health_token)) or operator_token==health_token:raise ValueError('DISTINCT_STAGING_TOKENS_REQUIRED')
  class Handler(BaseHTTPRequestHandler):
   def log_message(self,*args):pass
@@ -21,7 +21,8 @@ def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.
   def do_POST(self):
    self.connection.settimeout(5)
    if not self.authorized(operator_token):return self.send(401,dict(status='UNAUTHORIZED'))
-   if self.path not in ('/staging/admin-action','/staging/customer-response'):return self.send(404,dict(status='NOT_FOUND'))
+   allowed=('/staging/admin-action','/staging/customer-response')+ (('/staging/proposal-response',) if response_secret is not None else ())
+   if self.path not in allowed:return self.send(404,dict(status='NOT_FOUND'))
    try:
     if self.headers.get('Transfer-Encoding'):raise ValueError()
     size=int(self.headers.get('Content-Length','0'))
@@ -30,7 +31,10 @@ def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.
     if len(data)!=size:raise ValueError()
     body=json.loads(data)
     if not isinstance(body,dict):raise ValueError()
-    if self.path=='/staging/admin-action':
+    if self.path=='/staging/proposal-response':
+     from event_customer_response_staging import respond
+     result=respond('POST',body,stream_id,enabled=True,secret=response_secret,transport=writer)
+    elif self.path=='/staging/admin-action':
      if set(body)!={'requestId','orderId','action','targetAt'}:raise ValueError()
      result=admin_action(stream_id,body['requestId'],body['orderId'],body['action'],body['targetAt'],enabled=True,transport=writer)
     else:
