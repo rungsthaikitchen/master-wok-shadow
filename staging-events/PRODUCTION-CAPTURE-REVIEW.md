@@ -59,3 +59,7 @@ Four local characterization tests passed (node --test staging-events/production-
 Current deployed Railway server.py and order-confirm v18 source are needed to finish the exact handler diff. Existing credentials need not be disclosed; repository access or those source files is sufficient. Also verify the website's served revision and active call paths before retiring any legacy handler.
 
 Next implementation: production-shaped staging fixtures and a reviewed shared transaction/adapter covering these lifecycle cases. Production mutation/capture activation remains outside this review. No additional service, bucket or paid provider is required for the next local/staging code work.
+
+## Owner-supplied backend follow-up
+
+The owner subsequently supplied current server(1).py, SHA-256 ad15337033c5b4a91816e2c5875460dcff1364d43e6a9619be8aa8a1d6412d88, identical to the previous uploaded file. Backend route findings can now be prepared against that owner-supplied current source. Independent deployed commit matching and order-confirm Edge source remain unverified. See CUSTOMER-RESPONSE-ADAPTER.md for the default-off proposal-bound response preparation and source-specific findings. No production change was applied.
