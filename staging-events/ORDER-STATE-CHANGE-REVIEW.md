@@ -24,3 +24,7 @@ Review/deployment sequence:
 4. Keep production unchanged. Delivery/cross-date lifecycle handling and remaining live mutation paths still need separate integration work and review.
 
 The new event changes source identity/build checks. Use a fresh journal for the candidate trial; never mix it into an identity-bound journal from the previous build.
+
+## Bounded authenticated trial candidate
+
+event_terminal_http_trial.py is disabled unless MASTER_WOK_TERMINAL_HTTP_TRIAL_ENABLED=true, all other runtime/trial flags are explicitly false, and an explicit deadline is within ten minutes. Each outbound request checks the deadline. A persistent dedicated budget caps the run at twelve writer attempts and one export. Stream 682fa56b-34ea-4ce5-bf91-324a95075c02 and /data/terminal-http-682fa56b are fixed; previous budgets are not reset. The loopback HTTP server has no public domain. Two fixed synthetic collection baskets exercise rejection followed by cancel/complete, exact terminal retry, and late acceptance refusal. Expected export: eight events, two hypothetical comparisons, no remaining reservations. No cloud backup/provider calls are enabled.
