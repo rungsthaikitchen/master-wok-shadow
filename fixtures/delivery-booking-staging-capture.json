@@ -1,0 +1,170 @@
+{
+  "events": [
+    {
+      "at": "2026-10-20T07:42:44.117095Z",
+      "kind": "RESERVATION_SET",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          }
+        ],
+        "orderId": "synthetic-delivery",
+        "targetAt": "2026-10-20T17:00:00.000000Z",
+        "orderType": "delivery",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "delivery-create",
+      "sequence": 1,
+      "commitment": "PROPOSED"
+    },
+    {
+      "at": "2026-10-20T07:42:44.163129Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          }
+        ],
+        "orderId": "synthetic-delivery",
+        "targetAt": "2026-10-20T18:00:00.000000Z",
+        "orderType": "delivery",
+        "deliveryReadyEstimate": {
+          "basis": "DELIVERY_PLANNER_ESTIMATE",
+          "arrivalAt": "2026-10-20T18:10:00Z",
+          "estimatedAt": "2026-10-20T07:42:44.150129Z",
+          "foodReadyAt": "2026-10-20T17:55:00Z"
+        }
+      },
+      "eventId": "delivery-offer-1",
+      "sequence": 2,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T07:42:44.166666Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          }
+        ],
+        "orderId": "synthetic-delivery",
+        "targetAt": "2026-10-20T18:30:00.000000Z",
+        "orderType": "delivery",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "delivery-offer-2",
+      "sequence": 3,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T07:42:44.170644Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          }
+        ],
+        "orderId": "synthetic-delivery",
+        "targetAt": "2026-10-20T18:00:00.000000Z",
+        "orderType": "delivery",
+        "deliveryReadyEstimate": {
+          "basis": "DELIVERY_PLANNER_ESTIMATE",
+          "arrivalAt": "2026-10-20T18:10:00Z",
+          "estimatedAt": "2026-10-20T07:42:44.150129Z",
+          "foodReadyAt": "2026-10-20T17:55:00Z"
+        }
+      },
+      "eventId": "delivery-offer-3",
+      "sequence": 4,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T07:42:44.172201Z",
+      "kind": "PROPOSAL_RESPONSE",
+      "eventId": "delivery-accept-3",
+      "orderId": "synthetic-delivery",
+      "response": "ACCEPTED",
+      "sequence": 5,
+      "proposalEventId": "delivery-offer-3"
+    },
+    {
+      "at": "2026-10-20T07:42:44.174994Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "panang-curry"
+          }
+        ],
+        "orderId": "synthetic-delivery",
+        "targetAt": "2026-10-20T19:00:00.000000Z",
+        "orderType": "delivery",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "delivery-offer-4",
+      "sequence": 6,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-20T07:42:44.176018Z",
+      "kind": "PROPOSAL_RESPONSE",
+      "eventId": "delivery-reject-4",
+      "orderId": "synthetic-delivery",
+      "response": "REJECTED",
+      "sequence": 7,
+      "proposalEventId": "delivery-offer-4"
+    },
+    {
+      "at": "2026-10-20T07:42:44.176985Z",
+      "kind": "ORDER_STATE_CHANGED",
+      "status": "COMPLETED",
+      "eventId": "delivery-complete",
+      "orderId": "synthetic-delivery",
+      "sequence": 8
+    }
+  ],
+  "coverage": {
+    "basis": "DECISION_EVENT_LOG",
+    "complete": true,
+    "throughAt": "2026-10-20T07:42:44.176985Z",
+    "eventCount": 8,
+    "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+    "lastSequence": 8,
+    "firstSequence": 1
+  },
+  "serviceDate": "2026-10-20"
+}
