@@ -83,6 +83,7 @@ BEGIN
   RAISE EXCEPTION 'REQUEST_ID_REUSED';
  END IF;
  SELECT * INTO STRICT b FROM master_wok_event_test.booking_rows WHERE stream_id=p_stream AND id=p_order FOR UPDATE;
+ IF b.status='moved_service_date' THEN RAISE EXCEPTION 'ORDER_MOVED_SERVICE_DATE'; END IF;
  IF b.status IN ('cancelled','completed') THEN RAISE EXCEPTION 'TERMINAL_ORDER'; END IF;
  IF (p_action='offer')<>(p_target IS NOT NULL) OR (p_action IN ('accept','reject'))<>(p_proposal IS NOT NULL) THEN RAISE EXCEPTION 'COMMAND_FIELDS_REFUSED'; END IF;
  e:=jsonb_build_object('eventId',p_request,'at',to_char(clock_timestamp() AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"'));

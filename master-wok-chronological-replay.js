@@ -58,13 +58,21 @@ function validateEventBatch(input){
   if(Buffer.byteLength(JSON.stringify(input))>5000000)throw Error('EVENT_INPUT_TOO_LARGE');
   const through=stamp(input.coverage.throughAt);
   const events=structuredClone(input.events).sort((a,b)=>a.sequence-b.sequence);
-  const ids=new Set();let prior=-Infinity;
+  const ids=new Set(),transferIds=new Set();let prior=-Infinity;
   for(const [index,event] of events.entries()){
    if(!event||!id(event.eventId)||ids.has(event.eventId)||event.sequence!==index+1||
-    !['RESERVATION_SET','RESERVATION_RELEASED','BOOKING_DECISION','PROPOSAL_RESPONSE','ORDER_STATE_CHANGED'].includes(event.kind)||
+    !['RESERVATION_SET','RESERVATION_RELEASED','BOOKING_DECISION','PROPOSAL_RESPONSE','ORDER_STATE_CHANGED','RESERVATION_TRANSFERRED_OUT','RESERVATION_TRANSFERRED_IN'].includes(event.kind)||
     stamp(event.at)<prior||stamp(event.at)>through||local(event.at).day>input.serviceDate)throw Error('EVENT_SEQUENCE_UNVERIFIED');
    prior=stamp(event.at);ids.add(event.eventId);
-   if(event.kind==='PROPOSAL_RESPONSE'){
+   if(event.kind==='RESERVATION_TRANSFERRED_OUT'||event.kind==='RESERVATION_TRANSFERRED_IN'){
+    const outgoing=event.kind==='RESERVATION_TRANSFERRED_OUT';
+    const otherDay=outgoing?event.toServiceDate:event.fromServiceDate;
+    if(!id(event.transferId)||event.transferId.length>80||transferIds.has(event.transferId)||!validServiceDate(otherDay)||otherDay===input.serviceDate||
+     !exact(event,outgoing?['eventId','sequence','at','kind','orderId','transferId','toServiceDate']:['eventId','sequence','at','kind','order','actualDecision','transferId','fromServiceDate']))throw Error('TRANSFER_CONTRACT_REQUIRED');
+    transferIds.add(event.transferId);
+    if(outgoing){if(!id(event.orderId))throw Error('TRANSFER_CONTRACT_REQUIRED');}
+    else{if(event.actualDecision!=='SUGGESTED'||event.order?.deliveryReadyEstimate!==null)throw Error('TRANSFER_CONTRACT_REQUIRED');validateOrder(event.order,input.serviceDate,event.at);}
+   }else if(event.kind==='PROPOSAL_RESPONSE'){
     if(!exact(event,['eventId','sequence','at','kind','orderId','proposalEventId','response'])||
      !id(event.orderId)||!id(event.proposalEventId)||!['ACCEPTED','REJECTED'].includes(event.response))throw Error('PROPOSAL_RESPONSE_REQUIRED');
    }else if(event.kind==='ORDER_STATE_CHANGED'){
@@ -91,6 +99,11 @@ function validateEventBatch(input){
     closed.add(orderId);continue;
    }
    known.add(orderId);
+   if(event.kind==='RESERVATION_TRANSFERRED_IN'&&held.has(orderId))throw Error('TRANSFER_DESTINATION_OCCUPIED');
+   if(event.kind==='RESERVATION_TRANSFERRED_OUT'){
+    if(!held.delete(orderId))throw Error('UNKNOWN_RESERVATION_RELEASE');
+    proposals.delete(orderId);continue;
+   }
    if(event.kind==='RESERVATION_RELEASED'){
     if(!held.delete(orderId))throw Error('UNKNOWN_RESERVATION_RELEASE');
     closed.add(orderId);
@@ -127,7 +140,7 @@ function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElaps
     continue;
    }
    if(event.kind==='ORDER_STATE_CHANGED')continue;
-   if(event.kind==='RESERVATION_RELEASED'){
+   if(event.kind==='RESERVATION_RELEASED'||event.kind==='RESERVATION_TRANSFERRED_OUT'){
     if(!active.delete(event.orderId))throw Error('UNKNOWN_RESERVATION_RELEASE');
     continue;
    }
@@ -166,7 +179,7 @@ function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElaps
   const safe=['COMPLETE_EVENT_COVERAGE_REQUIRED','EVENT_SEQUENCE_UNVERIFIED','EVENT_TIME_REQUIRED',
    'ORDER_CONTRACT_REQUIRED','SERVICE_TARGET_REQUIRED','BASKET_CONTRACT_REQUIRED','COLLECTION_ESTIMATE_REFUSED',
    'DELIVERY_ESTIMATE_CONTRACT_REQUIRED','RELEASE_CONTRACT_REQUIRED','EVENT_CONTRACT_REQUIRED',
-   'ORDER_STATE_CONTRACT_REQUIRED','ORDER_STATE_CHANGE_REQUIRED','ORDER_ALREADY_CLOSED','PROPOSAL_RESPONSE_REQUIRED','STALE_PROPOSAL_RESPONSE','UNKNOWN_RESERVATION_RELEASE','ASSESSOR_CONTRACT_REQUIRED','REPLAY_BUDGET_REQUIRED','REPLAY_TIME_BUDGET_EXHAUSTED','EVENT_INPUT_TOO_LARGE'];
+   'TRANSFER_CONTRACT_REQUIRED','TRANSFER_DESTINATION_OCCUPIED','ORDER_STATE_CONTRACT_REQUIRED','ORDER_STATE_CHANGE_REQUIRED','ORDER_ALREADY_CLOSED','PROPOSAL_RESPONSE_REQUIRED','STALE_PROPOSAL_RESPONSE','UNKNOWN_RESERVATION_RELEASE','ASSESSOR_CONTRACT_REQUIRED','REPLAY_BUDGET_REQUIRED','REPLAY_TIME_BUDGET_EXHAUSTED','EVENT_INPUT_TOO_LARGE'];
   return fail(safe.includes(error.message)?error.message:'CHRONOLOGICAL_REPLAY_FAILED');
  }
 }

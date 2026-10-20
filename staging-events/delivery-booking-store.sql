@@ -83,6 +83,7 @@ BEGIN
  END IF;
  SELECT * INTO STRICT b FROM master_wok_event_test.booking_rows WHERE stream_id=p_stream AND id=p_order FOR UPDATE;
  IF b.order_type<>'delivery' THEN RAISE EXCEPTION 'DELIVERY_ORDER_REQUIRED'; END IF;
+ IF b.status='moved_service_date' THEN RAISE EXCEPTION 'ORDER_MOVED_SERVICE_DATE'; END IF;
  IF b.status IN ('cancelled','completed') THEN RAISE EXCEPTION 'TERMINAL_ORDER'; END IF;
  IF p_action='confirm' AND b.status='customer_declined_time' THEN RAISE EXCEPTION 'NEW_OFFER_REQUIRED'; END IF;
  target:=CASE WHEN p_action='offer' THEN p_target ELSE coalesce(b.proposed_time,b.confirmed_time,b.preferred_time) END;

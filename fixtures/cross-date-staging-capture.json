@@ -1,0 +1,138 @@
+{
+  "source_batch": {
+    "events": [
+      {
+        "at": "2026-10-20T10:05:50.961169Z",
+        "kind": "RESERVATION_SET",
+        "order": {
+          "lines": [
+            {
+              "qty": 1,
+              "mods": [],
+              "itemId": "jasmine-rice"
+            }
+          ],
+          "orderId": "synthetic-cross-date",
+          "targetAt": "2026-10-20T18:00:00.000000Z",
+          "orderType": "collection",
+          "deliveryReadyEstimate": null
+        },
+        "eventId": "move-create",
+        "sequence": 1,
+        "commitment": "PROPOSED"
+      },
+      {
+        "at": "2026-10-20T10:05:50.976863Z",
+        "kind": "RESERVATION_TRANSFERRED_OUT",
+        "eventId": "move-forward_out",
+        "orderId": "synthetic-cross-date",
+        "sequence": 2,
+        "transferId": "move-forward",
+        "toServiceDate": "2026-10-21"
+      },
+      {
+        "at": "2026-10-20T10:05:50.984308Z",
+        "kind": "RESERVATION_TRANSFERRED_IN",
+        "order": {
+          "lines": [
+            {
+              "qty": 1,
+              "mods": [],
+              "itemId": "jasmine-rice"
+            }
+          ],
+          "orderId": "synthetic-cross-date",
+          "targetAt": "2026-10-20T19:00:00.000000Z",
+          "orderType": "collection",
+          "deliveryReadyEstimate": null
+        },
+        "eventId": "move-back_in",
+        "sequence": 3,
+        "transferId": "move-back",
+        "actualDecision": "SUGGESTED",
+        "fromServiceDate": "2026-10-21"
+      },
+      {
+        "at": "2026-10-20T10:05:50.988208Z",
+        "kind": "PROPOSAL_RESPONSE",
+        "eventId": "reject-return-offer",
+        "orderId": "synthetic-cross-date",
+        "response": "REJECTED",
+        "sequence": 4,
+        "proposalEventId": "move-back_in"
+      },
+      {
+        "at": "2026-10-20T10:05:50.989224Z",
+        "kind": "ORDER_STATE_CHANGED",
+        "status": "COMPLETED",
+        "eventId": "close-return-order",
+        "orderId": "synthetic-cross-date",
+        "sequence": 5
+      }
+    ],
+    "coverage": {
+      "basis": "DECISION_EVENT_LOG",
+      "complete": true,
+      "throughAt": "2026-10-20T10:05:50.989224Z",
+      "eventCount": 5,
+      "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+      "lastSequence": 5,
+      "firstSequence": 1
+    },
+    "serviceDate": "2026-10-20"
+  },
+  "destination_batch": {
+    "events": [
+      {
+        "at": "2026-10-20T10:05:50.976863Z",
+        "kind": "RESERVATION_TRANSFERRED_IN",
+        "order": {
+          "lines": [
+            {
+              "qty": 1,
+              "mods": [],
+              "itemId": "jasmine-rice"
+            }
+          ],
+          "orderId": "synthetic-cross-date",
+          "targetAt": "2026-10-21T18:00:00.000000Z",
+          "orderType": "collection",
+          "deliveryReadyEstimate": null
+        },
+        "eventId": "move-forward_in",
+        "sequence": 1,
+        "transferId": "move-forward",
+        "actualDecision": "SUGGESTED",
+        "fromServiceDate": "2026-10-20"
+      },
+      {
+        "at": "2026-10-20T10:05:50.981484Z",
+        "kind": "PROPOSAL_RESPONSE",
+        "eventId": "accept-new-day",
+        "orderId": "synthetic-cross-date",
+        "response": "ACCEPTED",
+        "sequence": 2,
+        "proposalEventId": "move-forward_in"
+      },
+      {
+        "at": "2026-10-20T10:05:50.984308Z",
+        "kind": "RESERVATION_TRANSFERRED_OUT",
+        "eventId": "move-back_out",
+        "orderId": "synthetic-cross-date",
+        "sequence": 3,
+        "transferId": "move-back",
+        "toServiceDate": "2026-10-20"
+      }
+    ],
+    "coverage": {
+      "basis": "DECISION_EVENT_LOG",
+      "complete": true,
+      "throughAt": "2026-10-20T10:05:50.984308Z",
+      "eventCount": 3,
+      "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+      "lastSequence": 3,
+      "firstSequence": 1
+    },
+    "serviceDate": "2026-10-21"
+  }
+}
