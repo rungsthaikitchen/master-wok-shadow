@@ -43,3 +43,23 @@ The GET-only authenticated /healthz endpoint reports acquisition/recovery health
 A healthy monitor means fresh, complete paired evidence was processed and a matching recovery round trip was demonstrated. Recommendations may still be UNVERIFIED; none of these states confirms actual cooking, travel or a booking decision.
 
 Validation: all 79 Python event tests pass. The 20 focused transfer tests pass, including 11 new monitor/recovery tests; the new monitor suite also passes with TZ=UTC. Tests use synthetic captures and injected object storage. Node implementation files are unchanged in this step; the preceding 187 core / 19 staging tests per timezone are not presented as new runs.
+
+## Subsequent real-provider rehearsal
+
+The reviewed implementation was then pinned to commit 20d9dc996feca8c077ab8e6922d5fc4f61e223c3 on the existing private staging service and volume. Disabled preflight deployment dc493a10-f39f-4246-ac80-8cb5aa41c3f6 reached SUCCESS and logged DISABLED/sourceRequests=0 at 2026-10-21T06:46:54.679196329Z.
+
+The existing reader received temporary receipt SELECT and export EXECUTE only; move EXECUTE and event INSERT remained false. Only the two existing synthetic streams were enabled. No booking writer grant was needed. The unchanged history contains eleven events (including the preceding explicitly labelled administrative cleanup), three transfer receipts and zero remaining reservations.
+
+Provider rehearsal deployment 293f651e-e34f-4358-b1ee-1ebce2232871 reached SUCCESS. At 2026-10-21T06:47:57.915528564Z it logged:
+
+```json
+{"status":"OBSERVED","sourceRequests":1,"intake":"QUEUED","recovery":"PAIR_RECOVERY_VERIFIED","acknowledgedBundles":1,"healthy":true,"verified":false}
+```
+
+This result requires an authenticated fixed-reader export, both replay results acknowledged, a real existing-bucket upload/readback, and a new-file restore with source access blocked. It is not inferred from the injected-storage tests. The provider-path restore ran in the staging process; independent-process verification was tested separately offline. No new service, bucket, domain or volume was created.
+
+At 2026-10-21T06:49:07.960546858Z the next authenticated cycle logged OBSERVED, ALREADY_QUEUED, CACHED_PAIR_RECOVERY_VERIFIED, acknowledgedBundles=1 and healthy=true. An unchanged poll therefore refreshed health without adding a second bundle or repeating the object round trip. A management read independently confirmed the source remained at eleven events, three receipts and zero reservations.
+
+The monitor/recovery flags were then set false and the deadline zero, both fixture streams disabled, and the reader receipt SELECT / export EXECUTE grants revoked. The ordinary disabled staging start command was restored. No production or booking decisions were changed.
+
+Cleanup deployment 80e725d2-3376-4ead-9f27-5b3cb9dfa57c reached SUCCESS on the pinned code. The final source/grant check returned enabled_streams=0 and reader_export=false. Trial evidence remains in /data/transfer-monitor-staging/transfer-bundles.sqlite3 and the existing bucket; no live production data was written.
