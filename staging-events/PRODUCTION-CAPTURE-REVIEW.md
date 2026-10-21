@@ -63,3 +63,27 @@ Next implementation: production-shaped staging fixtures and a reviewed shared tr
 ## Owner-supplied backend follow-up
 
 The owner subsequently supplied current server(1).py, SHA-256 ad15337033c5b4a91816e2c5875460dcff1364d43e6a9619be8aa8a1d6412d88, identical to the previous uploaded file. Backend route findings can now be prepared against that owner-supplied current source. Independent deployed commit matching and order-confirm Edge source remain unverified. See CUSTOMER-RESPONSE-ADAPTER.md for the default-off proposal-bound response preparation and source-specific findings. No production change was applied.
+
+## 21 October: isolated legacy response characterization
+
+While Railway builds are paused, read-only inspection reconfirmed backend deployment 7fb18840-8d11-441a-8c40-13abf60ee5b9, commit 51616be77f92fcfd99958e8d784361eb232073a5, on main with start command python server.py. Repository retrieval still returned 404 and order-confirm source retrieval still returned UNAVAILABLE. The configured SUPABASE_ORDER_ACTION_URL variable exists; its value and active target were not inspected. No deployed-source equivalence is claimed.
+
+Seven new tests in railway-shadow/test_event_legacy_backend.py execute the exact hashed owner-supplied source with an empty import environment, mocked HTTP/database/notification modules and synthetic orders. Passing these tests confirms legacy discrepancies, not fixes:
+
+| Reproduced case | Observed result |
+|---|---|
+| GET accept, no token | Updates the order; merely opening a link can mutate it |
+| Matching order ID, unrelated token | Token is not validated before mutation |
+| Accept PATCH fails | Customer still sees an acceptance success page |
+| Neither response finds an order | Both routes still display success wording without a write |
+| Cancelled row with no proposal | Acceptance still writes customer_accepted_time |
+| New offer commits between lookup and PATCH | PATCH has only an ID predicate; an older target can become confirmed alongside the newer proposal |
+| Decline | Updates status only; time fields remain, requiring consistent reservation interpretation |
+
+The simulated read/write interleaving demonstrates a missing revision predicate in this source. It is not a real database concurrency test. All HTTP methods are mocks; no live endpoint, customer row or notification provider is exercised.
+
+The smallest next integration remains the existing default-off, POST-only staging adapter plus the shared transaction: validate the current proposal revision and allowed status while holding the order lock, update the single reservation and append its event atomically, and return success only from a committed receipt. Notification failure must not change that receipt. Before replacing legacy links, establish which deployed customer-response paths are active and verify their current source. Preserve the requested original time as history, not a second reservation.
+
+These tests deliberately remain separate from the adapter tests so a legacy reproduction passing cannot be mistaken for corrected production behaviour. No production scheduling changes, new services or provider charges were introduced.
+
+Validation: all 97 Python event tests passed with MASTER_WOK_REVIEW_SERVER_PATH set, including the seven new legacy characterizations and existing staging adapter tests; no tests skipped. The supplied backend is loaded locally only. No runtime code changed, so the previously passed Node suites were not repeated for this test/documentation-only change.
