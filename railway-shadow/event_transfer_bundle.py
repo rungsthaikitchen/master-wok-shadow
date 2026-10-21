@@ -87,18 +87,24 @@ class TransferBundleStore:
    if r.get('status')!='REPLAYED' or r.get('verified') is not False or r.get('networkRequests')!=0 or r.get('serviceDate')!=b['serviceDate'] or r.get('coverageThroughAt')!=b['coverage']['throughAt'] or r.get('decisionCount')!=len(events) or len(r.get('observations',[]))!=len(events):raise EventCaptureError('BUNDLE_COMPARISON_INCOMPLETE')
    for event,value in zip(events,r['observations']):
     if value.get('eventId')!=event['eventId'] or value.get('sequence')!=event['sequence'] or value.get('orderId')!=event['order']['orderId'] or value.get('decisionAt')!=event['at'] or value.get('actualDecision')!=event['actualDecision'] or value.get('verified') is not False:raise EventCaptureError('BUNDLE_COMPARISON_INCOMPLETE')
+ def assert_source_allowed(self):
+  if self.db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='recovery_guard'").fetchone():
+   raise EventCaptureError('RECOVERED_STORE_SOURCE_DISABLED')
  def verify(self,db=None):
   db=self.db if db is None else db
-  if db.execute('PRAGMA integrity_check').fetchone()[0]!='ok' or db.execute('SELECT identity FROM meta').fetchall()!=[(self.identity,)]:raise EventCaptureError('BUNDLE_ACK_INTEGRITY_FAILED')
-  count=0
-  for key,body,build,state,result,sha in db.execute('SELECT key,payload,build,state,result,result_hash FROM bundles'):
+  if db.execute('PRAGMA application_id').fetchone()[0]!=0x4D575442 or db.execute('PRAGMA user_version').fetchone()[0]!=1 or db.execute('PRAGMA integrity_check').fetchone()[0]!='ok' or db.execute('SELECT identity FROM meta').fetchall()!=[(self.identity,)]:raise EventCaptureError('BUNDLE_ACK_INTEGRITY_FAILED')
+  count=0;expected_streams={}
+  for key,body,build,state,result,sha in db.execute('SELECT key,payload,build,state,result,result_hash FROM bundles ORDER BY rowid'):
    bundle=json.loads(body)
+   for stream in bundle['streams']:
+    b=stream['batch'];expected_streams[stream['streamId']]=(stream['streamId'],b['serviceDate'],canonical(b['events']),timestamp(b['coverage']['throughAt']).timestamp())
    if key!=digest(dict(identity=self.identity,bundle=bundle,build=build)):raise EventCaptureError('BUNDLE_ACK_INTEGRITY_FAILED')
    if state=='ACKED':
     value=json.loads(result)
     if digest(value)!=sha:raise EventCaptureError('BUNDLE_ACK_INTEGRITY_FAILED')
     self._check_result(bundle,value);count+=1
    elif state!='PENDING' or result is not None or sha is not None:raise EventCaptureError('BUNDLE_ACK_INTEGRITY_FAILED')
+  if db.execute('SELECT * FROM streams ORDER BY id').fetchall()!=sorted(expected_streams.values()):raise EventCaptureError('BUNDLE_STREAM_INTEGRITY_FAILED')
   return dict(acknowledged=count,bundles=db.execute('SELECT count(*) FROM bundles').fetchone()[0])
  def snapshot(self,destination):
   path=Path(destination)
@@ -119,6 +125,7 @@ class TransferBundleStore:
 def poll_pair(store=None,*,enabled=False,transport=None):
  if enabled is not True:return dict(status='DISABLED',sourceRequests=0,verified=False)
  if not isinstance(store,TransferBundleStore) or not callable(transport):raise EventCaptureError('BUNDLE_TRANSPORT_REQUIRED')
+ store.assert_source_allowed()
  rows=transport(dict(query=QUERY,parameters=store.streams))
  if not isinstance(rows,list) or len(rows)!=1 or set(rows[0])!={'bundle'}:raise EventCaptureError('BUNDLE_ENVELOPE_REQUIRED')
  return dict(store.enqueue(rows[0]['bundle']),sourceRequests=1,verified=False)
