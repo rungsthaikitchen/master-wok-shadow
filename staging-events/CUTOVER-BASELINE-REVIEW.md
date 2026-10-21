@@ -8,7 +8,7 @@ The empty-start replay contract cannot describe starting observation with existi
 
 The batch retains the same three root fields. For this mode coverage.basis is CUTOVER_BASELINE_AND_EVENT_LOG and initialState is SAVED_STATE_AT_CUTOVER. complete=true asserts completeness FROM the cutover, not completeness of the earlier service history. The first sequence must be CUTOVER_BASELINE with basis CURRENT_SAVED_STATE_AT_CUTOVER, a server at timestamp, commitments, and unreservedOrderIds. It never contributes a decision observation.
 
-Each held commitment has the existing allowlisted order payload, commitment PROPOSED or CONFIRMED, and proposalEventId. Proposed reservations require a unique opaque source-mapped current offer revision; confirmed rows require null. Missing or ambiguous revisions are rejected, not fabricated. Known orders with no capacity hold may be listed by pseudonymous ID so a later terminal status can be recorded without creating a reservation.
+Each held commitment has the existing allowlisted order payload, commitment PROPOSED or CONFIRMED, and proposalEventId. Proposed reservations require a unique opaque source-mapped current reservation revision; confirmed rows require null. Missing or ambiguous revisions are rejected, not fabricated. The private synthetic backend also has pending request holds: their create-event revision identifies the hold but is not a communicated offer. The copied lifecycle status still refuses customer acceptance until an actual offer exists. Known orders with no capacity hold may be listed by pseudonymous ID so a later terminal status can be recorded without creating a reservation.
 
 The baseline seeds the reducer's held/known/proposal state at cutover. Subsequent acceptance confirms the same hold; a new proposal replaces it immediately, and rejection/releases remove it. Cross-date pair validation can bind an outgoing order to a baseline hold without creating an earlier booking event. Delivery estimates are neither invented nor retimestamped; missing/stale evidence still leaves affected comparisons UNVERIFIED.
 
@@ -28,7 +28,7 @@ The baseline is the first immutable event, so existing batch hashes and every su
 
 Local tests demonstrate durable intake, future-only observations, rewrite refusal, failed-result rollback, reopened snapshot recovery, and a baseline-held order moving across two service days. The fixture contains invented orders and no customer data.
 
-The deployed PostgreSQL record/export functions do NOT yet produce or accept this new baseline kind. No production saved-state export is relabelled complete and no source hook is installed. The next source-side step must atomically establish the baseline and capture barrier, seed the matching reservation projection, and prove all active writers are covered before prospective completeness can be claimed.
+The hosted PostgreSQL record/export functions do NOT yet produce or accept this new baseline kind. Local candidate SQL now produces it; see CUTOVER-SOURCE-REVIEW.md for tested scope and hosted rehearsal dependencies. No production saved-state export is relabelled complete and no source hook is installed. The local source-side candidate atomically establishes the baseline, seeds the matching reservation projection and retires the old private stream. Multi-session hosted verification and proof of all active production writers remain required before prospective completeness can be claimed.
 
 ## Access dependencies checked again
 
