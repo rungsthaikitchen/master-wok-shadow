@@ -9,8 +9,8 @@ test('authenticated paired export retains one provisional reservation after acce
  assert.deepEqual(r.results.map(s=>[s.result.serviceDate,s.result.remainingCommitments]),[['2026-10-21',1],['2026-10-22',0]]);
  assert.equal(r.results.reduce((n,s)=>n+s.result.decisionCount,0),3);
  assert.ok(r.results.every(s=>s.result.observations.every(o=>o.actualDecision==='SUGGESTED'&&o.verified===false)));
- // Rice-only zero-Rung-work remains a known unverified assessment case.
- assert.ok(r.results.every(s=>s.result.observations.every(o=>o.prediction==='UNVERIFIED')));
+ // The opt-in server replay now handles explicit zero Rung workload.
+ assert.ok(r.results.every(s=>s.result.observations.every(o=>o.prediction===(Intl.DateTimeFormat().resolvedOptions().timeZone==='Europe/London'?'GREEN':'UNVERIFIED'))));
 });
 test('separate offline curry sensitivity confirms the authenticated fixture limitation is not a failed transfer pairing',()=>{
  const prior=process.env.TZ;process.env.TZ='Europe/London';

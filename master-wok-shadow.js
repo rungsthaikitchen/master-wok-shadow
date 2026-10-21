@@ -336,7 +336,7 @@ async function assessHypotheticalV1(serviceDate) {
 
   // Experimental replay only. It never changes orders or booking availability.
   // Existing historical orders are retained even when the model would flag them.
-  function replayReservationsV1(serviceDate, reservations) {
+  function replayReservationsV1(serviceDate, reservations, { allowZeroRungWork = false } = {}) {
     const fail = reason => ({
       status: "UNVERIFIED", verified: false, reason, observations: []
     });
@@ -382,10 +382,16 @@ async function assessHypotheticalV1(serviceDate) {
     const valid = { conservative: true, raw: true };
 
     function withDuration(order, mode) {
-      if (mode === "conservative") return order;
-      const minutes = model.calculateCombinedKitchenPressure([
+      if (mode === "conservative" && allowZeroRungWork !== true) return order;
+      const window = model.calculateCombinedKitchenPressure([
         order.classification
-      ])?.productionWindow?.rawMinutes;
+      ])?.productionWindow;
+      // Opt-in server replay only: an excluded resource needs no invented job.
+      // Both calibrated and raw workloads must explicitly agree on zero.
+      if (allowZeroRungWork === true && window?.rawMinutes === 0 &&
+          window?.reservedMinutes === 0) return null;
+      if (mode === "conservative") return order;
+      const minutes = window?.rawMinutes;
       if (!Number.isFinite(minutes) || minutes <= 0) {
         throw new Error("Invalid raw production duration");
       }
@@ -417,7 +423,13 @@ async function assessHypotheticalV1(serviceDate) {
             movableIds.has(String(order.orderId))
           );
           const result = engine.schedule(
-            [...movable, proposed].map(order => withDuration(order, mode)),
+            [...movable, proposed].map(order => {
+              const job = withDuration(order, mode);
+              if (job === null && order === proposed && order.readyMinute < asOfMinute) {
+                throw new Error("Zero-work target precedes assessment time");
+              }
+              return job;
+            }).filter(order => order !== null),
             {
               serviceDate,
               asOfMinute,

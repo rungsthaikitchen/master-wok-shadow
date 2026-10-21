@@ -33,7 +33,7 @@ function createReplayAssessment({timeoutMs=2000}={}) {
           classification:context.window.MasterWokModelV1.classifyBasket(order.lines)};
       });
       context.serviceDate = serviceDate;
-      const replay = vm.runInContext('window.MasterWokShadowV1.replayReservationsV1(serviceDate,reservations)',context,{timeout:timeoutMs});
+      const replay = vm.runInContext('window.MasterWokShadowV1.replayReservationsV1(serviceDate,reservations,{allowZeroRungWork:true})',context,{timeout:timeoutMs});
       const last = replay.observations.at(-1);
       if (!last || last.orderId !== String(input.proposed.orderId)) return uncertain('REPLAY_UNVERIFIED');
       return {status:last.status,reasonCode:last.status === 'UNVERIFIED' ? 'REPLAY_UNVERIFIED' : 'HYPOTHETICAL_REPLAY'};

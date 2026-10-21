@@ -41,3 +41,5 @@ Temporary transfer receipt SELECT/INSERT privileges and move/export EXECUTE gran
 MASTER_WOK_TRANSFER_TRIAL_ENABLED was set false, its deadline zero, and the start command restored to python railway-shadow/event_runtime_staging.py. Cleanup deployment 1bbb4a12-25ae-4a69-be6f-63275492632f reached SUCCESS and logged DISABLED/sourceRequests=0 at 2026-10-21T06:20:47.588144116Z. The service remains pinned to the tested code; no domains, services or volumes were added.
 
 Next work: resolve the zero-workload replay edge case; route transfer histories into the paired controller with separate acquisition-freshness health; include new evidence in independently tested recovery; then close active-writer coverage and baseline gaps before production event capture. Histories connected to more than two streams remain explicitly unsupported.
+
+Offline follow-up: ZERO-RUNG-WORK-REPLAY.md records a subsequent opt-in server replay fix and reassessment of the unchanged capture. The original authenticated-run results and deployed code are preserved; no second authenticated run or deployment is implied.
