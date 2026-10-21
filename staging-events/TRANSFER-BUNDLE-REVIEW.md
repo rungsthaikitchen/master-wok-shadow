@@ -34,3 +34,5 @@ Only exactly two non-empty streams are supported here. Wider connected histories
 Local snapshot recovery is tested. Independent cloud recovery and backup inclusion of transfer receipts/bundles and planning evidence remain required before relying on the new path for production capture. Full live-writer coverage and the initial production baseline remain separate rollout dependencies.
 
 Reference: [PostgreSQL function volatility and statement snapshots](https://www.postgresql.org/docs/current/xfunc-volatility.html).
+
+21 October follow-up: the bounded authenticated two-writer and read-only-reader trial now passes, including process termination before ACK commit and local snapshot reopen. See TRANSFER-AUTHENTICATED-TRIAL.md for exact evidence, recommendation limitations and verified disabled cleanup. Broader connected histories, acquisition-freshness controller integration and independent cloud recovery remain outstanding.
