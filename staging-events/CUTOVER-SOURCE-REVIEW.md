@@ -4,7 +4,7 @@
 
 ## Behaviour
 
-`cutover-baseline-store.sql` adds an invoker-only administrative `seed_cutover_baseline(source,destination,request)` candidate. It requires distinct enabled synthetic streams with the same service date and a completely empty destination. Both stream rows are locked in UUID order, matching the existing move lock order. Existing synthetic handlers lock the stream before changing rows, baskets or reservations; this is a required writer protocol, not protection against privileged SQL bypassing the protocol.
+`cutover-baseline-store.sql` (load cutover-baseline-snapshot.sql first) adds an invoker-only administrative `seed_cutover_baseline(source,destination,request)` candidate. It requires distinct enabled synthetic streams with the same service date and a completely empty destination. Both stream rows are locked in UUID order, matching the existing move lock order. Existing synthetic handlers lock the stream before changing rows, baskets or reservations; this is a required writer protocol, not protection against privileged SQL bypassing the protocol.
 
 Within the transaction it validates booking status, authoritative reservation projection, complete baskets and explicit effective targets. Proposed offers retain their current revision. Confirmed reservations retain one hold with no offer revision. A pending request's provisional hold retains its create-event revision, but its booking status remains pending: the customer response handler cannot accept it as an offered time. Known declined orders carry no capacity. Completed/cancelled orders do not become baseline commitments or new decisions.
 
@@ -18,7 +18,7 @@ Delivery estimates are preserved exactly, including their original evidence time
 
 Missing baskets, mismatched payloads or targets, private fields, unknown statuses, stale/duplicate offer revisions, orphan reservations, active bookings without holds, non-empty destinations and cross-day cloning fail before capture. The candidate limits source booking rows to 1,000, held commitments to 500 and baseline JSON text to 100 KB. The downstream five MB batch limit and full shared Node validation still apply.
 
-Sources containing a cross-date transfer event are deliberately refused with CONNECTED_CUTOVER_REQUIRED. A single-stream operation cannot establish a safe boundary for connected histories; those need a coordinated multi-stream producer. The tested offline pair reducer supporting baseline events does not itself implement that source boundary.
+Sources containing a cross-date transfer event are deliberately refused with CONNECTED_CUTOVER_REQUIRED. A single-stream operation cannot establish a safe boundary for connected histories. CUTOVER-PAIR-REVIEW.md now describes the coordinated two-date producer and hosted rollback checks; connected components with a third stream remain refused.
 
 All new functions use SECURITY INVOKER and a fixed search_path. PUBLIC, anon, authenticated and service_role receive no seed execution permission. Existing restricted writer roles are not expanded to copy all lifecycle fields or disable streams. This candidate is an administrative rehearsal tool, not a browser RPC or a production migration.
 
@@ -35,6 +35,6 @@ Full checks pass: 191 core Node tests and 38 staging Node entries in both Europe
 1. Review/install the candidate definitions only in the private staging schema, with no runtime grants or production connection.
 2. Exercise two real PostgreSQL sessions: a writer completing before the lock must appear in the baseline; one waiting behind cutover must receive SOURCE_DISABLED. Test opposed lock acquisition, failure/rollback, timeout/retry and consistent reader snapshots. Verify restricted roles still cannot invoke seed or re-enable old streams. Existing roles/grants are not presumed sufficient.
 3. Rehearse command-router and observer-identity handover, including a real durable baseline intake/restart/recovery and cleanup. The source candidate is now installed in private staging only; actual concurrent-session and router/recovery rehearsal remain incomplete.
-4. Resolve connected-stream cutover, exact deployed legacy writer/source coverage, and checkout's separate order/item persistence before preparing the production capture diff. Existing order-confirm retrieval and backend repository access gaps remain as recorded in PRODUCTION-CAPTURE-REVIEW.md.
+4. Resolve components spanning more than two service dates, exact deployed legacy writer/source coverage, and checkout's separate order/item persistence before preparing the production capture diff. Existing order-confirm retrieval and backend repository access gaps remain as recorded in PRODUCTION-CAPTURE-REVIEW.md.
 
 A private synthetic completeness marker proves only the cooperating handlers from the explicit cutover. It cannot establish full production coverage or reconstruct earlier decision history. Live availability, checkout and customer booking decisions remain unchanged.

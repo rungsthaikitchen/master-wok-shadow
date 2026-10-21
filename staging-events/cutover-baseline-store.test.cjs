@@ -9,7 +9,7 @@ test('source cutover runs against isolated PostgreSQL with rollback',async t=>{
  const db=new PGlite();
  try{
   await db.exec('CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role;');
-  for(const f of ['schema.sql','booking-store.sql','delivery-booking-store.sql','cutover-record-export.sql','cutover-baseline-store.sql']) await db.exec(fs.readFileSync(path.join(__dirname,f),'utf8'));
+  for(const f of ['schema.sql','booking-store.sql','delivery-booking-store.sql','cutover-record-export.sql','cutover-baseline-snapshot.sql','cutover-baseline-store.sql']) await db.exec(fs.readFileSync(path.join(__dirname,f),'utf8'));
   const q=async(sql,args=[]) => (await db.query(sql,args)).rows;
   const scalar=async(sql,args=[]) => Object.values((await q(sql,args))[0])[0];
   const call=async(name,args) => scalar(`SELECT master_wok_event_test.${name}(${args.map((_,i)=>'$'+(i+1)).join(',')})`,args);

@@ -1,5 +1,7 @@
 # Hosted cutover rehearsal — partial completion
 
+Subsequent two-date source work is documented in CUTOVER-PAIR-REVIEW.md. It adds the shared snapshot helper and paired producer, hosted rollback evidence and durable paired-baseline tests. The Railway concurrency deployment described below remains blocked; the earlier rehearsal record is retained.
+
 21 October 2026. Private staging project hvrqgufqjslvgiohgkvu only. No production Supabase writes, scheduling/checkout changes, new infrastructure, runtime grants or Railway deployments occurred.
 
 ## Installed and verified
