@@ -1,0 +1,95 @@
+{
+  "events": [
+    {
+      "at": "2026-10-21T07:31:28.298946Z",
+      "kind": "CUTOVER_BASELINE",
+      "basis": "CURRENT_SAVED_STATE_AT_CUTOVER",
+      "eventId": "hosted-cutover-baseline",
+      "sequence": 1,
+      "commitments": [
+        {
+          "order": {
+            "lines": [
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              }
+            ],
+            "orderId": "synthetic-hosted-cutover",
+            "targetAt": "2026-10-22T19:00:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "commitment": "PROPOSED",
+          "proposalEventId": "hosted-current-offer"
+        }
+      ],
+      "unreservedOrderIds": []
+    },
+    {
+      "at": "2026-10-21T07:31:28.311410Z",
+      "kind": "PROPOSAL_RESPONSE",
+      "eventId": "hosted-accept-offer",
+      "orderId": "synthetic-hosted-cutover",
+      "response": "ACCEPTED",
+      "sequence": 2,
+      "proposalEventId": "hosted-current-offer"
+    },
+    {
+      "at": "2026-10-21T07:31:28.313803Z",
+      "kind": "BOOKING_DECISION",
+      "order": {
+        "lines": [
+          {
+            "qty": 1,
+            "mods": [
+              {
+                "id": "chicken"
+              }
+            ],
+            "itemId": "green-curry"
+          }
+        ],
+        "orderId": "synthetic-hosted-cutover",
+        "targetAt": "2026-10-22T19:30:00.000000Z",
+        "orderType": "collection",
+        "deliveryReadyEstimate": null
+      },
+      "eventId": "hosted-replacement-offer",
+      "sequence": 3,
+      "actualDecision": "SUGGESTED"
+    },
+    {
+      "at": "2026-10-21T07:31:28.315966Z",
+      "kind": "PROPOSAL_RESPONSE",
+      "eventId": "hosted-reject-replacement",
+      "orderId": "synthetic-hosted-cutover",
+      "response": "REJECTED",
+      "sequence": 4,
+      "proposalEventId": "hosted-replacement-offer"
+    },
+    {
+      "at": "2026-10-21T07:31:28.320305Z",
+      "kind": "ORDER_STATE_CHANGED",
+      "status": "COMPLETED",
+      "eventId": "hosted-complete-unreserved",
+      "orderId": "synthetic-hosted-cutover",
+      "sequence": 5
+    }
+  ],
+  "coverage": {
+    "basis": "CUTOVER_BASELINE_AND_EVENT_LOG",
+    "complete": true,
+    "throughAt": "2026-10-21T07:31:28.320305Z",
+    "eventCount": 5,
+    "initialState": "SAVED_STATE_AT_CUTOVER",
+    "lastSequence": 5,
+    "firstSequence": 1
+  },
+  "serviceDate": "2026-10-22"
+}

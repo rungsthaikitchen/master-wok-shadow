@@ -119,3 +119,13 @@ test('source cutover runs against isolated PostgreSQL with rollback',async t=>{
   });
  }finally{await db.close();}
 });
+
+test('actual rolled-back hosted cutover export preserves future-only lifecycle',()=>{
+ const batch=require('../fixtures/cutover-baseline-staging-capture.json');
+ assert.equal(validateEventBatch(batch).length,5);
+ const result=replay(batch,{enabled:true});
+ assert.equal(result.status,'REPLAYED');assert.equal(result.decisionCount,1);
+ assert.equal(result.baselineCommitments,1);assert.equal(result.remainingCommitments,0);
+ assert.equal(result.historicalDecisionCoverage,false);assert.equal(result.verified,false);
+ assert.deepEqual(batch.events.map(e=>e.kind),['CUTOVER_BASELINE','PROPOSAL_RESPONSE','BOOKING_DECISION','PROPOSAL_RESPONSE','ORDER_STATE_CHANGED']);
+});

@@ -28,7 +28,7 @@ The baseline is the first immutable event, so existing batch hashes and every su
 
 Local tests demonstrate durable intake, future-only observations, rewrite refusal, failed-result rollback, reopened snapshot recovery, and a baseline-held order moving across two service days. The fixture contains invented orders and no customer data.
 
-The hosted PostgreSQL record/export functions do NOT yet produce or accept this new baseline kind. Local candidate SQL now produces it; see CUTOVER-SOURCE-REVIEW.md for tested scope and hosted rehearsal dependencies. No production saved-state export is relabelled complete and no source hook is installed. The local source-side candidate atomically establishes the baseline, seeds the matching reservation projection and retires the old private stream. Multi-session hosted verification and proof of all active production writers remain required before prospective completeness can be claimed.
+The private staging PostgreSQL producer/export candidate now supports the baseline under rollback-tested lifecycle checks; generic record ingress still refuses arbitrary baseline events. No producer is installed in production. See CUTOVER-HOSTED-REHEARSAL.md for exact current scope and the outstanding real-concurrency blocker. No production saved-state export is relabelled complete and no source hook is installed. The source-side candidate atomically establishes the baseline, seeds the matching reservation projection and retires the old private stream; the hosted rollback/lifecycle checks pass. Multi-session hosted verification and proof of all active production writers remain required before prospective completeness can be claimed.
 
 ## Access dependencies checked again
 

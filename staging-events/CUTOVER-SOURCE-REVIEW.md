@@ -1,6 +1,6 @@
 # Source cutover capture candidate
 
-21 October 2026. Private synthetic candidate only. Tested locally against PGlite's PostgreSQL engine. No hosted Supabase SQL mutations, Railway changes, new infrastructure or production hooks were performed for this change. No runtime execution grants were added.
+21 October 2026. Private synthetic candidate only. Tested locally against PGlite's PostgreSQL engine. The local implementation was followed by private hosted installation and rolled-back lifecycle checks; see CUTOVER-HOSTED-REHEARSAL.md for current status. No Railway deployment, new infrastructure or production hook was applied. No runtime execution grants were added.
 
 ## Behaviour
 
@@ -34,7 +34,7 @@ Full checks pass: 191 core Node tests and 38 staging Node entries in both Europe
 
 1. Review/install the candidate definitions only in the private staging schema, with no runtime grants or production connection.
 2. Exercise two real PostgreSQL sessions: a writer completing before the lock must appear in the baseline; one waiting behind cutover must receive SOURCE_DISABLED. Test opposed lock acquisition, failure/rollback, timeout/retry and consistent reader snapshots. Verify restricted roles still cannot invoke seed or re-enable old streams. Existing roles/grants are not presumed sufficient.
-3. Rehearse command-router and observer-identity handover, including a real durable baseline intake/restart/recovery and cleanup. Until then the source producer remains undeployed.
+3. Rehearse command-router and observer-identity handover, including a real durable baseline intake/restart/recovery and cleanup. The source candidate is now installed in private staging only; actual concurrent-session and router/recovery rehearsal remain incomplete.
 4. Resolve connected-stream cutover, exact deployed legacy writer/source coverage, and checkout's separate order/item persistence before preparing the production capture diff. Existing order-confirm retrieval and backend repository access gaps remain as recorded in PRODUCTION-CAPTURE-REVIEW.md.
 
 A private synthetic completeness marker proves only the cooperating handlers from the explicit cutover. It cannot establish full production coverage or reconstruct earlier decision history. Live availability, checkout and customer booking decisions remain unchanged.
