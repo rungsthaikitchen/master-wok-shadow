@@ -47,23 +47,45 @@ function ready(order,at){
  const minute=local(e.foodReadyAt).minute;
  return minute>=990&&minute<=1320?minute:null;
 }
+function validateBaseline(event,day){
+ if(!exact(event,['eventId','sequence','at','kind','basis','commitments','unreservedOrderIds'])||event.sequence!==1||event.basis!=='CURRENT_SAVED_STATE_AT_CUTOVER'||!Array.isArray(event.commitments)||event.commitments.length>500||!Array.isArray(event.unreservedOrderIds)||event.commitments.length+event.unreservedOrderIds.length>1000)throw Error('CUTOVER_BASELINE_REQUIRED');
+ const orders=new Set(),revisions=new Set();
+ for(const row of event.commitments){
+  if(!exact(row,['order','commitment','proposalEventId'])||!['PROPOSED','CONFIRMED'].includes(row.commitment)||orders.has(row.order?.orderId))throw Error('CUTOVER_BASELINE_REQUIRED');
+  validateOrder(row.order,day,event.at);orders.add(row.order.orderId);
+  if(row.commitment==='PROPOSED'){
+   if(!id(row.proposalEventId)||revisions.has(row.proposalEventId)||row.proposalEventId===event.eventId)throw Error('CUTOVER_PROPOSAL_REVISION_REQUIRED');
+   revisions.add(row.proposalEventId);
+  }else if(row.proposalEventId!==null)throw Error('CUTOVER_PROPOSAL_REVISION_REQUIRED');
+ }
+ for(const oid of event.unreservedOrderIds){if(!id(oid)||orders.has(oid))throw Error('CUTOVER_BASELINE_REQUIRED');orders.add(oid);}
+}
 function validateEventBatch(input){
+  const cutover=input?.coverage?.basis==='CUTOVER_BASELINE_AND_EVENT_LOG';
   if(!exact(input,['serviceDate','coverage','events'])||!validServiceDate(input.serviceDate)||
    !Array.isArray(input.events)||input.events.length>1000||
    !exact(input.coverage,['basis','complete','eventCount','firstSequence','lastSequence','initialState','throughAt'])||
-   input.coverage.basis!=='DECISION_EVENT_LOG'||input.coverage.complete!==true||
-   input.coverage.initialState!=='NO_PRIOR_SERVICE_COMMITMENTS'||
+   (!cutover&&input.coverage.basis!=='DECISION_EVENT_LOG')||input.coverage.complete!==true||
+   input.coverage.initialState!==(cutover?'SAVED_STATE_AT_CUTOVER':'NO_PRIOR_SERVICE_COMMITMENTS')||
    input.coverage.eventCount!==input.events.length||input.coverage.firstSequence!==1||
    input.coverage.lastSequence!==input.events.length)throw Error('COMPLETE_EVENT_COVERAGE_REQUIRED');
   if(Buffer.byteLength(JSON.stringify(input))>5000000)throw Error('EVENT_INPUT_TOO_LARGE');
   const through=stamp(input.coverage.throughAt);
   const events=structuredClone(input.events).sort((a,b)=>a.sequence-b.sequence);
   const ids=new Set(),transferIds=new Set();let prior=-Infinity;
+  if(cutover&&events[0]?.kind!=='CUTOVER_BASELINE')throw Error('CUTOVER_BASELINE_REQUIRED');
   for(const [index,event] of events.entries()){
    if(!event||!id(event.eventId)||ids.has(event.eventId)||event.sequence!==index+1||
-    !['RESERVATION_SET','RESERVATION_RELEASED','BOOKING_DECISION','PROPOSAL_RESPONSE','ORDER_STATE_CHANGED','RESERVATION_TRANSFERRED_OUT','RESERVATION_TRANSFERRED_IN'].includes(event.kind)||
+    !['RESERVATION_SET','RESERVATION_RELEASED','BOOKING_DECISION','PROPOSAL_RESPONSE','ORDER_STATE_CHANGED','RESERVATION_TRANSFERRED_OUT','RESERVATION_TRANSFERRED_IN','CUTOVER_BASELINE'].includes(event.kind)||
     stamp(event.at)<prior||stamp(event.at)>through||local(event.at).day>input.serviceDate)throw Error('EVENT_SEQUENCE_UNVERIFIED');
+   if(cutover&&index>0&&stamp(event.at)<=stamp(events[0].at))throw Error('CUTOVER_EVENT_BARRIER_REQUIRED');
    prior=stamp(event.at);ids.add(event.eventId);
+   if(event.kind==='CUTOVER_BASELINE'){
+    if(!cutover||index!==0)throw Error('CUTOVER_BASELINE_REQUIRED');
+    validateBaseline(event,input.serviceDate);
+    for(const row of event.commitments)if(row.proposalEventId)ids.add(row.proposalEventId);
+    continue;
+   }
    if(event.kind==='RESERVATION_TRANSFERRED_OUT'||event.kind==='RESERVATION_TRANSFERRED_IN'){
     const outgoing=event.kind==='RESERVATION_TRANSFERRED_OUT';
     const otherDay=outgoing?event.toServiceDate:event.fromServiceDate;
@@ -91,6 +113,11 @@ function validateEventBatch(input){
   // Reject stale responses at ingress, before persistence or any assessment.
   const proposals=new Map(), held=new Set(), known=new Set(), closed=new Set();
   for(const event of events){
+   if(event.kind==='CUTOVER_BASELINE'){
+    for(const row of event.commitments){known.add(row.order.orderId);held.add(row.order.orderId);if(row.commitment==='PROPOSED')proposals.set(row.order.orderId,row.proposalEventId);}
+    for(const oid of event.unreservedOrderIds)known.add(oid);
+    continue;
+   }
    const orderId=event.orderId||event.order.orderId;
    if(event.kind==='PROPOSAL_RESPONSE'&&proposals.get(orderId)!==event.proposalEventId)throw Error('STALE_PROPOSAL_RESPONSE');
    if(closed.has(orderId))throw Error('ORDER_ALREADY_CLOSED');
@@ -134,6 +161,10 @@ function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElaps
   for(const event of events){
    const elapsed=clock()-started;
    if(!Number.isFinite(elapsed)||elapsed<0||elapsed>maxElapsedMs)throw Error('REPLAY_TIME_BUDGET_EXHAUSTED');
+   if(event.kind==='CUTOVER_BASELINE'){
+    for(const row of event.commitments)reserve(row.order,event.at,row.commitment);
+    continue;
+   }
    if(event.kind==='PROPOSAL_RESPONSE'){
     if(event.response==='REJECTED')active.delete(event.orderId);
     else active.get(event.orderId).commitment='CONFIRMED';
@@ -174,9 +205,9 @@ function replay(input,{enabled=false,assess,clock=()=>performance.now(),maxElaps
     event.actualDecision==='ACCEPTED'?'CONFIRMED':'PROPOSED');
   }
   return {status:'REPLAYED',verified:false,networkRequests:0,serviceDate:input.serviceDate,
-   evidenceBasis:EVIDENCE,coverageThroughAt:input.coverage.throughAt,decisionCount:observations.length,remainingCommitments:active.size,observations};
+   evidenceBasis:EVIDENCE,...(events[0]?.kind==='CUTOVER_BASELINE'?{coverageBasis:input.coverage.basis,baselineAt:events[0].at,baselineCommitments:events[0].commitments.length,historicalDecisionCoverage:false}:{}),coverageThroughAt:input.coverage.throughAt,decisionCount:observations.length,remainingCommitments:active.size,observations};
  }catch(error){
-  const safe=['COMPLETE_EVENT_COVERAGE_REQUIRED','EVENT_SEQUENCE_UNVERIFIED','EVENT_TIME_REQUIRED',
+  const safe=['CUTOVER_BASELINE_REQUIRED','CUTOVER_PROPOSAL_REVISION_REQUIRED','CUTOVER_EVENT_BARRIER_REQUIRED','COMPLETE_EVENT_COVERAGE_REQUIRED','EVENT_SEQUENCE_UNVERIFIED','EVENT_TIME_REQUIRED',
    'ORDER_CONTRACT_REQUIRED','SERVICE_TARGET_REQUIRED','BASKET_CONTRACT_REQUIRED','COLLECTION_ESTIMATE_REFUSED',
    'DELIVERY_ESTIMATE_CONTRACT_REQUIRED','RELEASE_CONTRACT_REQUIRED','EVENT_CONTRACT_REQUIRED',
    'TRANSFER_CONTRACT_REQUIRED','TRANSFER_DESTINATION_OCCUPIED','ORDER_STATE_CONTRACT_REQUIRED','ORDER_STATE_CHANGE_REQUIRED','ORDER_ALREADY_CLOSED','PROPOSAL_RESPONSE_REQUIRED','STALE_PROPOSAL_RESPONSE','UNKNOWN_RESERVATION_RELEASE','ASSESSOR_CONTRACT_REQUIRED','REPLAY_BUDGET_REQUIRED','REPLAY_TIME_BUDGET_EXHAUSTED','EVENT_INPUT_TOO_LARGE'];

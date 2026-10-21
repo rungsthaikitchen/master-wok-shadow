@@ -85,6 +85,7 @@ class TransferBundleStore:
   for row in result['results']:
    b=batches[row['streamId']];r=row['result'];events=[e for e in b['events'] if e['kind'] in ('BOOKING_DECISION','RESERVATION_TRANSFERRED_IN')]
    if r.get('status')!='REPLAYED' or r.get('verified') is not False or r.get('networkRequests')!=0 or r.get('serviceDate')!=b['serviceDate'] or r.get('coverageThroughAt')!=b['coverage']['throughAt'] or r.get('decisionCount')!=len(events) or len(r.get('observations',[]))!=len(events):raise EventCaptureError('BUNDLE_COMPARISON_INCOMPLETE')
+   if b['events'] and b['events'][0]['kind']=='CUTOVER_BASELINE' and (r.get('coverageBasis')!='CUTOVER_BASELINE_AND_EVENT_LOG' or r.get('baselineAt')!=b['events'][0]['at'] or r.get('baselineCommitments')!=len(b['events'][0]['commitments']) or r.get('historicalDecisionCoverage') is not False):raise EventCaptureError('BUNDLE_BASELINE_BINDING_REQUIRED')
    for event,value in zip(events,r['observations']):
     if value.get('eventId')!=event['eventId'] or value.get('sequence')!=event['sequence'] or value.get('orderId')!=event['order']['orderId'] or value.get('decisionAt')!=event['at'] or value.get('actualDecision')!=event['actualDecision'] or value.get('verified') is not False:raise EventCaptureError('BUNDLE_COMPARISON_INCOMPLETE')
  def assert_source_allowed(self):

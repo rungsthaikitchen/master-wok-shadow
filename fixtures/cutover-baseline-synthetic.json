@@ -1,0 +1,16 @@
+{
+ "serviceDate":"2026-10-21",
+ "coverage":{"basis":"CUTOVER_BASELINE_AND_EVENT_LOG","complete":true,"eventCount":7,"firstSequence":1,"lastSequence":7,"initialState":"SAVED_STATE_AT_CUTOVER","throughAt":"2026-10-21T12:06:00Z"},
+ "events":[
+  {"eventId":"cutover-1","sequence":1,"at":"2026-10-21T12:00:00Z","kind":"CUTOVER_BASELINE","basis":"CURRENT_SAVED_STATE_AT_CUTOVER","commitments":[
+   {"order":{"orderId":"synthetic-a","orderType":"collection","targetAt":"2026-10-21T17:00:00Z","lines":[{"itemId":"panang-curry","qty":1,"mods":[{"id":"chicken"}]}],"deliveryReadyEstimate":null},"commitment":"PROPOSED","proposalEventId":"opaque-pre-cutover-offer-a"},
+   {"order":{"orderId":"synthetic-b","orderType":"collection","targetAt":"2026-10-21T18:00:00Z","lines":[{"itemId":"jasmine-rice","qty":1,"mods":[]}],"deliveryReadyEstimate":null},"commitment":"CONFIRMED","proposalEventId":null}
+  ],"unreservedOrderIds":["synthetic-c"]},
+  {"eventId":"new-d","sequence":2,"at":"2026-10-21T12:01:00Z","kind":"BOOKING_DECISION","actualDecision":"ACCEPTED","order":{"orderId":"synthetic-d","orderType":"collection","targetAt":"2026-10-21T19:00:00Z","lines":[{"itemId":"panang-curry","qty":1,"mods":[{"id":"chicken"}]}],"deliveryReadyEstimate":null}},
+  {"eventId":"answer-a","sequence":3,"at":"2026-10-21T12:02:00Z","kind":"PROPOSAL_RESPONSE","orderId":"synthetic-a","proposalEventId":"opaque-pre-cutover-offer-a","response":"ACCEPTED"},
+  {"eventId":"offer-a-new","sequence":4,"at":"2026-10-21T12:03:00Z","kind":"BOOKING_DECISION","actualDecision":"SUGGESTED","order":{"orderId":"synthetic-a","orderType":"collection","targetAt":"2026-10-21T19:30:00Z","lines":[{"itemId":"panang-curry","qty":1,"mods":[{"id":"chicken"}]}],"deliveryReadyEstimate":null}},
+  {"eventId":"reject-a-new","sequence":5,"at":"2026-10-21T12:04:00Z","kind":"PROPOSAL_RESPONSE","orderId":"synthetic-a","proposalEventId":"offer-a-new","response":"REJECTED"},
+  {"eventId":"complete-b","sequence":6,"at":"2026-10-21T12:05:00Z","kind":"RESERVATION_RELEASED","orderId":"synthetic-b","reason":"COMPLETED"},
+  {"eventId":"complete-c","sequence":7,"at":"2026-10-21T12:06:00Z","kind":"ORDER_STATE_CHANGED","orderId":"synthetic-c","status":"COMPLETED"}
+ ]
+}

@@ -147,6 +147,7 @@ class EventCaptureJournal:
             result.get('coverageThroughAt')!=batch['coverage']['throughAt'] or result.get('decisionCount')!=len(decisions) or
             len(result.get('observations',[]))!=len(decisions)):
             raise EventCaptureError('REPLAY_RESULT_BINDING_REQUIRED')
+        if batch['events'] and batch['events'][0]['kind']=='CUTOVER_BASELINE' and (result.get('coverageBasis')!='CUTOVER_BASELINE_AND_EVENT_LOG' or result.get('baselineAt')!=batch['events'][0]['at'] or result.get('baselineCommitments')!=len(batch['events'][0]['commitments']) or result.get('historicalDecisionCoverage') is not False):raise EventCaptureError('BASELINE_RESULT_BINDING_REQUIRED')
         records=[];prefixes=prefix_digests(batch['events'])
         for event,observation in zip(decisions,result['observations']):
             if (set(observation)!=OBS_FIELDS or observation['verified'] is not False or
@@ -160,6 +161,7 @@ class EventCaptureJournal:
                 raise EventCaptureError('REDACTED_OBSERVATION_REQUIRED')
             record=dict(observation,sourceIdentity=self.identity,scope=SCOPE,buildHash=message['buildHash'],
                 sourcePrefixHash=prefixes[event['sequence']])
+            if batch['events'][0]['kind']=='CUTOVER_BASELINE':record.update(coverageBasis='CUTOVER_BASELINE_AND_EVENT_LOG',baselineAt=batch['events'][0]['at'],historicalDecisionCoverage=False)
             key=digest(dict(identity=self.identity,buildHash=message['buildHash'],eventId=event['eventId']))
             records.append((key,canonical(record)))
         with self.db:
@@ -228,6 +230,7 @@ def verify_store(db,identity):
         sequence=value['sequence']
         if type(sequence) is not int or not 1<=sequence<=len(batch['events']):raise EventCaptureError('MEMBER_BINDING_REQUIRED')
         event=batch['events'][sequence-1]
+        if batch['events'][0]['kind']=='CUTOVER_BASELINE' and (value.get('coverageBasis')!='CUTOVER_BASELINE_AND_EVENT_LOG' or value.get('baselineAt')!=batch['events'][0]['at'] or value.get('historicalDecisionCoverage') is not False):raise EventCaptureError('BASELINE_OBSERVATION_BINDING_REQUIRED')
         if (event['kind'] not in ('BOOKING_DECISION','RESERVATION_TRANSFERRED_IN') or value['eventId']!=event['eventId'] or value['buildHash']!=build or
             value['orderId']!=event['order']['orderId'] or value['decisionAt']!=event['at'] or
             value['actualDecision']!=event['actualDecision'] or value['sourcePrefixHash']!=prefixes[batch_key][sequence]):

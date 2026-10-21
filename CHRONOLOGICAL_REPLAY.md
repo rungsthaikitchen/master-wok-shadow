@@ -4,6 +4,8 @@
 
 ## Evidence contract
 
+The empty-start contract below remains supported. An explicit cutover mode is now available for saved commitments already present when capture begins; see staging-events/CUTOVER-BASELINE-REVIEW.md. It uses a distinct coverage basis and immutable first CUTOVER_BASELINE event, compares only later decisions, and never reconstructs prior decisions or cooking activity. No deployed source exporter currently produces this mode.
+
 Input is `{serviceDate, coverage, events}`. `serviceDate` is the London service date. Coverage has exactly:
 
 - `basis: "DECISION_EVENT_LOG"`, `complete: true`.

@@ -7,7 +7,7 @@ function validateTransferPair(source,destination,transferId,{enabled=false}={}){
  try{
   const a=validateEventBatch(source).filter(e=>e.transferId===transferId),b=validateEventBatch(destination).filter(e=>e.transferId===transferId);
   if(a.length!==1||b.length!==1||a[0].kind!=='RESERVATION_TRANSFERRED_OUT'||b[0].kind!=='RESERVATION_TRANSFERRED_IN'||a[0].orderId!==b[0].order.orderId||a[0].at!==b[0].at||a[0].toServiceDate!==destination.serviceDate||b[0].fromServiceDate!==source.serviceDate)throw Error();
-  let held;
+  let held=source.events.find(e=>e.kind==='CUTOVER_BASELINE')?.commitments.find(r=>r.order.orderId===a[0].orderId)?.order;
   for(const e of source.events.slice().sort((x,y)=>x.sequence-y.sequence)){
    if(e.sequence>=a[0].sequence)break;
    if((e.orderId||e.order?.orderId)!==a[0].orderId)continue;
