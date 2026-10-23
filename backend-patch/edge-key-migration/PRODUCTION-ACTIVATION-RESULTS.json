@@ -1,0 +1,43 @@
+{
+  "recordedAt": "2026-10-23T21:51:16.882036+00:00",
+  "ownerReportedFlagEnabled": true,
+  "sourceReadback": {
+    "review-order": {
+      "version": 15,
+      "verifyJwt": true,
+      "sourceMatchesCandidate": true
+    },
+    "hyper-worker": {
+      "version": 34,
+      "verifyJwt": false,
+      "sourceMatchesCandidate": true
+    },
+    "geocode-order": {
+      "version": 11,
+      "verifyJwt": true,
+      "sourceMatchesCandidate": true
+    }
+  },
+  "checks": [
+    {
+      "function": "review-order",
+      "httpStatus": 401,
+      "check": "incorrect-admin-secret"
+    },
+    {
+      "function": "hyper-worker",
+      "result": "NOT_VERIFIED",
+      "reason": "HTTP_TUNNEL_403"
+    },
+    {
+      "function": "geocode-order",
+      "result": "NOT_ATTEMPTED_AFTER_CONNECTION_FAILURE"
+    }
+  ],
+  "databaseAuthentication": "NOT_VERIFIED_AFTER_ACTIVATION",
+  "diagnosticDeployment": "REJECTED_BY_AUTOMATIC_APPROVAL_REVIEW",
+  "diagnosticCreated": false,
+  "productionDatabaseWrites": 0,
+  "providerCalls": 0,
+  "notifications": 0
+}

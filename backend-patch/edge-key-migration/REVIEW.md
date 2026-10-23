@@ -1,6 +1,6 @@
 # Edge database credential candidates — 23 October 2026
 
-Credential candidates prepared and tested offline. An isolated staging diagnostic was subsequently deployed and disabled; see staging/REHEARSAL.md. Follow-up: credential support has now been deployed to the three existing production functions; new-key activation is pending. See PRODUCTION-ROLLOUT.md for the current state. No production SQL writes, notifications, Google requests, key revocations, caller-auth changes or scheduling changes.
+Credential candidates prepared and tested offline. An isolated staging diagnostic was subsequently deployed and disabled; see staging/REHEARSAL.md. Follow-up: credential support has now been deployed to the three existing production functions; the owner has reported new-key activation; post-activation database verification remains pending (see production-verify/STATUS.md). See PRODUCTION-ROLLOUT.md for the current state. No production SQL writes, notifications, Google requests, key revocations, caller-auth changes or scheduling changes.
 
 ## Scope
 

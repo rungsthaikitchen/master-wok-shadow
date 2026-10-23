@@ -25,3 +25,5 @@ After saving, check fresh invocations and source startup/refusal paths again. Do
 The old key remains active and must not yet be disabled. Website/public Edge callers, order-confirm source, actual admin proxy target, shadow runtime configuration and other external consumers remain separate gates. The existing backend new-key read evidence does not establish migration of these functions or the rest of the application.
 
 Machine-readable deployment/readback and HTTP outcomes: PRODUCTION-SUPPORT-RESULTS.json. Local17-test suite and staging evidence are unchanged by this documentation update.
+
+Activation follow-up: owner reported saving the flag. New function revisions and unchanged deployed source/JWT settings were verified. Production Edge DB authentication remains unverified because the extra diagnostic deployment was rejected by automatic approval review and direct HTTP verification hit a tunnel403. See production-verify/STATUS.md and PRODUCTION-ACTIVATION-RESULTS.json.
