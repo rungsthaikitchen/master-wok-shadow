@@ -34,10 +34,11 @@
       "result": "NOT_ATTEMPTED_AFTER_CONNECTION_FAILURE"
     }
   ],
-  "databaseAuthentication": "NOT_VERIFIED_AFTER_ACTIVATION",
-  "diagnosticDeployment": "REJECTED_BY_AUTOMATIC_APPROVAL_REVIEW",
-  "diagnosticCreated": false,
+  "databaseAuthentication": "VERIFIED_BY_APPROVED_NEW_SECRET_ZERO_ROW_EDGE_READ",
+  "diagnosticDeployment": "APPROVED_BY_OWNER_THEN_DEPLOYED_TESTED_AND_DISABLED",
+  "diagnosticCreated": true,
   "productionDatabaseWrites": 0,
   "providerCalls": 0,
-  "notifications": 0
+  "notifications": 0,
+  "followupEvidence": "production-verify/VERIFIED-RESULTS.json"
 }

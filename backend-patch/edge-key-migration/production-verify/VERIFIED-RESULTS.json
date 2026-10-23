@@ -1,0 +1,48 @@
+{
+  "recordedAt": "2026-10-23T21:55:03.334328+00:00",
+  "project": "ubyjrrsvbbqomitpaidb",
+  "approval": "Owner explicitly approved new protected diagnostic endpoint and possible usage charges after automatic-review rejection",
+  "diagnosticFunction": "rtk-edge-credential-read-check",
+  "diagnosticFunctionId": "fe924bd4-306a-4226-b57d-b1f9c54d2228",
+  "readVersion": 1,
+  "disabledVersion": 2,
+  "verifyJwt": true,
+  "productionRead": {
+    "check": "approved-production-zero-row-read",
+    "httpStatus": 200,
+    "result": {
+      "status": "PASSED",
+      "source": "PRODUCTION_ZERO_ROW_READ",
+      "mode": "NEW_SECRET",
+      "flagEnabled": true,
+      "requests": 1,
+      "customerRows": 0,
+      "writes": 0,
+      "notifications": 0,
+      "providerCalls": 0
+    }
+  },
+  "shutdownResponse": {
+    "check": "production-diagnostic-shutdown",
+    "httpStatus": 503,
+    "status": "DISABLED",
+    "requests": 0
+  },
+  "shutdownSourceReadback": "Unconditional DISABLED response, empty import map, no SDK/helper imports",
+  "existingFunctionChecks": [
+    {
+      "function": "hyper-worker",
+      "httpStatus": 401,
+      "expectedStatus": 401,
+      "passed": true
+    },
+    {
+      "function": "geocode-order",
+      "httpStatus": 400,
+      "expectedStatus": 400,
+      "passed": true
+    }
+  ],
+  "businessBookingActionsExecuted": 0,
+  "legacyKeyRevoked": false
+}
