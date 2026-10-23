@@ -1,6 +1,6 @@
 # Edge database credential candidates — 23 October 2026
 
-Prepared and tested offline. Nothing has been deployed. No production SQL writes, notifications, Google requests, key revocations, caller-auth changes or scheduling changes.
+Credential candidates prepared and tested offline. An isolated staging diagnostic was subsequently deployed and disabled; see staging/REHEARSAL.md. Candidate handlers have not been deployed as active business functions. No production SQL writes, notifications, Google requests, key revocations, caller-auth changes or scheduling changes.
 
 ## Scope
 
@@ -29,3 +29,5 @@ Use only the existing staging Supabase project hvrqgufqjslvgiohgkvu. Rehearse im
 Only after staging evidence and a fresh production-source comparison should these credential-only changes be considered for production. Do not revoke legacy keys: browser clients, other functions, shadow configurations, webhooks/cron and external scripts still need coverage. Local tests do not prove no other consumers exist.
 
 Official migration guidance checked: https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys . Changelog index retrieved and relevant breaking-change tags reviewed; no database schema change is involved in this candidate.
+
+Hosted follow-up: the staging diagnostic verified actual Deno SDK/helper imports, legacy and new-secret zero-row reads, the diagnostic JWT gate, three candidate module imports with business listeners captured, and permanent shutdown. See staging/REHEARSAL.md and RESULTS.json for limits. Production credentials/settings were not changed.

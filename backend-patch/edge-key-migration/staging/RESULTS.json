@@ -1,0 +1,73 @@
+{
+  "project": "hvrqgufqjslvgiohgkvu",
+  "function": "master-wok-edge-key-rehearsal",
+  "functionId": "1ec26dce-f08a-49ca-8509-24a911c97d71",
+  "readProbeVersion": 2,
+  "moduleProbeVersion": 3,
+  "disabledVersion": 4,
+  "verifyJwt": true,
+  "readChecks": [
+    {
+      "check": "no-jwt",
+      "httpStatus": 401,
+      "result": {}
+    },
+    {
+      "check": "no-capability",
+      "httpStatus": 503,
+      "result": {
+        "status": "DISABLED",
+        "requests": 0
+      }
+    },
+    {
+      "check": "legacy-read",
+      "httpStatus": 200,
+      "result": {
+        "status": "PASSED",
+        "source": "STAGING_ONLY",
+        "mode": "legacy",
+        "requests": 1,
+        "customerRows": 0,
+        "writes": 0,
+        "notifications": 0,
+        "providerCalls": 0
+      }
+    },
+    {
+      "check": "new-read",
+      "httpStatus": 200,
+      "result": {
+        "status": "PASSED",
+        "source": "STAGING_ONLY",
+        "mode": "new",
+        "requests": 1,
+        "customerRows": 0,
+        "writes": 0,
+        "notifications": 0,
+        "providerCalls": 0
+      }
+    }
+  ],
+  "moduleCheck": {
+    "check": "candidate-module-imports",
+    "httpStatus": 200,
+    "result": {
+      "status": "PASSED",
+      "source": "STAGING_ONLY",
+      "loadedModules": 3,
+      "businessHandlersExecuted": 0,
+      "requests": 0,
+      "writes": 0,
+      "notifications": 0,
+      "providerCalls": 0
+    }
+  },
+  "shutdownCheck": {
+    "check": "permanent-shutdown-v4",
+    "httpStatus": 503,
+    "status": "DISABLED",
+    "requests": 0
+  },
+  "recordedAt": "2026-10-23T21:43:04.335823+00:00"
+}
