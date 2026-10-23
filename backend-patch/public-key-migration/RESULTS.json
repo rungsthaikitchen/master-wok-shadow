@@ -1,0 +1,230 @@
+{
+  "recordedAt": "2026-10-23T22:18:02.680859+00:00",
+  "localTests": 15,
+  "localSkipped": 0,
+  "stagingProject": "hvrqgufqjslvgiohgkvu",
+  "stagingProbeVersion": 7,
+  "stagingDisabledVersion": 8,
+  "stagingModeChecks": [
+    {
+      "check": "no-capability",
+      "httpStatus": 503,
+      "expected": 503,
+      "passed": true,
+      "response": {
+        "status": "DISABLED",
+        "requests": 0
+      }
+    },
+    {
+      "check": "legacy-old",
+      "httpStatus": 200,
+      "expected": 200,
+      "passed": true,
+      "response": {
+        "status": "ALLOWED",
+        "mode": "legacy",
+        "databaseRequests": 0,
+        "writes": 0,
+        "providerCalls": 0,
+        "notifications": 0
+      }
+    },
+    {
+      "check": "legacy-new",
+      "httpStatus": 401,
+      "expected": 401,
+      "passed": true,
+      "response": {
+        "status": "DENIED",
+        "mode": "legacy",
+        "databaseRequests": 0,
+        "writes": 0,
+        "providerCalls": 0,
+        "notifications": 0
+      }
+    },
+    {
+      "check": "dual-old",
+      "httpStatus": 200,
+      "expected": 200,
+      "passed": true,
+      "response": {
+        "status": "ALLOWED",
+        "mode": "dual",
+        "databaseRequests": 0,
+        "writes": 0,
+        "providerCalls": 0,
+        "notifications": 0
+      }
+    },
+    {
+      "check": "dual-new",
+      "httpStatus": 200,
+      "expected": 200,
+      "passed": true,
+      "response": {
+        "status": "ALLOWED",
+        "mode": "dual",
+        "databaseRequests": 0,
+        "writes": 0,
+        "providerCalls": 0,
+        "notifications": 0
+      }
+    },
+    {
+      "check": "publishable-old",
+      "httpStatus": 401,
+      "expected": 401,
+      "passed": true,
+      "response": {
+        "status": "DENIED",
+        "mode": "publishable",
+        "databaseRequests": 0,
+        "writes": 0,
+        "providerCalls": 0,
+        "notifications": 0
+      }
+    },
+    {
+      "check": "publishable-new",
+      "httpStatus": 200,
+      "expected": 200,
+      "passed": true,
+      "response": {
+        "status": "ALLOWED",
+        "mode": "publishable",
+        "databaseRequests": 0,
+        "writes": 0,
+        "providerCalls": 0,
+        "notifications": 0
+      }
+    }
+  ],
+  "stagingShutdown": {
+    "httpStatus": 503,
+    "status": "DISABLED",
+    "requests": 0
+  },
+  "legacyAliasInvestigation": [
+    {
+      "sent": "anon",
+      "httpStatus": 401,
+      "status": "DENIED",
+      "diagnostic": {
+        "legacyEnvIsJwt": false,
+        "legacyEnvIsPublishable": true,
+        "requestKeyIsJwt": true,
+        "requestKeyIsPublishable": false,
+        "legacyMatchesRequestKey": false
+      }
+    },
+    {
+      "sent": "pub",
+      "httpStatus": 200,
+      "status": "ALLOWED",
+      "diagnostic": {
+        "legacyEnvIsJwt": false,
+        "legacyEnvIsPublishable": true,
+        "requestKeyIsJwt": false,
+        "requestKeyIsPublishable": true,
+        "legacyMatchesRequestKey": true
+      }
+    }
+  ],
+  "productionGuards": {
+    "get-delivery-route-quote": {
+      "version": 7,
+      "verifyJwt": false,
+      "ownKeyGuard": true,
+      "sourceMatchesCandidate": true
+    },
+    "geocode-address": {
+      "version": 8,
+      "verifyJwt": false,
+      "ownKeyGuard": true,
+      "sourceMatchesCandidate": true
+    },
+    "geocode-order": {
+      "version": 12,
+      "verifyJwt": false,
+      "ownKeyGuard": true,
+      "sourceMatchesCandidate": true
+    }
+  },
+  "productionChecks": [
+    {
+      "check": "missing-key",
+      "httpStatus": 401,
+      "expected": 401,
+      "passed": true
+    },
+    {
+      "check": "legacy-caller",
+      "httpStatus": 400,
+      "expected": 400,
+      "passed": true
+    },
+    {
+      "check": "publishable-before-dual",
+      "httpStatus": 401,
+      "expected": 401,
+      "passed": true
+    },
+    {
+      "function": "get-delivery-route-quote",
+      "check": "missing-key",
+      "httpStatus": 401,
+      "expected": 401,
+      "passed": true
+    },
+    {
+      "function": "get-delivery-route-quote",
+      "check": "legacy-caller",
+      "httpStatus": 400,
+      "expected": 400,
+      "passed": true
+    },
+    {
+      "function": "get-delivery-route-quote",
+      "check": "publishable-before-dual",
+      "httpStatus": 401,
+      "expected": 401,
+      "passed": true
+    },
+    {
+      "function": "geocode-order",
+      "check": "missing-key",
+      "httpStatus": 401,
+      "expected": 401,
+      "passed": true
+    },
+    {
+      "function": "geocode-order",
+      "check": "legacy-caller",
+      "httpStatus": 400,
+      "expected": 400,
+      "passed": true
+    },
+    {
+      "function": "geocode-order",
+      "check": "publishable-before-dual",
+      "httpStatus": 401,
+      "expected": 401,
+      "passed": true
+    }
+  ],
+  "publishableDataApiRead": {
+    "httpStatus": 200,
+    "emptyResult": true,
+    "writes": 0
+  },
+  "preparedWebsiteCommit": "b4db919971e6163f014bed29892176ccfa42a5b1",
+  "websiteMainParent": "cb39250cc2d1d6de03b090a8183db4ae5ba30c62",
+  "websiteMainUpdated": false,
+  "productionPublicMode": "LEGACY_INFERRED_FROM_NEW_KEY_REJECTIONS",
+  "productionDatabaseWrites": 0,
+  "providerCalls": 0,
+  "notifications": 0,
+  "legacyKeysRevoked": false
+}

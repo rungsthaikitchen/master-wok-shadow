@@ -1,0 +1,27 @@
+{
+  "admin.html": {
+    "sha256": "6f47fcea74c20407f0b4ec2ca5326bba0cd5feab9af69ac2152380cf2e6be130",
+    "githubBlob": "a5e5aeaad1244a69bc6e5f52dbb02122691f2b11",
+    "githubCommit": "cb39250cc2d1d6de03b090a8183db4ae5ba30c62"
+  },
+  "geocode-address.ts": {
+    "sha256": "0ad8fbabed221bae9dec35ac57d03e1b6f868a4e3e5eafc3d72f7e66896e9dec",
+    "version": 7,
+    "verifyJwt": true
+  },
+  "geocode-order.ts": {
+    "sha256": "b4615fdf36f5114ec3fdcb5ba8048e287a2681914a374d9d41a42163b1b87f70",
+    "version": 11,
+    "verifyJwt": true
+  },
+  "get-delivery-route-quote.ts": {
+    "sha256": "79190a74937938a0d18aca1a2882ba454e690586ea0b1d54a2cf1f0ad7d9bbe8",
+    "version": 6,
+    "verifyJwt": true
+  },
+  "index.html": {
+    "sha256": "473389a12c2b95f5c2a96ebf1933faf9e757e7f3a5cbc247f73898ebc83e67ef",
+    "githubBlob": "1102ab8c713a0dba5a0a5df8745871ca8a2ef688",
+    "githubCommit": "cb39250cc2d1d6de03b090a8183db4ae5ba30c62"
+  }
+}

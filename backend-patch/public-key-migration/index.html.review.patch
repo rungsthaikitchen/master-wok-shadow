@@ -1,0 +1,65 @@
+--- a/index.html
++++ b/index.html
+@@ -3106,14 +3106,14 @@
+     </iframe>
+   </div>
+ </div>
+-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
++<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
+ 
+ <script>
+   const SUPABASE_URL = 'https://ubyjrrsvbbqomitpaidb.supabase.co';
+-  const SUPABASE_ANON_KEY = '[LEGACY_PUBLIC_KEY]';
++  const SUPABASE_PUBLIC_KEY = '[NEW_PUBLISHABLE_KEY]';
+   
+   
+-  window.sb = window.sb || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
++  window.sb = window.sb || window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
+ 
+   console.log('Supabase ready:', window.supabaseClient);
+ </script>
+@@ -3568,8 +3568,7 @@
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+-        "apikey": SUPABASE_ANON_KEY,
+-        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
++        "apikey": SUPABASE_PUBLIC_KEY
+       },
+       body: JSON.stringify({
+         origin: restaurant,
+@@ -4926,7 +4925,7 @@
+ 
+ 
+  Supabase JS (CDN)
+-  <!--<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>-->
++  <!--<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>-->
+   <script>
+   console.log("Supabase global:", window.supabase);
+   console.log("createClient:", window.supabase?.createClient);
+@@ -4937,8 +4936,8 @@
+   <script>
+     // Init Supabase
+    // const SUPABASE_URL = 'https://ubyjrrsvbbqomitpaidb.supabase.co';
+-    //const SUPABASE_ANON_KEY = //'[LEGACY_PUBLIC_KEY]';
+-   // const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
++    //const SUPABASE_PUBLIC_KEY = //'[NEW_PUBLISHABLE_KEY]';
++   // const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
+ 	
+ 
+ /* ------------------------------
+@@ -8766,12 +8765,12 @@
+ </script>
+ 
+ 
+-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
++<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
+ <!--<script>
+ (() => {
+   // ====== CONFIG ======
+   const SUPABASE_URL = "https://ubyjrrsvbbqomitpaidb.supabase.co";
+-  const SUPABASE_ANON_KEY = '[LEGACY_PUBLIC_KEY]';
++  const SUPABASE_PUBLIC_KEY = '[NEW_PUBLISHABLE_KEY]';
+ 
+   // ====== HARD GUARDS ======
+   if (!window.supabase || typeof window.supabase.createClient !== "function") {

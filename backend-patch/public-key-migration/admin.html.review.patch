@@ -1,0 +1,21 @@
+--- a/admin.html
++++ b/admin.html
+@@ -1015,15 +1015,15 @@
+   </main>
+   <audio id="new-order-sound" src="Sounds/bell railroad1.wav" preload="auto"></audio>
+   <!-- Supabase JS -->
+-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
++  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
+   <script>
+     // ---------- Config ----------
+     const SUPABASE_URL = 'https://ubyjrrsvbbqomitpaidb.supabase.co';
+-	const SUPABASE_ANON_KEY = '[LEGACY_PUBLIC_KEY]';
++	const SUPABASE_PUBLIC_KEY = '[NEW_PUBLISHABLE_KEY]';
+ 
+ 		// do this ONCE
+ 		window.supabaseClient = window.supabaseClient
+-		  || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
++		  || window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
+ 
+ 		// then everywhere else:
+ 		const sb = window.supabaseClient;

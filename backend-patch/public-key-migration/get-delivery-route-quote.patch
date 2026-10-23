@@ -1,0 +1,18 @@
+--- a/index.ts
++++ b/index.ts
+@@ -1,3 +1,5 @@
++import { publicAccess } from "./public-access.mjs";
++import { legacyPublicKeyHash } from "./legacy-public-key.mjs";
+ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+ 
+ const GOOGLE_MAPS_API_KEY = Deno.env.get("GOOGLE_MAPS_API_KEY") || "";
+@@ -22,6 +24,9 @@
+   if (req.method === "OPTIONS") {
+     return new Response("ok", { headers: corsHeaders });
+   }
++
++  const denied = await publicAccess(req, (name) => Deno.env.get(name), corsHeaders, legacyPublicKeyHash);
++  if (denied) return denied;
+ 
+   try {
+     if (req.method !== "POST") {
