@@ -1,0 +1,55 @@
+{
+  "project": "ubyjrrsvbbqomitpaidb",
+  "recordedAt": "2026-10-23T21:46:59.070980+00:00",
+  "sourceComparison": "All three raw source hashes, versions and verify_jwt settings matched reviewed manifest immediately before deployment",
+  "readback": {
+    "review-order": {
+      "version": 14,
+      "verifyJwt": true,
+      "deployedSource": "MATCHES_TESTED_CANDIDATE"
+    },
+    "hyper-worker": {
+      "version": 33,
+      "verifyJwt": false,
+      "deployedSource": "MATCHES_TESTED_CANDIDATE"
+    },
+    "geocode-order": {
+      "version": 10,
+      "verifyJwt": true,
+      "deployedSource": "MATCHES_TESTED_CANDIDATE"
+    }
+  },
+  "checks": [
+    {
+      "function": "review-order",
+      "check": "missing-jwt",
+      "httpStatus": 401
+    },
+    {
+      "function": "review-order",
+      "check": "incorrect-admin-secret-with-valid-jwt",
+      "httpStatus": 401
+    },
+    {
+      "function": "hyper-worker",
+      "check": "incorrect-admin-secret-without-jwt",
+      "httpStatus": 401
+    },
+    {
+      "function": "geocode-order",
+      "check": "missing-jwt",
+      "httpStatus": 401
+    },
+    {
+      "function": "geocode-order",
+      "check": "valid-jwt-incomplete-payload",
+      "httpStatus": 400
+    }
+  ],
+  "databaseWrites": 0,
+  "providerCalls": 0,
+  "notifications": 0,
+  "secretConfigurationChanged": false,
+  "newKeyActivation": "PENDING_OWNER_DASHBOARD_FLAG",
+  "legacyKeyRevoked": false
+}
