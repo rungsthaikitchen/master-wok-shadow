@@ -4,7 +4,7 @@ Prepared offline only. No service variable was read, changed or revoked; no depl
 
 ## Evidence
 
-The owner confirmed the live Railway backend variable SUPABASE_SERVICE_ROLE_KEY starts with eyJ, and created default publishable and secret keys in production Supabase. Secret values were not supplied. Railway OAuth is unavailable to this session. Production source and installed dependency versions remain independently unverified.
+The owner confirmed the live Railway backend variable SUPABASE_SERVICE_ROLE_KEY starts with eyJ, and created default publishable and secret keys in production Supabase. Secret values were not supplied. Railway OAuth is unavailable to this session. On 23 October the owner supplied the GitHub archive for the commit linked by the active Railway deployment, 51616be77f92fcfd99958e8d784361eb232073a5. All three archived files match the previously supplied files byte-for-byte. This closes the supplied-source comparison gate; direct connector retrieval and installed production dependency versions remain unavailable.
 
 This candidate applies to the exact supplied server(1).py, SHA-256 ad15337033c5b4a91816e2c5875460dcff1364d43e6a9619be8aa8a1d6412d88. It uses both create_client and direct REST requests for booking/loyalty operations. The original requirements.txt has unpinned flask, twilio, requests and supabase. The original direct REST helper sends its key in both apikey and Authorization: Bearer. The examined supabase-py 2.33.0 also supplies a Bearer header by default. These observations establish header construction, not a demonstrated production authentication failure.
 
@@ -23,7 +23,7 @@ No order status rules, proposal handling, pricing, capacity calculation, endpoin
 
 ## Rollout sequence and remaining gates
 
-1. Establish that the deployed backend source matches the supplied file, or rebase the candidate against the actual deployed source. Confirm Python/runtime dependencies, active notification files and every backend consumer. The known backend repository was previously inaccessible; do not overwrite unseen changes.
+1. Source comparison completed using the owner-downloaded deployment commit archive (see below). Before applying, check that no newer backend commit/deployment has appeared. Still confirm Python/runtime dependencies and every backend consumer; do not overwrite unseen changes on the backend branch.
 2. Exercise this candidate against a staging project with its own secret, validating database access, loyalty and the existing admin proxy contract. Local mock tests do not prove real platform acceptance. Do not place the production secret in staging or into chat/source control.
 3. Confirm Railway build/deploy access and its current credential-recovery guidance. Use a dedicated production backend secret key rather than sharing one key with every service. Enter the replacement directly through the service's secret configuration when rollout is ready.
 4. Deploy the reviewed credential patch and pinned requirements to the backend with the new variable. Verify the running commit and read-only database access. Plan any live functional write/notification checks explicitly with the owner; no such checks are authorized or performed by this review.
@@ -56,3 +56,17 @@ Addresses, URLs, port numbers and account identifiers are configuration rather t
 Validation: nine offline tests passed, no skips, with the exact supplied backend path configured. The patch also applies cleanly before the earlier staging route patch. The actual SDK 2.33.0 issued mocked GET/POST/PATCH requests with apikey only, and the hook preserved an unrelated user JWT. pip check reported no broken requirements after installing all four original backend packages; the resolved environment is pinned in requirements-secret-key.txt. No actual Supabase credential or real endpoint was used. Python 3.12 was tested; notification delivery and full loyalty business behaviour were not exercised by this credential-focused suite. The existing 97 event tests were not repeated because this candidate is not imported by that runtime.
 
 Reproduce in an isolated environment by installing requirements-secret-key.txt, then running unittest discovery in backend-patch for test_secret_key_compatibility.py with MASTER_WOK_REVIEW_SERVER_PATH pointing to the exact supplied source. Keep all real production credentials out of that environment.
+
+## Deployment commit archive follow-up — 23 October
+
+The owner opened the active deployment's GitHub link, which points to https://github.com/rungsthaikitchen/order-backend/commit/51616be77f92fcfd99958e8d784361eb232073a5, then downloaded its Browse files archive. GitHub connector reads for this commit still returned 404. The archive contains only the three expected backend files; archive paths and member sizes were checked before extraction.
+
+| File | SHA-256 | Compared with earlier supplied copy |
+|---|---|---|
+| server.py | ad15337033c5b4a91816e2c5875460dcff1364d43e6a9619be8aa8a1d6412d88 | Identical |
+| notifications.py | 34ace2ae84a5f141a8620fa7feefc2706165c7efd0616a4d4af83f53ec050577 | Identical |
+| requirements.txt | 979a71fb94b9cec1c60306b555fdfc46780d8c3339bbf08633a51ccef4e99129 | Identical |
+
+notifications.py reads Brevo, Twilio and Pushover credentials and implements their sending paths. It does not reference SENDGRID_API_KEY or SMTP_* variables. That is evidence about this source, not proof that those credentials have no consumers elsewhere. Removing unused variables alone would not revoke the provider credentials.
+
+The old isolated test environment had expired. A first wider-suite attempt failed because Flask and psycopg were absent from the refreshed base runtime; these were environment dependency errors. Recreated the isolated environment from the committed requirements snapshot, then installed psycopg[binary]==3.3.6 for the separate event suite. Final reruns against the extracted server.py passed: nine credential compatibility tests and all 97 event tests, with no skips. pip check passed. The archive SHA-256 is 09bd51b23c88be71f252b77dcea5e9990a59c94594eb7145d87af466f4946e46. No production endpoint or notification was exercised. Real staging authentication and the wider consumer/revocation review are still required.

@@ -87,3 +87,7 @@ The smallest next integration remains the existing default-off, POST-only stagin
 These tests deliberately remain separate from the adapter tests so a legacy reproduction passing cannot be mistaken for corrected production behaviour. No production scheduling changes, new services or provider charges were introduced.
 
 Validation: all 97 Python event tests passed with MASTER_WOK_REVIEW_SERVER_PATH set, including the seven new legacy characterizations and existing staging adapter tests; no tests skipped. The supplied backend is loaded locally only. No runtime code changed, so the previously passed Node suites were not repeated for this test/documentation-only change.
+
+## 23 October: deployed-commit archive comparison
+
+The owner supplied the archive downloaded from the commit linked by the active Railway deployment, 51616be77f92fcfd99958e8d784361eb232073a5. server.py, notifications.py and requirements.txt are byte-for-byte identical to the earlier supplied files. This resolves the supplied-source mismatch dependency recorded above, based on the owner's deployment link/archive; direct GitHub connector retrieval still returns 404. Current installed dependency versions, any newer deployment, the active configured Edge action target and order-confirm source remain separate verification items. See backend-patch/SECRET-KEY-MIGRATION-REVIEW.md for hashes and the independent credential migration candidate. No live handler was invoked or changed.
