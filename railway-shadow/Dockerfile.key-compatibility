@@ -1,0 +1,8 @@
+FROM python:3.12-slim-bookworm
+WORKDIR /app
+COPY backend-patch/requirements-secret-key.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+COPY backend-patch/rtk_supabase_credentials.py /app/backend-patch/rtk_supabase_credentials.py
+COPY railway-shadow/key_compatibility_staging.py /app/railway-shadow/key_compatibility_staging.py
+ENV PYTHONUNBUFFERED=1
+CMD ["python", "railway-shadow/key_compatibility_staging.py"]
