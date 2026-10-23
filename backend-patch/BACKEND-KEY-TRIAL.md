@@ -46,3 +46,18 @@ After evidence: set the backend trial flag false, remove its temporary staging s
 21 local backend-patch tests passed, no skips, using the actual Python SDK and stateful HTTP mocks. Six new tests cover full synthetic scenario/cleanup, detecting legacy false success, refusal without deleting pre-existing fixtures, request/path/origin/budget guards, disabled/scope/marker safety, and exact source extraction. Prior 97 event tests were not repeated because their runtime is unchanged. Real staging SQL acceptance passed with rollback; real hosted handler/SDK writes have not yet run. The dedicated image has not yet been built.
 
 After hosted evidence and cleanup, review any remaining production consumer dependencies before replacing/revoking legacy credentials. Do not disable legacy anon/service_role globally merely because this trial passes.
+
+## Hosted trial evidence — 23 October 2026
+
+Owner-provided Railway logs establish both runs on staging service 012e5ef6-6225-4ab3-95f5-894583db7e83, environment c1b8fad6-dbfc-4188-b4b5-a5dbfbf53279, project 7821ad5b-f5c2-4ab4-9206-c3d76eefd4c8. Build SHA was 2c670d11a42961d90d225ea771fcd4781a9c53e0.
+
+| Deployment | UTC observation | Result |
+|---|---|---|
+| ab3a2ab0-e843-485e-94ed-7aca1a047130 | 2026-10-23T07:43:25.973497815Z | DISABLED, requests 0 |
+| a90a373c-a13f-4542-a8f5-4acce427c41c | 2026-10-23T10:08:17.440750295Z | PASSED, source STAGING_FIXTURES_ONLY, requests 35, fixtureWrites 15, fixtureRowsRemaining 0, notifications 0, productionWrites 0 |
+
+The pass explicitly reports edgeBoundary LOCAL_STUB, concurrentSettlementVerified false and fullProductionSchemaVerified false. This supersedes the preceding not-yet-built/not-yet-run status: the image and real hosted handler/SDK fixture operations ran. The pass covers the assertions described above and does not establish external Edge behaviour, concurrent settlement, full schema compatibility or production rotation.
+
+A separate read-only SQL check through the staging Supabase connector independently confirmed orders=0, customers=0 and loyaltyAccounts=0 in the three dedicated fixture tables after the trial. No production data was queried for this cleanup check.
+
+Trial shutdown pending: set MASTER_WOK_BACKEND_KEY_TRIAL_ENABLED=false, remove MASTER_WOK_STAGING_SECRET_KEY from the staging service, deploy disabled and record zero-request execution. Preserve the marker. All other trial flags must remain false. Secret deletion cannot be established from runtime logs alone while Railway OAuth remains unavailable.
