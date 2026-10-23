@@ -1,0 +1,24 @@
+--- a/index.ts
++++ b/index.ts
+@@ -1,6 +1,7 @@
+ // functions/hyper-worker/index.ts
+ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
++import { createClient } from "npm:@supabase/supabase-js@2.118.0";
++import { edgeDatabaseClient } from "./edge-credentials.mjs";
+ // ---------- CORS ----------
+ const corsHeaders = {
+   "Access-Control-Allow-Origin": "*",
+@@ -14,11 +15,7 @@
+ const SENDGRID_API_KEY = Deno.env.get("SENDGRID_API_KEY") || "";
+ const EMAIL_FROM = Deno.env.get("EMAIL_FROM") || "";
+ // ---------- Supabase client ----------
+-const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+-  auth: {
+-    persistSession: false
+-  }
+-});
++const supabase = edgeDatabaseClient(createClient, SUPABASE_URL, SERVICE_ROLE_KEY, { auth: { persistSession: false } }, (name) => Deno.env.get(name));
+ // ---------- Helpers ----------
+ function jsonResponse(body, status = 200) {
+   return new Response(JSON.stringify(body), {

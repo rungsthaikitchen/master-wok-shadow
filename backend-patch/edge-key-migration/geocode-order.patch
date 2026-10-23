@@ -1,0 +1,17 @@
+--- a/index.ts
++++ b/index.ts
+@@ -1,11 +1,12 @@
+ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
++import { createClient } from "npm:@supabase/supabase-js@2.118.0";
++import { edgeDatabaseClient } from "./edge-credentials.mjs";
+ 
+ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+ const GOOGLE_MAPS_API_KEY = Deno.env.get("GOOGLE_MAPS_API_KEY")!;
+ 
+-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
++const supabase = edgeDatabaseClient(createClient, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, undefined, (name) => Deno.env.get(name));
+ 
+ // --- CORS headers so the browser can call this function ---
+ const corsHeaders = {

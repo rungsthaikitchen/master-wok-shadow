@@ -1,0 +1,20 @@
+{
+  "review-order": {
+    "version": 13,
+    "verifyJwt": true,
+    "normalizedSha256": "304584dd1ddd3f7223213bdc259ac1e6a048f41b8565736b3f5bdff7db2f3fb3",
+    "retrievedSha256": "7c8eeb3fc6e7630f72ffb32472128a35971ab28f1640c8147ed7a46bff6cd47e"
+  },
+  "hyper-worker": {
+    "version": 32,
+    "verifyJwt": false,
+    "normalizedSha256": "03ad7797af31006c387e1ec24c66f9ecc406c0772d6fecea48b329ced8438d1e",
+    "retrievedSha256": "91fdadc2610d2175344bb6c3d60295597e8d0902b708a99cc737bb03c5576f44"
+  },
+  "geocode-order": {
+    "version": 9,
+    "verifyJwt": true,
+    "normalizedSha256": "debd10ed268b99b765ce5f1ec9d517a27353e31e020b287bb50ee6ef588614d9",
+    "retrievedSha256": "b8ebc477166c09ad68a06cf231b327edc796ed542072b6ffb48683ff84a74331"
+  }
+}

@@ -1,0 +1,16 @@
+--- a/index.ts
++++ b/index.ts
+@@ -1,10 +1,11 @@
+ // supabase/functions/review-order/index.ts
+ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
++import { createClient } from "npm:@supabase/supabase-js@2.118.0";
++import { edgeDatabaseClient } from "./edge-credentials.mjs";
+ 
+ const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+ const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+-const supabase = createClient(supabaseUrl, serviceRoleKey);
++const supabase = edgeDatabaseClient(createClient, supabaseUrl, serviceRoleKey, undefined, (name) => Deno.env.get(name));
+ 
+ // Worldpay / Easipay – Hosted Payment Pages (Pay by Link) :contentReference[oaicite:0]{index=0}
+ const WORLDPAY_BASE_URL = Deno.env.get("WORLDPAY_BASE_URL") ?? "https://try.access.worldpay.com";

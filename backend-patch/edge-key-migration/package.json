@@ -1,0 +1,7 @@
+{
+  "name": "rtk-edge-key-migration-review",
+  "private": true,
+  "type": "module",
+  "scripts": {"test": "node --test *.test.mjs"},
+  "dependencies": {"@supabase/supabase-js": "2.118.0"}
+}
