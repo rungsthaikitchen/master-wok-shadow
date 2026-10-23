@@ -29,3 +29,16 @@ This run neither rotates production credentials nor closes the complete backend 
 ## Validation
 
 15 offline tests passed (nine backend credential tests plus six staging check tests), no skips, using the exact deployment archive server.py. Coverage includes disabled no-network startup, exact staging identities, other-trial refusal, no legacy fallback, zero-row requests, no redirects, durable no-repeat on success/failure, client closure, unexpected-row refusal, and sanitized failure logs. The dedicated Docker image and real staging authentication have not yet been run. Existing 97 event tests already passed against the archive; event-runtime code is unchanged.
+
+## Hosted evidence — 23 October 2026
+
+The owner supplied Railway runtime logs from the exact staging service/environment above. These are owner-provided logs; connector read-back remains unavailable due to OAuth. Build SHA in both runs is 33d21ba7b3b213f2f03a9e123ed4fc805f88c429.
+
+| Deployment | UTC observation | Result |
+|---|---|---|
+| 6af8b243-68f1-4d97-8024-87c9968900ef | 2026-10-23T04:45:49.885044033Z | DISABLED, requests 0 |
+| 737f1d05-bca6-4fba-8b89-fb8d406137c1 | 2026-10-23T04:48:49.752415709Z | PASSED, requests 2, source STAGING_ONLY, customerRows 0, writes 0, notifications 0, bookingLifecycleVerified false |
+
+This supersedes the earlier not-yet-run status: the dedicated image ran and both new-key read paths passed in hosted staging. It does not validate booking/loyalty mutations, notifications, the complete backend service or production credentials. The startup logs show volume attachment on both deployments; contents and attempt marker have not been independently inspected.
+
+Cleanup pending: set MASTER_WOK_KEY_COMPATIBILITY_ENABLED=false, remove MASTER_WOK_STAGING_SECRET_KEY from this service, deploy disabled, and record DISABLED/requests 0 on the expected build. Retain the attempt marker and existing shared staging key; removing a service variable does not revoke a key. Do not resume other staging trials or change the live backend as part of cleanup.
