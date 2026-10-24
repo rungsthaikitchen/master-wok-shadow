@@ -12,7 +12,7 @@ Current review is read-only against production. No running collector configurati
 | Private event readers/writers | Restricted database-role DSNs | Independent of Data API keys; private role permissions and credential exposure/rotation remain separate |
 | Google routing, notification, backup storage and health/operator credentials | Provider-specific credentials | Not rotated by the Supabase API-key migration |
 
-This table is a source-code inventory, not proof of current Railway variables. Railway list-services again returned UNAUTHORIZED/requires reauthentication on24 October. No reconnect loop, credential fetch or browser-session probe was attempted. No secret values were requested or retrieved. Current production MASTER_WOK_SOURCE_KIND and backend SUPABASE_ORDER_ACTION_URL are non-secret configuration values that still need read-back from the owner/dashboard while the connector is unavailable.
+This table is a source-code inventory, not proof of current Railway variables. Railway list-services again returned UNAUTHORIZED/requires reauthentication on24 October. No reconnect loop, credential fetch or browser-session probe was attempted. No secret values were requested or retrieved. Owner dashboard read-back on 24 October confirms production MASTER_WOK_SOURCE_KIND=management_read_only and backend SUPABASE_ORDER_ACTION_URL=https://ubyjrrsvbbqomitpaidb.supabase.co/functions/v1/hyper-worker. These are owner-reported configuration values, not an independent runtime health check. The production kitchen collector therefore does not require this isolated REST-header patch; keep its existing management credential and transport unchanged.
 
 ## Collector patch and tests
 
@@ -26,7 +26,7 @@ Validation:38 tests passed:5 new transport/header tests,26 collector/persistence
 
 Supabase get_edge_function(order-confirm) still returns UNAVAILABLE/internal ProtocolError. Do not equate that with an empty or inactive function, and do not overwrite it with a guessed implementation. The repository order-confirm.html (blob16ff06758d560dc2207ccc0491c86fe2d6ee819f) has no API key and makes GET to the old functions.supabase.co/order-confirm URL with token and decision query parameters. It was inspected as source only; no confirmation URL was opened because GET can change an order.
 
-The verified backend snapshot's notifications.py builds current proposed-time SMS/email links to Railway /orders/{id}/time/accept and /time/decline. The Edge hyper-worker source still constructs the older order-confirm.html links, but both its notifyCustomerEmail call and the helper's sendEmail call are commented out. That identifies multiple historical paths, not proof that every customer link now uses Railway. Old emailed links may remain usable. The configured live action target remains unknown because its Railway variable value has not been read.
+The verified backend snapshot's notifications.py builds current proposed-time SMS/email links to Railway /orders/{id}/time/accept and /time/decline. The Edge hyper-worker source still constructs the older order-confirm.html links, but both its notifyCustomerEmail call and the helper's sendEmail call are commented out. That identifies multiple historical paths, not proof that every customer link now uses Railway. Old emailed links may remain usable. Owner dashboard read-back confirms the configured backend action target is hyper-worker. The owner also confirms order-confirm still has a blank dashboard Code tab. Its deployed source remains unavailable, not proven empty; leave it unchanged.
 
 ## Aggregate production review (no customer data or token URLs)
 
@@ -41,9 +41,13 @@ Raw analytics activity includes genuine traffic and earlier tests. HTTP200 is no
 
 ## What unblocks completion
 
-1. Read the non-secret MASTER_WOK_SOURCE_KIND from master-wok-production-shadow and SUPABASE_ORDER_ACTION_URL from the live order-backend service. Do not copy key/token/DSN values.
+1. Completed by owner dashboard read-back: production kitchen source is management_read_only and backend action target is hyper-worker. No secret values were supplied and no transport migration is needed for this kitchen collector.
 2. Recover actual order-confirm source from the dashboard/export if available. If its Code tab is still blank, record that and keep this function unchanged; source retrieval failure alone is not grounds for retirement or a replacement deployment.
 3. With Railway read access restored or owner-supplied safe metadata, inspect all live shadow source modes and credential names. Apply any REST patch/migration in staging before considering a collector release. Rotate potentially exposed management/provider credentials separately with their consumers coordinated.
 4. Finish consumer coverage and the existing browser overlap/cache transition before switching public-key mode or globally disabling legacy keys. No revocation is authorized by a no-traffic result.
 
 Primary migration guidance already verified during the preceding deployment work: https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys . The hosted alias discovery and public/browser rollout are recorded separately under backend-patch/public-key-migration.
+
+## Next event-capture gate — 24 October
+
+The six offline event_cutover_trial safety/budget tests pass again. The hosted concurrency witness remains unrun: fixed offer times and synthetic stream fixtures target 22 October, now past. Regenerate and review matching dates, fixture identities and expected counts before any staging enable; changing only the runner timestamp is insufficient. Existing streams must stay disabled until their state has been checked. Railway authentication is still unresolved; do not treat offline checks as hosted concurrency, lifecycle coverage or production decision capture. No live scheduling change, key revocation or production database write is required to record these findings.
