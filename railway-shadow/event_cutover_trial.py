@@ -4,16 +4,21 @@ import os
 from pathlib import Path
 import sqlite3
 import time
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from concurrent.futures import ThreadPoolExecutor
 from event_capture_journal import EventCaptureError,canonical
 from event_runtime_transport import connection_parameters,ROLES
 
+FIXTURE_DAY='2026-10-25'
+OFFER_AT=FIXTURE_DAY+'T19:15:00+00:00'
 CASES=(
- ('before','a6b17a1d-2df6-42e4-8ebb-5ffc37a4ad36','a5fb7fff-3acd-450f-89cb-8457f58c6fe4','8a9104e1-2f1d-44f5-a56b-f8fb791e3f97',2110202601),
- ('after','a52623e7-f829-4dc5-a1ab-d717f023c514','1834bee9-2cc5-4690-8028-5aef07ce659e','5a23e598-c909-4d9b-9acc-878b6eed7ee6',2110202602),
- ('rollback','93a4fafb-09f9-4f2e-af5a-0bc2aba1ba34','dc668793-a0a6-4b73-bb40-f5e6b4a04793','ea5797d8-7b98-4c91-b21b-1dc4f9f87cc2',2110202603),
- ('timeout','d8316ae4-1053-48f7-9f6b-cd93513c6cd3','b492dc0a-196e-4702-980c-b66e46420577','59b42331-0807-4ed3-b135-f36092e80add',2110202604))
-DIRECTORY=Path('/data/cutover-trial-21-oct')
+ ('before', 'd8316d40-dba5-5cfc-9b3b-b1b6b44757c5', '76233fa7-6e66-544c-ba50-8e072954d6a0', '05a2a236-2e3e-5656-9567-91e54947f5d0', 2410202601),
+ ('after', '31cbc165-7d89-5c45-b636-111169870599', 'd75a6760-875c-5a87-8249-ce6501b04b1b', 'e853a4eb-579e-57c0-9713-bbcf7fa82fd2', 2410202602),
+ ('rollback', '826a5959-b663-5f87-8c1d-4ae5632703f1', '8124b620-8152-51a4-89f4-73df3224bccb', '51814786-c024-5267-8c48-65e6bac8ab5b', 2410202603),
+ ('timeout', '5ef97bb9-d8d0-5eb7-949d-f96bf8514a97', '5955a3b6-ff96-5df1-8520-8f462af3651c', '882a8cd1-5dd8-58e8-8461-3dad75c54d0a', 2410202604),
+)
+DIRECTORY=Path('/data/cutover-trial-25-oct-v1')
 FLAGS=('MASTER_WOK_EVENT_RUNTIME_ENABLED','MASTER_WOK_EVENT_RUNTIME_TRIAL_ENABLED','MASTER_WOK_EVENT_CLOUD_BACKUP_ENABLED','MASTER_WOK_EVENT_SOAK_ENABLED','MASTER_WOK_SIGNED_HTTP_TRIAL_ENABLED','MASTER_WOK_BOOKING_HTTP_TRIAL_ENABLED','MASTER_WOK_TERMINAL_HTTP_TRIAL_ENABLED','MASTER_WOK_DELIVERY_HTTP_TRIAL_ENABLED','MASTER_WOK_CONTINUOUS_STAGING_ENABLED','MASTER_WOK_PREPARED_STAGING_ENABLED','MASTER_WOK_TRANSFER_TRIAL_ENABLED','MASTER_WOK_TRANSFER_MONITOR_ENABLED','MASTER_WOK_TRANSFER_MONITOR_RECOVERY_ENABLED')
 MARKER="SELECT pid FROM pg_locks WHERE locktype='advisory' AND classid=0 AND objid=%s::oid AND objsubid=1 AND granted"
 BLOCKERS='SELECT pg_blocking_pids(%s::integer)'
@@ -31,6 +36,7 @@ def configuration(env,now=None):
  try:deadline=float(env.get('MASTER_WOK_CUTOVER_TRIAL_END_EPOCH','0'))
  except (ValueError,TypeError):raise EventCaptureError('CUTOVER_TRIAL_DEADLINE_REFUSED') from None
  if not now<deadline<=now+600:raise EventCaptureError('CUTOVER_TRIAL_DEADLINE_REFUSED')
+ if datetime.fromtimestamp(now,timezone.utc).astimezone(ZoneInfo('Europe/London')).date().isoformat()>FIXTURE_DAY or now>=datetime.fromisoformat(OFFER_AT).timestamp():raise EventCaptureError('CUTOVER_TRIAL_FIXTURES_EXPIRED')
  return deadline,connection_parameters(env.get('MASTER_WOK_EVENT_READER_DSN'),'reader'),connection_parameters(env.get('MASTER_WOK_EVENT_WRITER_DSN'),'writer')
 
 class Budget:
@@ -81,7 +87,7 @@ class Trial:
   parameters=dict(self.parameters,options='-c statement_timeout=40000 -c lock_timeout='+('300' if short else '35000')+' -c idle_in_transaction_session_timeout=120000')
   conn=(self.connect or psycopg.connect)(**parameters);role_check(conn,'writer');return conn
  def offer(self,conn,case,request):
-  self.budget.take('write');return conn.execute(APPLY,[case[1],request,case[3],'offer','2026-10-22T19:15:00Z',None]).fetchone()[0]
+  self.budget.take('write');return conn.execute(APPLY,[case[1],request,case[3],'offer',OFFER_AT,None]).fetchone()[0]
  def before(self):
   c=CASES[0]
   with self.writer() as conn:

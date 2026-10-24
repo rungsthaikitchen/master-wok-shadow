@@ -1,3 +1,11 @@
+## 24 October preparation update — not deployed or executed
+
+The refreshed runner and `cutover-concurrency-fixtures-25-oct.sql` now use service day 25 October, twelve new source/destination/booking identities, fresh advisory markers and `/data/cutover-trial-25-oct-v1`. Existing fixture rows and durable attempt markers are retained. The SQL prepares four bookings transactionally, leaving all eight streams disabled at commit; identity conflicts fail rather than replacing history. This SQL has not been executed or validated on hosted PostgreSQL yet. It must only be run against staging hvrqgufqjslvgiohgkvu after project identity verification.
+
+The enabled runner refuses expired service dates or an elapsed 19:15 UTC offer target before inspecting DSNs or opening connections. It remains disabled by default. October 25 is after the UK clock change: 18:00Z and 19:15Z are also 18:00 and 19:15 Europe/London. Any later refresh must update both runner and matching SQL; do not enable this pack after expiry.
+
+Before hosted use: inspect current streams and staging service settings; apply/check the new fixture SQL while disabled; confirm counts source=1/destination=0 and all dates/identities; deploy the runner disabled; then explicitly enable only the eight reviewed streams with the bounded runner deadline. The four synchronization cases and cleanup requirements below still apply, using the new CASES markers instead of the historical marker values printed below. Successful local tests are not proof of real database lock overlap. No production activation or key retirement follows from this preparation.
+
 # Hosted cutover rehearsal — partial completion
 
 Subsequent two-date source work is documented in CUTOVER-PAIR-REVIEW.md. It adds the shared snapshot helper and paired producer, hosted rollback evidence and durable paired-baseline tests. The Railway concurrency deployment described below remains blocked; the earlier rehearsal record is retained.

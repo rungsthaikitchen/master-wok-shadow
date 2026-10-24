@@ -32,6 +32,35 @@ class CutoverTrialTests(unittest.TestCase):
   for value in ('1000','1601','nan','inf','invalid'):
    env=self.env();env['MASTER_WOK_CUTOVER_TRIAL_END_EPOCH']=value
    with self.subTest(value=value),self.assertRaisesRegex(EventCaptureError,'CUTOVER_TRIAL_DEADLINE_REFUSED'):trial.configuration(env,now=1000)
+ def test_expired_fixtures_refused_before_dsn_configuration(self):
+  expiry=trial.datetime.fromisoformat(trial.OFFER_AT).timestamp()
+  for now in (expiry,expiry+86400):
+   env=self.env();env['MASTER_WOK_CUTOVER_TRIAL_END_EPOCH']=str(now+300)
+   with self.subTest(now=now),patch.object(trial,'connection_parameters',side_effect=AssertionError('credentials inspected')):
+    with self.assertRaisesRegex(EventCaptureError,'CUTOVER_TRIAL_FIXTURES_EXPIRED'):trial.configuration(env,now=now)
+ def test_refresh_preserves_old_fixture_history_and_matches_prepared_sql(self):
+  sql=(Path(__file__).resolve().parent.parent/'staging-events/cutover-concurrency-fixtures-25-oct.sql').read_text()
+  identities=[value for case in trial.CASES for value in case[1:4]]
+  self.assertEqual(len(set(identities)),12)
+  self.assertNotIn('a6b17a1d-2df6-42e4-8ebb-5ffc37a4ad36',identities)
+  for case in trial.CASES:
+   self.assertIn(case[1],sql);self.assertIn(case[2],sql);self.assertIn(case[3],sql)
+  self.assertEqual(sql.count('SET enabled=false'),4)
+  self.assertNotIn('DELETE ',sql);self.assertNotIn('ON CONFLICT',sql)
+  self.assertIn(trial.FIXTURE_DAY,sql)
+  self.assertNotEqual(str(trial.DIRECTORY),'/data/cutover-trial-21-oct')
+ def test_offer_uses_refreshed_target_through_real_query_boundary(self):
+  seen=[]
+  class Conn:
+   def execute(self,query,params):
+    seen.append((query,params));return self
+   def fetchone(self):return ('RECORDED',)
+  class Budget:
+   def take(self,kind):self.kind=kind
+  budget=Budget();obj=trial.Trial(None,{},budget)
+  self.assertEqual(obj.offer(Conn(),trial.CASES[0],'unit-offer'),'RECORDED')
+  self.assertEqual(budget.kind,'write')
+  self.assertEqual(seen,[(trial.APPLY,[trial.CASES[0][1],'unit-offer',trial.CASES[0][3],'offer',trial.OFFER_AT,None])])
  def test_budget_survives_restart_and_limits_failed_attempts(self):
   with tempfile.TemporaryDirectory() as directory:
    path=Path(directory)/'attempts.sqlite3';first=trial.Budget(path,2000,clock=lambda:1000);first.take('started');first.take('write')
