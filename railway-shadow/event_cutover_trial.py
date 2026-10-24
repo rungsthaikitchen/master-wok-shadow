@@ -25,6 +25,7 @@ BLOCKERS='SELECT pg_blocking_pids(%s::integer)'
 STATE='SELECT id::text,enabled,event_count,master_wok_event_test.export(id) FROM master_wok_event_test.streams WHERE id=ANY(%s::uuid[]) ORDER BY id'
 APPLY='SELECT master_wok_event_test.apply_booking(%s::uuid,%s::text,%s::uuid,%s::text,%s::timestamptz,%s::text)'
 LOCK='SELECT id FROM master_wok_event_test.streams WHERE id=%s::uuid FOR UPDATE'
+PREFLIGHT='SELECT id::text,service_date::text,scope,enabled,event_count FROM master_wok_event_test.streams WHERE id=ANY(%s::uuid[]) ORDER BY id'
 
 def emit(**data):print(canonical(dict(data,verified=False)),flush=True)
 
@@ -37,10 +38,11 @@ def configuration(env,now=None):
  except (ValueError,TypeError):raise EventCaptureError('CUTOVER_TRIAL_DEADLINE_REFUSED') from None
  if not now<deadline<=now+600:raise EventCaptureError('CUTOVER_TRIAL_DEADLINE_REFUSED')
  if datetime.fromtimestamp(now,timezone.utc).astimezone(ZoneInfo('Europe/London')).date().isoformat()>FIXTURE_DAY or now>=datetime.fromisoformat(OFFER_AT).timestamp():raise EventCaptureError('CUTOVER_TRIAL_FIXTURES_EXPIRED')
+ if deadline>=datetime.fromisoformat(OFFER_AT).timestamp():raise EventCaptureError('CUTOVER_TRIAL_DEADLINE_REFUSED')
  return deadline,connection_parameters(env.get('MASTER_WOK_EVENT_READER_DSN'),'reader'),connection_parameters(env.get('MASTER_WOK_EVENT_WRITER_DSN'),'writer')
 
 class Budget:
- LIMITS={'started':1,'probe':180,'write':6,'read':6}
+ LIMITS={'started':1,'probe':180,'write':6,'read':7}
  def __init__(self,path,deadline,clock=time.time):
   self.path=Path(path);self.deadline=deadline;self.clock=clock
   if any(p.is_symlink() for p in (self.path,*self.path.parents)):raise EventCaptureError('CUTOVER_TRIAL_PATH_REFUSED')
@@ -72,6 +74,10 @@ def wait_until(check,budget,*,seconds=100):
 class Trial:
  def __init__(self,reader,writer_parameters,budget,*,connect=None):
   self.reader=reader;self.parameters=writer_parameters;self.budget=budget;self.connect=connect;self.evidence=[]
+ def preflight(self):
+  expected={c[i]:(FIXTURE_DAY,'SYNTHETIC_STAGING_EVENTS',True,1 if i==1 else 0) for c in CASES for i in (1,2)}
+  self.budget.take('read');rows=self.reader.execute(PREFLIGHT,[sorted(expected)]).fetchall()
+  if len(rows)!=8 or {r[0]:tuple(r[1:]) for r in rows}!=expected:raise EventCaptureError('CUTOVER_TRIAL_FIXTURE_STATE_REFUSED')
  def probe(self,query,params):
   if query not in (MARKER,BLOCKERS):raise EventCaptureError('CUTOVER_TRIAL_QUERY_REFUSED')
   self.budget.take('probe');return self.reader.execute(query,params).fetchall()
@@ -157,7 +163,7 @@ def main(env=None):
  budget=Budget(DIRECTORY/'attempts.sqlite3',deadline);budget.take('started')
  import psycopg
  with psycopg.connect(**reader_params,autocommit=True) as reader:
-  role_check(reader,'reader');trial=Trial(reader,writer_params,budget)
+  role_check(reader,'reader');trial=Trial(reader,writer_params,budget);trial.preflight()
   states={'before':trial.before(),'after':trial.waiter(CASES[1]),'rollback':trial.waiter(CASES[2],rollback=True),'timeout':trial.timeout()}
  result=dict(status='OBSERVED',scope='SYNTHETIC_CUTOVER_TRIAL',evidence=trial.evidence,attempts=budget.summary(),verified=False)
  for name,value in [('states.json',states),('result.json',result)]:

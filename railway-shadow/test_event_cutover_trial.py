@@ -38,6 +38,28 @@ class CutoverTrialTests(unittest.TestCase):
    env=self.env();env['MASTER_WOK_CUTOVER_TRIAL_END_EPOCH']=str(now+300)
    with self.subTest(now=now),patch.object(trial,'connection_parameters',side_effect=AssertionError('credentials inspected')):
     with self.assertRaisesRegex(EventCaptureError,'CUTOVER_TRIAL_FIXTURES_EXPIRED'):trial.configuration(env,now=now)
+ def test_deadline_cannot_outlive_fixture_target(self):
+  expiry=trial.datetime.fromisoformat(trial.OFFER_AT).timestamp()
+  env=self.env();env['MASTER_WOK_CUTOVER_TRIAL_END_EPOCH']=str(expiry)
+  with patch.object(trial,'connection_parameters',side_effect=AssertionError('credentials inspected')):
+   with self.assertRaisesRegex(EventCaptureError,'CUTOVER_TRIAL_DEADLINE_REFUSED'):trial.configuration(env,now=expiry-300)
+ def test_preflight_refuses_missing_disabled_wrong_date_or_consumed_streams(self):
+  rows=[(case[i],trial.FIXTURE_DAY,'SYNTHETIC_STAGING_EVENTS',True,1 if i==1 else 0) for case in trial.CASES for i in (1,2)]
+  class Reader:
+   def execute(self,query,params):
+    self.query=query;self.params=params;return self
+   def fetchall(self):return self.rows
+  class Budget:
+   def take(self,kind):self.kind=kind
+  reader=Reader();budget=Budget();obj=trial.Trial(reader,{},budget)
+  reader.rows=rows;obj.preflight()
+  self.assertEqual(reader.query,trial.PREFLIGHT);self.assertEqual(budget.kind,'read')
+  variants=[rows[:-1],rows+[rows[0]]]
+  for index,value in ((1,'2026-10-22'),(2,'OTHER_SCOPE'),(3,False),(4,2)):
+   changed=list(rows);entry=list(rows[0]);entry[index]=value;changed[0]=tuple(entry);variants.append(changed)
+  for variant in variants:
+   reader.rows=variant
+   with self.subTest(rows=variant),self.assertRaisesRegex(EventCaptureError,'CUTOVER_TRIAL_FIXTURE_STATE_REFUSED'):obj.preflight()
  def test_refresh_preserves_old_fixture_history_and_matches_prepared_sql(self):
   sql=(Path(__file__).resolve().parent.parent/'staging-events/cutover-concurrency-fixtures-25-oct.sql').read_text()
   identities=[value for case in trial.CASES for value in case[1:4]]

@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-24",
+  "scope": "LOCAL_SYNTHETIC_ONLY",
+  "postgresEngine": "PGlite 0.3.14",
+  "node": {
+    "files": [
+      "staging-events/cutover-concurrency-fixtures.test.cjs",
+      "staging-events/cutover-baseline-store.test.cjs"
+    ],
+    "timezones": {
+      "Europe/London": {
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0
+      },
+      "UTC": {
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "python": {
+    "file": "railway-shadow/test_event_cutover_trial.py",
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0
+  },
+  "testClock": "Moving local PostgreSQL clock substitution; 24/26 October expiry cases",
+  "hostedSqlVerified": false,
+  "concurrentSettlementVerified": false,
+  "productionWrites": 0,
+  "deployments": 0,
+  "additionalInfrastructure": 0
+}
