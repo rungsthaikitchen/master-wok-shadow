@@ -69,9 +69,15 @@ class ReadOnlySource:
             parsed.username or parsed.password or parsed.port not in (None, 443) or
             parsed.path not in ('', '/') or parsed.query or parsed.fragment):
             raise ShadowError('INVALID_SUPABASE_ORIGIN')
-        if not key or not 1 <= page_size <= 500 or max_rows < page_size:
+        if (not isinstance(key, str) or not key or any(ch.isspace() for ch in key) or
+                not 1 <= page_size <= 500 or max_rows < page_size):
+            raise ShadowError('INVALID_SOURCE_CONFIG')
+        # New API keys are opaque application keys, not JWTs. Preserve legacy
+        # Bearer behaviour, but never silently treat a malformed new key as one.
+        if key.startswith('sb_') and not re.fullmatch(r'sb_(?:publishable|secret)_[A-Za-z0-9_-]+', key):
             raise ShadowError('INVALID_SOURCE_CONFIG')
         self.url, self.key = url.rstrip('/'), key
+        self.apikey_only = key.startswith(('sb_publishable_', 'sb_secret_'))
         self.transport = transport or self._get
         self.page_size, self.max_rows = page_size, max_rows
 
@@ -93,8 +99,10 @@ class ReadOnlySource:
         while True:
             query = {**params, 'order': 'id.asc', 'offset': len(data), 'limit': self.page_size}
             url = self.url + '/rest/v1/' + table + '?' + urlencode(query)
-            rows, count_range = self.transport(url, {'apikey': self.key,
-                'Authorization': 'Bearer ' + self.key, 'Prefer': 'count=exact'})
+            headers = {'apikey': self.key, 'Prefer': 'count=exact'}
+            if not self.apikey_only:
+                headers['Authorization'] = 'Bearer ' + self.key
+            rows, count_range = self.transport(url, headers)
             match = re.fullmatch(r'(?:\d+-\d+|\*)/(\d+)', count_range)
             if not match or not isinstance(rows, list):
                 raise ShadowError('COUNT_UNAVAILABLE')
@@ -514,3 +522,4 @@ if __name__ == '__main__':
     except Exception as error:
         print(canonical(safe_startup_failure(error)), flush=True)
         raise SystemExit(1)
+
