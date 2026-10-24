@@ -1,6 +1,6 @@
 # Public browser key migration — 23 October 2026
 
-Current state: three production caller guards installed in legacy compatibility mode, current website/main unchanged, browser candidate commit prepared but not published. No production database writes, live test orders, notifications, payments or Google requests were performed. Full machine-readable outcomes are in RESULTS.json.
+Current state (24 October): dual-key mode verified on all three production caller guards; website commit b4db919971e6163f014bed29892176ccfa42a5b1 deployed successfully by Cloudflare. Public homepage and pinned CDN artifact verified; admin content requires an authenticated Cloudflare Access session. See WEBSITE-ROLLOUT.md and WEBSITE-ROLLOUT-RESULTS.json. Earlier preparation steps below are historical. No production database writes, live test orders, notifications, payments or Google requests were performed. Full machine-readable outcomes are in RESULTS.json.
 
 ## Scope and compatibility
 
@@ -57,3 +57,5 @@ After the new site is confirmed and a suitable cache/session transition has been
 Use npm ci --ignore-scripts in ../edge-key-migration for the shared locked SDK dependency, then run RTK_PUBLIC_KEY_SOURCE_DIR=/absolute/snapshots npm test here. Snapshots are required; tests do not silently skip them. Builder command: python3 build-candidates.py --source-dir /absolute/snapshots --output-dir /absolute/candidates --publishable-key-file /absolute/public-key-file. Input hashes, original key role/project and key format are checked. Browser review patches redact both public key literals. Live candidate source remains in the website repository review commit; full baseline files were not duplicated into this audit repository.
 
 Official references checked: https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys and https://supabase.com/docs/guides/functions/secrets . Observed hosted environment behaviour takes precedence over assuming an environment variable's historical name identifies its present format.
+
+24 October rollout follow-up: owner saved RTK_EDGE_PUBLIC_KEY_MODE=dual. All six real old/new key checks returned normal incomplete-payload400 responses on the three functions. A transient tunnel failure on the admin function was resolved with one bounded identical retry. Main was advanced with an expected-SHA lease, Cloudflare Pages reported success, the public homepage contains the expected publishable key and no legacy JWT literals, and the CDN SDK bytes exactly match the tested UMD package artifact. Admin request redirected to Cloudflare Access; its authenticated content/UI was not independently verified. No live booking or provider request was executed. Keep dual mode and legacy keys enabled while remaining consumers are resolved.

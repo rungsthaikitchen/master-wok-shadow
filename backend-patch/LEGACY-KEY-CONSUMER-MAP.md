@@ -8,7 +8,7 @@ Owner committed the three credential files to order-backend at 105b0845f3f4d5054
 
 Staging fixture trial shutdown confirmed by owner logs: deployment1358299b-984d-4792-a3bb-923d33bf83be, build63219288b33ff25bbc6d23fcfab3bb0a7bf5361b, DISABLED/requests0. Logs do not independently prove deletion of the temporary variable.
 
-## Current consumer findings
+## Initial consumer findings (23 October; follow-up updates below)
 
 | Consumer | Evidence | Migration dependency |
 | --- | --- | --- |
@@ -47,3 +47,5 @@ Reference checked: https://supabase.com/docs/guides/getting-started/migrating-to
 Production support follow-up: reviewed credential adapters installed in review-order v14, hyper-worker v33 and geocode-order v10 after exact source comparison and safe denial-path checks. Incoming JWT settings retained. No secret flag changed; new-key activation and production Edge DB read verification remain pending. See edge-key-migration/PRODUCTION-ROLLOUT.md. Legacy key retirement remains blocked by the other consumers above.
 
 Activation verification complete for the shared Edge adapter/environment: approved protected diagnostic made one production zero-row read using the actual enabled flag/new secret and was permanently disabled afterward. Existing updated function refusal checks passed. See edge-key-migration/production-verify/VERIFIED-RESULTS.json. This is credential authentication evidence, not an end-to-end live booking test or migration of remaining legacy consumers.
+
+24 October website rollout: main in Rungs-Thai-Kitchen now points to b4db919971e6163f014bed29892176ccfa42a5b1 and Cloudflare Pages reported successful deployment. Public homepage uses the publishable key/pinned SDK, with zero legacy JWT literals. Admin source is in the same deployed commit; served admin content is protected by Cloudflare Access and was not independently inspected. Both legacy/publishable callers pass input validation on all three public geocoding/route guards in verified dual mode. Global legacy-key retirement remains pending other consumers; no credential revoked. See public-key-migration/WEBSITE-ROLLOUT-RESULTS.json.
