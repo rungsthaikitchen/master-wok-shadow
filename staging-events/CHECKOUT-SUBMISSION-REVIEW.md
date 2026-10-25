@@ -1,5 +1,7 @@
 # Atomic checkout submission candidate — 25 October 2026
 
+Update: the [restricted hosted concurrency and HTTP rehearsal](CHECKOUT-SUBMISSION-HOSTED-REHEARSAL.md) has now passed. The candidate was installed privately in staging for the bounded run, then its streams were disabled and temporary grants revoked. The original candidate-stage record below is historical; the production mapping and authorization limitations remain.
+
 Default-off, isolated synthetic staging candidate. No production migration, checkout edit, runtime import, grant or deployment. This extends the previously tested atomic kitchen-booking store with a complete **supported checkout snapshot** and a route-wide retry receipt. It is not a drop-in replacement for the production payload.
 
 ## Transaction and retry boundary

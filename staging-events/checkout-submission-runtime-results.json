@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-25",
+  "runtimeCommit": "2b9e15838b34694bcf897cdcb1d6e5bc3268fe65",
+  "initialDisabledDeployment": "082f2a65-f6a7-4dd7-a260-a12c50d85695",
+  "enabledDeployment": "3d49ddd3-b6a7-47dd-871c-b3973a78135b",
+  "outcome": {
+    "attempts": {
+      "probe": 3,
+      "read": 14,
+      "started": 1,
+      "write": 13
+    },
+    "evidence": [
+      {
+        "case": "same-request",
+        "eventCount": 1,
+        "result": "ALREADY_RECORDED",
+        "uncommittedExportInvisible": true,
+        "waiterBlocked": true,
+        "waiterPid": 1116775,
+        "writerPid": 1116774
+      },
+      {
+        "case": "same-quote",
+        "eventCount": 1,
+        "result": "CHECKOUT_QUOTE_USED",
+        "uncommittedExportInvisible": true,
+        "waiterBlocked": true,
+        "waiterPid": 1116778,
+        "writerPid": 1116777
+      },
+      {
+        "case": "rollback",
+        "eventCount": 1,
+        "result": "RECORDED",
+        "uncommittedExportInvisible": true,
+        "waiterBlocked": true,
+        "waiterPid": 1116781,
+        "writerPid": 1116779
+      },
+      {
+        "case": "timeout",
+        "eventCount": 1,
+        "retry": "RECORDED_THEN_ALREADY_RECORDED",
+        "sqlstate": "55P03"
+      }
+    ],
+    "http": {
+      "httpCalls": 7,
+      "lostSuccessResponseRetried": true,
+      "status": "PASSED"
+    },
+    "notifications": 0,
+    "productionWrites": 0,
+    "replay": {
+      "actualDecisions": 0,
+      "events": 2,
+      "recoveryVerified": true
+    },
+    "scope": "SYNTHETIC_STAGING_CHECKOUT",
+    "status": "OBSERVED",
+    "verified": false
+  },
+  "local": {
+    "pythonPerTimezone": 21,
+    "nodeEntriesPerTimezone": 18,
+    "timezones": [
+      "Europe/London",
+      "UTC"
+    ]
+  },
+  "cleanup": {
+    "enabledStreams": 0,
+    "activeRuntimeSessions": 0,
+    "routeSelect": false,
+    "quoteAccess": false,
+    "receiptAccess": false,
+    "submitExecute": false,
+    "existingCreateRetained": true,
+    "existingDeliveryRetained": true,
+    "deployment": "3804e82b-e5a8-4539-95ac-c63544401ac8",
+    "deploymentStatus": "SUCCESS",
+    "runtimeStatus": "DISABLED",
+    "sourceRequests": 0
+  },
+  "productionChanged": false,
+  "limitations": [
+    "Synthetic staging; no production field mapping or quote issuer",
+    "Loopback operator HTTP; no public customer endpoint",
+    "In-process injected failure after commit, not a physical network-loss test",
+    "One route/day with current default READ COMMITTED transactions"
+  ]
+}
