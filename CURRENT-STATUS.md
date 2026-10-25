@@ -1,4 +1,4 @@
-Current 25 October staging result: [guarded cutover response HTTP review](staging-events/CUTOVER-RESPONSE-HTTP-REVIEW.md) and [live writer coverage review](staging-events/BOOKING-COVERAGE-AND-HANDOVER-REVIEW.md). Hosted concurrency and guarded response/recovery rehearsals pass; trials are disabled. Full live booking-event capture remains incomplete. Earlier dated handover notes follow.
+Current 25 October candidate: [automatic command routing and observer handover](staging-events/COMMAND-ROUTE-REVIEW.md). Local focused tests and hosted rolled-back SQL checks pass, including draining decisions committed between polls before cutover. The new route-lock concurrency and restricted-runtime rehearsal remain outstanding; the candidate is default-off and not deployed. Earlier [guarded response HTTP](staging-events/CUTOVER-RESPONSE-HTTP-REVIEW.md) and stream-lock concurrency rehearsals passed and their trials are disabled. [Full live writer coverage](staging-events/BOOKING-COVERAGE-AND-HANDOVER-REVIEW.md) remains incomplete. Earlier dated handover notes follow.
 
 # Master Wok review status — 15 October 2026
 

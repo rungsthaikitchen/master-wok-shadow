@@ -1,0 +1,415 @@
+{
+  "basis": "HOSTED_POSTGRES_ROLLED_BACK_SYNTHETIC",
+  "final": {
+    "batch": {
+      "events": [
+        {
+          "at": "2026-10-25T07:19:50.508680Z",
+          "kind": "CUTOVER_BASELINE",
+          "basis": "CURRENT_SAVED_STATE_AT_CUTOVER",
+          "eventId": "switch",
+          "sequence": 1,
+          "commitments": [
+            {
+              "order": {
+                "lines": [
+                  {
+                    "qty": 1,
+                    "mods": [
+                      {
+                        "id": "chicken"
+                      }
+                    ],
+                    "itemId": "green-curry"
+                  }
+                ],
+                "orderId": "synthetic-router",
+                "targetAt": "2026-10-26T19:15:00.000000Z",
+                "orderType": "collection",
+                "deliveryReadyEstimate": null
+              },
+              "commitment": "PROPOSED",
+              "proposalEventId": "offer-between-polls"
+            }
+          ],
+          "unreservedOrderIds": []
+        },
+        {
+          "at": "2026-10-25T07:19:50.526007Z",
+          "kind": "PROPOSAL_RESPONSE",
+          "eventId": "old-reply",
+          "orderId": "synthetic-router",
+          "response": "ACCEPTED",
+          "sequence": 2,
+          "proposalEventId": "offer-between-polls"
+        },
+        {
+          "at": "2026-10-25T07:19:50.529180Z",
+          "kind": "BOOKING_DECISION",
+          "order": {
+            "lines": [
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              }
+            ],
+            "orderId": "synthetic-router",
+            "targetAt": "2026-10-26T19:30:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "offer-b",
+          "sequence": 3,
+          "actualDecision": "SUGGESTED"
+        },
+        {
+          "at": "2026-10-25T07:19:50.531889Z",
+          "kind": "PROPOSAL_RESPONSE",
+          "eventId": "new-reply",
+          "orderId": "synthetic-router",
+          "response": "REJECTED",
+          "sequence": 4,
+          "proposalEventId": "offer-b"
+        }
+      ],
+      "coverage": {
+        "basis": "CUTOVER_BASELINE_AND_EVENT_LOG",
+        "complete": true,
+        "throughAt": "2026-10-25T07:19:50.531889Z",
+        "eventCount": 4,
+        "initialState": "SAVED_STATE_AT_CUTOVER",
+        "lastSequence": 4,
+        "firstSequence": 1
+      },
+      "serviceDate": "2026-10-26"
+    },
+    "scope": "SYNTHETIC_STAGING_EVENTS",
+    "enabled": true,
+    "project": "hvrqgufqjslvgiohgkvu",
+    "routeId": "b50c7828-1485-4416-8f9c-05327885fa46",
+    "attested": true,
+    "streamId": "ae5d2081-f884-4c7a-8d5c-d1a9a1429d53",
+    "eventCount": 4,
+    "generation": 1,
+    "serviceDate": "2026-10-26",
+    "previousBatch": {
+      "events": [
+        {
+          "at": "2026-10-25T07:19:50.480541Z",
+          "kind": "RESERVATION_SET",
+          "order": {
+            "lines": [
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              }
+            ],
+            "orderId": "synthetic-router",
+            "targetAt": "2026-10-26T18:00:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "create",
+          "sequence": 1,
+          "commitment": "PROPOSED"
+        },
+        {
+          "at": "2026-10-25T07:19:50.488778Z",
+          "kind": "BOOKING_DECISION",
+          "order": {
+            "lines": [
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              }
+            ],
+            "orderId": "synthetic-router",
+            "targetAt": "2026-10-26T19:00:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "offer-a",
+          "sequence": 2,
+          "actualDecision": "SUGGESTED"
+        },
+        {
+          "at": "2026-10-25T07:19:50.493778Z",
+          "kind": "BOOKING_DECISION",
+          "order": {
+            "lines": [
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              }
+            ],
+            "orderId": "synthetic-router",
+            "targetAt": "2026-10-26T19:15:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "offer-between-polls",
+          "sequence": 3,
+          "actualDecision": "SUGGESTED"
+        }
+      ],
+      "coverage": {
+        "basis": "DECISION_EVENT_LOG",
+        "complete": true,
+        "throughAt": "2026-10-25T07:19:50.493778Z",
+        "eventCount": 3,
+        "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+        "lastSequence": 3,
+        "firstSequence": 1
+      },
+      "serviceDate": "2026-10-26"
+    },
+    "cutoverRequest": "switch",
+    "previousRetired": true,
+    "previousStreamId": "0c4095f7-6825-494f-939d-886fe5b7e44b",
+    "previousEventCount": 3
+  },
+  "initial": {
+    "batch": {
+      "events": [
+        {
+          "at": "2026-10-25T07:19:50.480541Z",
+          "kind": "RESERVATION_SET",
+          "order": {
+            "lines": [
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              }
+            ],
+            "orderId": "synthetic-router",
+            "targetAt": "2026-10-26T18:00:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "create",
+          "sequence": 1,
+          "commitment": "PROPOSED"
+        },
+        {
+          "at": "2026-10-25T07:19:50.488778Z",
+          "kind": "BOOKING_DECISION",
+          "order": {
+            "lines": [
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              }
+            ],
+            "orderId": "synthetic-router",
+            "targetAt": "2026-10-26T19:00:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "offer-a",
+          "sequence": 2,
+          "actualDecision": "SUGGESTED"
+        }
+      ],
+      "coverage": {
+        "basis": "DECISION_EVENT_LOG",
+        "complete": true,
+        "throughAt": "2026-10-25T07:19:50.488778Z",
+        "eventCount": 2,
+        "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+        "lastSequence": 2,
+        "firstSequence": 1
+      },
+      "serviceDate": "2026-10-26"
+    },
+    "scope": "SYNTHETIC_STAGING_EVENTS",
+    "enabled": true,
+    "project": "hvrqgufqjslvgiohgkvu",
+    "routeId": "b50c7828-1485-4416-8f9c-05327885fa46",
+    "attested": false,
+    "streamId": "0c4095f7-6825-494f-939d-886fe5b7e44b",
+    "eventCount": 2,
+    "generation": 0,
+    "serviceDate": "2026-10-26",
+    "previousBatch": null,
+    "cutoverRequest": null,
+    "previousRetired": false,
+    "previousStreamId": null,
+    "previousEventCount": null
+  },
+  "switched": {
+    "batch": {
+      "events": [
+        {
+          "at": "2026-10-25T07:19:50.508680Z",
+          "kind": "CUTOVER_BASELINE",
+          "basis": "CURRENT_SAVED_STATE_AT_CUTOVER",
+          "eventId": "switch",
+          "sequence": 1,
+          "commitments": [
+            {
+              "order": {
+                "lines": [
+                  {
+                    "qty": 1,
+                    "mods": [
+                      {
+                        "id": "chicken"
+                      }
+                    ],
+                    "itemId": "green-curry"
+                  }
+                ],
+                "orderId": "synthetic-router",
+                "targetAt": "2026-10-26T19:15:00.000000Z",
+                "orderType": "collection",
+                "deliveryReadyEstimate": null
+              },
+              "commitment": "PROPOSED",
+              "proposalEventId": "offer-between-polls"
+            }
+          ],
+          "unreservedOrderIds": []
+        }
+      ],
+      "coverage": {
+        "basis": "CUTOVER_BASELINE_AND_EVENT_LOG",
+        "complete": true,
+        "throughAt": "2026-10-25T07:19:50.508680Z",
+        "eventCount": 1,
+        "initialState": "SAVED_STATE_AT_CUTOVER",
+        "lastSequence": 1,
+        "firstSequence": 1
+      },
+      "serviceDate": "2026-10-26"
+    },
+    "scope": "SYNTHETIC_STAGING_EVENTS",
+    "enabled": true,
+    "project": "hvrqgufqjslvgiohgkvu",
+    "routeId": "b50c7828-1485-4416-8f9c-05327885fa46",
+    "attested": true,
+    "streamId": "ae5d2081-f884-4c7a-8d5c-d1a9a1429d53",
+    "eventCount": 1,
+    "generation": 1,
+    "serviceDate": "2026-10-26",
+    "previousBatch": {
+      "events": [
+        {
+          "at": "2026-10-25T07:19:50.480541Z",
+          "kind": "RESERVATION_SET",
+          "order": {
+            "lines": [
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              }
+            ],
+            "orderId": "synthetic-router",
+            "targetAt": "2026-10-26T18:00:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "create",
+          "sequence": 1,
+          "commitment": "PROPOSED"
+        },
+        {
+          "at": "2026-10-25T07:19:50.488778Z",
+          "kind": "BOOKING_DECISION",
+          "order": {
+            "lines": [
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              }
+            ],
+            "orderId": "synthetic-router",
+            "targetAt": "2026-10-26T19:00:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "offer-a",
+          "sequence": 2,
+          "actualDecision": "SUGGESTED"
+        },
+        {
+          "at": "2026-10-25T07:19:50.493778Z",
+          "kind": "BOOKING_DECISION",
+          "order": {
+            "lines": [
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              }
+            ],
+            "orderId": "synthetic-router",
+            "targetAt": "2026-10-26T19:15:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "offer-between-polls",
+          "sequence": 3,
+          "actualDecision": "SUGGESTED"
+        }
+      ],
+      "coverage": {
+        "basis": "DECISION_EVENT_LOG",
+        "complete": true,
+        "throughAt": "2026-10-25T07:19:50.493778Z",
+        "eventCount": 3,
+        "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+        "lastSequence": 3,
+        "firstSequence": 1
+      },
+      "serviceDate": "2026-10-26"
+    },
+    "cutoverRequest": "switch",
+    "previousRetired": true,
+    "previousStreamId": "0c4095f7-6825-494f-939d-886fe5b7e44b",
+    "previousEventCount": 3
+  }
+}

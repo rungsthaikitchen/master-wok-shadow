@@ -1,5 +1,7 @@
 # Private Postgres event-source rehearsal
 
+Latest candidate: [automatic command routing and observer handover](COMMAND-ROUTE-REVIEW.md), 25 October. This candidate was tested locally and in a hosted rollback transaction; it is not installed or deployed.
+
 Staging project: `hvrqgufqjslvgiohgkvu`. This is a private synthetic backend, not a trigger or callback on `public.orders`. Production and existing staging order rows were not modified.
 
 ## Installed and exercised, 19 October 2026
