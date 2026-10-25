@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-25",
+  "scope": "SYNTHETIC_STAGING_REVIEW_ONLY",
+  "python": {
+    "passedPerTimezone": 7,
+    "timezones": [
+      "Europe/London",
+      "UTC"
+    ]
+  },
+  "node": {
+    "passedEntriesPerTimezone": 10,
+    "timezones": [
+      "Europe/London",
+      "UTC"
+    ],
+    "engine": "PGlite 0.3.14"
+  },
+  "hostedSql": {
+    "rollbackChecksPassed": true,
+    "candidateRemainsInstalled": false,
+    "enabledStreamsAfterRollback": 0,
+    "restrictedLoginExecutionVerified": false,
+    "concurrentWrapperVerified": false
+  },
+  "productionWrites": 0,
+  "productionDeployments": 0,
+  "newInfrastructure": 0,
+  "liveWriterCoverageComplete": false,
+  "automaticRouterHandoverVerified": false,
+  "engineVerified": false
+}

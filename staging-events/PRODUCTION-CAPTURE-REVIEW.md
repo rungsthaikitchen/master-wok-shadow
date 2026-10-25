@@ -1,3 +1,5 @@
+Current 25 October coverage review and the tested response/observer handover candidate: [BOOKING-COVERAGE-AND-HANDOVER-REVIEW.md](BOOKING-COVERAGE-AND-HANDOVER-REVIEW.md). Earlier evidence below is historical; production coverage remains incomplete.
+
 # Production event capture review — 20 October 2026
 
 Review only. No production writes, migrations, deployments, scheduling or checkout changes. The new helper snapshot and four characterization tests are isolated review artifacts; no runtime imports them. Passing tests reproduce observed discrepancies; they do not mean live behaviour is corrected.
