@@ -1,0 +1,227 @@
+{
+  "scope": "SYNTHETIC_STAGING_ONLY",
+  "streams": [
+    {
+      "id": "5ef97bb9-d8d0-5eb7-949d-f96bf8514a97",
+      "day": "2026-10-25",
+      "batch": {
+        "events": [
+          {
+            "at": "2026-10-25T06:27:05.554428Z",
+            "kind": "RESERVATION_SET",
+            "order": {
+              "lines": [
+                {
+                  "qty": 1,
+                  "mods": [
+                    {
+                      "id": "chicken"
+                    }
+                  ],
+                  "itemId": "green-curry"
+                }
+              ],
+              "orderId": "synthetic-cutover-timeout",
+              "targetAt": "2026-10-25T18:00:00.000000Z",
+              "orderType": "collection",
+              "deliveryReadyEstimate": null
+            },
+            "eventId": "cutover-create-timeout",
+            "sequence": 1,
+            "commitment": "PROPOSED"
+          },
+          {
+            "at": "2026-10-25T06:31:51.957328Z",
+            "kind": "BOOKING_DECISION",
+            "order": {
+              "lines": [
+                {
+                  "qty": 1,
+                  "mods": [
+                    {
+                      "id": "chicken"
+                    }
+                  ],
+                  "itemId": "green-curry"
+                }
+              ],
+              "orderId": "synthetic-cutover-timeout",
+              "targetAt": "2026-10-25T19:15:00.000000Z",
+              "orderType": "collection",
+              "deliveryReadyEstimate": null
+            },
+            "eventId": "cutover-timeout-retry",
+            "sequence": 2,
+            "actualDecision": "SUGGESTED"
+          }
+        ],
+        "coverage": {
+          "basis": "DECISION_EVENT_LOG",
+          "complete": true,
+          "throughAt": "2026-10-25T06:31:51.957328Z",
+          "eventCount": 2,
+          "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+          "lastSequence": 2,
+          "firstSequence": 1
+        },
+        "serviceDate": "2026-10-25"
+      },
+      "enabled": true,
+      "eventCount": 2
+    },
+    {
+      "id": "76233fa7-6e66-544c-ba50-8e072954d6a0",
+      "day": "2026-10-25",
+      "batch": {
+        "events": [
+          {
+            "at": "2026-10-25T06:30:24.533956Z",
+            "kind": "CUTOVER_BASELINE",
+            "basis": "CURRENT_SAVED_STATE_AT_CUTOVER",
+            "eventId": "cutover-baseline-before",
+            "sequence": 1,
+            "commitments": [
+              {
+                "order": {
+                  "lines": [
+                    {
+                      "qty": 1,
+                      "mods": [
+                        {
+                          "id": "chicken"
+                        }
+                      ],
+                      "itemId": "green-curry"
+                    }
+                  ],
+                  "orderId": "synthetic-cutover-before",
+                  "targetAt": "2026-10-25T19:15:00.000000Z",
+                  "orderType": "collection",
+                  "deliveryReadyEstimate": null
+                },
+                "commitment": "PROPOSED",
+                "proposalEventId": "cutover-direct-before"
+              }
+            ],
+            "unreservedOrderIds": []
+          }
+        ],
+        "coverage": {
+          "basis": "CUTOVER_BASELINE_AND_EVENT_LOG",
+          "complete": true,
+          "throughAt": "2026-10-25T06:30:24.533956Z",
+          "eventCount": 1,
+          "initialState": "SAVED_STATE_AT_CUTOVER",
+          "lastSequence": 1,
+          "firstSequence": 1
+        },
+        "serviceDate": "2026-10-25"
+      },
+      "enabled": true,
+      "eventCount": 1
+    },
+    {
+      "id": "8124b620-8152-51a4-89f4-73df3224bccb",
+      "day": "2026-10-25",
+      "batch": {
+        "events": [
+          {
+            "at": "2026-10-25T06:32:29.085150Z",
+            "kind": "CUTOVER_BASELINE",
+            "basis": "CURRENT_SAVED_STATE_AT_CUTOVER",
+            "eventId": "cutover-baseline-rollback",
+            "sequence": 1,
+            "commitments": [
+              {
+                "order": {
+                  "lines": [
+                    {
+                      "qty": 1,
+                      "mods": [
+                        {
+                          "id": "chicken"
+                        }
+                      ],
+                      "itemId": "green-curry"
+                    }
+                  ],
+                  "orderId": "synthetic-cutover-rollback",
+                  "targetAt": "2026-10-25T19:15:00.000000Z",
+                  "orderType": "collection",
+                  "deliveryReadyEstimate": null
+                },
+                "commitment": "PROPOSED",
+                "proposalEventId": "cutover-direct-rollback"
+              }
+            ],
+            "unreservedOrderIds": []
+          }
+        ],
+        "coverage": {
+          "basis": "CUTOVER_BASELINE_AND_EVENT_LOG",
+          "complete": true,
+          "throughAt": "2026-10-25T06:32:29.085150Z",
+          "eventCount": 1,
+          "initialState": "SAVED_STATE_AT_CUTOVER",
+          "lastSequence": 1,
+          "firstSequence": 1
+        },
+        "serviceDate": "2026-10-25"
+      },
+      "enabled": true,
+      "eventCount": 1
+    },
+    {
+      "id": "d75a6760-875c-5a87-8249-ce6501b04b1b",
+      "day": "2026-10-25",
+      "batch": {
+        "events": [
+          {
+            "at": "2026-10-25T06:30:42.235125Z",
+            "kind": "CUTOVER_BASELINE",
+            "basis": "CURRENT_SAVED_STATE_AT_CUTOVER",
+            "eventId": "cutover-baseline-after",
+            "sequence": 1,
+            "commitments": [
+              {
+                "order": {
+                  "lines": [
+                    {
+                      "qty": 1,
+                      "mods": [
+                        {
+                          "id": "chicken"
+                        }
+                      ],
+                      "itemId": "green-curry"
+                    }
+                  ],
+                  "orderId": "synthetic-cutover-after",
+                  "targetAt": "2026-10-25T18:00:00.000000Z",
+                  "orderType": "collection",
+                  "deliveryReadyEstimate": null
+                },
+                "commitment": "PROPOSED",
+                "proposalEventId": "cutover-create-after"
+              }
+            ],
+            "unreservedOrderIds": []
+          }
+        ],
+        "coverage": {
+          "basis": "CUTOVER_BASELINE_AND_EVENT_LOG",
+          "complete": true,
+          "throughAt": "2026-10-25T06:30:42.235125Z",
+          "eventCount": 1,
+          "initialState": "SAVED_STATE_AT_CUTOVER",
+          "lastSequence": 1,
+          "firstSequence": 1
+        },
+        "serviceDate": "2026-10-25"
+      },
+      "enabled": true,
+      "eventCount": 1
+    }
+  ],
+  "rollbackSeedRetryVerified": true
+}

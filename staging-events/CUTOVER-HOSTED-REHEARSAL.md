@@ -1,3 +1,22 @@
+## Hosted concurrency and recovery passed — 25 October 2026
+
+The previously blocked direct-session witness has now run on the existing Railway staging service and Supabase staging project hvrqgufqjslvgiohgkvu. Reviewed build e1d0c13e85212322c751bd769862708efbefd2fa first deployed disabled as f803b0e5-0a57-4442-b301-827dcc455dc9, with DISABLED/sourceRequests=0 observed. Hosted fixture preparation passed once under ROLLBACK, then committed four fresh synthetic bookings with all eight streams disabled. Restricted role checks passed: neither runtime role can seed or enable streams; only the writer can apply bookings. No grants changed.
+
+Enabled deployment 2adcc33f-7644-497a-abfb-13cd58752792 completed successfully. Its 06:31:52 UTC terminal OBSERVED evidence establishes actual database session blocking through pg_blocking_pids, not merely parallel connector requests:
+
+- Before: seed was blocked by the writer; the writer committed and its communicated proposal revision appeared in the new baseline.
+- After: writer was blocked by the seed; the reader saw only committed pre-cutover state; after seed commit, the old-source writer was refused SOURCE_DISABLED.
+- Rollback: writer was blocked by the seed; the reader saw no partial baseline; after seed rollback the writer recorded successfully. A later seed with the rolled-back request ID returned RECORDED, then ALREADY_RECORDED on exact retry.
+- Timeout: real lock contention raised PostgreSQL 55P03; no partial event remained, and one retry with the same request ID returned RECORDED with exactly two source events.
+
+Budget used: started=1, writes=5 of 6, state/metadata reads=7 of 7, probes=65 of 180. Administrative seed calls stayed external to the restricted runner. All data were fixed synthetic staging fixtures; provider calls, notifications and production writes were zero. Frozen reservations in disabled streams are retained audit history, not active kitchen commitments.
+
+The actual exports are fixtures/cutover-concurrency-hosted-25-oct.json; the structured witness and cleanup evidence is cutover-concurrency-hosted-results.json. Two new Python tests pass in each of Europe/London and UTC. They replay all four actual exports through the real Node bridge and persistent journal, inject an ACK interruption, restart/retry, reject duplicate work, snapshot and restore. The three cutover baselines have zero reconstructed historical decisions and retain historicalDecisionCoverage=false; the timeout stream contains exactly one retried decision. All engine results remain verified=false.
+
+Cleanup deployment 6c1e021e-9acb-47a9-ad63-777aafbfa73d reached SUCCESS and emitted DISABLED/sourceRequests=0. The enabled flag is false and its deadline is 0. Independent staging SQL confirms enabled_streams=0 and active_reservations=0. The existing service now retains the reviewed cutover image/command as its disabled one-shot baseline, with restart NEVER and the existing /data volume. The earlier backend credential trial command remains a recovery reference, not an enabled workload. No production source or runtime flag changed; no infrastructure was created. No environment patch was pending at the initial inspection.
+
+Remaining gates: this witness does not prove full live booking-handler coverage, connected-stream router/observer handover, or reliable production decision-event capture. Those integration gates must be completed before claiming a verified comparison against actual booking decisions. Current production polling remains current-state evidence, not historical decision coverage. The sections below are retained as historical preparation and earlier blocker records.
+
 ## Local validation completed — 24 October
 
 The refreshed fixture SQL now runs successfully against the pinned PGlite 0.3.14 PostgreSQL engine. New checks execute the real setup, booking, cutover and export functions and the runner's exact preflight query. They verify disabled setup, duplicate refusal without resetting history, rollback of earlier pairs on a later identity conflict, expiry refusal, and one held commitment after offer/baseline/acceptance. Local tests substitute only a moving database clock to keep this intentionally expiring fixture pack reproducible; no provider or production database is contacted.

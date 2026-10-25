@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-25",
+  "scope": "SYNTHETIC_STAGING_ONLY",
+  "buildSha": "e1d0c13e85212322c751bd769862708efbefd2fa",
+  "disabledDeployment": "f803b0e5-0a57-4442-b301-827dcc455dc9",
+  "trialDeployment": "2adcc33f-7644-497a-abfb-13cd58752792",
+  "trialTerminalStatus": "SUCCESS",
+  "observedAt": "2026-10-25T06:31:52.651812342Z",
+  "concurrencyWitnessPassed": true,
+  "evidence": [
+    {
+      "case": "before",
+      "seedBlockedByWriter": true,
+      "seedPid": 1090709,
+      "writerPid": 1090698
+    },
+    {
+      "case": "after",
+      "readerSawOnlyCommittedState": true,
+      "seedPid": 1091325,
+      "writerBlockedBySeed": true,
+      "writerPid": 1091327
+    },
+    {
+      "case": "rollback",
+      "readerSawOnlyCommittedState": true,
+      "seedPid": 1091349,
+      "writerBlockedBySeed": true,
+      "writerPid": 1091351
+    },
+    {
+      "case": "timeout",
+      "lockTimeout": "55P03",
+      "sameRequestRetry": "RECORDED",
+      "sourceEvents": 2
+    }
+  ],
+  "attempts": {
+    "probe": 65,
+    "read": 7,
+    "started": 1,
+    "write": 5
+  },
+  "rollbackSeedRetryVerified": true,
+  "cleanup": {
+    "deployment": "6c1e021e-9acb-47a9-ad63-777aafbfa73d",
+    "status": "SUCCESS",
+    "runner": "DISABLED",
+    "sourceRequests": 0,
+    "enabledStreams": 0,
+    "activeReservations": 0
+  },
+  "productionWrites": 0,
+  "providerCalls": 0,
+  "notifications": 0,
+  "newInfrastructure": 0,
+  "engineVerified": false,
+  "bookingLifecycleProductionCaptureVerified": false,
+  "recoveryValidation": {
+    "testsPerTimezone": 2,
+    "timezones": [
+      "Europe/London",
+      "UTC"
+    ],
+    "streams": 4,
+    "checks": [
+      "actual Node replay",
+      "interrupted ACK",
+      "restart and retry",
+      "duplicate intake",
+      "snapshot and restore"
+    ],
+    "passed": true
+  }
+}
