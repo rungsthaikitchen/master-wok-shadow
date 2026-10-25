@@ -20,13 +20,13 @@ test('single-hop cutover response candidate executes real PostgreSQL',async t=>{
   await call('create_booking',[f.src,'create',f.booking,'synthetic-order',day+'T18:00:00Z',[{item_id:'green-curry',qty:1,modifiers:[{id:'chicken'}]}]]);
   await call('apply_booking',[f.src,'offer-a',f.booking,'offer',day+'T19:00:00Z',null]);
   if(accepted)await call('apply_booking',[f.src,'prior-reply',f.booking,'accept',null,'offer-a']);
-  await call('seed_cutover_baseline',[f.src,f.dst,'baseline']);await later();return f;
+  await call('seed_cutover_baseline',[f.src,f.dst,'baseline']);await call('authorize_cutover_response_route',[f.src,f.dst,'baseline']);await later();return f;
  }
  async function rolled(name,fn){await t.test(name,async()=>{await db.exec('BEGIN');try{await fn(await setup());}finally{await db.exec('ROLLBACK');}});}
  const answer=(f,request='reply',action='accept',proposal='offer-a',cutover='baseline')=>call('apply_cutover_response',[f.src,f.dst,cutover,request,'synthetic-order',action,proposal]);
  async function refuses(fn,error){await db.exec('SAVEPOINT refusal');try{await assert.rejects(fn,error);}finally{await db.exec('ROLLBACK TO refusal');}}
  try{
-  await db.exec('CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role;');
+  await db.exec('CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role; CREATE ROLE master_wok_event_writer_login;');
   for(const file of ['schema.sql','booking-store.sql','delivery-booking-store.sql','cutover-record-export.sql','cutover-baseline-snapshot.sql','cutover-baseline-store.sql','cutover-response-candidate.sql']) await db.exec(fs.readFileSync(path.join(__dirname,file),'utf8'));
   await rolled('pre-cutover proposal accepted once without adding capacity',async f=>{
    assert.equal(await answer(f),'RECORDED');assert.equal(await answer(f),'ALREADY_RECORDED');
@@ -79,6 +79,12 @@ print(json.dumps(calls))`;
    await refuses(()=>answer(f),/CUTOVER_ROUTE_UNPROVEN/);
    assert.equal(await scalar('SELECT event_count FROM master_wok_event_test.streams WHERE id=$1',[f.dst]),1);
   });
+  await rolled('runtime cannot rely on a forged ordinary seed receipt without admin attestation',async f=>{
+   await q('DELETE FROM master_wok_event_test.cutover_response_routes WHERE source_stream=$1',[f.src]);
+   await refuses(()=>answer(f),/ADMIN_CUTOVER_ROUTE_REQUIRED/);
+   assert.equal(await call('authorize_cutover_response_route',[f.src,f.dst,'baseline']),'RECORDED');
+   assert.equal(await call('authorize_cutover_response_route',[f.src,f.dst,'baseline']),'ALREADY_RECORDED');
+  });
   await rolled('reactivated source refuses compatibility routing',async f=>{
    await q('UPDATE master_wok_event_test.streams SET enabled=true WHERE id=$1',[f.src]);
    await refuses(()=>answer(f),/CUTOVER_ROUTE_UNPROVEN/);
@@ -87,6 +93,13 @@ print(json.dumps(calls))`;
    await refuses(()=>answer(f,'bad-action','complete'),/CUTOVER_RESPONSE_REQUIRED/);
    await q('UPDATE master_wok_event_test.streams SET enabled=false WHERE id=$1',[f.dst]);
    await refuses(()=>answer(f),/CUTOVER_ROUTE_UNPROVEN/);
+  });
+  await t.test('restricted writer can read admin receipts but cannot forge or authorize them',async()=>{
+   await db.exec(fs.readFileSync(path.join(__dirname,'cutover-response-runtime-role.sql'),'utf8'));
+   assert.equal(await scalar("SELECT has_table_privilege('master_wok_event_writer_login','master_wok_event_test.cutover_response_routes','SELECT')"),true);
+   assert.equal(await scalar("SELECT has_table_privilege('master_wok_event_writer_login','master_wok_event_test.cutover_response_routes','INSERT,UPDATE,DELETE')"),false);
+   assert.equal(await scalar("SELECT has_function_privilege('master_wok_event_writer_login','master_wok_event_test.authorize_cutover_response_route(uuid,uuid,text)','EXECUTE')"),false);
+   assert.equal(await scalar("SELECT has_function_privilege('master_wok_event_writer_login','master_wok_event_test.apply_cutover_response(uuid,uuid,text,text,text,text,text)','EXECUTE')"),true);
   });
   await t.test('candidate remains invoker-only and has no public execution grant',async()=>{
    const r=await q("SELECT prosecdef FROM pg_proc WHERE oid='master_wok_event_test.apply_cutover_response(uuid,uuid,text,text,text,text,text)'::regprocedure");assert.equal(r[0].prosecdef,false);
