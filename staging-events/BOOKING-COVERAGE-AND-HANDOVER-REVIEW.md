@@ -1,4 +1,4 @@
-Latest result: [CUTOVER-RESPONSE-HTTP-REVIEW.md](CUTOVER-RESPONSE-HTTP-REVIEW.md). The guarded route has passed with the restricted hosted login; the earlier prototype receipt weakness below is superseded by admin-owned attestations. Live coverage and automatic router handover remain incomplete.
+Latest source inventory: [LIVE-WRITER-SOURCE-REVIEW-25-OCT.md](LIVE-WRITER-SOURCE-REVIEW-25-OCT.md). This corrects the apparent admin dropdown and commented main-page checkout findings, and adds the kitchen board and two alternate checkout pages. [Automatic router/observer handover](COMMAND-ROUTE-HOSTED-REHEARSAL.md) has passed its bounded hosted staging rehearsal; complete live coverage remains incomplete. The earlier prototype receipt weakness below is superseded by admin-owned attestations. Earlier candidate-stage evidence follows.
 
 # Booking coverage and observer handover — 25 October 2026
 
@@ -9,9 +9,10 @@ Production is unchanged. Overall readiness for complete booking-decision compari
 | Path | Evidence | Remaining requirement |
 | --- | --- | --- |
 | Main checkout | index.html at website commit 55938bc73cd762be614a300ef54bacaedda5f6b0; order upsert and item insert are separate calls | Capture a complete basket only after its actual persistence boundary; do not call an order INSERT a complete booking |
-| Alternate checkout code | Another order/item insert path remains in the source; reachability unproven | Establish reachability or instrument it before claiming all writers |
+| Alternate checkout code | Main-page second handler is commented out; two separately named checkout pages contain executable writers | Cover or explicitly retire the separate pages; do not count the main-page comment as another active handler |
 | Admin accept/suggest/decline/complete | Proxy targets hyper-worker, confirmed by owner dashboard; credential changes did not add lifecycle event capture | Adapt all active lifecycle actions to the shared atomic command/reservation/event contract |
-| Admin details status selector | Source attaches a change handler to updateOrderStatus, which updates orders directly | Cover this writer or explicitly retire it through a separately reviewed product change |
+| Admin details status helper | Conditional listener and direct updater exist, but current normal Details output creates no selector | Treat as a latent helper; no active dropdown UI is established |
+| Kitchen board | Separate kitchen.html drag/drop reaches a direct status UPDATE in offline characterization | Include or explicitly retire this writer; actual use is not established by source alone |
 | Railway customer time responses | Owner-supplied backend and deployed credential patch preserve separate accept/decline mutations | Revision-bound, idempotent transactional response integration is still needed; no test request sent to real customer links |
 | Legacy order-confirm | Source retrieval again returns UNAVAILABLE; owner still sees a blank Code tab | Do not overwrite, remove or assume unused. Recover source or formally bound legacy coverage before a completeness claim |
 | review-order Edge function | A distinct mutation contract exists; current use unproven | Establish active callers or explicitly limit claimed coverage |

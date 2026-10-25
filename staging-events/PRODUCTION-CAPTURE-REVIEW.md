@@ -1,4 +1,4 @@
-Current 25 October coverage review and the tested response/observer handover candidate: [BOOKING-COVERAGE-AND-HANDOVER-REVIEW.md](BOOKING-COVERAGE-AND-HANDOVER-REVIEW.md). Earlier evidence below is historical; production coverage remains incomplete.
+Current 25 October source correction and full repository inventory: [LIVE-WRITER-SOURCE-REVIEW-25-OCT.md](LIVE-WRITER-SOURCE-REVIEW-25-OCT.md). The apparent admin dropdown is not rendered in the current normal UI, the main-page alternate checkout is commented out, and separate kitchen/refactor pages add potential writers. Earlier evidence below is historical; production coverage remains incomplete.
 
 # Production event capture review — 20 October 2026
 

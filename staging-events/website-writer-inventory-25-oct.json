@@ -1,0 +1,260 @@
+{
+  "websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0",
+  "evidenceBasis": "HTML5_AND_JAVASCRIPT_SYNTAX_REVIEW_NOT_LIVE_TRAFFIC",
+  "files": [
+    {
+      "path": "admin.html",
+      "sha256": "24554db69696878ae20799d6ccc7918fa71a544799fb2dce9f87a9216712f61c",
+      "gitBlob": "bc93a949262e18e682f7738d672e56e40ce70633",
+      "parsedScriptUnits": 3,
+      "mutations": [
+        {
+          "table": "orders",
+          "method": "update",
+          "line": 2715
+        }
+      ],
+      "unresolvedMutationCalls": [],
+      "markers": [
+        ".status-select",
+        "/admin-api/order-action",
+        "order-confirm"
+      ]
+    },
+    {
+      "path": "index.html",
+      "sha256": "a5c995ae62861e1e3d04fb70be5c69b5a9dc177b2721e7d8806a2a9d5cf09806",
+      "gitBlob": "8e87ca3c195e22cf547e17f318a517e28c5fe8e3",
+      "parsedScriptUnits": 21,
+      "mutations": [
+        {
+          "table": "customers",
+          "method": "update",
+          "line": 7232
+        },
+        {
+          "table": "customers",
+          "method": "update",
+          "line": 7258
+        },
+        {
+          "table": "customers",
+          "method": "insert",
+          "line": 7279
+        },
+        {
+          "table": "orders",
+          "method": "upsert",
+          "line": 7958
+        },
+        {
+          "table": "order_items",
+          "method": "insert",
+          "line": 8001
+        }
+      ],
+      "unresolvedMutationCalls": [
+        {
+          "method": "delete",
+          "line": 4147,
+          "reason": "REQUIRES_MANUAL_CLASSIFICATION"
+        },
+        {
+          "method": "delete",
+          "line": 4161,
+          "reason": "REQUIRES_MANUAL_CLASSIFICATION"
+        }
+      ],
+      "markers": [
+        "order-confirm"
+      ]
+    },
+    {
+      "path": "order-confirm.html",
+      "sha256": "9e5b855a3d65f457ef87d495f68ac0bcad7c8787a1a2f1c3de592a27d68c215b",
+      "gitBlob": "16ff06758d560dc2207ccc0491c86fe2d6ee819f",
+      "parsedScriptUnits": 1,
+      "mutations": [],
+      "unresolvedMutationCalls": [],
+      "markers": [
+        "order-confirm"
+      ]
+    },
+    {
+      "path": "kitchen.html",
+      "sha256": "3b2caf2d83ffb2c5f3cb37f8f882c68b4612c3a251b76c2783f69a6d86331df4",
+      "gitBlob": "6084a99062c7aac16150ac2c0755f05b8b395c4a",
+      "parsedScriptUnits": 1,
+      "mutations": [
+        {
+          "table": "orders",
+          "method": "update",
+          "line": 94
+        }
+      ],
+      "unresolvedMutationCalls": [],
+      "markers": []
+    },
+    {
+      "path": "index_inline_ordering_refactor.html",
+      "sha256": "83f62fd73cee2161048099766e95dc2fafe472c4722b305d152d32bab31924c3",
+      "gitBlob": "46f3c25acdeb3ba7b4c4e6be54c311b28bb765c6",
+      "parsedScriptUnits": 21,
+      "mutations": [
+        {
+          "table": "customers",
+          "method": "update",
+          "line": 9294
+        },
+        {
+          "table": "customers",
+          "method": "update",
+          "line": 9320
+        },
+        {
+          "table": "customers",
+          "method": "insert",
+          "line": 9341
+        },
+        {
+          "table": "orders",
+          "method": "upsert",
+          "line": 9678
+        },
+        {
+          "table": "order_items",
+          "method": "insert",
+          "line": 9711
+        }
+      ],
+      "unresolvedMutationCalls": [
+        {
+          "method": "delete",
+          "line": 7108,
+          "reason": "REQUIRES_MANUAL_CLASSIFICATION"
+        },
+        {
+          "method": "delete",
+          "line": 7122,
+          "reason": "REQUIRES_MANUAL_CLASSIFICATION"
+        }
+      ],
+      "markers": [
+        "order-confirm"
+      ]
+    },
+    {
+      "path": "images/index_inline_ordering_refactor.html",
+      "sha256": "00e8278df99a8ef2d2d5a7bb4432295ef19de3861c43c76c72863b3afd5ae8f6",
+      "gitBlob": "0e8659b1a269d4605ca0799ebcc381c43a36eef4",
+      "parsedScriptUnits": 21,
+      "mutations": [
+        {
+          "table": "customers",
+          "method": "update",
+          "line": 9065
+        },
+        {
+          "table": "customers",
+          "method": "update",
+          "line": 9091
+        },
+        {
+          "table": "customers",
+          "method": "insert",
+          "line": 9112
+        },
+        {
+          "table": "orders",
+          "method": "upsert",
+          "line": 9459
+        },
+        {
+          "table": "order_items",
+          "method": "insert",
+          "line": 9492
+        }
+      ],
+      "unresolvedMutationCalls": [
+        {
+          "method": "delete",
+          "line": 6958,
+          "reason": "REQUIRES_MANUAL_CLASSIFICATION"
+        },
+        {
+          "method": "delete",
+          "line": 6972,
+          "reason": "REQUIRES_MANUAL_CLASSIFICATION"
+        }
+      ],
+      "markers": [
+        "order-confirm"
+      ]
+    },
+    {
+      "path": "christmas-hours.html",
+      "sha256": "9186ee7c9496818f9744f2f7f2adc191c7b6825d07b19981b8bc906ebc05ca19",
+      "gitBlob": "f65ddd2a65de52209d75449162a38048ed54a88c",
+      "parsedScriptUnits": 0,
+      "mutations": [],
+      "unresolvedMutationCalls": [],
+      "markers": []
+    },
+    {
+      "path": "cookiepolicy.html",
+      "sha256": "f08447e00c71c82259aba5fd6d132eeb9eac8c5deb07ae0ffcc81c060612b221",
+      "gitBlob": "5fee345e94ce7e77ac27b436e2fbc50c49c16e95",
+      "parsedScriptUnits": 0,
+      "mutations": [],
+      "unresolvedMutationCalls": [],
+      "markers": []
+    },
+    {
+      "path": "privacypolicy.html",
+      "sha256": "1e66f06bd8c885261cb658e89b49d2f3cf36ced7464d8309978bb3e36348f2a8",
+      "gitBlob": "bd70c7fc13e2dfade4f77de58430c5e85ff4b9ac",
+      "parsedScriptUnits": 0,
+      "mutations": [],
+      "unresolvedMutationCalls": [],
+      "markers": []
+    },
+    {
+      "path": "functions/admin-api/order-action.js",
+      "sha256": "e7914a3a1b3df63696aef5135c0d7b2a7db24df82b7ba7bca1da33e157b0c706",
+      "gitBlob": "88964efb8f384cdada1b9af600581865f81a066a",
+      "parsedScriptUnits": 1,
+      "mutations": [],
+      "unresolvedMutationCalls": [],
+      "markers": [
+        "/admin-order-action"
+      ]
+    },
+    {
+      "path": "functions/admin-api/service-control.js",
+      "sha256": "652f3b031e61d57aec76ac2ffbcac4b1d69904e19eba91f061cc57b961ccc49f",
+      "gitBlob": "90f59a336c12dc5daa931e3b60d4e668c6020554",
+      "parsedScriptUnits": 1,
+      "mutations": [],
+      "unresolvedMutationCalls": [],
+      "markers": []
+    },
+    {
+      "path": "functions/admin-api/test.js",
+      "sha256": "ff50e798aad17c9c7c30f70ca4d8cc23ecccd14e9ae127537cc3f86807cbdb65",
+      "gitBlob": "979013929d56905d415a1ebe62b266395625e0af",
+      "parsedScriptUnits": 1,
+      "mutations": [],
+      "unresolvedMutationCalls": [],
+      "markers": []
+    },
+    {
+      "path": "functions/api/service-state.js",
+      "sha256": "8c5ee924947a26ca40ad30a1ffb245d6abb5def0e6d3b42161441b217f89d0a5",
+      "gitBlob": "3f68fcb8ee57e7c26ca52b4a697378a9a451f3b7",
+      "parsedScriptUnits": 1,
+      "mutations": [],
+      "unresolvedMutationCalls": [],
+      "markers": []
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "reviewedAt": "2026-10-25",
+  "evidenceBasis": "READ_ONLY_DEPLOYED_FUNCTION_METADATA_AND_SOURCE",
+  "functions": [
+    {
+      "slug": "hyper-worker",
+      "version": 35,
+      "status": "ACTIVE",
+      "bundleSha256": "c873401ee67e2fbd4f763c7923dca63ee076a9247093abcad14a7753729b6f72",
+      "sourceRetrieved": true
+    },
+    {
+      "slug": "review-order",
+      "version": 16,
+      "status": "ACTIVE",
+      "bundleSha256": "6a5492f74565e0cff732d66bfcd3bc3fa4640ac19051e5ae0e1c3d2b699b9894",
+      "sourceRetrieved": true
+    },
+    {
+      "slug": "order-confirm",
+      "version": 22,
+      "status": "ACTIVE",
+      "sourceRetrieved": false,
+      "sourceError": "ProtocolError",
+      "usage": "Active order-confirm.html script GETs this function when supplied token/decision. Hyper-worker contains link construction but its own email call is disabled; current link issuance or traffic is not established. No customer link was invoked."
+    }
+  ]
+}

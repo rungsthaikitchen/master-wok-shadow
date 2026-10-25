@@ -1,0 +1,8 @@
+{
+  "name": "master-wok-source-review-tools",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Offline HTML and JavaScript source review; no network or application runtime wiring",
+  "scripts": {"test": "node --test *.test.cjs"},
+  "dependencies": {"acorn": "8.15.0", "parse5": "7.3.0"}
+}
