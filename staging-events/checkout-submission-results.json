@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-25",
+  "scope": "SYNTHETIC_STAGING_ONLY",
+  "local": {
+    "focusedEntriesPerTimezone": 17,
+    "withAdjacentRouteEntriesPerTimezone": 29,
+    "timezones": [
+      "Europe/London",
+      "UTC"
+    ],
+    "passed": true
+  },
+  "hosted": {
+    "scope": "SYNTHETIC_STAGING_ONLY",
+    "passed": true,
+    "verified": false,
+    "originalEvents": 1,
+    "runtimeGranted": false,
+    "submissionReceipts": 1,
+    "exactRetryAfterCutover": "ALREADY_RECORDED",
+    "badSecondLineRolledBack": true,
+    "destinationBaselineEvents": 1
+  },
+  "cleanup": {
+    "quoteTableAbsent": true,
+    "submissionTableAbsent": true,
+    "submitFunctionAbsent": true,
+    "enabledStreams": 0
+  },
+  "productionWrites": 0,
+  "deployed": false,
+  "limitations": [
+    "Management/admin transaction with rollback; not restricted runtime",
+    "No new simultaneous-submission hosted witness",
+    "Supported synthetic checkout shape, not full production payload",
+    "No production quote issuer or pricing authority",
+    "No browser reload recovery for submission attempt"
+  ]
+}
