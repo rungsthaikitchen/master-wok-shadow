@@ -1,3 +1,5 @@
+Latest candidate: [full checkout atomic persistence](CHECKOUT-FULL-PERSISTENCE-REVIEW.md), tested locally and default-off; no hosted changes. See checkout-full-persistence-results.json for exact verification scope.
+
 # Private Postgres event-source rehearsal
 
 Latest mapping: [full current checkout fields](CHECKOUT-PRODUCTION-FIELD-MAPPING.md), 25 October. The default-off offline adapter preserves private payload values and separates engine input. It is not wired to the website, persistence or production.

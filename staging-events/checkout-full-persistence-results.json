@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-25",
+  "status": "LOCAL_SYNTHETIC_PASSED",
+  "verified": false,
+  "prediction": "UNVERIFIED",
+  "hostedFullPayloadVerified": false,
+  "productionWrites": 0,
+  "notifications": 0,
+  "deployments": 0,
+  "newCost": false,
+  "tests": {
+    "Europe/London": {
+      "entries": 41,
+      "passed": 41,
+      "failed": 0
+    },
+    "UTC": {
+      "entries": 41,
+      "passed": 41,
+      "failed": 0
+    }
+  },
+  "newTestEntriesPerTimezone": 14,
+  "websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0",
+  "sourceSha256": {
+    "staging-events/checkout-full-persistence-candidate.sql": "8a28a5b26ca296eeb4b2b9caad9f572d73fdaeba3b2a0d2ef0827a0384d50fc0",
+    "staging-events/checkout-full-persistence-client.cjs": "59ad3c044488f1fb386d84088d29481c9bb2393f1e899abd9af2d31f4d72012b",
+    "staging-events/checkout-full-persistence.test.cjs": "17341430243240f5131d5f45c5f68d942fae52a055bd932ed8e12f980b5330ce"
+  },
+  "limitations": [
+    "synthetic fixture quote authority only",
+    "private JSON snapshots, not typed production table replica",
+    "ASAP unresolved target refused",
+    "no hosted full-payload concurrency or runtime-role rehearsal",
+    "no public or live wiring"
+  ]
+}
