@@ -6,7 +6,7 @@ import threading
 from event_staging_handlers import admin_action,customer_response
 from event_capture_journal import EventCaptureError
 
-def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.0.1',port=0,response_secret=None,creation_transport=None,cutover_response=None):
+def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.0.1',port=0,response_secret=None,creation_transport=None,cutover_response=None,checkout_submission=None):
  if any(not isinstance(t,str) or len(t)<32 for t in (operator_token,health_token)) or operator_token==health_token:raise ValueError('DISTINCT_STAGING_TOKENS_REQUIRED')
  class Handler(BaseHTTPRequestHandler):
   def log_message(self,*args):pass
@@ -24,11 +24,13 @@ def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.
    allowed=('/staging/admin-action','/staging/customer-response')+ (('/staging/proposal-response',) if response_secret is not None else ())
    if creation_transport is not None:allowed+=('/staging/create-booking',)
    if cutover_response is not None:allowed+=('/staging/cutover-proposal-response',)
+   if checkout_submission is not None:allowed+=('/staging/submit-checkout',)
    if self.path not in allowed:return self.send(404,dict(status='NOT_FOUND'))
    try:
     if self.headers.get('Transfer-Encoding'):raise ValueError()
     size=int(self.headers.get('Content-Length','0'))
-    if not 1<=size<=8192:raise ValueError()
+    limit=100512 if self.path=='/staging/submit-checkout' else 8192
+    if not 1<=size<=limit:raise ValueError()
     data=self.rfile.read(size)
     if len(data)!=size:raise ValueError()
     def unique(pairs):
@@ -37,9 +39,11 @@ def serve_api(stream_id,operator_token,health_token,writer,health,*,host='127.0.
       if key in result:raise ValueError()
       result[key]=value
      return result
-    body=json.loads(data,object_pairs_hook=unique) if self.path=='/staging/cutover-proposal-response' else json.loads(data)
+    body=json.loads(data,object_pairs_hook=unique) if self.path in ('/staging/cutover-proposal-response','/staging/submit-checkout') else json.loads(data)
     if not isinstance(body,dict):raise ValueError()
-    if self.path=='/staging/cutover-proposal-response':
+    if self.path=='/staging/submit-checkout':
+     result=checkout_submission(body)
+    elif self.path=='/staging/cutover-proposal-response':
      result=cutover_response(body)
     elif self.path=='/staging/create-booking':
      from event_booking_transport import CREATE_QUERY
