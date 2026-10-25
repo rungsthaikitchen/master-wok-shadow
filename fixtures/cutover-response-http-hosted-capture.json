@@ -1,0 +1,94 @@
+{
+  "batch": {
+    "events": [
+      {
+        "at": "2026-10-25T06:52:01.561247Z",
+        "kind": "CUTOVER_BASELINE",
+        "basis": "CURRENT_SAVED_STATE_AT_CUTOVER",
+        "eventId": "cutover-http-baseline",
+        "sequence": 1,
+        "commitments": [
+          {
+            "order": {
+              "lines": [
+                {
+                  "qty": 1,
+                  "mods": [
+                    {
+                      "id": "chicken"
+                    }
+                  ],
+                  "itemId": "green-curry"
+                }
+              ],
+              "orderId": "synthetic-cutover-http",
+              "targetAt": "2026-10-26T19:00:00.000000Z",
+              "orderType": "collection",
+              "deliveryReadyEstimate": null
+            },
+            "commitment": "PROPOSED",
+            "proposalEventId": "offer-a"
+          }
+        ],
+        "unreservedOrderIds": []
+      },
+      {
+        "at": "2026-10-25T06:53:29.934719Z",
+        "kind": "PROPOSAL_RESPONSE",
+        "eventId": "reply_0ebb9c3ed8a273795fd5b66a4318d636f8f466c1a04d377cc37bd452a6f2e85a",
+        "orderId": "synthetic-cutover-http",
+        "response": "ACCEPTED",
+        "sequence": 2,
+        "proposalEventId": "offer-a"
+      },
+      {
+        "at": "2026-10-25T06:53:33.240328Z",
+        "kind": "BOOKING_DECISION",
+        "order": {
+          "lines": [
+            {
+              "qty": 1,
+              "mods": [
+                {
+                  "id": "chicken"
+                }
+              ],
+              "itemId": "green-curry"
+            }
+          ],
+          "orderId": "synthetic-cutover-http",
+          "targetAt": "2026-10-26T19:30:00.000000Z",
+          "orderType": "collection",
+          "deliveryReadyEstimate": null
+        },
+        "eventId": "offer-b",
+        "sequence": 3,
+        "actualDecision": "SUGGESTED"
+      },
+      {
+        "at": "2026-10-25T06:53:38.274747Z",
+        "kind": "PROPOSAL_RESPONSE",
+        "eventId": "reply_4d0f0a64b8510ec76842628541f39f092fa3d667badc6595b3d1807dae955b6d",
+        "orderId": "synthetic-cutover-http",
+        "response": "REJECTED",
+        "sequence": 4,
+        "proposalEventId": "offer-b"
+      }
+    ],
+    "coverage": {
+      "basis": "CUTOVER_BASELINE_AND_EVENT_LOG",
+      "complete": true,
+      "throughAt": "2026-10-25T06:53:38.274747Z",
+      "eventCount": 4,
+      "initialState": "SAVED_STATE_AT_CUTOVER",
+      "lastSequence": 4,
+      "firstSequence": 1
+    },
+    "serviceDate": "2026-10-26"
+  },
+  "scope": "SYNTHETIC_STAGING_ONLY",
+  "finalStatus": "customer_declined_time",
+  "sourceEventCount": 2,
+  "destinationEventCount": 4,
+  "remainingReservations": 0
+}

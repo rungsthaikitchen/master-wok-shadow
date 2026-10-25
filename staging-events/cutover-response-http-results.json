@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-25",
+  "scope": "SYNTHETIC_STAGING_ONLY",
+  "codeCommit": "1793c17a0eca9378de3bb26f92ffc4d3137c90be",
+  "migration": "master_wok_private_cutover_response_route",
+  "disabledDeployment": "2e562866-7845-4331-b79d-bf87eb1c7b94",
+  "enabledDeployment": "2e55ffc2-b2ed-47cb-b885-9159ec903337",
+  "observedAt": "2026-10-25T06:53:43.154614436Z",
+  "httpCalls": 10,
+  "attempts": {
+    "started": 1,
+    "write": 7,
+    "read": 1
+  },
+  "restrictedLoginExecutionVerified": true,
+  "recoveryVerified": true,
+  "adminAttestationRequired": true,
+  "temporaryCutoverGrantsRevoked": true,
+  "cleanup": {
+    "deployment": "19647d01-743c-4e6f-89a4-3ee24ce6eb2e",
+    "status": "SUCCESS",
+    "runner": "DISABLED",
+    "sourceRequests": 0,
+    "enabledStreams": 0,
+    "activeReservations": 0,
+    "writerCanReadOrChangeRoutes": false,
+    "writerCanExecuteResponse": false
+  },
+  "readback": {
+    "sourceEventCount": 2,
+    "destinationEventCount": 4,
+    "remainingReservations": 0,
+    "finalStatus": "customer_declined_time"
+  },
+  "localTests": {
+    "pythonFocused": 13,
+    "nodeEntriesPerTimezone": 12,
+    "nodeTimezones": [
+      "Europe/London",
+      "UTC"
+    ],
+    "hostedCaptureRegressionPerTimezone": 1
+  },
+  "productionWrites": 0,
+  "notifications": 0,
+  "providerCalls": 0,
+  "newInfrastructure": 0,
+  "automaticCurrentRouteSelectionVerified": false,
+  "completeLiveWriterCoverage": false,
+  "engineVerified": false
+}

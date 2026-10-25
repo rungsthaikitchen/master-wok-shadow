@@ -1,3 +1,5 @@
+Latest result: [CUTOVER-RESPONSE-HTTP-REVIEW.md](CUTOVER-RESPONSE-HTTP-REVIEW.md). The guarded route has passed with the restricted hosted login; the earlier prototype receipt weakness below is superseded by admin-owned attestations. Live coverage and automatic router handover remain incomplete.
+
 # Booking coverage and observer handover — 25 October 2026
 
 Production is unchanged. Overall readiness for complete booking-decision comparison remains false. Successful concurrency/recovery checks do not close the live writer-coverage gate.
