@@ -1,0 +1,10 @@
+-- Temporary bounded rehearsal only. No quote issuance or route switching rights.
+GRANT SELECT ON master_wok_event_test.command_routes,master_wok_event_test.full_checkout_quotes TO master_wok_event_writer_login;
+GRANT SELECT,INSERT ON master_wok_event_test.full_checkout_submissions TO master_wok_event_writer_login;
+GRANT INSERT ON master_wok_event_test.full_checkout_orders,master_wok_event_test.full_checkout_items TO master_wok_event_writer_login;
+CREATE POLICY full_quote_writer_read ON master_wok_event_test.full_checkout_quotes FOR SELECT TO master_wok_event_writer_login USING(EXISTS(SELECT FROM master_wok_event_test.command_routes r WHERE r.id=route_id AND r.scope='SYNTHETIC_STAGING_EVENTS'));
+CREATE POLICY full_submission_writer_read ON master_wok_event_test.full_checkout_submissions FOR SELECT TO master_wok_event_writer_login USING(EXISTS(SELECT FROM master_wok_event_test.command_routes r WHERE r.id=route_id AND r.scope='SYNTHETIC_STAGING_EVENTS'));
+CREATE POLICY full_submission_writer_insert ON master_wok_event_test.full_checkout_submissions FOR INSERT TO master_wok_event_writer_login WITH CHECK(EXISTS(SELECT FROM master_wok_event_test.command_routes r WHERE r.id=route_id AND r.scope='SYNTHETIC_STAGING_EVENTS'));
+CREATE POLICY full_order_writer_insert ON master_wok_event_test.full_checkout_orders FOR INSERT TO master_wok_event_writer_login WITH CHECK(EXISTS(SELECT FROM master_wok_event_test.full_checkout_submissions s WHERE s.route_id=full_checkout_orders.route_id AND s.request_id=full_checkout_orders.request_id));
+CREATE POLICY full_item_writer_insert ON master_wok_event_test.full_checkout_items FOR INSERT TO master_wok_event_writer_login WITH CHECK(EXISTS(SELECT FROM master_wok_event_test.full_checkout_submissions s WHERE s.route_id=full_checkout_items.route_id AND s.request_id=full_checkout_items.request_id));
+GRANT EXECUTE ON FUNCTION master_wok_event_test.submit_full_checkout(uuid,text,uuid,uuid,jsonb),master_wok_event_test.validate_full_checkout_object(jsonb,text,text) TO master_wok_event_writer_login;

@@ -1,0 +1,83 @@
+{
+  "eventCount": 2,
+  "batch": {
+    "events": [
+      {
+        "at": "2026-10-25T17:29:53.373000Z",
+        "kind": "RESERVATION_SET",
+        "order": {
+          "lines": [
+            {
+              "qty": 2,
+              "mods": [
+                {
+                  "id": "chicken"
+                }
+              ],
+              "itemId": "green-curry"
+            },
+            {
+              "qty": 1,
+              "mods": [
+                {
+                  "id": "chicken"
+                }
+              ],
+              "itemId": "sticky-rice"
+            }
+          ],
+          "orderId": "synthetic-full-http",
+          "targetAt": "2026-10-26T18:30:00.000000Z",
+          "orderType": "collection",
+          "deliveryReadyEstimate": null
+        },
+        "eventId": "full-764340c47b2cda25f541275e20c256ecd2cf99268b333e860db8174540f5cbcd",
+        "sequence": 1,
+        "commitment": "PROPOSED"
+      },
+      {
+        "at": "2026-10-25T17:29:53.383000Z",
+        "kind": "RESERVATION_SET",
+        "order": {
+          "lines": [
+            {
+              "qty": 2,
+              "mods": [
+                {
+                  "id": "chicken"
+                }
+              ],
+              "itemId": "green-curry"
+            },
+            {
+              "qty": 1,
+              "mods": [
+                {
+                  "id": "chicken"
+                }
+              ],
+              "itemId": "sticky-rice"
+            }
+          ],
+          "orderId": "synthetic-full-http-delivery",
+          "targetAt": "2026-10-26T18:30:00.000000Z",
+          "orderType": "delivery",
+          "deliveryReadyEstimate": null
+        },
+        "eventId": "full-d76a33a6559136d420145027c8efb6e33931707be37b168b25e3df03b97b41e2",
+        "sequence": 2,
+        "commitment": "PROPOSED"
+      }
+    ],
+    "coverage": {
+      "basis": "DECISION_EVENT_LOG",
+      "complete": true,
+      "throughAt": "2026-10-25T17:29:53.383000Z",
+      "eventCount": 2,
+      "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+      "lastSequence": 2,
+      "firstSequence": 1
+    },
+    "serviceDate": "2026-10-26"
+  }
+}
