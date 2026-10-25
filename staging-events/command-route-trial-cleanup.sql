@@ -1,0 +1,3 @@
+REVOKE SELECT ON master_wok_event_test.command_routes,master_wok_event_test.cutover_response_routes FROM master_wok_event_reader_login,master_wok_event_writer_login;
+REVOKE EXECUTE ON FUNCTION master_wok_event_test.export_command_route(uuid) FROM master_wok_event_reader_login;
+REVOKE EXECUTE ON FUNCTION master_wok_event_test.routed_create_booking(uuid,text,uuid,text,timestamptz,jsonb),master_wok_event_test.routed_apply_booking(uuid,text,text,text,timestamptz,text,uuid),master_wok_event_test.apply_cutover_response(uuid,uuid,text,text,text,text,text) FROM master_wok_event_writer_login;

@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-25",
+  "runtimeCommit": "5fd8f85758ed5a59a8ede9d9391a5adfcaed4895",
+  "enabledDeployment": "ee1376dd-39e8-49cd-98e3-d28870ef1eae",
+  "initialDisabledDeployment": "86c77b65-e64c-45e6-b714-519083dbb2fc",
+  "outcome": {
+    "attempts": {
+      "probe": 52,
+      "read": 15,
+      "started": 1,
+      "write": 13
+    },
+    "evidence": [
+      {
+        "adminPid": 1095966,
+        "case": "before",
+        "switchBlockedByRoutedWriter": true,
+        "writerPid": 1095963
+      },
+      {
+        "case": "runtime",
+        "currentDecisions": 1,
+        "currentEvents": 4,
+        "healthy": true,
+        "httpCalls": 8,
+        "interruptedBeforeCheckpoint": true,
+        "restartRecoveryVerified": true,
+        "retiredDecisions": 2,
+        "retiredEvents": 3
+      },
+      {
+        "adminPid": 1095998,
+        "case": "after",
+        "readerSawCommittedRouteOnly": true,
+        "writerBlockedBySwitch": true,
+        "writerPid": 1095999
+      },
+      {
+        "adminPid": 1096003,
+        "case": "rollback",
+        "readerSawCommittedRouteOnly": true,
+        "writerBlockedBySwitch": true,
+        "writerPid": 1096004
+      },
+      {
+        "case": "timeout",
+        "eventCount": 3,
+        "exactRetry": "RECORDED_THEN_ALREADY_RECORDED",
+        "sqlstate": "55P03"
+      }
+    ],
+    "notifications": 0,
+    "productionWrites": 0,
+    "scope": "SYNTHETIC_STAGING_COMMAND_ROUTE",
+    "status": "OBSERVED",
+    "verified": false
+  },
+  "localFocused": {
+    "pythonPerTimezone": 26,
+    "nodeEntriesPerTimezone": 12,
+    "timezones": [
+      "Europe/London",
+      "UTC"
+    ]
+  },
+  "cleanup": {
+    "enabledStreams": 0,
+    "activeRuntimeSessions": 0,
+    "readerRouteAccess": false,
+    "writerRouteAccess": false,
+    "routedWriterExecute": false,
+    "responseExecute": false,
+    "exportExecute": false,
+    "deployment": "a4b346bc-6c98-4cc1-bfb9-6aa02559178c",
+    "deploymentStatus": "SUCCESS",
+    "runtimeStatus": "DISABLED",
+    "sourceRequests": 0
+  },
+  "limitations": [
+    "Synthetic staging only",
+    "Loopback HTTP only",
+    "One same-day cutover; multi-hop and connected-day routing unsupported",
+    "Production writer coverage remains incomplete"
+  ]
+}

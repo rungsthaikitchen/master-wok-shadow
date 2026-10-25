@@ -1,5 +1,7 @@
 # Automatic command routing and observer handover — 25 October 2026
 
+Update: the [hosted route-lock and restricted-runtime rehearsal](COMMAND-ROUTE-HOSTED-REHEARSAL.md) has now passed. It closes gates 1–3 below for the bounded synthetic scope; it does not close production coverage or continuous-operation requirements. The candidate and temporary runtime grants were installed privately in staging for that run, then the trial was disabled and its grants revoked. The original candidate-stage record follows.
+
 Candidate for isolated synthetic staging review. Default disabled. No production booking, checkout, notification, database or deployment changes were made by this candidate.
 
 ## Behaviour
