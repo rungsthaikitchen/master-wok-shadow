@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-25",
+  "websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0",
+  "scope": "OFFLINE_STAGING_FIELD_MAPPING",
+  "mainOrderFields": 25,
+  "mainItemFields": 9,
+  "legacyOrderFields": 20,
+  "legacyItemFields": 8,
+  "mappingTestsPerTimezone": 10,
+  "combinedNodeEntriesPerTimezone": 27,
+  "timezones": [
+    "Europe/London",
+    "UTC"
+  ],
+  "passed": true,
+  "sourceRequestsByAdapter": 0,
+  "productionWrites": 0,
+  "deployed": false,
+  "findings": [
+    "Main discount_label is assigned twice; later value retained",
+    "Current item constructors omit item_note",
+    "Private values preserved; engine allowlist excludes customer/money/notes/display fields",
+    "Delivery distance supplies no deliveryReadyEstimate"
+  ],
+  "limitations": [
+    "Mapping only; full payload persistence wrapper not implemented",
+    "Customer ID ownership/address snapshot not verified",
+    "Browser reload key recovery not implemented",
+    "No authoritative menu/price attestation supplied",
+    "order-confirm source remains inaccessible"
+  ]
+}

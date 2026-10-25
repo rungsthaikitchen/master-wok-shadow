@@ -1,0 +1,141 @@
+{
+  "websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0",
+  "pages": {
+    "index.html": {
+      "order": {
+        "keys": [
+          "customer_id",
+          "subtotal",
+          "discount",
+          "discount_label",
+          "discount_code",
+          "discount_amount",
+          "discount_label",
+          "delivery_fee",
+          "delivery_straight_line_miles",
+          "delivery_route_miles",
+          "delivery_distance_source",
+          "total",
+          "loyalty_discount",
+          "loyalty_points_redeem_pending",
+          "loyalty_points_earned_pending",
+          "loyalty_reward_applied",
+          "loyalty_expected_balance",
+          "loyalty_settled",
+          "order_type",
+          "notes",
+          "order_ref",
+          "payment_preference",
+          "preferred_time",
+          "asap_requested",
+          "communication_preference",
+          "idempotency_key"
+        ],
+        "expression": "{\n  customer_id: customerId,\n\n  subtotal: Number(submitTotals.subtotal.toFixed(2)),\n  discount: Number(totalDiscount.toFixed(2)),\n  discount_label:\n    submitTotals.loyalty_discount > 0\n      ? 'Loyalty reward'\n      : Number(disc?.discount || 0) > 0\n        ? 'Wed/Thu discount'\n        : null,\n\n  discount_code: appliedDiscountCode,\n  discount_amount: Number(appliedDiscountAmount || 0),\n  discount_label: appliedDiscountCode ? `Discount code ${appliedDiscountCode}` : null,\n\n  delivery_fee: Number(submitTotals.delivery_fee.toFixed(2)),\n\ndelivery_straight_line_miles:\n  submitTotals.delivery_straight_line_miles != null\n    ? Number(Number(submitTotals.delivery_straight_line_miles).toFixed(2))\n    : null,\n\ndelivery_route_miles:\n  submitTotals.delivery_route_miles != null\n    ? Number(Number(submitTotals.delivery_route_miles).toFixed(2))\n    : null,\n\ndelivery_distance_source:\n  submitTotals.delivery_distance_source,\n\ntotal: Number(submitTotals.total.toFixed(2)),\n\n  // loyalty fields\n  loyalty_discount: Number((submitTotals.loyalty_discount || 0).toFixed(2)),\n  loyalty_points_redeem_pending: Number(submitTotals.loyalty_points_redeem_pending || 0),\n  loyalty_points_earned_pending: Number(submitTotals.loyalty_points_earned_pending || 0),\n  loyalty_reward_applied: !!submitTotals.loyalty_reward_applied,\n  loyalty_expected_balance: Number.isFinite(submitTotals.loyalty_expected_balance)\n    ? Number(submitTotals.loyalty_expected_balance)\n    : null,\n  loyalty_settled: false,\n\n  order_type: orderType,\n  notes,\n  order_ref: orderRef,\n  payment_preference,\n  preferred_time: preferredTimeISO,\n  asap_requested: asapRequested,\n  communication_preference: communicationPreference,\n\n  idempotency_key: idempotencyKey,\n}",
+        "sha256": "fdc697ddc64b38c5dc310b7af47c3490be13911f0942313f772cbd4c6be7271a"
+      },
+      "items": {
+        "keys": [
+          "order_id",
+          "item_id",
+          "name",
+          "unit_price",
+          "qty",
+          "modifiers",
+          "spice",
+          "img",
+          "kitchen_load"
+        ],
+        "expression": "{\n\t\t\t\t  order_id: orderId,\n\t\t\t\t  item_id,\n\t\t\t\t  name: line.name,\n\t\t\t\t  unit_price: Number(line.unitPrice.toFixed(2)),\n\t\t\t\t  qty: line.qty,\n\t\t\t\t  modifiers: (line.mods ?? []).map(m => ({\n\t\t\t\t\tid: m.id,\n\t\t\t\t\tname: m.name,\n\t\t\t\t\tdelta: m.delta\n\t\t\t\t  })),\n\t\t\t\t  spice: (typeof line.spice === 'number') ? line.spice : null,\n\t\t\t\t  img: line.img || null,\n\t\t\t\t  kitchen_load: kitchenLoad\n\t\t\t\t}",
+        "sha256": "e0cfe9a9566bcfd1bc87712348dfdd6f520d0328de6045c2e07329e790b122ba"
+      },
+      "gitBlob": "8e87ca3c195e22cf547e17f318a517e28c5fe8e3"
+    },
+    "index_inline_ordering_refactor.html": {
+      "order": {
+        "keys": [
+          "customer_id",
+          "subtotal",
+          "discount",
+          "discount_label",
+          "delivery_fee",
+          "total",
+          "loyalty_discount",
+          "loyalty_points_redeem_pending",
+          "loyalty_points_earned_pending",
+          "loyalty_reward_applied",
+          "loyalty_expected_balance",
+          "loyalty_settled",
+          "order_type",
+          "notes",
+          "order_ref",
+          "payment_preference",
+          "preferred_time",
+          "asap_requested",
+          "communication_preference",
+          "idempotency_key"
+        ],
+        "expression": "{\n  customer_id: customerId,\n\n  subtotal: Number(submitTotals.subtotal.toFixed(2)),\n  discount: Number(totalDiscount.toFixed(2)),\n  discount_label:\n    submitTotals.loyalty_discount > 0\n      ? 'Loyalty reward'\n      : Number(disc?.discount || 0) > 0\n        ? 'Wed/Thu discount'\n        : null,\n  delivery_fee: Number(submitTotals.delivery_fee.toFixed(2)),\n  total: Number(submitTotals.total.toFixed(2)),\n\n  // loyalty fields\n  loyalty_discount: Number((submitTotals.loyalty_discount || 0).toFixed(2)),\n  loyalty_points_redeem_pending: Number(submitTotals.loyalty_points_redeem_pending || 0),\n  loyalty_points_earned_pending: Number(submitTotals.loyalty_points_earned_pending || 0),\n  loyalty_reward_applied: !!submitTotals.loyalty_reward_applied,\n  loyalty_expected_balance: Number.isFinite(submitTotals.loyalty_expected_balance)\n    ? Number(submitTotals.loyalty_expected_balance)\n    : null,\n  loyalty_settled: false,\n\n  order_type: orderType,\n  notes,\n  order_ref: orderRef,\n  payment_preference,\n  preferred_time: finalPreferredTimeISO,\n  asap_requested: asapRequested,\n  communication_preference: communicationPreference,\n\n  idempotency_key: idempotencyKey,\n}",
+        "sha256": "ed4413afbcc95f41064f35c8c3263030e73e0caed4a1812bdd0b83f77c03d969"
+      },
+      "items": {
+        "keys": [
+          "order_id",
+          "item_id",
+          "name",
+          "unit_price",
+          "qty",
+          "modifiers",
+          "spice",
+          "img"
+        ],
+        "expression": "{\n\t\t\t\torder_id: orderId,\n\t\t\t\titem_id,\n\t\t\t\tname: line.name,\n\t\t\t\tunit_price: Number(line.unitPrice.toFixed(2)),\n\t\t\t\tqty: line.qty,\n\t\t\t\tmodifiers: (line.mods ?? []).map(m => ({ id: m.id, name: m.name, delta: m.delta })),\n\t\t\t\tspice: (typeof line.spice === 'number') ? line.spice : null,\n\t\t\t\timg: line.img || null\n\t\t\t  }",
+        "sha256": "5a004fb272e2b0406d62a6d21280fb7fe40626a4e10ab92445dbd0b18591f9c0"
+      },
+      "gitBlob": "46f3c25acdeb3ba7b4c4e6be54c311b28bb765c6"
+    },
+    "images/index_inline_ordering_refactor.html": {
+      "order": {
+        "keys": [
+          "customer_id",
+          "subtotal",
+          "discount",
+          "discount_label",
+          "delivery_fee",
+          "total",
+          "loyalty_discount",
+          "loyalty_points_redeem_pending",
+          "loyalty_points_earned_pending",
+          "loyalty_reward_applied",
+          "loyalty_expected_balance",
+          "loyalty_settled",
+          "order_type",
+          "notes",
+          "order_ref",
+          "payment_preference",
+          "preferred_time",
+          "asap_requested",
+          "communication_preference",
+          "idempotency_key"
+        ],
+        "expression": "{\n  customer_id: customerId,\n\n  subtotal: Number(submitTotals.subtotal.toFixed(2)),\n  discount: Number(totalDiscount.toFixed(2)),\n  discount_label:\n    submitTotals.loyalty_discount > 0\n      ? 'Loyalty reward'\n      : Number(disc?.discount || 0) > 0\n        ? 'Wed/Thu discount'\n        : null,\n  delivery_fee: Number(submitTotals.delivery_fee.toFixed(2)),\n  total: Number(submitTotals.total.toFixed(2)),\n\n  // loyalty fields\n  loyalty_discount: Number((submitTotals.loyalty_discount || 0).toFixed(2)),\n  loyalty_points_redeem_pending: Number(submitTotals.loyalty_points_redeem_pending || 0),\n  loyalty_points_earned_pending: Number(submitTotals.loyalty_points_earned_pending || 0),\n  loyalty_reward_applied: !!submitTotals.loyalty_reward_applied,\n  loyalty_expected_balance: Number.isFinite(submitTotals.loyalty_expected_balance)\n    ? Number(submitTotals.loyalty_expected_balance)\n    : null,\n  loyalty_settled: false,\n\n  order_type: orderType,\n  notes,\n  order_ref: orderRef,\n  payment_preference,\n  preferred_time: finalPreferredTimeISO,\n  asap_requested: asapRequested,\n  communication_preference: communicationPreference,\n\n  idempotency_key: idempotencyKey,\n}",
+        "sha256": "ed4413afbcc95f41064f35c8c3263030e73e0caed4a1812bdd0b83f77c03d969"
+      },
+      "items": {
+        "keys": [
+          "order_id",
+          "item_id",
+          "name",
+          "unit_price",
+          "qty",
+          "modifiers",
+          "spice",
+          "img"
+        ],
+        "expression": "{\n\t\t\t\torder_id: orderId,\n\t\t\t\titem_id,\n\t\t\t\tname: line.name,\n\t\t\t\tunit_price: Number(line.unitPrice.toFixed(2)),\n\t\t\t\tqty: line.qty,\n\t\t\t\tmodifiers: (line.mods ?? []).map(m => ({ id: m.id, name: m.name, delta: m.delta })),\n\t\t\t\tspice: (typeof line.spice === 'number') ? line.spice : null,\n\t\t\t\timg: line.img || null\n\t\t\t  }",
+        "sha256": "5a004fb272e2b0406d62a6d21280fb7fe40626a4e10ab92445dbd0b18591f9c0"
+      },
+      "gitBlob": "0e8659b1a269d4605ca0799ebcc381c43a36eef4"
+    }
+  }
+}

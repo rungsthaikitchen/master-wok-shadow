@@ -1,5 +1,7 @@
 # Private Postgres event-source rehearsal
 
+Latest mapping: [full current checkout fields](CHECKOUT-PRODUCTION-FIELD-MAPPING.md), 25 October. The default-off offline adapter preserves private payload values and separates engine input. It is not wired to the website, persistence or production.
+
 Latest result: [restricted hosted atomic checkout rehearsal](CHECKOUT-SUBMISSION-HOSTED-REHEARSAL.md), 25 October. Concurrent submission, HTTP retry and recovery checks passed. The trial is disabled with temporary grants revoked. The supported synthetic shape is not a production checkout replacement.
 
 Latest result: [hosted automatic command routing and observer handover](COMMAND-ROUTE-HOSTED-REHEARSAL.md), 25 October. The bounded synthetic staging trial passed; it is now disabled with temporary runtime grants revoked. Production integration remains incomplete.

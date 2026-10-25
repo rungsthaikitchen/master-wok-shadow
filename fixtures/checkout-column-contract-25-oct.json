@@ -1,0 +1,242 @@
+{
+  "reviewedAt": "2026-10-25",
+  "evidenceBasis": "SCHEMA_METADATA_ONLY_NO_CUSTOMER_ROWS",
+  "tables": {
+    "orders": {
+      "id": {
+        "type": "uuid",
+        "nullable": false
+      },
+      "customer_id": {
+        "type": "uuid",
+        "nullable": true
+      },
+      "status": {
+        "type": "text",
+        "nullable": false
+      },
+      "subtotal": {
+        "type": "numeric",
+        "nullable": false
+      },
+      "notes": {
+        "type": "text",
+        "nullable": true
+      },
+      "created_at": {
+        "type": "timestamp with time zone",
+        "nullable": true
+      },
+      "order_type": {
+        "type": "text",
+        "nullable": true
+      },
+      "delivery_fee": {
+        "type": "numeric",
+        "nullable": true
+      },
+      "order_ref": {
+        "type": "text",
+        "nullable": true
+      },
+      "preferred_time": {
+        "type": "timestamp with time zone",
+        "nullable": true
+      },
+      "review_status": {
+        "type": "text",
+        "nullable": false
+      },
+      "confirmed_time": {
+        "type": "timestamp with time zone",
+        "nullable": true
+      },
+      "payment_link": {
+        "type": "text",
+        "nullable": true
+      },
+      "communication_channel": {
+        "type": "text",
+        "nullable": true
+      },
+      "payment_preference": {
+        "type": "text",
+        "nullable": false
+      },
+      "payment_status": {
+        "type": "text",
+        "nullable": false
+      },
+      "paid_at": {
+        "type": "timestamp with time zone",
+        "nullable": true
+      },
+      "confirm_token": {
+        "type": "text",
+        "nullable": true
+      },
+      "proposed_time": {
+        "type": "timestamp with time zone",
+        "nullable": true
+      },
+      "paid": {
+        "type": "boolean",
+        "nullable": true
+      },
+      "communication_preference": {
+        "type": "text",
+        "nullable": true
+      },
+      "asap_requested": {
+        "type": "boolean",
+        "nullable": false
+      },
+      "delivery_address": {
+        "type": "text",
+        "nullable": true
+      },
+      "customer_lat": {
+        "type": "double precision",
+        "nullable": true
+      },
+      "customer_lng": {
+        "type": "double precision",
+        "nullable": true
+      },
+      "idempotency_key": {
+        "type": "text",
+        "nullable": true
+      },
+      "discount": {
+        "type": "numeric",
+        "nullable": true
+      },
+      "total": {
+        "type": "numeric",
+        "nullable": true
+      },
+      "discount_label": {
+        "type": "text",
+        "nullable": true
+      },
+      "is_test": {
+        "type": "boolean",
+        "nullable": false
+      },
+      "loyalty_settled": {
+        "type": "boolean",
+        "nullable": false
+      },
+      "loyalty_discount": {
+        "type": "numeric",
+        "nullable": false
+      },
+      "loyalty_points_redeem_pending": {
+        "type": "integer",
+        "nullable": false
+      },
+      "loyalty_points_earned_pending": {
+        "type": "integer",
+        "nullable": false
+      },
+      "loyalty_reward_applied": {
+        "type": "boolean",
+        "nullable": false
+      },
+      "loyalty_expected_balance": {
+        "type": "integer",
+        "nullable": true
+      },
+      "delivery_straight_line_miles": {
+        "type": "numeric",
+        "nullable": true
+      },
+      "delivery_route_miles": {
+        "type": "numeric",
+        "nullable": true
+      },
+      "delivery_distance_source": {
+        "type": "text",
+        "nullable": true
+      },
+      "staff_notified_at": {
+        "type": "timestamp with time zone",
+        "nullable": true
+      },
+      "staff_notify_attempts": {
+        "type": "integer",
+        "nullable": true
+      },
+      "staff_notify_error": {
+        "type": "text",
+        "nullable": true
+      },
+      "discount_code": {
+        "type": "text",
+        "nullable": true
+      },
+      "discount_amount": {
+        "type": "numeric",
+        "nullable": true
+      },
+      "device_os": {
+        "type": "text",
+        "nullable": true
+      },
+      "user_agent": {
+        "type": "text",
+        "nullable": true
+      },
+      "device_platform": {
+        "type": "text",
+        "nullable": true
+      }
+    },
+    "order_items": {
+      "id": {
+        "type": "uuid",
+        "nullable": false
+      },
+      "order_id": {
+        "type": "uuid",
+        "nullable": true
+      },
+      "item_id": {
+        "type": "text",
+        "nullable": false
+      },
+      "name": {
+        "type": "text",
+        "nullable": false
+      },
+      "unit_price": {
+        "type": "numeric",
+        "nullable": false
+      },
+      "qty": {
+        "type": "integer",
+        "nullable": false
+      },
+      "modifiers": {
+        "type": "jsonb",
+        "nullable": true
+      },
+      "spice": {
+        "type": "integer",
+        "nullable": true
+      },
+      "img": {
+        "type": "text",
+        "nullable": true
+      },
+      "item_note": {
+        "type": "text",
+        "nullable": true
+      },
+      "kitchen_load": {
+        "type": "numeric",
+        "nullable": true
+      }
+    }
+  }
+}
