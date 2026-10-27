@@ -1,0 +1,922 @@
+[
+  {
+    "route": "122fbd93-c3d2-5726-8dc7-81e3afbe879f",
+    "stream": "b7586c17-edaf-5a89-8252-d3f7aed57ca0",
+    "order": "35429214-780d-567a-8700-6b4bedb5799e",
+    "quote": "178a2b55-4ee7-568f-921a-c1e65190e937",
+    "request": "f3ee4d5b-312b-5e45-b183-78a1f290ec08",
+    "customer": "2c522071-0c1b-5431-8d00-8e6a577b4b66",
+    "name": "same-request",
+    "page": "index.html",
+    "alternateRequest": "46fc5af6-c391-589a-ad3d-d043a8377e2e",
+    "alternateOrder": "9c2d90e7-2cf4-5b45-a0a1-6890b861297b",
+    "input": {
+      "enabled": true,
+      "project": "hvrqgufqjslvgiohgkvu",
+      "sourcePage": "index.html",
+      "orderId": "35429214-780d-567a-8700-6b4bedb5799e",
+      "orderAlias": "synthetic-full-same-request",
+      "order": {
+        "customer_id": "2c522071-0c1b-5431-8d00-8e6a577b4b66",
+        "subtotal": 24,
+        "discount": 4,
+        "discount_label": "Discount code SYNTHETIC",
+        "discount_code": "SYNTHETIC",
+        "discount_amount": 1,
+        "delivery_fee": 0,
+        "delivery_straight_line_miles": null,
+        "delivery_route_miles": null,
+        "delivery_distance_source": null,
+        "total": 20,
+        "loyalty_discount": 3,
+        "loyalty_points_redeem_pending": 30,
+        "loyalty_points_earned_pending": 20,
+        "loyalty_reward_applied": true,
+        "loyalty_expected_balance": 100,
+        "loyalty_settled": false,
+        "order_type": "collection",
+        "notes": "SYNTHETIC-PRIVATE-NOTE",
+        "order_ref": "SYNTHETIC-PRIVATE-REF",
+        "payment_preference": "cash",
+        "preferred_time": "2026-10-28T18:30:00Z",
+        "asap_requested": false,
+        "communication_preference": "sms",
+        "idempotency_key": "f3ee4d5b-312b-5e45-b183-78a1f290ec08"
+      },
+      "items": [
+        {
+          "order_id": "35429214-780d-567a-8700-6b4bedb5799e",
+          "item_id": "green-curry",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 2,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png",
+          "kitchen_load": 1
+        },
+        {
+          "order_id": "35429214-780d-567a-8700-6b4bedb5799e",
+          "item_id": "sticky-rice",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 1,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png",
+          "kitchen_load": 1,
+          "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+        }
+      ],
+      "routeId": "122fbd93-c3d2-5726-8dc7-81e3afbe879f",
+      "quoteId": "178a2b55-4ee7-568f-921a-c1e65190e937"
+    },
+    "payload": {
+      "source": {
+        "websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0",
+        "page": "index.html"
+      },
+      "orderAlias": "synthetic-full-same-request",
+      "privateWrite": {
+        "order": {
+          "customer_id": "2c522071-0c1b-5431-8d00-8e6a577b4b66",
+          "subtotal": 24,
+          "discount": 4,
+          "discount_label": "Discount code SYNTHETIC",
+          "discount_code": "SYNTHETIC",
+          "discount_amount": 1,
+          "delivery_fee": 0,
+          "delivery_straight_line_miles": null,
+          "delivery_route_miles": null,
+          "delivery_distance_source": null,
+          "total": 20,
+          "loyalty_discount": 3,
+          "loyalty_points_redeem_pending": 30,
+          "loyalty_points_earned_pending": 20,
+          "loyalty_reward_applied": true,
+          "loyalty_expected_balance": 100,
+          "loyalty_settled": false,
+          "order_type": "collection",
+          "notes": "SYNTHETIC-PRIVATE-NOTE",
+          "order_ref": "SYNTHETIC-PRIVATE-REF",
+          "payment_preference": "cash",
+          "preferred_time": "2026-10-28T18:30:00Z",
+          "asap_requested": false,
+          "communication_preference": "sms",
+          "idempotency_key": "f3ee4d5b-312b-5e45-b183-78a1f290ec08"
+        },
+        "items": [
+          {
+            "order_id": "35429214-780d-567a-8700-6b4bedb5799e",
+            "item_id": "green-curry",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 2,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png",
+            "kitchen_load": 1
+          },
+          {
+            "order_id": "35429214-780d-567a-8700-6b4bedb5799e",
+            "item_id": "sticky-rice",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 1,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png",
+            "kitchen_load": 1,
+            "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "route": "0d086197-1bca-5ff6-9795-764cd370a111",
+    "stream": "80987831-64af-5631-8645-db0c5aa854a0",
+    "order": "508162a0-dc6c-58a3-b54b-2a312777f407",
+    "quote": "fb733cc9-1330-5821-aa62-ffd2fb6a8ea9",
+    "request": "cd833f2a-bbe2-5234-a4f9-4862fc1ce2b5",
+    "customer": "6014a98c-b2d3-5479-ad8c-e87812a39123",
+    "name": "same-quote",
+    "page": "index_inline_ordering_refactor.html",
+    "alternateRequest": "d40eea1c-ce52-5a49-8a6d-cd76604d66a2",
+    "alternateOrder": "f7715e0c-0758-5b80-8108-92956cae4205",
+    "input": {
+      "enabled": true,
+      "project": "hvrqgufqjslvgiohgkvu",
+      "sourcePage": "index_inline_ordering_refactor.html",
+      "orderId": "508162a0-dc6c-58a3-b54b-2a312777f407",
+      "orderAlias": "synthetic-full-same-quote",
+      "order": {
+        "customer_id": "6014a98c-b2d3-5479-ad8c-e87812a39123",
+        "subtotal": 24,
+        "discount": 4,
+        "discount_label": "Loyalty reward",
+        "delivery_fee": 0,
+        "total": 20,
+        "loyalty_discount": 3,
+        "loyalty_points_redeem_pending": 30,
+        "loyalty_points_earned_pending": 20,
+        "loyalty_reward_applied": true,
+        "loyalty_expected_balance": 100,
+        "loyalty_settled": false,
+        "order_type": "collection",
+        "notes": "SYNTHETIC-PRIVATE-NOTE",
+        "order_ref": "SYNTHETIC-PRIVATE-REF",
+        "payment_preference": "cash",
+        "preferred_time": "2026-10-28T18:30:00Z",
+        "asap_requested": false,
+        "communication_preference": "sms",
+        "idempotency_key": "cd833f2a-bbe2-5234-a4f9-4862fc1ce2b5"
+      },
+      "items": [
+        {
+          "order_id": "508162a0-dc6c-58a3-b54b-2a312777f407",
+          "item_id": "green-curry",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 2,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png"
+        },
+        {
+          "order_id": "508162a0-dc6c-58a3-b54b-2a312777f407",
+          "item_id": "sticky-rice",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 1,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png",
+          "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+        }
+      ],
+      "routeId": "0d086197-1bca-5ff6-9795-764cd370a111",
+      "quoteId": "fb733cc9-1330-5821-aa62-ffd2fb6a8ea9"
+    },
+    "payload": {
+      "source": {
+        "websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0",
+        "page": "index_inline_ordering_refactor.html"
+      },
+      "orderAlias": "synthetic-full-same-quote",
+      "privateWrite": {
+        "order": {
+          "customer_id": "6014a98c-b2d3-5479-ad8c-e87812a39123",
+          "subtotal": 24,
+          "discount": 4,
+          "discount_label": "Loyalty reward",
+          "delivery_fee": 0,
+          "total": 20,
+          "loyalty_discount": 3,
+          "loyalty_points_redeem_pending": 30,
+          "loyalty_points_earned_pending": 20,
+          "loyalty_reward_applied": true,
+          "loyalty_expected_balance": 100,
+          "loyalty_settled": false,
+          "order_type": "collection",
+          "notes": "SYNTHETIC-PRIVATE-NOTE",
+          "order_ref": "SYNTHETIC-PRIVATE-REF",
+          "payment_preference": "cash",
+          "preferred_time": "2026-10-28T18:30:00Z",
+          "asap_requested": false,
+          "communication_preference": "sms",
+          "idempotency_key": "cd833f2a-bbe2-5234-a4f9-4862fc1ce2b5"
+        },
+        "items": [
+          {
+            "order_id": "508162a0-dc6c-58a3-b54b-2a312777f407",
+            "item_id": "green-curry",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 2,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png"
+          },
+          {
+            "order_id": "508162a0-dc6c-58a3-b54b-2a312777f407",
+            "item_id": "sticky-rice",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 1,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png",
+            "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "route": "9b2a76fd-99bc-51d4-b321-1bb00ef364f2",
+    "stream": "0dfbdcc1-d7b4-598e-b6b3-d22a10f871fb",
+    "order": "67669283-3506-5f38-93fe-ee5ebc2c71de",
+    "quote": "ff8c8266-5708-5b3c-bb71-da08f5266c0f",
+    "request": "e870d5b9-92ba-52f8-a137-23e88f85a3bc",
+    "customer": "3ee5a294-00fc-5782-bf2e-78a5413f44cc",
+    "name": "rollback",
+    "page": "images/index_inline_ordering_refactor.html",
+    "alternateRequest": "af3961e5-21eb-50f3-955b-22f1c867abf8",
+    "alternateOrder": "367383b0-3141-575e-8117-cdc3ef6c8563",
+    "input": {
+      "enabled": true,
+      "project": "hvrqgufqjslvgiohgkvu",
+      "sourcePage": "images/index_inline_ordering_refactor.html",
+      "orderId": "67669283-3506-5f38-93fe-ee5ebc2c71de",
+      "orderAlias": "synthetic-full-rollback",
+      "order": {
+        "customer_id": "3ee5a294-00fc-5782-bf2e-78a5413f44cc",
+        "subtotal": 24,
+        "discount": 4,
+        "discount_label": "Loyalty reward",
+        "delivery_fee": 0,
+        "total": 20,
+        "loyalty_discount": 3,
+        "loyalty_points_redeem_pending": 30,
+        "loyalty_points_earned_pending": 20,
+        "loyalty_reward_applied": true,
+        "loyalty_expected_balance": 100,
+        "loyalty_settled": false,
+        "order_type": "collection",
+        "notes": "SYNTHETIC-PRIVATE-NOTE",
+        "order_ref": "SYNTHETIC-PRIVATE-REF",
+        "payment_preference": "cash",
+        "preferred_time": "2026-10-28T18:30:00Z",
+        "asap_requested": false,
+        "communication_preference": "sms",
+        "idempotency_key": "e870d5b9-92ba-52f8-a137-23e88f85a3bc"
+      },
+      "items": [
+        {
+          "order_id": "67669283-3506-5f38-93fe-ee5ebc2c71de",
+          "item_id": "green-curry",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 2,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png"
+        },
+        {
+          "order_id": "67669283-3506-5f38-93fe-ee5ebc2c71de",
+          "item_id": "sticky-rice",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 1,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png",
+          "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+        }
+      ],
+      "routeId": "9b2a76fd-99bc-51d4-b321-1bb00ef364f2",
+      "quoteId": "ff8c8266-5708-5b3c-bb71-da08f5266c0f"
+    },
+    "payload": {
+      "source": {
+        "websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0",
+        "page": "images/index_inline_ordering_refactor.html"
+      },
+      "orderAlias": "synthetic-full-rollback",
+      "privateWrite": {
+        "order": {
+          "customer_id": "3ee5a294-00fc-5782-bf2e-78a5413f44cc",
+          "subtotal": 24,
+          "discount": 4,
+          "discount_label": "Loyalty reward",
+          "delivery_fee": 0,
+          "total": 20,
+          "loyalty_discount": 3,
+          "loyalty_points_redeem_pending": 30,
+          "loyalty_points_earned_pending": 20,
+          "loyalty_reward_applied": true,
+          "loyalty_expected_balance": 100,
+          "loyalty_settled": false,
+          "order_type": "collection",
+          "notes": "SYNTHETIC-PRIVATE-NOTE",
+          "order_ref": "SYNTHETIC-PRIVATE-REF",
+          "payment_preference": "cash",
+          "preferred_time": "2026-10-28T18:30:00Z",
+          "asap_requested": false,
+          "communication_preference": "sms",
+          "idempotency_key": "e870d5b9-92ba-52f8-a137-23e88f85a3bc"
+        },
+        "items": [
+          {
+            "order_id": "67669283-3506-5f38-93fe-ee5ebc2c71de",
+            "item_id": "green-curry",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 2,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png"
+          },
+          {
+            "order_id": "67669283-3506-5f38-93fe-ee5ebc2c71de",
+            "item_id": "sticky-rice",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 1,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png",
+            "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "route": "48666d73-5d97-5b94-be67-c46c9d13ba84",
+    "stream": "ff131c05-49b9-5a4b-b86c-6084fae403df",
+    "order": "8776bd98-adfd-58d0-9303-b4aff04aae21",
+    "quote": "fd3f1e00-1757-5d03-93b0-6f29443a58c9",
+    "request": "73d81694-8d02-5071-ac0a-87e4c1f8d933",
+    "customer": "8fa78f6b-706d-5768-8269-ac75ee98dfca",
+    "name": "timeout",
+    "page": "index.html",
+    "alternateRequest": "417bd35e-1724-56ba-83d8-16868e093dd4",
+    "alternateOrder": "c03ddb6f-a8ad-5cb7-9d6b-67de9efb2b39",
+    "input": {
+      "enabled": true,
+      "project": "hvrqgufqjslvgiohgkvu",
+      "sourcePage": "index.html",
+      "orderId": "8776bd98-adfd-58d0-9303-b4aff04aae21",
+      "orderAlias": "synthetic-full-timeout",
+      "order": {
+        "customer_id": "8fa78f6b-706d-5768-8269-ac75ee98dfca",
+        "subtotal": 24,
+        "discount": 4,
+        "discount_label": "Discount code SYNTHETIC",
+        "discount_code": "SYNTHETIC",
+        "discount_amount": 1,
+        "delivery_fee": 3,
+        "delivery_straight_line_miles": 1,
+        "delivery_route_miles": 1.5,
+        "delivery_distance_source": "synthetic-route",
+        "total": 23,
+        "loyalty_discount": 3,
+        "loyalty_points_redeem_pending": 30,
+        "loyalty_points_earned_pending": 20,
+        "loyalty_reward_applied": true,
+        "loyalty_expected_balance": 100,
+        "loyalty_settled": false,
+        "order_type": "delivery",
+        "notes": "SYNTHETIC-PRIVATE-NOTE",
+        "order_ref": "SYNTHETIC-PRIVATE-REF",
+        "payment_preference": "cash",
+        "preferred_time": "2026-10-28T18:30:00Z",
+        "asap_requested": false,
+        "communication_preference": "sms",
+        "idempotency_key": "73d81694-8d02-5071-ac0a-87e4c1f8d933"
+      },
+      "items": [
+        {
+          "order_id": "8776bd98-adfd-58d0-9303-b4aff04aae21",
+          "item_id": "green-curry",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 2,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png",
+          "kitchen_load": 1
+        },
+        {
+          "order_id": "8776bd98-adfd-58d0-9303-b4aff04aae21",
+          "item_id": "sticky-rice",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 1,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png",
+          "kitchen_load": 1,
+          "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+        }
+      ],
+      "routeId": "48666d73-5d97-5b94-be67-c46c9d13ba84",
+      "quoteId": "fd3f1e00-1757-5d03-93b0-6f29443a58c9"
+    },
+    "payload": {
+      "source": {
+        "websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0",
+        "page": "index.html"
+      },
+      "orderAlias": "synthetic-full-timeout",
+      "privateWrite": {
+        "order": {
+          "customer_id": "8fa78f6b-706d-5768-8269-ac75ee98dfca",
+          "subtotal": 24,
+          "discount": 4,
+          "discount_label": "Discount code SYNTHETIC",
+          "discount_code": "SYNTHETIC",
+          "discount_amount": 1,
+          "delivery_fee": 3,
+          "delivery_straight_line_miles": 1,
+          "delivery_route_miles": 1.5,
+          "delivery_distance_source": "synthetic-route",
+          "total": 23,
+          "loyalty_discount": 3,
+          "loyalty_points_redeem_pending": 30,
+          "loyalty_points_earned_pending": 20,
+          "loyalty_reward_applied": true,
+          "loyalty_expected_balance": 100,
+          "loyalty_settled": false,
+          "order_type": "delivery",
+          "notes": "SYNTHETIC-PRIVATE-NOTE",
+          "order_ref": "SYNTHETIC-PRIVATE-REF",
+          "payment_preference": "cash",
+          "preferred_time": "2026-10-28T18:30:00Z",
+          "asap_requested": false,
+          "communication_preference": "sms",
+          "idempotency_key": "73d81694-8d02-5071-ac0a-87e4c1f8d933"
+        },
+        "items": [
+          {
+            "order_id": "8776bd98-adfd-58d0-9303-b4aff04aae21",
+            "item_id": "green-curry",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 2,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png",
+            "kitchen_load": 1
+          },
+          {
+            "order_id": "8776bd98-adfd-58d0-9303-b4aff04aae21",
+            "item_id": "sticky-rice",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 1,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png",
+            "kitchen_load": 1,
+            "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "route": "d89fdf0e-ddaa-5b0a-9329-b40208fcb56f",
+    "stream": "49a715e6-036e-5b49-8e8a-d80eedfb5b76",
+    "order": "040956a0-cfa7-5f8c-8920-a5c31ab752d2",
+    "quote": "775b1122-0e6e-50e6-9cee-4cbffd8aa134",
+    "request": "e03ed331-cd3c-5410-a8e4-d270a0f564d6",
+    "customer": "29fe1796-26b2-5630-bd37-ce2a7301b915",
+    "name": "http",
+    "page": "index.html",
+    "alternateRequest": "216dfc5f-c1e3-5ea1-8993-dfa4cc325e4d",
+    "alternateOrder": "8cddcff7-1364-5fd1-a614-de2bd260494f",
+    "input": {
+      "enabled": true,
+      "project": "hvrqgufqjslvgiohgkvu",
+      "sourcePage": "index.html",
+      "orderId": "040956a0-cfa7-5f8c-8920-a5c31ab752d2",
+      "orderAlias": "synthetic-full-http",
+      "order": {
+        "customer_id": "29fe1796-26b2-5630-bd37-ce2a7301b915",
+        "subtotal": 24,
+        "discount": 4,
+        "discount_label": "Discount code SYNTHETIC",
+        "discount_code": "SYNTHETIC",
+        "discount_amount": 1,
+        "delivery_fee": 0,
+        "delivery_straight_line_miles": null,
+        "delivery_route_miles": null,
+        "delivery_distance_source": null,
+        "total": 20,
+        "loyalty_discount": 3,
+        "loyalty_points_redeem_pending": 30,
+        "loyalty_points_earned_pending": 20,
+        "loyalty_reward_applied": true,
+        "loyalty_expected_balance": 100,
+        "loyalty_settled": false,
+        "order_type": "collection",
+        "notes": "SYNTHETIC-PRIVATE-NOTE",
+        "order_ref": "SYNTHETIC-PRIVATE-REF",
+        "payment_preference": "cash",
+        "preferred_time": "2026-10-28T18:30:00Z",
+        "asap_requested": false,
+        "communication_preference": "sms",
+        "idempotency_key": "e03ed331-cd3c-5410-a8e4-d270a0f564d6"
+      },
+      "items": [
+        {
+          "order_id": "040956a0-cfa7-5f8c-8920-a5c31ab752d2",
+          "item_id": "green-curry",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 2,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png",
+          "kitchen_load": 1
+        },
+        {
+          "order_id": "040956a0-cfa7-5f8c-8920-a5c31ab752d2",
+          "item_id": "sticky-rice",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 1,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png",
+          "kitchen_load": 1,
+          "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+        }
+      ],
+      "routeId": "d89fdf0e-ddaa-5b0a-9329-b40208fcb56f",
+      "quoteId": "775b1122-0e6e-50e6-9cee-4cbffd8aa134"
+    },
+    "payload": {
+      "source": {
+        "websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0",
+        "page": "index.html"
+      },
+      "orderAlias": "synthetic-full-http",
+      "privateWrite": {
+        "order": {
+          "customer_id": "29fe1796-26b2-5630-bd37-ce2a7301b915",
+          "subtotal": 24,
+          "discount": 4,
+          "discount_label": "Discount code SYNTHETIC",
+          "discount_code": "SYNTHETIC",
+          "discount_amount": 1,
+          "delivery_fee": 0,
+          "delivery_straight_line_miles": null,
+          "delivery_route_miles": null,
+          "delivery_distance_source": null,
+          "total": 20,
+          "loyalty_discount": 3,
+          "loyalty_points_redeem_pending": 30,
+          "loyalty_points_earned_pending": 20,
+          "loyalty_reward_applied": true,
+          "loyalty_expected_balance": 100,
+          "loyalty_settled": false,
+          "order_type": "collection",
+          "notes": "SYNTHETIC-PRIVATE-NOTE",
+          "order_ref": "SYNTHETIC-PRIVATE-REF",
+          "payment_preference": "cash",
+          "preferred_time": "2026-10-28T18:30:00Z",
+          "asap_requested": false,
+          "communication_preference": "sms",
+          "idempotency_key": "e03ed331-cd3c-5410-a8e4-d270a0f564d6"
+        },
+        "items": [
+          {
+            "order_id": "040956a0-cfa7-5f8c-8920-a5c31ab752d2",
+            "item_id": "green-curry",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 2,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png",
+            "kitchen_load": 1
+          },
+          {
+            "order_id": "040956a0-cfa7-5f8c-8920-a5c31ab752d2",
+            "item_id": "sticky-rice",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 1,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png",
+            "kitchen_load": 1,
+            "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "route": "d89fdf0e-ddaa-5b0a-9329-b40208fcb56f",
+    "stream": "49a715e6-036e-5b49-8e8a-d80eedfb5b76",
+    "order": "7d201319-c287-5fe6-a2f1-c609ef74d951",
+    "quote": "0b50dbc8-8b51-5cf5-adea-23ae3c5c674d",
+    "request": "79ccd183-df65-59b3-b0c9-646a815259a2",
+    "customer": "9d3a6cc5-eb85-5b39-9958-33c23217e1be",
+    "name": "http-delivery",
+    "page": "index.html",
+    "alternateRequest": "f41dbd59-6ae5-590c-a11d-7cb0354e61fd",
+    "alternateOrder": "e390a2e9-1e48-505f-ae21-669404df9e84",
+    "input": {
+      "enabled": true,
+      "project": "hvrqgufqjslvgiohgkvu",
+      "sourcePage": "index.html",
+      "orderId": "7d201319-c287-5fe6-a2f1-c609ef74d951",
+      "orderAlias": "synthetic-full-http-delivery",
+      "order": {
+        "customer_id": "9d3a6cc5-eb85-5b39-9958-33c23217e1be",
+        "subtotal": 24,
+        "discount": 4,
+        "discount_label": "Discount code SYNTHETIC",
+        "discount_code": "SYNTHETIC",
+        "discount_amount": 1,
+        "delivery_fee": 3,
+        "delivery_straight_line_miles": 1,
+        "delivery_route_miles": 1.5,
+        "delivery_distance_source": "synthetic-route",
+        "total": 23,
+        "loyalty_discount": 3,
+        "loyalty_points_redeem_pending": 30,
+        "loyalty_points_earned_pending": 20,
+        "loyalty_reward_applied": true,
+        "loyalty_expected_balance": 100,
+        "loyalty_settled": false,
+        "order_type": "delivery",
+        "notes": "SYNTHETIC-PRIVATE-NOTE",
+        "order_ref": "SYNTHETIC-PRIVATE-REF",
+        "payment_preference": "cash",
+        "preferred_time": "2026-10-28T18:30:00Z",
+        "asap_requested": false,
+        "communication_preference": "sms",
+        "idempotency_key": "79ccd183-df65-59b3-b0c9-646a815259a2"
+      },
+      "items": [
+        {
+          "order_id": "7d201319-c287-5fe6-a2f1-c609ef74d951",
+          "item_id": "green-curry",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 2,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png",
+          "kitchen_load": 1
+        },
+        {
+          "order_id": "7d201319-c287-5fe6-a2f1-c609ef74d951",
+          "item_id": "sticky-rice",
+          "name": "SYNTHETIC-PRIVATE-DISPLAY",
+          "unit_price": 12,
+          "qty": 1,
+          "modifiers": [
+            {
+              "id": "chicken",
+              "name": "SYNTHETIC-PRIVATE-MOD",
+              "delta": 0.001
+            }
+          ],
+          "spice": 2,
+          "img": "/synthetic-private.png",
+          "kitchen_load": 1,
+          "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+        }
+      ],
+      "routeId": "d89fdf0e-ddaa-5b0a-9329-b40208fcb56f",
+      "quoteId": "0b50dbc8-8b51-5cf5-adea-23ae3c5c674d"
+    },
+    "payload": {
+      "source": {
+        "websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0",
+        "page": "index.html"
+      },
+      "orderAlias": "synthetic-full-http-delivery",
+      "privateWrite": {
+        "order": {
+          "customer_id": "9d3a6cc5-eb85-5b39-9958-33c23217e1be",
+          "subtotal": 24,
+          "discount": 4,
+          "discount_label": "Discount code SYNTHETIC",
+          "discount_code": "SYNTHETIC",
+          "discount_amount": 1,
+          "delivery_fee": 3,
+          "delivery_straight_line_miles": 1,
+          "delivery_route_miles": 1.5,
+          "delivery_distance_source": "synthetic-route",
+          "total": 23,
+          "loyalty_discount": 3,
+          "loyalty_points_redeem_pending": 30,
+          "loyalty_points_earned_pending": 20,
+          "loyalty_reward_applied": true,
+          "loyalty_expected_balance": 100,
+          "loyalty_settled": false,
+          "order_type": "delivery",
+          "notes": "SYNTHETIC-PRIVATE-NOTE",
+          "order_ref": "SYNTHETIC-PRIVATE-REF",
+          "payment_preference": "cash",
+          "preferred_time": "2026-10-28T18:30:00Z",
+          "asap_requested": false,
+          "communication_preference": "sms",
+          "idempotency_key": "79ccd183-df65-59b3-b0c9-646a815259a2"
+        },
+        "items": [
+          {
+            "order_id": "7d201319-c287-5fe6-a2f1-c609ef74d951",
+            "item_id": "green-curry",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 2,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png",
+            "kitchen_load": 1
+          },
+          {
+            "order_id": "7d201319-c287-5fe6-a2f1-c609ef74d951",
+            "item_id": "sticky-rice",
+            "name": "SYNTHETIC-PRIVATE-DISPLAY",
+            "unit_price": 12,
+            "qty": 1,
+            "modifiers": [
+              {
+                "id": "chicken",
+                "name": "SYNTHETIC-PRIVATE-MOD",
+                "delta": 0.001
+              }
+            ],
+            "spice": 2,
+            "img": "/synthetic-private.png",
+            "kitchen_load": 1,
+            "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"
+          }
+        ]
+      }
+    }
+  }
+]

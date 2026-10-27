@@ -3,7 +3,7 @@
   "batch": {
     "events": [
       {
-        "at": "2026-10-25T17:29:53.373000Z",
+        "at": "2026-10-27T05:23:08.722000Z",
         "kind": "RESERVATION_SET",
         "order": {
           "lines": [
@@ -27,16 +27,16 @@
             }
           ],
           "orderId": "synthetic-full-http",
-          "targetAt": "2026-10-26T18:30:00.000000Z",
+          "targetAt": "2026-10-28T18:30:00.000000Z",
           "orderType": "collection",
           "deliveryReadyEstimate": null
         },
-        "eventId": "full-764340c47b2cda25f541275e20c256ecd2cf99268b333e860db8174540f5cbcd",
+        "eventId": "full-45d43beda7e98db48ffccd9f36060b773fdbe9b5170a745a33fee6b792682976",
         "sequence": 1,
         "commitment": "PROPOSED"
       },
       {
-        "at": "2026-10-25T17:29:53.383000Z",
+        "at": "2026-10-27T05:23:08.731000Z",
         "kind": "RESERVATION_SET",
         "order": {
           "lines": [
@@ -60,11 +60,11 @@
             }
           ],
           "orderId": "synthetic-full-http-delivery",
-          "targetAt": "2026-10-26T18:30:00.000000Z",
+          "targetAt": "2026-10-28T18:30:00.000000Z",
           "orderType": "delivery",
           "deliveryReadyEstimate": null
         },
-        "eventId": "full-d76a33a6559136d420145027c8efb6e33931707be37b168b25e3df03b97b41e2",
+        "eventId": "full-cfbab71dae28ffd8587d24513220fe663c9887e5fdbcbdefb7e74a4204697bf2",
         "sequence": 2,
         "commitment": "PROPOSED"
       }
@@ -72,12 +72,12 @@
     "coverage": {
       "basis": "DECISION_EVENT_LOG",
       "complete": true,
-      "throughAt": "2026-10-25T17:29:53.383000Z",
+      "throughAt": "2026-10-27T05:23:08.731000Z",
       "eventCount": 2,
       "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
       "lastSequence": 2,
       "firstSequence": 1
     },
-    "serviceDate": "2026-10-26"
+    "serviceDate": "2026-10-28"
   }
 }

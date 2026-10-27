@@ -15,9 +15,9 @@ from event_runtime_http import serve_api
 from event_postgres_export import source_identity,poll
 
 ROOT=Path(__file__).resolve().parent.parent
-FIXTURES=json.loads((ROOT/'fixtures/checkout-full-trial-26-oct-v1.json').read_text())
+FIXTURES=json.loads((ROOT/'fixtures/checkout-full-trial-28-oct-v1.json').read_text())
 CASES=FIXTURES[:5];DELIVERY=FIXTURES[5]
-DIRECTORY=Path('/data/full-checkout-trial-26-oct-v1')
+DIRECTORY=Path('/data/full-checkout-trial-28-oct-v1')
 QUERY='SELECT master_wok_event_test.submit_full_checkout($1::uuid,$2::text,$3::uuid,$4::uuid,$5::jsonb) AS result'
 SQL='SELECT master_wok_event_test.submit_full_checkout(%s::uuid,%s::text,%s::uuid,%s::uuid,%s::jsonb)'
 PRIVILEGES="SELECT has_table_privilege(current_user,'master_wok_event_test.full_checkout_quotes','INSERT,UPDATE,DELETE'),has_table_privilege(current_user,'master_wok_event_test.full_checkout_submissions','UPDATE,DELETE'),has_table_privilege(current_user,'master_wok_event_test.full_checkout_orders','SELECT,UPDATE,DELETE'),has_table_privilege(current_user,'master_wok_event_test.full_checkout_items','SELECT,UPDATE,DELETE'),has_table_privilege(current_user,'master_wok_event_test.command_routes','INSERT,UPDATE,DELETE'),has_function_privilege(current_user,'master_wok_event_test.switch_command_route(uuid,integer,uuid,text)','EXECUTE')"
@@ -30,7 +30,7 @@ def configuration(env,now=None):
  if any(env.get(k)!=v for k,v in expected.items()) or any(env.get(k)!='false' for k in (*FLAGS,*EXTRA_FLAGS,'MASTER_WOK_CHECKOUT_TRIAL_ENABLED')):raise EventCaptureError('FULL_CHECKOUT_SCOPE_REFUSED')
  try:deadline=float(env.get('MASTER_WOK_FULL_CHECKOUT_TRIAL_END_EPOCH','0'))
  except (ValueError,TypeError):raise EventCaptureError('FULL_CHECKOUT_DEADLINE_REFUSED') from None
- if not now<deadline<=now+600 or deadline>=datetime.fromisoformat('2026-10-26T18:00:00Z').timestamp():raise EventCaptureError('FULL_CHECKOUT_DEADLINE_REFUSED')
+ if not now<deadline<=now+600 or deadline>=datetime.fromisoformat('2026-10-28T18:00:00Z').timestamp():raise EventCaptureError('FULL_CHECKOUT_DEADLINE_REFUSED')
  return deadline,connection_parameters(env.get('MASTER_WOK_EVENT_READER_DSN'),'reader'),connection_parameters(env.get('MASTER_WOK_EVENT_WRITER_DSN'),'writer')
 def check_role(conn):
  if conn.execute('SELECT current_user,rolsuper,rolbypassrls FROM pg_roles WHERE rolname=current_user').fetchone()!=(ROLES['writer'],False,False):raise EventCaptureError('DATABASE_ROLE_UNPROVEN')

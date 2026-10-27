@@ -2,7 +2,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const {database}=require('./command-route-test-helper.cjs');
 const {prepareCheckout}=require('./checkout-production-field-adapter.cjs');
 const {FullSubmissionAttempt}=require('./checkout-full-persistence-client.cjs');
-const fixtures=require('../fixtures/checkout-full-trial-26-oct-v1.json');
+const fixtures=require('../fixtures/checkout-full-trial-28-oct-v1.json');
 test('all six full trial envelopes are derived from the reviewed mapper with isolated bindings',async()=>{
  for(const f of fixtures){const m=prepareCheckout(f.input);assert.deepEqual(f.payload,{source:m.source,orderAlias:m.engineProjection.orderId,privateWrite:m.privateWrite});assert.equal(f.input.order.idempotency_key,f.request);assert.equal(f.input.orderId,f.order);assert.equal(f.input.quoteId,f.quote);assert.equal(f.input.routeId,f.route);new FullSubmissionAttempt(f.input);}
  assert.equal(new Set(fixtures.map(f=>f.request)).size,6);assert.equal(new Set(fixtures.map(f=>f.quote)).size,6);assert.equal(new Set(fixtures.map(f=>f.page)).size,3);
