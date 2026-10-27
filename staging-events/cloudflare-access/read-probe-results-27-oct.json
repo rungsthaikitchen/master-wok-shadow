@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-27",
+  "status": "DEPLOYED_READ_ONLY_PROBE_AWAITING_OWNER_BROWSER",
+  "actualAccessLoginVerified": false,
+  "websiteCommit": "3a16e1bb464cc0f4dc1d4206e82783063ec55dfa",
+  "firstAttemptCommit": "546cdc37408006406eb8d5513224b381793034d0",
+  "firstAttemptDeployment": "FAILED",
+  "deployment": "Cloudflare Pages SUCCESS",
+  "completedAt": "2026-10-27T06:18:08Z",
+  "expiry": "2026-10-27T08:10:45.000Z",
+  "bundleSha256": "98b3151adf2a651f5ff38fd87b4ab25f5f731c2da1635ee28de01d2a2c7b2485",
+  "productionBookingOrDatabaseWrites": 0,
+  "observerFlagChanges": 0,
+  "websitePathsChanged": [
+    "functions/admin-api/access-check.js"
+  ],
+  "tests": {
+    "Europe/London": {
+      "entries": 30,
+      "passed": 30
+    },
+    "UTC": {
+      "entries": 30,
+      "passed": 30
+    }
+  },
+  "pagesTooling": {
+    "wrangler": "4.153.0",
+    "functionsBuild": "PASSED",
+    "localFullRuntimeSmoke": "NOT_COMPLETED"
+  },
+  "dependencies": {
+    "jose": "6.2.13",
+    "buildOnlyEsbuild": "0.28.2",
+    "knownVulnerabilities": 0
+  },
+  "limits": [
+    "read-only probe is live; protected admin action wrapper remains offline",
+    "no real Access identity or browser session was read",
+    "synthetic signatures and local SQL are not an actual Access login",
+    "full live actor/capture integration and order-confirm source remain unresolved"
+  ]
+}

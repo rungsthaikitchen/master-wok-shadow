@@ -3,7 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
-  "scripts": { "test": "node --test *.test.mjs" },
-  "dependencies": { "jose": "6.2.13" }
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test *.test.mjs"
+  },
+  "dependencies": {
+    "jose": "6.2.13"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
 }

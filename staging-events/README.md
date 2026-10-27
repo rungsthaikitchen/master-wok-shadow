@@ -1,3 +1,5 @@
+Latest: [bounded read-only Access probe](cloudflare-access/READ-PROBE-27-OCT.md), deployed successfully and awaiting owner browser verification; expires 08:10:45 UK time. No admin-action or booking integration activated.
+
 Latest: [Cloudflare-protected HTTP adapter](cloudflare-access/PROXY-REVIEW-27-OCT.md), tested offline and disabled by default. Actual Access settings remain the hosted integration blocker.
 
 Latest clarification: [Cloudflare Access signature gate](cloudflare-access/README.md) matches the owner-confirmed admin sign-in boundary. Offline/default-off; awaiting non-secret team/AUD/API coverage configuration.

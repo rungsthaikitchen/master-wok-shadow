@@ -1,3 +1,5 @@
+Latest: [bounded read-only identity probe](READ-PROBE-27-OCT.md) is deployed and awaiting the owner browser check. It expires at 08:10:45 UK time on 27 October. The action wrapper remains offline; no booking or database changes were activated.
+
 Latest: [protected HTTP proxy adapter review](PROXY-REVIEW-27-OCT.md), 22 combined test entries per timezone. Offline/default-off; hosted integration still needs actual team/AUD/API coverage.
 
 # Cloudflare Access admin gate — offline review candidate
