@@ -1,4 +1,12 @@
-Owner probe returned REFUSED; safe diagnostic categories are now deployed. Refreshing the same bounded read-only URL will identify the failure category without disclosing identity or token data. See READ-PROBE-27-OCT.md.
+Current status (27 October, evening): the real preview authentication probe passed
+and its route was removed from the current preview. The next connection package
+is implemented/tested but remains disabled and undeployed; see
+[PREVIEW-CONNECTION-27-OCT.md](PREVIEW-CONNECTION-27-OCT.md) for current results,
+private-configuration dependencies and the bounded launch/shutdown sequence.
+
+Earlier development notes below are historical and may refer to expired probes.
+
+Owner probe returned REFUSED; safe diagnostic categories were deployed. See READ-PROBE-27-OCT.md for that historical investigation.
 
 Latest: [bounded read-only identity probe](READ-PROBE-27-OCT.md) is deployed and awaiting the owner browser check. It expires at 08:10:45 UK time on 27 October. The action wrapper remains offline; no booking or database changes were activated.
 

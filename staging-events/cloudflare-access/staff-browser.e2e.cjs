@@ -1,27 +1,38 @@
 // Real Chromium, actual HTTP routes, synthetic Access gateway and embedded SQL.
 const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('node:http');
-const {pathToFileURL}=require('node:url'),{randomUUID}=require('node:crypto');
+const {pathToFileURL}=require('node:url'),{randomUUID,randomBytes}=require('node:crypto');
 const {chromium}=require('playwright'),{database}=require('../command-route-test-helper.cjs');
 (async()=>{
  const {generateKeyPair,exportJWK,SignJWT}=await import(pathToFileURL(__dirname+'/node_modules/jose/dist/webapi/index.js').href);
  const {createStagingBrowserApi}=await import(pathToFileURL(__dirname+'/staff-browser-api.mjs').href);
  const {createSyntheticStaffReceiver}=await import(pathToFileURL(__dirname+'/versioned-staff-command.mjs').href);
+ const {createPreviewFixtureApi}=await import(pathToFileURL(__dirname+'/preview-fixture-api.mjs').href);
+ const {createPreviewFixtureReceiver}=await import(pathToFileURL(__dirname+'/preview-fixture-protocol.mjs').href);
+ const {PREVIEW_ACCESS}=await import(pathToFileURL(__dirname+'/preview-access-profile.mjs').href);
+ const preview=process.env.PREVIEW_FIXTURE_ADAPTER==='true',boundOrigin=preview?PREVIEW_ACCESS.requestOrigin:'https://synthetic-admin.invalid';
  const d=await database();let server,browser;
  try{
   await d.db.exec(fs.readFileSync(__dirname+'/../staff-command-candidate.sql','utf8'));let f=await d.fixture();
-  const {publicKey,privateKey}=await generateKeyPair('RS256'),key={...await exportJWK(publicKey),kid:'synthetic',alg:'RS256',use:'sig'},aud='a'.repeat(64),issuer='https://synthetic-team.cloudflareaccess.com';
+  const {publicKey,privateKey}=await generateKeyPair('RS256'),key={...await exportJWK(publicKey),kid:'synthetic',alg:'RS256',use:'sig'},aud=preview?PREVIEW_ACCESS.audience:'a'.repeat(64),issuer=preview?PREVIEW_ACCESS.teamDomain:'https://synthetic-team.cloudflareaccess.com';
   const token=await new SignJWT({iss:issuer,aud:[aud],sub:'synthetic-staff',type:'app',iat:900,nbf:900,exp:2000}).setProtectedHeader({alg:'RS256',kid:'synthetic'}).sign(privateKey);
-  const hopKey='synthetic-browser-hop-key-12345',actorKey='synthetic-browser-actor-key-12345';
+  const hopKey=preview?randomBytes(32).toString('hex'):'synthetic-browser-hop-key-12345',actorKey=preview?randomBytes(32).toString('hex'):'synthetic-browser-actor-key-12345';
   let enabled=false,authenticated=true,loseNext=false,commandRequests=0,applies=0,externalRequests=0;
   const commands=[];
-  const receiver=createSyntheticStaffReceiver({enabled:true,hopKey,nowSeconds:()=>1000,applyCommand:async({actorId,command:c})=>{applies++;return d.call('apply_staff_command',[f.route,c.commandId,actorId,c.orderId,c.expectedRevision,c.action,c.target??null]);}});
   const state=async orderId=>{
    assert.equal(orderId,f.booking);
    const b=(await d.q("SELECT status,coalesce(proposed_time,confirmed_time,preferred_time) AS target FROM master_wok_event_test.booking_rows WHERE stream_id=$1 AND id=$2",[f.src,f.booking]))[0];
    const revision=await d.scalar("SELECT max(sequence) FROM master_wok_event_test.events WHERE stream_id=$1 AND (payload->>'orderId'='synthetic-route' OR payload->'order'->>'orderId'='synthetic-route')",[f.src]);
    return {orderId,revision,status:b.status,target:new Date(b.target).toISOString().replace('.000Z','Z'),proposalTargets:[f.day+'T19:30:00Z',f.day+'T20:00:00Z']};
   };
-  const api=createStagingBrowserApi({enabled:true,audience:aud,hopKey,actorKey,nowSeconds:()=>1000,fetcher:async url=>{assert.equal(String(url),issuer+'/cdn-cgi/access/certs');return new Response(JSON.stringify({keys:[key]}));},readState:state,sendEnvelope:receiver});
+  let budget=0;
+  function createApi(){
+   const scope={fixture:{orderId:f.booking,targets:['19:00','19:30','20:00'].map(t=>f.day+'T'+t+':00Z')},endEpoch:1600};
+   const options={enabled:true,audience:aud,hopKey,actorKey,nowSeconds:()=>1000,...(preview?scope:{})};
+   const applyCommand=async({actorId,command:c})=>{applies++;return d.call('apply_staff_command',[f.route,c.commandId,actorId,c.orderId,c.expectedRevision,c.action,c.target??null]);};
+   const receiver=preview?createPreviewFixtureReceiver({...options,readState:state,applyCommand,takeBudget:async()=>{if(++budget>100)throw Error('LOCAL_BUDGET_LIMIT');}}):createSyntheticStaffReceiver({...options,applyCommand});
+   return (preview?createPreviewFixtureApi:createStagingBrowserApi)({...options,fetcher:async url=>{assert.equal(String(url),issuer+'/cdn-cgi/access/certs');return new Response(JSON.stringify({keys:[key]}));},readState:state,sendEnvelope:receiver});
+  }
+  let api=createApi();
   const disabled=createStagingBrowserApi();let origin;
   server=http.createServer(async(req,res)=>{
    try{
@@ -29,10 +40,10 @@ const {chromium}=require('playwright'),{database}=require('../command-route-test
     if(req.url.startsWith('/admin-api/')){
      let body='';for await(const chunk of req){body+=chunk;if(body.length>8192)throw Error('SIZE');}
      const validOrigin=req.headers.origin===origin;
-     const headers={'Content-Type':req.headers['content-type']||'',Origin:validOrigin?'https://synthetic-admin.invalid':'https://other.invalid'};
+     const headers={'Content-Type':req.headers['content-type']||'',Origin:validOrigin?boundOrigin:'https://other.invalid'};
      if(authenticated)headers['Cf-Access-Jwt-Assertion']=token;
      if(req.url==='/admin-api/staff-command-v1'){commandRequests++;commands.push(JSON.parse(body));}
-     const r=await(enabled?api:disabled)(new Request('https://synthetic-admin.invalid'+req.url,{method:req.method,headers,body}));
+     const r=await(enabled?api:disabled)(new Request(boundOrigin+req.url,{method:req.method,headers,body}));
      if(loseNext&&req.url==='/admin-api/staff-command-v1'&&r.status===200){loseNext=false;res.writeHead(502,{'Content-Type':'application/json'});return res.end('{"error":"SYNTHETIC_LOST_APPLICATION_SUCCESS"}');}
      res.writeHead(r.status,Object.fromEntries(r.headers));return res.end(await r.text());
     }
@@ -60,7 +71,7 @@ const {chromium}=require('playwright'),{database}=require('../command-route-test
   authenticated=false;await page.getByRole('button',{name:'Confirm order',exact:true}).click();await wait('Sign in again');const before=applies;authenticated=true;await page.getByRole('button',{name:'Retry saved action'}).click();await wait('Action saved.');assert.equal(applies,before+1);assert.equal(await page.locator('#status').textContent(),'Confirmed');
   await page.getByRole('button',{name:'Cancel order',exact:true}).click();await wait('Action saved.');assert.equal(await page.locator('#status').textContent(),'Cancelled');assert.equal(await offer.isDisabled(),true);assert.equal(await d.scalar('SELECT count(*)::int FROM master_wok_event_test.reservations WHERE stream_id=$1',[f.src]),0);
   await page.screenshot({path:'/tmp/master-wok-staff-browser.png',fullPage:true});
-  f=await d.fixture();const quotaContext=await browser.newContext({timezoneId:'Europe/London'});await quotaContext.addInitScript(()=>{Storage.prototype.setItem=function(){throw new DOMException('Quota','QuotaExceededError');};});const quota=await quotaContext.newPage();await quota.goto(origin+'/admin-staging/master-wok.html');await quota.waitForFunction(()=>document.getElementById('message').textContent.includes('Ready for a test action'));const requestsBefore=commandRequests;await quota.getByRole('button',{name:'Offer time',exact:true}).click();await quota.waitForFunction(()=>document.getElementById('message').textContent.includes('Stop here'));assert.equal(commandRequests,requestsBefore);assert.equal(await quota.getByRole('button',{name:'Offer time',exact:true}).isDisabled(),true);await quotaContext.close();
-  assert.equal(externalRequests,0);console.log(JSON.stringify({status:'PASSED',browser:'Chromium',timezone:'Europe/London',cases:8,lostSuccessRetryPreservedCommand:true,realReload:true,conflictReviewRequired:true,storageFailureMakesNoRequest:true,externalRequests,productionRequests:0,notifications:0,hostedAccessVerified:false}));
+  f=await d.fixture();api=createApi();const quotaContext=await browser.newContext({timezoneId:'Europe/London'});await quotaContext.addInitScript(()=>{Storage.prototype.setItem=function(){throw new DOMException('Quota','QuotaExceededError');};});const quota=await quotaContext.newPage();await quota.goto(origin+'/admin-staging/master-wok.html');await quota.waitForFunction(()=>document.getElementById('message').textContent.includes('Ready for a test action'));const requestsBefore=commandRequests;await quota.getByRole('button',{name:'Offer time',exact:true}).click();await quota.waitForFunction(()=>document.getElementById('message').textContent.includes('Stop here'));assert.equal(commandRequests,requestsBefore);assert.equal(await quota.getByRole('button',{name:'Offer time',exact:true}).isDisabled(),true);await quotaContext.close();
+  assert.equal(externalRequests,0);console.log(JSON.stringify({status:'PASSED',browser:'Chromium',timezone:'Europe/London',cases:8,adapter:preview?'PINNED_PREVIEW_FIXTURE':'SYNTHETIC_ONLY',lostSuccessRetryPreservedCommand:true,realReload:true,conflictReviewRequired:true,storageFailureMakesNoRequest:true,externalRequests,productionRequests:0,notifications:0,hostedAccessVerified:false}));
  }finally{if(browser)await browser.close();if(server)await new Promise(resolve=>server.close(resolve));await d.db.close();}
 })().catch(e=>{console.error(e.stack);process.exitCode=1;});
