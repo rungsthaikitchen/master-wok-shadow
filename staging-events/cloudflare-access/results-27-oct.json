@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-27",
+  "status": "OFFLINE_CLOUDFLARE_SIGNATURE_TESTS_PASSED",
+  "verified": false,
+  "ownerConfirmedAdminSignIn": "Cloudflare Zero Trust Access",
+  "productionWrites": 0,
+  "deployments": 0,
+  "realAccessTokensRead": 0,
+  "liveCloudflarePolicyVerified": false,
+  "tests": {
+    "Europe/London": {
+      "entries": 13,
+      "passed": 13
+    },
+    "UTC": {
+      "entries": 13,
+      "passed": 13
+    }
+  },
+  "dependency": {
+    "name": "jose",
+    "version": "6.2.13",
+    "auditKnownVulnerabilities": 0
+  },
+  "sourceSha256": {
+    "access-gate.mjs": "7fbf880ff3ddd38925aa68dcc0129e0519d8d70ee4b6a444e0a3c1283722a726",
+    "access-gate.test.mjs": "4133a736b6f1076fbd9cc9f174aa6c5c298afb6e468851f2ff3d5015203dadab",
+    "access-lifecycle.test.mjs": "96a0fa23b56906c4430a9d609313b2e63afdfee47570d945c8061d52eebb8ff1",
+    "package.json": "c82329896f6ce0122120d372d87da37320dacd5a14f6c7265d5decb106ac37ef",
+    "package-lock.json": "d1fa060c186ae01e03d75d761e3f42d5e3fba076545165fe99f6385416dc7c1a"
+  },
+  "neededConfiguration": [
+    "team domain",
+    "admin application AUD",
+    "protected hostname/path entries including admin API",
+    "staging origin and synthetic identity policy"
+  ]
+}

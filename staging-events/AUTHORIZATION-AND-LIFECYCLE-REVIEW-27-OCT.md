@@ -1,3 +1,5 @@
+Owner clarification after this review: admin sign-in is protected by Cloudflare Zero Trust Access. The [Cloudflare signature gate candidate](cloudflare-access/README.md) is now the preferred route; the Supabase gate below is an offline alternative, not a second required login. Actual application AUD/team and API path coverage remain unverified.
+
 # Authorization and lifecycle integration review — 27 October 2026
 
 This review identifies the remaining trust boundaries and supplies an offline, default-off **staging admin authorization gate**. No production code, database policy, order, route, deployment or notification was changed. No customer rows or customer links were accessed. Existing read-only saved-state monitoring does not require this gate to keep running; authoritative actor-labelled event capture is a separate integration step.

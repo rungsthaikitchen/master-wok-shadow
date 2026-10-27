@@ -1,3 +1,5 @@
+Latest clarification: [Cloudflare Access signature gate](cloudflare-access/README.md) matches the owner-confirmed admin sign-in boundary. Offline/default-off; awaiting non-secret team/AUD/API coverage configuration.
+
 Latest review: [authorization and lifecycle boundaries](AUTHORIZATION-AND-LIFECYCLE-REVIEW-27-OCT.md). Offline candidate only; do not deploy the admin guard by itself.
 
 Latest result: [complete checkout hosted rehearsal](CHECKOUT-FULL-HOSTED-REHEARSAL.md) passed on 27 October; trial disabled and temporary access revoked. See checkout-full-hosted-results-27-oct.json for evidence and limits.

@@ -1,0 +1,7 @@
+{
+  "enabled": false,
+  "project": "hvrqgufqjslvgiohgkvu",
+  "teamDomain": "REPLACE_WITH_HTTPS_ACCESS_TEAM_DOMAIN",
+  "audience": "REPLACE_WITH_ACCESS_APPLICATION_AUD",
+  "requestOrigin": "REPLACE_WITH_STAGING_ADMIN_HTTPS_ORIGIN"
+}
