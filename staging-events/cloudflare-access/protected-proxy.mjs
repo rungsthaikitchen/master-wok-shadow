@@ -4,7 +4,7 @@ import {createAccessAdminGate} from './access-gate.mjs';
 const json=(status,error)=>new Response(JSON.stringify({error}),{status,headers:{'Content-Type':'application/json','Cache-Control':'no-store'}});
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 class Refusal extends Error{constructor(code,status){super(code);this.status=status;}}
-async function readBounded(body,maximum){
+export async function readBounded(body,maximum){
  if(!body)return '';
  const reader=body.getReader(),chunks=[];let length=0;
  try{

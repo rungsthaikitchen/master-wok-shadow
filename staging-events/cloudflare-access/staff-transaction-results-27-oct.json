@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-27",
+  "status": "LOCAL_VERIFIED_STAFF_TRANSACTION_PASSED",
+  "deployments": 0,
+  "productionRequests": 0,
+  "productionWrites": 0,
+  "notifications": 0,
+  "hostedStagingVerified": false,
+  "multiConnectionConcurrencyVerified": false,
+  "tests": {
+    "Europe/London": {
+      "passed": 52,
+      "failed": 0
+    },
+    "UTC": {
+      "passed": 52,
+      "failed": 0
+    }
+  },
+  "runtime": {
+    "status": "PASSED",
+    "scope": "LOCAL_WORKERD_SIGNED_STAFF_TRANSACTION",
+    "cases": 9,
+    "keyRequests": 1,
+    "syntheticServiceRequests": 6,
+    "transactionAttempts": 6,
+    "staffAuditRows": 3,
+    "finalEventCount": 5,
+    "finalReservations": 0,
+    "productionRequests": 0,
+    "notifications": 0,
+    "hostedStagingVerified": false,
+    "multiConnectionConcurrencyVerified": false
+  },
+  "sourceSha256": {
+    "staff-command-candidate.sql": "7fc1e9398155996d8e1679aef26d474a221f74f42091b0ea3b612282e027a7f2",
+    "cloudflare-access/versioned-staff-command.mjs": "075d7da8e7da87435a46bfc4c8a99c0e88b6bf3b598586464be27f8f8b76019c",
+    "cloudflare-access/versioned-staff-command.test.mjs": "109ffe8922840461168695cb3a4aefdb00402a71d42a52258f34dcc5344bd0b1",
+    "cloudflare-access/staff-command-outbox.mjs": "9634d21efd0eb8f44f57ba1f3cfb8ed03d08766818d7100bad28eab41d4adece",
+    "cloudflare-access/staff-command-outbox.test.mjs": "7585bc0fbc619c91023b764888777472e522da0d52c4bd2feec02cd237904e3b",
+    "cloudflare-access/runtime-staff-transaction.cjs": "ef7285196a980f5967ce0537941fc5a142a1be9e37eda34a9bb6cf304989ff8c",
+    "cloudflare-access/protected-proxy.mjs": "efe864117afd240f1f5d1f9714a03267127d8882434bfcfc30fc301baac234b9"
+  },
+  "coverage": [
+    "real synthetic Access RS256 verification and HMAC service-envelope verification across Workers/Node",
+    "stable per-intent command IDs persisted before send and resumed by a new client store instance",
+    "lost-success retry with refreshed envelope returns ALREADY_RECORDED",
+    "changed command or authenticated actor reusing ID refused",
+    "order-event revision checked under stream lock; stale offers/customer responses refused",
+    "proposal replaces one hold immediately; acceptance does not add a second hold",
+    "customer rejection/cancellation releases hold",
+    "audit insertion failure rolls back booking, event, dedupe record and reservation",
+    "public/application roles have no new table or function grants"
+  ],
+  "limits": [
+    "Private synthetic schema, fixed route generation zero, collection fixtures only.",
+    "No hosted endpoint or production admin UI changed.",
+    "PGlite uses one connection; Promise.all is not separate-session concurrency proof.",
+    "Event revision is the latest event sequence for this order in the current stream, not a time or capacity estimate.",
+    "Stable actor pseudonym requires a retained HMAC key; key rotation/expiry and cross-cutover retry migration remain unimplemented.",
+    "Client storage tests simulate reload; real browser/multiple-tab conflict UI still needs integration.",
+    "Actor audit is linked to immutable event by foreign key; existing event JSON/export format is unchanged."
+  ]
+}
