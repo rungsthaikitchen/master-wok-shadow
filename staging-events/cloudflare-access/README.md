@@ -1,3 +1,5 @@
+Latest: [protected HTTP proxy adapter review](PROXY-REVIEW-27-OCT.md), 22 combined test entries per timezone. Offline/default-off; hosted integration still needs actual team/AUD/API coverage.
+
 # Cloudflare Access admin gate — offline review candidate
 
 The owner confirmed that the admin site already uses Cloudflare Zero Trust Access. Reuse that sign-in boundary. The earlier Supabase Auth gate is an alternative contract, not a proposed second login. This package has no production imports, deployed route, account configuration or database changes.
@@ -45,6 +47,6 @@ The existing root dependency tree and deployed runtime dependency files are unch
 
 ## Next change
 
-Once the actual team/AUD and API coverage are known, prepare a staging-only Pages proxy wrapper around this gate, preserving existing action payloads and service-secret forwarding. Rehearse with a synthetic Access identity and bounded non-customer command destination. Review that concrete diff before any live route activation. The earlier public Supabase customer/order policy exposure remains a separate hardening task; protecting an admin website does not narrow direct Data API permissions.
+The offline HTTP wrapper is now prepared. Once the actual team/AUD and API coverage are known, bind it to a staging-only fixed Pages transport preserving existing action payloads and service-secret forwarding. Rehearse with a synthetic Access identity and bounded non-customer command destination. Review that concrete diff before any live route activation. The earlier public Supabase customer/order policy exposure remains a separate hardening task; protecting an admin website does not narrow direct Data API permissions.
 
 References: [Cloudflare origin JWT validation](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/) and [application token claims](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/application-token/).

@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-27",
+  "status": "OFFLINE_PROTECTED_PROXY_TESTS_PASSED",
+  "verified": false,
+  "deployments": 0,
+  "productionWrites": 0,
+  "liveAdminPostRequests": 0,
+  "publicReadChecks": [
+    {
+      "path": "/admin.html",
+      "status": 403,
+      "server": "envoy",
+      "usableAccessRedirect": false
+    },
+    {
+      "path": "/admin-api/order-action",
+      "status": 403,
+      "server": "envoy",
+      "usableAccessRedirect": false
+    }
+  ],
+  "accessPolicyCoverageVerified": false,
+  "tests": {
+    "Europe/London": {
+      "entries": 22,
+      "passed": 22
+    },
+    "UTC": {
+      "entries": 22,
+      "passed": 22
+    }
+  },
+  "sourceSha256": {
+    "protected-proxy.mjs": "efe70ee22445277ae918a8c99b24ff23418948573e6c8082ed614426617bc855",
+    "protected-proxy.test.mjs": "1d6ce675ff5e9782503a9670046c075d7c99651e08a357707ae9d6e83e438b85"
+  },
+  "blockers": [
+    "actual team domain",
+    "intended application AUD",
+    "protected hostname/path entries",
+    "staging origin/synthetic identity and fixed transport"
+  ]
+}

@@ -1,3 +1,5 @@
+Latest: [Cloudflare-protected HTTP adapter](cloudflare-access/PROXY-REVIEW-27-OCT.md), tested offline and disabled by default. Actual Access settings remain the hosted integration blocker.
+
 Latest clarification: [Cloudflare Access signature gate](cloudflare-access/README.md) matches the owner-confirmed admin sign-in boundary. Offline/default-off; awaiting non-secret team/AUD/API coverage configuration.
 
 Latest review: [authorization and lifecycle boundaries](AUTHORIZATION-AND-LIFECYCLE-REVIEW-27-OCT.md). Offline candidate only; do not deploy the admin guard by itself.
