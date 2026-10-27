@@ -1,3 +1,5 @@
+Latest result: the owner browser returned REFUSED. Diagnostic-only website update `97b5721b8bb97e03b6bbc2a99cf0101d49898f06` deployed successfully at 06:26:07 UTC. It adds only static reasonCode categories, with no token/claim values or raw error text. Signature/issuer/audience/required-claim/time/human checks and original expiry remain unchanged. All 33 tests pass per timezone, including privacy checks for diagnostic failures. The root cause is still unknown until the owner refreshes and returns the safe code; no authenticated success is claimed.
+
 # Bounded read-only Access identity check — 27 October 2026
 
 An isolated new Pages function is deployed at `/admin-api/access-check` in website commit `3a16e1bb464cc0f4dc1d4206e82783063ec55dfa`. Cloudflare Pages reported **success** at 06:18:08 UTC. The existing website, admin-action proxy, checkout, backend and notification files were not modified. No Supabase data/policy writes or observer flag changes were made.

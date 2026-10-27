@@ -1,6 +1,6 @@
 {
   "date": "2026-10-27",
-  "status": "DEPLOYED_READ_ONLY_PROBE_AWAITING_OWNER_BROWSER",
+  "status": "DIAGNOSTIC_PROBE_DEPLOYED_AWAITING_SAFE_REASON_CODE",
   "actualAccessLoginVerified": false,
   "websiteCommit": "3a16e1bb464cc0f4dc1d4206e82783063ec55dfa",
   "firstAttemptCommit": "546cdc37408006406eb8d5513224b381793034d0",
@@ -8,7 +8,7 @@
   "deployment": "Cloudflare Pages SUCCESS",
   "completedAt": "2026-10-27T06:18:08Z",
   "expiry": "2026-10-27T08:10:45.000Z",
-  "bundleSha256": "98b3151adf2a651f5ff38fd87b4ab25f5f731c2da1635ee28de01d2a2c7b2485",
+  "bundleSha256": "69d772e456b6c60b996d1090ea5207f18240f4a7997bd2151b4f50a7c9f4e02d",
   "productionBookingOrDatabaseWrites": 0,
   "observerFlagChanges": 0,
   "websitePathsChanged": [
@@ -16,12 +16,12 @@
   ],
   "tests": {
     "Europe/London": {
-      "entries": 30,
-      "passed": 30
+      "entries": 33,
+      "passed": 33
     },
     "UTC": {
-      "entries": 30,
-      "passed": 30
+      "entries": 33,
+      "passed": 33
     }
   },
   "pagesTooling": {
@@ -39,5 +39,15 @@
     "no real Access identity or browser session was read",
     "synthetic signatures and local SQL are not an actual Access login",
     "full live actor/capture integration and order-confirm source remain unresolved"
-  ]
+  ],
+  "ownerObservedResult": {
+    "status": "REFUSED",
+    "scope": "ACCESS_READ_ONLY_PROBE",
+    "bookingRequests": 0,
+    "databaseRequests": 0,
+    "notifications": 0
+  },
+  "diagnosticWebsiteCommit": "97b5721b8bb97e03b6bbc2a99cf0101d49898f06",
+  "diagnosticDeploymentCompletedAt": "2026-10-27T06:26:07Z",
+  "diagnostics": "static failure categories only; unchanged verification rules and expiry"
 }
