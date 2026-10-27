@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-27",
+  "status": "LOCAL_STAGING_SERVICE_HOP_REHEARSAL_PASSED",
+  "hostedStagingVerified": false,
+  "deployments": 0,
+  "productionRequests": 0,
+  "databaseRequests": 0,
+  "notifications": 0,
+  "tests": {
+    "Europe/London": {
+      "passed": 41,
+      "failed": 0
+    },
+    "UTC": {
+      "passed": 41,
+      "failed": 0
+    }
+  },
+  "runtime": {
+    "status": "PASSED",
+    "scope": "SYNTHETIC_LOCAL_WORKERD_SERVICE_HOP",
+    "cases": 13,
+    "keyRequests": 1,
+    "syntheticActionRequests": 11,
+    "productionRequests": 0,
+    "databaseRequests": 0,
+    "notifications": 0,
+    "idempotency": "FORWARDING_ONLY_NOT_TRANSACTION_VERIFICATION",
+    "hostedStagingVerified": false
+  },
+  "runtimeTooling": {
+    "miniflare": "5.20261023.0-beta",
+    "compatibilityDate": "2026-10-27"
+  },
+  "fix": "Native Workers fetch must be called without configuration-object receiver; standalone transport invocation now regression tested.",
+  "sourceSha256": {
+    "staging-pages-action.mjs": "fc7ce6c5bd6e161685d691c2d0f4be01942cd68647bef57729eb3294131093de",
+    "staging-pages-action.test.mjs": "444775da86e2eb1921463af51cda1a412bc24be4478525309bfdf74092f5f001",
+    "runtime-staging-rehearsal.cjs": "c35785d7c195f6225e0efb79ec12be114ce11ca9d0092c70dd1ec7496b4c7e98",
+    "access-gate.mjs": "3755cf08e8d160025755e0b93c3189b4c07078d4aee601871d83f99a1f11f34d",
+    "access-gate.test.mjs": "4ef18ad23214f53857566c6cc4267155d8308f84b9b0626d9777ad484a0d3146"
+  },
+  "limits": [
+    "All outgoing runtime requests intercepted locally; no deployed Pages/Access/Railway/Edge integration tested.",
+    "Legacy UI payload has no stable command ID or offer revision; proxy passes duplicates unchanged and does not retry.",
+    "Service hop intentionally omits private Access actor; durable trusted actor attestation remains unimplemented.",
+    "Synthetic fixture accepts mark_paid as a payload; legacy live mark_paid behaviour is not repaired or endorsed.",
+    "No live reservation or event-capture changes activated."
+  ]
+}

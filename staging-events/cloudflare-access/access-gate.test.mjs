@@ -64,3 +64,5 @@ test('expiry is rechecked after a delayed key lookup; no mutation callback on ex
 test('authorization does not report success when the protected command refuses',async()=>{
  const s=setup({onAuthorized:async()=>{throw Error('COMMAND_REVISION_REFUSED');}});await assert.rejects(s.gate(req(await sign())),/COMMAND_REVISION_REFUSED/);
 });
+
+test('key transport is called without a configuration-object receiver (Workers fetch compatibility)',async()=>{const s=setup({fetcher:async function(){assert.equal(this,undefined);return new Response(JSON.stringify({keys:[jwk]}));}});assert.equal((await s.gate(req(await sign()))).status,'CALLBACK_REACHED');});
