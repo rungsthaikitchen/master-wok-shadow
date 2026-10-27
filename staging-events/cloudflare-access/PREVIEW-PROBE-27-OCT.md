@@ -17,8 +17,18 @@ automatic expiry is the backstop, not a claim that the deployed file is removed.
 Validation: all 68 Node tests passed in both Europe/London and UTC, including
 the exact standalone bundle, missing assertion, wrong host, POST, valid synthetic
 signature and expiry. The workerd smoke passed with one locally intercepted key
-request and zero booking/database/notification requests. Real hosted Access
-assertion verification remains pending the owner's signed-in browser test.
+request and zero booking/database/notification requests.
+
+Owner-reported hosted result on 27 October: `VERIFIED`, scope
+`ACCESS_READ_ONLY_PROBE`, bookingRequests 0, databaseRequests 0, notifications 0.
+This verifies the real preview authentication boundary only; it does not verify
+the staging database adapter, booking lifecycle or scheduling accuracy.
+
+Probe deployment commit: `774c2419d2726b276d8301a62db580b35576ef41`.
+Cleanup commit: `505f794671cd4dbf06d91a4dd19e595499b50218`, restoring exact
+default-disabled preview tree `f0d569cc53e4d637dac94d5b9abcfa10ec966de0`.
+Earlier hashed preview deployments can retain the expiring probe until its
+embedded deadline; cleanup of the branch alias does not delete deployment history.
 
 Owner test: visit the exact preview origin plus `/admin-api/access-check` after
 Cloudflare login. Expected response is `VERIFIED`, scope
