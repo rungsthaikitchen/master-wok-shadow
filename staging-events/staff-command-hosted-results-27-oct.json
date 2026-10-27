@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-27",
+  "status": "HOSTED_SYNTHETIC_STAFF_TRANSACTION_PASSED_AND_DISABLED",
+  "sourceCommit": "f94d473909cf89b64f6f525b9014a4484f9a084e",
+  "projectId": "hvrqgufqjslvgiohgkvu",
+  "postgres": "17.11",
+  "deployments": {
+    "disabled": "0eb0fe1d-fb8f-4bd1-bf2f-dfa5e6945508",
+    "enabled": "e411e17e-cfb0-4ba9-b101-fbfdd2c2a5e2",
+    "cleanup": "b908c8c9-3752-45ad-bd64-751556924148"
+  },
+  "runtime": {
+    "attempts": {
+      "probe": 4,
+      "read": 22,
+      "started": 1,
+      "write": 13
+    },
+    "cloudflareBoundary": "LOCAL_SYNTHETIC_SIGNATURES",
+    "evidence": [
+      {
+        "auditRows": 1,
+        "case": "same-id",
+        "eventCount": 3,
+        "outcome": {
+          "revision": 3,
+          "status": "ALREADY_RECORDED"
+        },
+        "uncommittedEventAndAuditInvisible": true,
+        "waiterBlocked": true,
+        "waiterPid": 1298230,
+        "writerPid": 1298229
+      },
+      {
+        "auditRows": 1,
+        "case": "competing",
+        "eventCount": 3,
+        "outcome": {
+          "status": "STAFF_REVISION_CONFLICT"
+        },
+        "uncommittedEventAndAuditInvisible": true,
+        "waiterBlocked": true,
+        "waiterPid": 1298232,
+        "writerPid": 1298231
+      },
+      {
+        "auditRows": 1,
+        "case": "rollback",
+        "eventCount": 3,
+        "outcome": {
+          "revision": 3,
+          "status": "RECORDED"
+        },
+        "uncommittedEventAndAuditInvisible": true,
+        "waiterBlocked": true,
+        "waiterPid": 1298234,
+        "writerPid": 1298233
+      },
+      {
+        "auditRows": 1,
+        "case": "timeout",
+        "eventCount": 3,
+        "retryIdempotent": true,
+        "sqlstate": "55P03"
+      },
+      {
+        "auditRows": 0,
+        "case": "audit",
+        "eventAndAuditAndHoldUnchanged": true,
+        "eventCount": 2,
+        "sqlstate": "42501"
+      }
+    ],
+    "http": {
+      "httpRequests": 3,
+      "invalidIdentityBlocked": true,
+      "lostSuccessRetried": true,
+      "status": "PASSED"
+    },
+    "notifications": 0,
+    "productionWrites": 0,
+    "scope": "SYNTHETIC_STAFF_COMMANDS",
+    "status": "OBSERVED",
+    "verified": false
+  },
+  "counts": {
+    "events": 18,
+    "staffAuditRows": 6,
+    "remainingHoldsOnDisabledStreams": 5,
+    "orphanAuditRows": 0
+  },
+  "cleanup": {
+    "enabledStreams": 0,
+    "appStaffExecute": false,
+    "runtimeSessions": 0,
+    "writerRouteRead": false,
+    "readerAuditAccess": false,
+    "writerAuditAccess": false,
+    "writerStaffExecute": false,
+    "writerRoutedExecute": false,
+    "activeSyntheticHolds": 0
+  },
+  "tests": {
+    "EuropeLondon": {
+      "nodePassed": 55,
+      "pythonPassed": 6
+    },
+    "UTC": {
+      "nodePassed": 55,
+      "pythonPassed": 6
+    }
+  },
+  "replay": {
+    "suggestedDecisions": 11,
+    "persistedObservations": 11,
+    "restartDuplicateObservations": 0,
+    "verified": false
+  },
+  "productionWrites": 0,
+  "notifications": 0,
+  "additionalInfrastructureCreated": false,
+  "advisors": {
+    "newFindings": 0,
+    "preExistingInfo": 2
+  },
+  "limits": [
+    "Synthetic fixtures and private schema only; no live scheduling or production Supabase changes.",
+    "Hosted SQL used genuine separate writer connections at READ COMMITTED.",
+    "Signed HTTP/Access identities were local synthetic fixtures, not a hosted Pages/Cloudflare integration.",
+    "Client reload simulated by reinstantiating storage adapter; no real browser integration.",
+    "Staff route generation zero and collection fixtures only.",
+    "Audit-aware export, actor-key lifecycle, complete lifecycle writer coverage and continuous capture integration remain open.",
+    "Existing infrastructure reused; incremental resource billing not measured."
+  ]
+}

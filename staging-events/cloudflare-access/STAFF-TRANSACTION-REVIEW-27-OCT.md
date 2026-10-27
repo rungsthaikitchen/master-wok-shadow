@@ -1,3 +1,5 @@
+Update: the subsequent hosted synthetic staging trial passed and was disabled; see ../STAFF-COMMAND-HOSTED-REHEARSAL-27-OCT.md. The local evidence below remains scoped to its original test stage.
+
 # Verified staff transaction candidate — 27 October 2026
 
 This separate versioned staging contract now connects a cryptographically verified synthetic Cloudflare staff identity through a signed service envelope to the existing booking/reservation/event transaction. No live UI, API, hosted database, availability or notification provider was changed. Defaults remain disabled and only synthetic signing-key configuration is accepted.
