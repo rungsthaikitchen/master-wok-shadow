@@ -1,0 +1,24 @@
+-- Hosted administrator second-line failure test. All changes rolled back.
+-- Runtime role tested separately by the bounded Railway trial.
+BEGIN;
+UPDATE master_wok_event_test.streams SET enabled=true WHERE id='b7586c17-edaf-5a89-8252-d3f7aed57ca0';
+INSERT INTO master_wok_event_test.full_checkout_quotes(id,route_id,payload,expires_at) VALUES('b11accd9-a3a0-551f-af55-ae20dd155ee2','122fbd93-c3d2-5726-8dc7-81e3afbe879f','{"source": {"websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0", "page": "index.html"}, "orderAlias": "synthetic-full-same-request", "privateWrite": {"order": {"customer_id": "2c522071-0c1b-5431-8d00-8e6a577b4b66", "subtotal": 24, "discount": 4, "discount_label": "Discount code SYNTHETIC", "discount_code": "SYNTHETIC", "discount_amount": 1, "delivery_fee": 0, "delivery_straight_line_miles": null, "delivery_route_miles": null, "delivery_distance_source": null, "total": 20, "loyalty_discount": 3, "loyalty_points_redeem_pending": 30, "loyalty_points_earned_pending": 20, "loyalty_reward_applied": true, "loyalty_expected_balance": 100, "loyalty_settled": false, "order_type": "collection", "notes": "SYNTHETIC-PRIVATE-NOTE", "order_ref": "SYNTHETIC-PRIVATE-REF", "payment_preference": "cash", "preferred_time": "2026-10-28T18:30:00Z", "asap_requested": false, "communication_preference": "sms", "idempotency_key": "f3ee4d5b-312b-5e45-b183-78a1f290ec08"}, "items": [{"order_id": "35429214-780d-567a-8700-6b4bedb5799e", "item_id": "green-curry", "name": "SYNTHETIC-PRIVATE-DISPLAY", "unit_price": 12, "qty": 2, "modifiers": [{"id": "chicken", "name": "SYNTHETIC-PRIVATE-MOD", "delta": 0.001}], "spice": 2, "img": "/synthetic-private.png", "kitchen_load": 1}, {"order_id": "35429214-780d-567a-8700-6b4bedb5799e", "item_id": "sticky-rice", "name": "SYNTHETIC-PRIVATE-DISPLAY", "unit_price": 12, "qty": 0, "modifiers": [{"id": "chicken", "name": "SYNTHETIC-PRIVATE-MOD", "delta": 0.001}], "spice": 2, "img": "/synthetic-private.png", "kitchen_load": 1, "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"}]}}'::jsonb,clock_timestamp()+interval '5 minutes');
+DO $test$ BEGIN
+ BEGIN
+  PERFORM master_wok_event_test.submit_full_checkout('122fbd93-c3d2-5726-8dc7-81e3afbe879f','f3ee4d5b-312b-5e45-b183-78a1f290ec08','35429214-780d-567a-8700-6b4bedb5799e','b11accd9-a3a0-551f-af55-ae20dd155ee2','{"source": {"websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0", "page": "index.html"}, "orderAlias": "synthetic-full-same-request", "privateWrite": {"order": {"customer_id": "2c522071-0c1b-5431-8d00-8e6a577b4b66", "subtotal": 24, "discount": 4, "discount_label": "Discount code SYNTHETIC", "discount_code": "SYNTHETIC", "discount_amount": 1, "delivery_fee": 0, "delivery_straight_line_miles": null, "delivery_route_miles": null, "delivery_distance_source": null, "total": 20, "loyalty_discount": 3, "loyalty_points_redeem_pending": 30, "loyalty_points_earned_pending": 20, "loyalty_reward_applied": true, "loyalty_expected_balance": 100, "loyalty_settled": false, "order_type": "collection", "notes": "SYNTHETIC-PRIVATE-NOTE", "order_ref": "SYNTHETIC-PRIVATE-REF", "payment_preference": "cash", "preferred_time": "2026-10-28T18:30:00Z", "asap_requested": false, "communication_preference": "sms", "idempotency_key": "f3ee4d5b-312b-5e45-b183-78a1f290ec08"}, "items": [{"order_id": "35429214-780d-567a-8700-6b4bedb5799e", "item_id": "green-curry", "name": "SYNTHETIC-PRIVATE-DISPLAY", "unit_price": 12, "qty": 2, "modifiers": [{"id": "chicken", "name": "SYNTHETIC-PRIVATE-MOD", "delta": 0.001}], "spice": 2, "img": "/synthetic-private.png", "kitchen_load": 1}, {"order_id": "35429214-780d-567a-8700-6b4bedb5799e", "item_id": "sticky-rice", "name": "SYNTHETIC-PRIVATE-DISPLAY", "unit_price": 12, "qty": 0, "modifiers": [{"id": "chicken", "name": "SYNTHETIC-PRIVATE-MOD", "delta": 0.001}], "spice": 2, "img": "/synthetic-private.png", "kitchen_load": 1, "item_note": "SYNTHETIC-PRIVATE-ITEM-NOTE"}]}}'::jsonb);
+  RAISE EXCEPTION 'EXPECTED_SECOND_ITEM_FAILURE_MISSING';
+ EXCEPTION WHEN OTHERS THEN
+  IF SQLERRM<>'FULL_CHECKOUT_ITEM_REQUIRED' THEN RAISE; END IF;
+ END;
+END $test$;
+DO $assert$ BEGIN
+ IF EXISTS(SELECT FROM master_wok_event_test.full_checkout_submissions WHERE route_id='122fbd93-c3d2-5726-8dc7-81e3afbe879f') OR
+    EXISTS(SELECT FROM master_wok_event_test.full_checkout_orders WHERE route_id='122fbd93-c3d2-5726-8dc7-81e3afbe879f') OR
+    EXISTS(SELECT FROM master_wok_event_test.full_checkout_items WHERE route_id='122fbd93-c3d2-5726-8dc7-81e3afbe879f') OR
+    EXISTS(SELECT FROM master_wok_event_test.booking_rows WHERE stream_id='b7586c17-edaf-5a89-8252-d3f7aed57ca0') OR
+    EXISTS(SELECT FROM master_wok_event_test.reservations WHERE stream_id='b7586c17-edaf-5a89-8252-d3f7aed57ca0') OR
+    EXISTS(SELECT FROM master_wok_event_test.events WHERE stream_id='b7586c17-edaf-5a89-8252-d3f7aed57ca0') THEN
+  RAISE EXCEPTION 'FULL_CHECKOUT_HOSTED_PARTIAL_WRITE';
+ END IF;
+END $assert$;
+ROLLBACK;

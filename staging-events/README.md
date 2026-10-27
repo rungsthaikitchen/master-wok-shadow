@@ -1,3 +1,5 @@
+Latest result: [complete checkout hosted rehearsal](CHECKOUT-FULL-HOSTED-REHEARSAL.md) passed on 27 October; trial disabled and temporary access revoked. See checkout-full-hosted-results-27-oct.json for evidence and limits.
+
 Latest candidate: [full checkout atomic persistence](CHECKOUT-FULL-PERSISTENCE-REVIEW.md), tested locally and default-off; no hosted changes. See checkout-full-persistence-results.json for exact verification scope.
 
 # Private Postgres event-source rehearsal

@@ -1,0 +1,115 @@
+{
+  "date": "2026-10-27",
+  "status": "HOSTED_SYNTHETIC_REHEARSAL_PASSED",
+  "verified": false,
+  "prediction": "UNVERIFIED",
+  "runtimeCommit": "d75e5fd548ede8fcd0363fcd67e109bd5369fedd",
+  "stagingProject": "hvrqgufqjslvgiohgkvu",
+  "postgres": "17.11",
+  "deployments": {
+    "disabled": "4d819894-355c-4be6-b97b-44aa661fe42e",
+    "enabled": "beb326b6-90c9-4bdb-9d78-1950d18bb3cc",
+    "cleanup": "b298f742-5020-4f85-ab08-2e5bcf8d099c"
+  },
+  "outcome": {
+    "level": "info",
+    "attempts": {
+      "probe": 3,
+      "read": 13,
+      "started": 1,
+      "write": 13
+    },
+    "evidence": [
+      {
+        "case": "same-request",
+        "eventCount": 1,
+        "result": "ALREADY_RECORDED",
+        "uncommittedExportInvisible": true,
+        "waiterBlocked": true,
+        "waiterPid": 1291650,
+        "writerPid": 1291649
+      },
+      {
+        "case": "same-quote",
+        "eventCount": 1,
+        "result": "FULL_CHECKOUT_QUOTE_USED",
+        "uncommittedExportInvisible": true,
+        "waiterBlocked": true,
+        "waiterPid": 1291652,
+        "writerPid": 1291651
+      },
+      {
+        "case": "rollback",
+        "eventCount": 1,
+        "result": "RECORDED",
+        "uncommittedExportInvisible": true,
+        "waiterBlocked": true,
+        "waiterPid": 1291655,
+        "writerPid": 1291654
+      },
+      {
+        "case": "timeout",
+        "eventCount": 1,
+        "retry": "RECORDED_THEN_ALREADY_RECORDED",
+        "sqlstate": "55P03"
+      }
+    ],
+    "http": {
+      "httpCalls": 7,
+      "lostSuccessResponseRetried": true,
+      "status": "PASSED"
+    },
+    "notifications": 0,
+    "productionWrites": 0,
+    "replay": {
+      "actualDecisions": 0,
+      "events": 2,
+      "recoveryVerified": true
+    },
+    "scope": "SYNTHETIC_FULL_CHECKOUT",
+    "status": "OBSERVED",
+    "verified": false
+  },
+  "independentPrivateEqualityAudit": {
+    "expected_orders": 6,
+    "receipts": 6,
+    "private_orders": 6,
+    "complete_orders_match": true,
+    "complete_items_match": true,
+    "private_items": 12,
+    "engine_events": 6,
+    "holds": 6
+  },
+  "hostedMalformedSecondLineRollback": "PASSED_AS_ADMINISTRATOR",
+  "cleanup": {
+    "enabled_streams": 0,
+    "runtime_sessions": 0,
+    "route_read": false,
+    "quote_access": false,
+    "receipt_access": false,
+    "private_order_access": false,
+    "private_item_access": false,
+    "submit_access": false,
+    "validate_access": false,
+    "existing_create": true
+  },
+  "localTests": {
+    "PythonPerTimezone": 14,
+    "NodeEntriesPerTimezone": 26,
+    "timezones": [
+      "Europe/London",
+      "UTC"
+    ]
+  },
+  "productionWrites": 0,
+  "notifications": 0,
+  "limitations": [
+    "synthetic trusted fixture quote issuer only",
+    "private JSON snapshots rather than typed production schema replica",
+    "no public endpoint or live checkout wiring",
+    "ASAP/customer ownership/catalog authority unresolved",
+    "HTTP after-commit application failure is not a physical packet-loss test",
+    "READ COMMITTED only; no claim for other isolation levels",
+    "one-hop same-day route cutover only; no new full hosted cutover run"
+  ]
+}

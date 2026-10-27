@@ -1,0 +1,285 @@
+{
+  "http": {
+    "eventCount": 2,
+    "batch": {
+      "events": [
+        {
+          "at": "2026-10-27T05:27:48.428896Z",
+          "kind": "RESERVATION_SET",
+          "order": {
+            "lines": [
+              {
+                "qty": 2,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              },
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "sticky-rice"
+              }
+            ],
+            "orderId": "synthetic-full-http",
+            "targetAt": "2026-10-28T18:30:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "full-45d43beda7e98db48ffccd9f36060b773fdbe9b5170a745a33fee6b792682976",
+          "sequence": 1,
+          "commitment": "PROPOSED"
+        },
+        {
+          "at": "2026-10-27T05:27:51.847231Z",
+          "kind": "RESERVATION_SET",
+          "order": {
+            "lines": [
+              {
+                "qty": 2,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              },
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "sticky-rice"
+              }
+            ],
+            "orderId": "synthetic-full-http-delivery",
+            "targetAt": "2026-10-28T18:30:00.000000Z",
+            "orderType": "delivery",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "full-cfbab71dae28ffd8587d24513220fe663c9887e5fdbcbdefb7e74a4204697bf2",
+          "sequence": 2,
+          "commitment": "PROPOSED"
+        }
+      ],
+      "coverage": {
+        "basis": "DECISION_EVENT_LOG",
+        "complete": true,
+        "throughAt": "2026-10-27T05:27:51.847231Z",
+        "eventCount": 2,
+        "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+        "lastSequence": 2,
+        "firstSequence": 1
+      },
+      "serviceDate": "2026-10-28"
+    }
+  },
+  "rollback": {
+    "eventCount": 1,
+    "batch": {
+      "events": [
+        {
+          "at": "2026-10-27T05:27:40.647946Z",
+          "kind": "RESERVATION_SET",
+          "order": {
+            "lines": [
+              {
+                "qty": 2,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              },
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "sticky-rice"
+              }
+            ],
+            "orderId": "synthetic-full-rollback",
+            "targetAt": "2026-10-28T18:30:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "full-e2d53266fc53e6d3a117f66bb2d5208b7fb994b8262e33346ac0f67d8db5b3d0",
+          "sequence": 1,
+          "commitment": "PROPOSED"
+        }
+      ],
+      "coverage": {
+        "basis": "DECISION_EVENT_LOG",
+        "complete": true,
+        "throughAt": "2026-10-27T05:27:40.647946Z",
+        "eventCount": 1,
+        "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+        "lastSequence": 1,
+        "firstSequence": 1
+      },
+      "serviceDate": "2026-10-28"
+    }
+  },
+  "same-quote": {
+    "eventCount": 1,
+    "batch": {
+      "events": [
+        {
+          "at": "2026-10-27T05:27:35.611176Z",
+          "kind": "RESERVATION_SET",
+          "order": {
+            "lines": [
+              {
+                "qty": 2,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              },
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "sticky-rice"
+              }
+            ],
+            "orderId": "synthetic-full-same-quote",
+            "targetAt": "2026-10-28T18:30:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "full-7f1b028d60b91d834b756687978ac1ec3e6f14dd4369725fe73670131840e723",
+          "sequence": 1,
+          "commitment": "PROPOSED"
+        }
+      ],
+      "coverage": {
+        "basis": "DECISION_EVENT_LOG",
+        "complete": true,
+        "throughAt": "2026-10-27T05:27:35.611176Z",
+        "eventCount": 1,
+        "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+        "lastSequence": 1,
+        "firstSequence": 1
+      },
+      "serviceDate": "2026-10-28"
+    }
+  },
+  "same-request": {
+    "eventCount": 1,
+    "batch": {
+      "events": [
+        {
+          "at": "2026-10-27T05:27:30.459161Z",
+          "kind": "RESERVATION_SET",
+          "order": {
+            "lines": [
+              {
+                "qty": 2,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              },
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "sticky-rice"
+              }
+            ],
+            "orderId": "synthetic-full-same-request",
+            "targetAt": "2026-10-28T18:30:00.000000Z",
+            "orderType": "collection",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "full-6fa7d463d40e53f43d663f3e4111ecdbc55621617c63ef8c8176fed04ae89e9b",
+          "sequence": 1,
+          "commitment": "PROPOSED"
+        }
+      ],
+      "coverage": {
+        "basis": "DECISION_EVENT_LOG",
+        "complete": true,
+        "throughAt": "2026-10-27T05:27:30.459161Z",
+        "eventCount": 1,
+        "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+        "lastSequence": 1,
+        "firstSequence": 1
+      },
+      "serviceDate": "2026-10-28"
+    }
+  },
+  "timeout": {
+    "eventCount": 1,
+    "batch": {
+      "events": [
+        {
+          "at": "2026-10-27T05:27:46.211037Z",
+          "kind": "RESERVATION_SET",
+          "order": {
+            "lines": [
+              {
+                "qty": 2,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "green-curry"
+              },
+              {
+                "qty": 1,
+                "mods": [
+                  {
+                    "id": "chicken"
+                  }
+                ],
+                "itemId": "sticky-rice"
+              }
+            ],
+            "orderId": "synthetic-full-timeout",
+            "targetAt": "2026-10-28T18:30:00.000000Z",
+            "orderType": "delivery",
+            "deliveryReadyEstimate": null
+          },
+          "eventId": "full-3c161dec7f0307e46cb1109ca9aa6c4f40a5ee7ffe04ee8e48788d938adac45b",
+          "sequence": 1,
+          "commitment": "PROPOSED"
+        }
+      ],
+      "coverage": {
+        "basis": "DECISION_EVENT_LOG",
+        "complete": true,
+        "throughAt": "2026-10-27T05:27:46.211037Z",
+        "eventCount": 1,
+        "initialState": "NO_PRIOR_SERVICE_COMMITMENTS",
+        "lastSequence": 1,
+        "firstSequence": 1
+      },
+      "serviceDate": "2026-10-28"
+    }
+  }
+}
