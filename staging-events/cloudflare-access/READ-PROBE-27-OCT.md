@@ -1,4 +1,4 @@
-Latest result: the owner browser returned REFUSED. Diagnostic-only website update `97b5721b8bb97e03b6bbc2a99cf0101d49898f06` deployed successfully at 06:26:07 UTC. It adds only static reasonCode categories, with no token/claim values or raw error text. Signature/issuer/audience/required-claim/time/human checks and original expiry remain unchanged. All 33 tests pass per timezone, including privacy checks for diagnostic failures. The root cause is still unknown until the owner refreshes and returns the safe code; no authenticated success is claimed.
+Latest: Workers redirect incompatibility reproduced and fixed; Cloudflare Pages deployment succeeded at 06:34:47 UTC. All 34 tests pass in both timezones and the bundled synthetic workerd smoke passes. Actual owner Access login awaits refresh.
 
 # Bounded read-only Access identity check — 27 October 2026
 
@@ -34,3 +34,11 @@ Open the protected URL in the browser used for the admin portal, sign in through
 MISSING_OR_INVALID_ASSERTION, REFUSED, an HTML error or a redirect loop require investigation; do not relax signature/audience checks. EXPIRED requires a fresh reviewed bounded build, not a clock-tolerance bypass. The probe has no endpoint that can accept/cancel/schedule an order.
 
 After the check, remove only the added diagnostic function in a separate cleanup commit, preserving concurrent website edits. The automatic deadline protects the waiting interval but does not delete source. Until the owner returns a VERIFIED result, record the authenticated check as pending. The protected admin-action wrapper remains offline/default-off and the previous staging trial remains disabled.
+
+## Workers key-fetch correction (06:34 UTC)
+
+Owner browser returned KEY_FETCH_FAILED. A workerd reproduction established that Request rejects redirect:"error" with TypeError; this is a runtime option incompatibility. The probe now uses manual redirects and requires HTTP 200 before returning any key response. All 34 tests pass in both timezones, including 301/302/307/308 and non-200 refusals with one fetch only. The offline admin gate uses the same supported option; JOSE rejects non-200 responses there. No verification claims or expiry changed.
+
+The exact deployed probe bundle passed an additional Miniflare 5.20261023.0-beta/workerd smoke: a synthetic RSA token verified using one intercepted public-key request, with no booking/database/notification requests. This is local runtime evidence, not a real Access login. Run runtime-probe-smoke.cjs with MINIFLARE_MODULE pointing at that optional installed module. The smoke uses the current bounded artifact and must run before its expiry.
+
+Website correction commit: 6b9b3696e76d3c37f8cb6bfefd2f4b53dd83323a. Real owner recheck remains pending.

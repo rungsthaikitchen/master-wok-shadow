@@ -14,7 +14,7 @@ test('exact deployed bundle verifies identity, contains no booking transport, an
  let fetches=0;const originalFetch=globalThis.fetch,originalNow=Date.now;
  try{
   Date.now=()=>0;
-  globalThis.fetch=async(url,init)=>{fetches++;assert.equal(String(url),config.teamDomain+'/cdn-cgi/access/certs');assert.equal(init.method,'GET');assert.equal(init.redirect,'error');assert.equal(init.credentials,'omit');return new Response(JSON.stringify({keys:[key]}),{status:200});};
+  globalThis.fetch=async(url,init)=>{fetches++;assert.equal(String(url),config.teamDomain+'/cdn-cgi/access/certs');assert.equal(init.method,'GET');assert.equal(init.redirect,'manual');assert.equal(init.credentials,'omit');return new Response(JSON.stringify({keys:[key]}),{status:200});};
   const {onRequest}=await import(bundleFile);
   // Worker module validation may occur before a request clock exists.
   assert.equal(fetches,0);Date.now=()=>now*1000;

@@ -14,7 +14,7 @@ test('configuration requires pinned public team, AUD, HTTPS origin and deadline 
 });
 test('valid signature returns status only: no JWT, identity, email, audience or cookie disclosure',async()=>{
  const s=setup(),token=await sign(),r=await s.handler(req(token));assert.equal(r.status,200);const body=await r.text();assert.deepEqual(JSON.parse(body),{status:'VERIFIED',scope:'ACCESS_READ_ONLY_PROBE',bookingRequests:0,databaseRequests:0,notifications:0});
- for(const x of [token,'PRIVATE',aud,'synthetic-human',issuer])assert.equal(body.includes(x),false);assert.equal(r.headers.get('Set-Cookie'),null);assert.equal(r.headers.get('Cache-Control'),'private, no-store');assert.equal(s.seen.length,1);assert.equal(s.seen[0].init.redirect,'error');assert.equal(s.seen[0].init.credentials,'omit');
+ for(const x of [token,'PRIVATE',aud,'synthetic-human',issuer])assert.equal(body.includes(x),false);assert.equal(r.headers.get('Set-Cookie'),null);assert.equal(r.headers.get('Cache-Control'),'private, no-store');assert.equal(s.seen.length,1);assert.equal(s.seen[0].init.redirect,'manual');assert.equal(s.seen[0].init.credentials,'omit');
 });
 test('GET has no action/body path and wrong method/origin/query/cookie-only never fetch keys',async()=>{
  const s=setup(),token=await sign();for(const input of [req(token,{method:'POST'}),req(token,{url:'https://other.invalid/admin-api/access-check'}),req(token,{url:origin+'/admin-api/access-check?token=fake'}),req(null,{headers:{Cookie:'CF_Authorization='+token}})])assert.notEqual((await s.handler(input)).status,200);

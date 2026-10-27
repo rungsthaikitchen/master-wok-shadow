@@ -782,7 +782,7 @@ function createReadProbe(options = {}) {
   if (!Number.isFinite(initial) || endEpoch > initial + 7200) throw Error("ACCESS_PROBE_DEADLINE_REFUSED");
   const jwks = createRemoteJWKSet(new URL(issuer.origin + "/cdn-cgi/access/certs"), { timeoutDuration: 5e3, cooldownDuration: 3e4, cacheMaxAge: 3e5, [customFetch]: async (url, init) => {
     try {
-      const r = await fetcher(url, { ...init, redirect: "error", credentials: "omit" });
+      const r = await fetcher(url, { ...init, redirect: "manual", credentials: "omit" });
       if (r.status !== 200) throw Error();
       return r;
     } catch {

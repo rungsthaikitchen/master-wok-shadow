@@ -25,7 +25,7 @@ test('configuration pins staging, a team host, application AUD and browser origi
 test('real RS256 signature and team JWKS authorize only a minimal private actor context',async()=>{
  const s=setup(),token=await sign();assert.equal((await s.gate(req(token))).status,'CALLBACK_REACHED');
  assert.deepEqual(s.seen,[{subject:SUB,source:'VERIFIED_CLOUDFLARE_ACCESS',authorizedAt:1000}]);assert.ok(Object.isFrozen(s.seen[0]));assert.equal(JSON.stringify(s.seen).includes('PRIVATE'),false);
- assert.equal(s.fetches.length,1);assert.equal(s.fetches[0].init.redirect,'error');assert.equal(s.fetches[0].init.credentials,'omit');assert.ok(!JSON.stringify(s.fetches).includes(token));
+ assert.equal(s.fetches.length,1);assert.equal(s.fetches[0].init.redirect,'manual');assert.equal(s.fetches[0].init.credentials,'omit');assert.ok(!JSON.stringify(s.fetches).includes(token));
 });
 test('unsigned identity headers, cookies, shared secrets and plain bearer do not reach JWKS or handler',async()=>{
  const s=setup();for(const headers of [{},{'Cf-Access-Authenticated-User-Email':'owner@example.invalid'},{Cookie:'CF_Authorization=fake'},{Authorization:'Bearer fake'},{'x-admin-secret':'fake'},{'Cf-Access-Jwt-Assertion':'fake'},{'Cf-Access-Jwt-Assertion':'x'.repeat(8200)}])await assert.rejects(s.gate(req(null,{headers})),/^Error: CLOUDFLARE_ACCESS_REFUSED$/);

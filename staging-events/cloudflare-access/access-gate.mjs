@@ -20,7 +20,7 @@ export function createAccessAdminGate(options={}){
  // in an untrusted JWT. No redirect or browser credentials on key requests.
  const jwks=createRemoteJWKSet(new URL(c.issuer+'/cdn-cgi/access/certs'),{
   timeoutDuration:5000,cooldownDuration:30000,cacheMaxAge:300000,
-  [customFetch]:(url,init)=>c.fetcher(url,{...init,redirect:'error',credentials:'omit'})
+  [customFetch]:(url,init)=>c.fetcher(url,{...init,redirect:'manual',credentials:'omit'})
  });
  function now(){const n=c.clock();if(!Number.isFinite(n)||n<0)refuse();return n;}
  return async request=>{

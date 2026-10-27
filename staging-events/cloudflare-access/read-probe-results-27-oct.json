@@ -1,14 +1,13 @@
 {
   "date": "2026-10-27",
-  "status": "DIAGNOSTIC_PROBE_DEPLOYED_AWAITING_SAFE_REASON_CODE",
+  "status": "WORKERS_REDIRECT_FIXED_AWAITING_OWNER_RECHECK",
   "actualAccessLoginVerified": false,
-  "websiteCommit": "3a16e1bb464cc0f4dc1d4206e82783063ec55dfa",
+  "websiteCommit": "6b9b3696e76d3c37f8cb6bfefd2f4b53dd83323a",
   "firstAttemptCommit": "546cdc37408006406eb8d5513224b381793034d0",
   "firstAttemptDeployment": "FAILED",
   "deployment": "Cloudflare Pages SUCCESS",
-  "completedAt": "2026-10-27T06:18:08Z",
   "expiry": "2026-10-27T08:10:45.000Z",
-  "bundleSha256": "69d772e456b6c60b996d1090ea5207f18240f4a7997bd2151b4f50a7c9f4e02d",
+  "bundleSha256": "e5715a5831d96454076a26c568c525a20c07b6c2ffed0f2c0b792ec8a72f0bc5",
   "productionBookingOrDatabaseWrites": 0,
   "observerFlagChanges": 0,
   "websitePathsChanged": [
@@ -16,18 +15,18 @@
   ],
   "tests": {
     "Europe/London": {
-      "entries": 33,
-      "passed": 33
+      "entries": 34,
+      "passed": 34
     },
     "UTC": {
-      "entries": 33,
-      "passed": 33
+      "entries": 34,
+      "passed": 34
     }
   },
   "pagesTooling": {
     "wrangler": "4.153.0",
     "functionsBuild": "PASSED",
-    "localFullRuntimeSmoke": "NOT_COMPLETED"
+    "localFullRuntimeSmoke": "PASSED_SYNTHETIC_WORKERD"
   },
   "dependencies": {
     "jose": "6.2.13",
@@ -42,12 +41,14 @@
   ],
   "ownerObservedResult": {
     "status": "REFUSED",
-    "scope": "ACCESS_READ_ONLY_PROBE",
+    "reasonCode": "KEY_FETCH_FAILED",
     "bookingRequests": 0,
     "databaseRequests": 0,
     "notifications": 0
   },
   "diagnosticWebsiteCommit": "97b5721b8bb97e03b6bbc2a99cf0101d49898f06",
   "diagnosticDeploymentCompletedAt": "2026-10-27T06:26:07Z",
-  "diagnostics": "static failure categories only; unchanged verification rules and expiry"
+  "diagnostics": "static failure categories only; unchanged verification rules and expiry",
+  "rootCause": "WORKER_REQUEST_REJECTS_REDIRECT_ERROR",
+  "completedAt": "2026-10-27T06:34:47Z"
 }

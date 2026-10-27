@@ -27,7 +27,7 @@ export function createReadProbe(options={}){
  try{issuer=new URL(teamDomain);origin=new URL(requestOrigin);}catch{throw Error('ACCESS_PROBE_CONFIGURATION_REQUIRED');}
  if(typeof audience!=='string'||! /^[a-f0-9]{64}$/.test(audience)||issuer.protocol!=='https:'||! /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.cloudflareaccess\.com$/.test(issuer.hostname)||issuer.port||issuer.username||issuer.password||issuer.pathname!=='/'||issuer.search||issuer.hash||origin.protocol!=='https:'||origin.port||origin.username||origin.password||origin.pathname!=='/'||origin.search||origin.hash||typeof clock!=='function'||typeof fetcher!=='function'||!Number.isSafeInteger(endEpoch))throw Error('ACCESS_PROBE_CONFIGURATION_REQUIRED');
  const initial=clock();if(!Number.isFinite(initial)||endEpoch>initial+7200)throw Error('ACCESS_PROBE_DEADLINE_REFUSED');
- const jwks=createRemoteJWKSet(new URL(issuer.origin+'/cdn-cgi/access/certs'),{timeoutDuration:5000,cooldownDuration:30000,cacheMaxAge:300000,[customFetch]:async(url,init)=>{try{const r=await fetcher(url,{...init,redirect:'error',credentials:'omit'});if(r.status!==200)throw Error();return r;}catch{const e=Error('ACCESS_PROBE_KEY_FETCH_FAILED');e.code='ACCESS_PROBE_KEY_FETCH_FAILED';throw e;}}});
+ const jwks=createRemoteJWKSet(new URL(issuer.origin+'/cdn-cgi/access/certs'),{timeoutDuration:5000,cooldownDuration:30000,cacheMaxAge:300000,[customFetch]:async(url,init)=>{try{const r=await fetcher(url,{...init,redirect:'manual',credentials:'omit'});if(r.status!==200)throw Error();return r;}catch{const e=Error('ACCESS_PROBE_KEY_FETCH_FAILED');e.code='ACCESS_PROBE_KEY_FETCH_FAILED';throw e;}}});
  return async request=>{
   try{
    const at=clock();if(!Number.isFinite(at)||at>=endEpoch)return reply(410,'EXPIRED');

@@ -16,3 +16,5 @@ test('signed wrong issuer/application, expiry and human token failures stay refu
  for(const [change,code]of [[p=>p.iss='https://other.cloudflareaccess.com','ISSUER_MISMATCH'],[p=>p.aud=['b'.repeat(64)],'APPLICATION_AUD_MISMATCH'],[p=>p.exp=999,'TOKEN_EXPIRED'],[p=>p.type='org','APPLICATION_TOKEN_REQUIRED'],[p=>p.common_name='service.access','HUMAN_IDENTITY_REQUIRED']])assert.equal((await result(change)).reasonCode,code);
 });
 test('key retrieval errors return only a static diagnostic, never error text',async()=>{const r=await result(()=>{},{fetcher:async()=>{throw Error('PRIVATE API KEY');}});assert.equal(r.reasonCode,'KEY_FETCH_FAILED');});
+
+test('manual redirects and all non-200 key responses fail closed without a second fetch',async()=>{for(const status of [301,302,307,308,401,403,500]){let calls=0;const r=await result(()=>{},{fetcher:async(url,init)=>{calls++;assert.equal(init.redirect,'manual');return new Response(null,{status,headers:{Location:'https://untrusted.invalid/'}});}});assert.equal(r.reasonCode,'KEY_FETCH_FAILED');assert.equal(calls,1);}});
