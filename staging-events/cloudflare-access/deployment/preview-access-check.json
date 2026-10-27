@@ -1,0 +1,13 @@
+{
+  "scope": "ACCESS_READ_ONLY_PROBE",
+  "enabled": true,
+  "teamDomain": "https://rungsthaikitchen.cloudflareaccess.com",
+  "audience": "3b86da1957ccfaeb4cc0ac32d737d93841f97bb9919c34237dbb291a4f4ef8a2",
+  "requestOrigin": "https://preview-staff-browser-2026-1.rungsthaikitchen.pages.dev",
+  "endEpoch": 1793139804,
+  "expiresAt": "2026-10-27T22:23:24.000Z",
+  "sha256": "5bf4c3f608e976c7f314c45ba87de995698a7a61a6fdf013214712101c96667b",
+  "bookingRequests": 0,
+  "databaseRequests": 0,
+  "notifications": 0
+}
