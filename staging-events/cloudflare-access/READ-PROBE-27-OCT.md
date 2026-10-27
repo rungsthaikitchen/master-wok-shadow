@@ -1,4 +1,4 @@
-Latest: Workers redirect incompatibility reproduced and fixed; Cloudflare Pages deployment succeeded at 06:34:47 UTC. All 34 tests pass in both timezones and the bundled synthetic workerd smoke passes. Actual owner Access login awaits refresh.
+Latest: owner returned VERIFIED from the deployed read-only probe with all three side-effect counters zero. Cleanup commit 9e944039a7d1dca9d6a2e2f3995cac589c93ea27 removes only the diagnostic function and exactly restores the original website tree. Cloudflare Pages cleanup deployed successfully at 06:36:39 UTC.
 
 # Bounded read-only Access identity check — 27 October 2026
 
@@ -42,3 +42,9 @@ Owner browser returned KEY_FETCH_FAILED. A workerd reproduction established that
 The exact deployed probe bundle passed an additional Miniflare 5.20261023.0-beta/workerd smoke: a synthetic RSA token verified using one intercepted public-key request, with no booking/database/notification requests. This is local runtime evidence, not a real Access login. Run runtime-probe-smoke.cjs with MINIFLARE_MODULE pointing at that optional installed module. The smoke uses the current bounded artifact and must run before its expiry.
 
 Website correction commit: 6b9b3696e76d3c37f8cb6bfefd2f4b53dd83323a. Real owner recheck remains pending.
+
+## Owner verification and cleanup
+
+The owner supplied VERIFIED / ACCESS_READ_ONLY_PROBE with bookingRequests=0, databaseRequests=0 and notifications=0 on 27 October. This establishes successful real Access assertion verification on the bounded diagnostic path. No real token, identity claims or browser session was shared. It does not validate all other admin/customer endpoints or activate command/event capture.
+
+Cleanup commit 9e944039a7d1dca9d6a2e2f3995cac589c93ea27 deletes only functions/admin-api/access-check.js. The resulting website tree 01ed35203e53d903cab23a4c03d4fe44ebe55a22 exactly equals the pre-probe baseline tree. Existing production files are unchanged.

@@ -1,7 +1,7 @@
 {
   "date": "2026-10-27",
-  "status": "WORKERS_REDIRECT_FIXED_AWAITING_OWNER_RECHECK",
-  "actualAccessLoginVerified": false,
+  "status": "OWNER_ACCESS_VERIFIED_PROBE_REMOVED",
+  "actualAccessLoginVerified": true,
   "websiteCommit": "6b9b3696e76d3c37f8cb6bfefd2f4b53dd83323a",
   "firstAttemptCommit": "546cdc37408006406eb8d5513224b381793034d0",
   "firstAttemptDeployment": "FAILED",
@@ -34,14 +34,14 @@
     "knownVulnerabilities": 0
   },
   "limits": [
-    "read-only probe is live; protected admin action wrapper remains offline",
-    "no real Access identity or browser session was read",
-    "synthetic signatures and local SQL are not an actual Access login",
-    "full live actor/capture integration and order-confirm source remain unresolved"
+    "Owner verified only the exact diagnostic path and configured Access issuer/application; other endpoints are not proven protected.",
+    "No real token, identity claims or browser session was read by the agent.",
+    "Protected admin action wrapper remains offline/default-off.",
+    "Full live actor/capture integration and order-confirm source remain unresolved."
   ],
   "ownerObservedResult": {
-    "status": "REFUSED",
-    "reasonCode": "KEY_FETCH_FAILED",
+    "status": "VERIFIED",
+    "scope": "ACCESS_READ_ONLY_PROBE",
     "bookingRequests": 0,
     "databaseRequests": 0,
     "notifications": 0
@@ -50,5 +50,20 @@
   "diagnosticDeploymentCompletedAt": "2026-10-27T06:26:07Z",
   "diagnostics": "static failure categories only; unchanged verification rules and expiry",
   "rootCause": "WORKER_REQUEST_REJECTS_REDIRECT_ERROR",
-  "completedAt": "2026-10-27T06:34:47Z"
+  "completedAt": "2026-10-27T06:34:47Z",
+  "verificationEvidence": "Owner supplied browser JSON from the bounded deployed probe; no token, identity claims or session shared.",
+  "priorOwnerObservedResult": {
+    "status": "REFUSED",
+    "reasonCode": "KEY_FETCH_FAILED",
+    "bookingRequests": 0,
+    "databaseRequests": 0,
+    "notifications": 0
+  },
+  "cleanup": {
+    "websiteCommit": "9e944039a7d1dca9d6a2e2f3995cac589c93ea27",
+    "treeSha": "01ed35203e53d903cab23a4c03d4fe44ebe55a22",
+    "baselineTreeRestored": true,
+    "deployment": "Cloudflare Pages SUCCESS",
+    "completedAt": "2026-10-27T06:36:39Z"
+  }
 }
