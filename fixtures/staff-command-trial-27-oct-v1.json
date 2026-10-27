@@ -1,0 +1,62 @@
+[
+  {
+    "name": "same-id",
+    "route": "c64e353d-130e-5390-b916-285b358faac2",
+    "stream": "82ad0dea-e101-5280-8007-e78ce026aede",
+    "order": "b6075b24-e7d6-5e22-9106-76f2cdfc4806",
+    "command": "4c8ad482-12d2-5a91-9703-21dbff34bf7b",
+    "alternate": "e27465a7-f2a9-579b-b13e-5b5d8e1982be",
+    "alias": "synthetic-staff-same-id",
+    "day": "2026-10-28"
+  },
+  {
+    "name": "competing",
+    "route": "dff0b850-9522-51ee-ba7b-769e14c290b7",
+    "stream": "a33121dc-d06e-5a4f-95ef-3403ffe599b6",
+    "order": "e7bc4faa-02dd-5aa4-b5c4-b2e67a4db4a1",
+    "command": "376da9a3-5dfe-5a9d-87a1-f0a80e4c9ae4",
+    "alternate": "918cdd35-58ef-5087-813b-e0e0cfc464ce",
+    "alias": "synthetic-staff-competing",
+    "day": "2026-10-28"
+  },
+  {
+    "name": "rollback",
+    "route": "661045b2-ce79-5c7e-9bd3-4ac6adcc186d",
+    "stream": "161f33aa-483a-537b-a3dd-19f65f64d65f",
+    "order": "741eaf34-60d0-5196-9a0a-39134e19553d",
+    "command": "0dba8b8e-311f-552a-a28f-1d93088a94c6",
+    "alternate": "006c3dbb-5831-5cab-8503-95fd6f7bb8b0",
+    "alias": "synthetic-staff-rollback",
+    "day": "2026-10-28"
+  },
+  {
+    "name": "timeout",
+    "route": "887f7e0c-b644-556f-99f8-d9c45038e39a",
+    "stream": "f29b56e5-96dc-52d0-a7b6-cb572dac711a",
+    "order": "adf8bffa-0084-5ebf-91af-54e4972ebc82",
+    "command": "325ec3cc-94d4-55ec-959d-aa44e000380c",
+    "alternate": "3aa6f3d2-b562-587e-bca6-872596acec9c",
+    "alias": "synthetic-staff-timeout",
+    "day": "2026-10-28"
+  },
+  {
+    "name": "audit",
+    "route": "343ac50d-fad5-59a0-838a-b8616b4c5adb",
+    "stream": "aa10e3cf-eb0d-5d60-9788-abb2683fde48",
+    "order": "7ec055b0-dffa-5d5d-96b3-5fc7bc465544",
+    "command": "47bf4ac3-48de-5f4b-96da-8aa476d27677",
+    "alternate": "df9309bc-aff8-5ba3-b591-e865d2ad62ab",
+    "alias": "synthetic-staff-audit",
+    "day": "2026-10-28"
+  },
+  {
+    "name": "http",
+    "route": "e1d53e64-6d26-5097-b74b-00a7d66dede4",
+    "stream": "3d36abc8-c9dd-57dc-a724-b1e99f2bb2fd",
+    "order": "5a3d5a5f-59aa-5451-b0b8-602c887cf99f",
+    "command": "54447ce0-cf86-52cd-97a1-2468825a6b09",
+    "alternate": "e8cc6743-2bac-5df1-a784-e66d7cc893c8",
+    "alias": "synthetic-staff-http",
+    "day": "2026-10-28"
+  }
+]

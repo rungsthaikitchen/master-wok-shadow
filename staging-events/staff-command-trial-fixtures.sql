@@ -1,0 +1,26 @@
+-- Staging hvrqgufqjslvgiohgkvu only. Synthetic fixed fixtures.
+DO $$ BEGIN IF EXISTS(SELECT FROM master_wok_event_test.streams WHERE enabled) THEN RAISE EXCEPTION 'OTHER_STREAM_ENABLED'; END IF; END $$;
+INSERT INTO master_wok_event_test.streams(id,service_date,enabled) VALUES('82ad0dea-e101-5280-8007-e78ce026aede','2026-10-28',true);
+INSERT INTO master_wok_event_test.command_routes(id,service_date,current_stream) VALUES('c64e353d-130e-5390-b916-285b358faac2','2026-10-28','82ad0dea-e101-5280-8007-e78ce026aede');
+SELECT master_wok_event_test.create_booking('82ad0dea-e101-5280-8007-e78ce026aede','staff-seed-create','b6075b24-e7d6-5e22-9106-76f2cdfc4806','synthetic-staff-same-id','2026-10-28T18:00:00Z','[{"item_id":"green-curry","qty":1,"modifiers":[{"id":"chicken"}]}]'::jsonb);
+SELECT master_wok_event_test.apply_booking('82ad0dea-e101-5280-8007-e78ce026aede','staff-seed-offer','b6075b24-e7d6-5e22-9106-76f2cdfc4806','offer','2026-10-28T19:00:00Z',NULL);
+INSERT INTO master_wok_event_test.streams(id,service_date,enabled) VALUES('a33121dc-d06e-5a4f-95ef-3403ffe599b6','2026-10-28',true);
+INSERT INTO master_wok_event_test.command_routes(id,service_date,current_stream) VALUES('dff0b850-9522-51ee-ba7b-769e14c290b7','2026-10-28','a33121dc-d06e-5a4f-95ef-3403ffe599b6');
+SELECT master_wok_event_test.create_booking('a33121dc-d06e-5a4f-95ef-3403ffe599b6','staff-seed-create','e7bc4faa-02dd-5aa4-b5c4-b2e67a4db4a1','synthetic-staff-competing','2026-10-28T18:00:00Z','[{"item_id":"green-curry","qty":1,"modifiers":[{"id":"chicken"}]}]'::jsonb);
+SELECT master_wok_event_test.apply_booking('a33121dc-d06e-5a4f-95ef-3403ffe599b6','staff-seed-offer','e7bc4faa-02dd-5aa4-b5c4-b2e67a4db4a1','offer','2026-10-28T19:00:00Z',NULL);
+INSERT INTO master_wok_event_test.streams(id,service_date,enabled) VALUES('161f33aa-483a-537b-a3dd-19f65f64d65f','2026-10-28',true);
+INSERT INTO master_wok_event_test.command_routes(id,service_date,current_stream) VALUES('661045b2-ce79-5c7e-9bd3-4ac6adcc186d','2026-10-28','161f33aa-483a-537b-a3dd-19f65f64d65f');
+SELECT master_wok_event_test.create_booking('161f33aa-483a-537b-a3dd-19f65f64d65f','staff-seed-create','741eaf34-60d0-5196-9a0a-39134e19553d','synthetic-staff-rollback','2026-10-28T18:00:00Z','[{"item_id":"green-curry","qty":1,"modifiers":[{"id":"chicken"}]}]'::jsonb);
+SELECT master_wok_event_test.apply_booking('161f33aa-483a-537b-a3dd-19f65f64d65f','staff-seed-offer','741eaf34-60d0-5196-9a0a-39134e19553d','offer','2026-10-28T19:00:00Z',NULL);
+INSERT INTO master_wok_event_test.streams(id,service_date,enabled) VALUES('f29b56e5-96dc-52d0-a7b6-cb572dac711a','2026-10-28',true);
+INSERT INTO master_wok_event_test.command_routes(id,service_date,current_stream) VALUES('887f7e0c-b644-556f-99f8-d9c45038e39a','2026-10-28','f29b56e5-96dc-52d0-a7b6-cb572dac711a');
+SELECT master_wok_event_test.create_booking('f29b56e5-96dc-52d0-a7b6-cb572dac711a','staff-seed-create','adf8bffa-0084-5ebf-91af-54e4972ebc82','synthetic-staff-timeout','2026-10-28T18:00:00Z','[{"item_id":"green-curry","qty":1,"modifiers":[{"id":"chicken"}]}]'::jsonb);
+SELECT master_wok_event_test.apply_booking('f29b56e5-96dc-52d0-a7b6-cb572dac711a','staff-seed-offer','adf8bffa-0084-5ebf-91af-54e4972ebc82','offer','2026-10-28T19:00:00Z',NULL);
+INSERT INTO master_wok_event_test.streams(id,service_date,enabled) VALUES('aa10e3cf-eb0d-5d60-9788-abb2683fde48','2026-10-28',true);
+INSERT INTO master_wok_event_test.command_routes(id,service_date,current_stream) VALUES('343ac50d-fad5-59a0-838a-b8616b4c5adb','2026-10-28','aa10e3cf-eb0d-5d60-9788-abb2683fde48');
+SELECT master_wok_event_test.create_booking('aa10e3cf-eb0d-5d60-9788-abb2683fde48','staff-seed-create','7ec055b0-dffa-5d5d-96b3-5fc7bc465544','synthetic-staff-audit','2026-10-28T18:00:00Z','[{"item_id":"green-curry","qty":1,"modifiers":[{"id":"chicken"}]}]'::jsonb);
+SELECT master_wok_event_test.apply_booking('aa10e3cf-eb0d-5d60-9788-abb2683fde48','staff-seed-offer','7ec055b0-dffa-5d5d-96b3-5fc7bc465544','offer','2026-10-28T19:00:00Z',NULL);
+INSERT INTO master_wok_event_test.streams(id,service_date,enabled) VALUES('3d36abc8-c9dd-57dc-a724-b1e99f2bb2fd','2026-10-28',true);
+INSERT INTO master_wok_event_test.command_routes(id,service_date,current_stream) VALUES('e1d53e64-6d26-5097-b74b-00a7d66dede4','2026-10-28','3d36abc8-c9dd-57dc-a724-b1e99f2bb2fd');
+SELECT master_wok_event_test.create_booking('3d36abc8-c9dd-57dc-a724-b1e99f2bb2fd','staff-seed-create','5a3d5a5f-59aa-5451-b0b8-602c887cf99f','synthetic-staff-http','2026-10-28T18:00:00Z','[{"item_id":"green-curry","qty":1,"modifiers":[{"id":"chicken"}]}]'::jsonb);
+SELECT master_wok_event_test.apply_booking('3d36abc8-c9dd-57dc-a724-b1e99f2bb2fd','staff-seed-offer','5a3d5a5f-59aa-5451-b0b8-602c887cf99f','offer','2026-10-28T19:00:00Z',NULL);
