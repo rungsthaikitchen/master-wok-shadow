@@ -1,0 +1,13 @@
+{
+  "enabled": false,
+  "files": {
+    "index.html": "bf0e87686e23f11a07c2bbd1476e57f9c1aa2bf3fead741b27e55e623e5997b6",
+    "_headers": "94bcf795999aa0753e8be4e638452bd12ec32bc41e0328bf86b64d5acb128c40",
+    "_routes.json": "1ae51d055c7305b204c9de514f9a23d4da3533179861e0a365a94d156215a3bf",
+    "admin-staging/master-wok.html": "bfa160ff0eb3342b29aeb6b089bf34581eefbceb8248a08e3f608a6b1bf9f684",
+    "admin-staging/staff-browser.css": "aea0dc7d9fe96c9efb4d0da46cbf43439a2b1d86802cd44633fa2d9a96292142",
+    "admin-staging/staff-browser.js": "340b32ceef8582b9930b5e35e0dae8298f72394cd4ab6f52adc5872c17e506b4",
+    "functions/admin-api/staff-command-v1.js": "30f1afdcaf42fbd5567109e2d02f677e0b1593bddc3f98d431d749b218d85e3e",
+    "functions/admin-api/staff-state-v1.js": "30f1afdcaf42fbd5567109e2d02f677e0b1593bddc3f98d431d749b218d85e3e"
+  }
+}

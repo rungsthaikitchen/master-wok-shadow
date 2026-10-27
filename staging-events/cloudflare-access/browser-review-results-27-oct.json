@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-27",
+  "status": "LOCAL_BROWSER_SERVER_TRANSACTION_PASSED_PREVIEW_DEPLOYED_DISABLED",
+  "preview": {
+    "branch": "preview/staff-browser-2026-10-27",
+    "commit": "59ef5f1d2c622f605b46233997739be71abc7015",
+    "url": "https://preview-staff-browser-2026-1.rungsthaikitchen.pages.dev/admin-staging/master-wok",
+    "deployment": "Cloudflare Pages SUCCESS",
+    "completedAt": "2026-10-27T17:37:06Z",
+    "observedMessage": "Staging route is disabled. No action has been sent.",
+    "actionButtonsDisabled": true,
+    "isolatedTree": true,
+    "legacyProductionFilesIncluded": false
+  },
+  "productionMain": "9e944039a7d1dca9d6a2e2f3995cac589c93ea27",
+  "tests": {
+    "EuropeLondon": {
+      "nodePassed": 62,
+      "pythonPassed": 6
+    },
+    "UTC": {
+      "nodePassed": 62,
+      "pythonPassed": 6
+    }
+  },
+  "browser": {
+    "status": "PASSED",
+    "browser": "Chromium",
+    "timezone": "Europe/London",
+    "cases": 8,
+    "lostSuccessRetryPreservedCommand": true,
+    "realReload": true,
+    "conflictReviewRequired": true,
+    "storageFailureMakesNoRequest": true,
+    "externalRequests": 0,
+    "productionRequests": 0,
+    "notifications": 0,
+    "hostedAccessVerified": false,
+    "playwright": "1.62.1",
+    "chromiumPackage": "@sparticuz/chromium@153.0.0"
+  },
+  "worker": {
+    "status": "PASSED",
+    "scope": "LOCAL_WORKERD_SIGNED_STAFF_TRANSACTION",
+    "cases": 9,
+    "keyRequests": 1,
+    "syntheticServiceRequests": 6,
+    "transactionAttempts": 6,
+    "staffAuditRows": 3,
+    "finalEventCount": 5,
+    "finalReservations": 0,
+    "productionRequests": 0,
+    "notifications": 0,
+    "hostedStagingVerified": false,
+    "multiConnectionConcurrencyVerified": false
+  },
+  "supabaseWrites": 0,
+  "railwayConfigurationChanges": 0,
+  "productionBookingRequests": 0,
+  "notifications": 0,
+  "cloudflareAdminPluginFound": false,
+  "limitations": [
+    "Hosted preview is disabled and has no configured data transport or environment credential access.",
+    "Real Access login on the preview hostname is unverified; prior owner verification was a different production-hosted read-only probe.",
+    "Browser end-to-end used a local synthetic Access gateway and embedded SQL, not hosted browser-to-Railway traffic.",
+    "Preview snapshot intentionally omits the production website and must never be merged to main.",
+    "Staging browser API remains synthetic-config only; real hostname/issuer/AUD and signed receiver integration need a reviewed scoped adapter.",
+    "Separate Access app/policy, staging-only keys, fresh fixtures and bounded runtime grants are required before hosted activation.",
+    "No additional service, domain, database or resource allocation was created; incremental build/request billing was not measured."
+  ]
+}

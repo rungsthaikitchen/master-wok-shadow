@@ -8,10 +8,12 @@ function configuration(o){
  try{issuer=new URL(o.teamDomain);origin=new URL(o.requestOrigin);}catch{refuse('CLOUDFLARE_ACCESS_CONFIGURATION_REQUIRED');}
  if(issuer.protocol!=='https:'||! /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.cloudflareaccess\.com$/.test(issuer.hostname)||issuer.port||issuer.username||issuer.password||issuer.pathname!=='/'||issuer.search||issuer.hash||
     origin.protocol!=='https:'||origin.port||origin.username||origin.password||origin.pathname!=='/'||origin.search||origin.hash)refuse('CLOUDFLARE_ACCESS_CONFIGURATION_REQUIRED');
+ const requestPath=o.requestPath??'/admin-api/order-action';
+ if(!['/admin-api/order-action','/admin-api/staff-command-v1','/admin-api/staff-state-v1'].includes(requestPath))refuse('CLOUDFLARE_ACCESS_CONFIGURATION_REQUIRED');
  const clock=o.nowSeconds===undefined?()=>Date.now()/1000:o.nowSeconds;
  const fetcher=o.fetcher===undefined?globalThis.fetch:o.fetcher;
  if(typeof clock!=='function'||typeof fetcher!=='function')refuse('CLOUDFLARE_ACCESS_CONFIGURATION_REQUIRED');
- return {issuer:issuer.origin,origin:origin.origin,audience:o.audience,clock,fetcher,onAuthorized:o.onAuthorized};
+ return {issuer:issuer.origin,origin:origin.origin,audience:o.audience,requestPath,clock,fetcher,onAuthorized:o.onAuthorized};
 }
 export function createAccessAdminGate(options={}){
  if(options.enabled!==true)return async()=>({status:'DISABLED',sourceRequests:0,verified:false});
@@ -28,7 +30,7 @@ export function createAccessAdminGate(options={}){
   let token;
   try{
    const u=new URL(request.url);
-   if(request.method!=='POST'||u.origin!==c.origin||u.pathname!=='/admin-api/order-action'||u.search||u.hash||
+   if(request.method!=='POST'||u.origin!==c.origin||u.pathname!==c.requestPath||u.search||u.hash||
       request.headers.get('origin')!==c.origin||request.headers.get('content-type')?.split(';')[0].trim().toLowerCase()!=='application/json')refuse();
    token=request.headers.get('cf-access-jwt-assertion');
    if(typeof token!=='string'||token.length>8192||! /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token))refuse();

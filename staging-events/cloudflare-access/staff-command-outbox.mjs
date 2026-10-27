@@ -1,5 +1,5 @@
 // Offline UI candidate. Inject browser storage; no automatic network requests.
-import {validateStaffCommand} from './versioned-staff-command.mjs';
+import {validateStaffCommand} from './staff-command-format.mjs';
 const KEY='master-wok:synthetic-staff-intent:v1';
 export function createStaffIntentStore(storage){
  function resume(){
@@ -15,6 +15,10 @@ export function createStaffIntentStore(storage){
    const raw=JSON.stringify(c);storage.setItem(KEY,raw);
    if(storage.getItem(KEY)!==raw)throw Error('STAFF_INTENT_NOT_PERSISTED');
    return Object.freeze(c);
+  },
+  discardRefused(commandId,error){
+   const c=resume();if(!c||c.commandId!==commandId||error!=='STAFF_REVISION_CONFLICT')throw Error('STAFF_INTENT_DISCARD_REFUSED');
+   storage.removeItem(KEY);if(storage.getItem(KEY)!==null)throw Error('STAFF_INTENT_NOT_CLEARED');
   },
   acknowledge(commandId,result){
    const c=resume();if(!c||c.commandId!==commandId||!result||!['RECORDED','ALREADY_RECORDED'].includes(result.status)||!Number.isSafeInteger(result.revision)||result.revision<1)throw Error('STAFF_INTENT_ACK_REFUSED');

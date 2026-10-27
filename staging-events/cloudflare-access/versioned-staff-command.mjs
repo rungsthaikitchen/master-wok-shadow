@@ -2,20 +2,14 @@
 import {createAccessAdminGate,PROJECT} from './access-gate.mjs';
 import {readBounded} from './protected-proxy.mjs';
 import {STAGING_ORIGIN,STAGING_ISSUER} from './staging-pages-action.mjs';
-const enc=new TextEncoder(),uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+import {validateStaffCommand} from './staff-command-format.mjs';
+export {validateStaffCommand} from './staff-command-format.mjs';
+const enc=new TextEncoder();
 const response=(status,body)=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json','Cache-Control':'no-store'}});
 const fail=code=>{throw Error(code);};
 function secret(s){if(typeof s!=='string'||!/^synthetic-[A-Za-z0-9_-]{16,100}$/.test(s))fail('SYNTHETIC_KEY_REQUIRED');return enc.encode(s);}
 const hmac=s=>crypto.subtle.importKey('raw',secret(s),{name:'HMAC',hash:'SHA-256'},false,['sign','verify']);
 const hex=b=>Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,'0')).join('');
-export function validateStaffCommand(c){
- const keys=['version','commandId','orderId','expectedRevision','action',...(c?.action==='offer'?['target']:[])].sort();
- if(!c||typeof c!=='object'||Array.isArray(c)||Object.keys(c).sort().join()!==keys.join()||c.version!==1||typeof c.commandId!=='string'||typeof c.orderId!=='string'||!uuid.test(c.commandId)||!uuid.test(c.orderId)||!Number.isSafeInteger(c.expectedRevision)||c.expectedRevision<1||!['offer','confirm','cancel','complete'].includes(c.action))fail('STAFF_COMMAND_REQUIRED');
- if(c.action==='offer'){
-  if(typeof c.target!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(c.target)||!Number.isFinite(Date.parse(c.target))||new Date(c.target).toISOString().replace('.000Z','Z')!==c.target)fail('STAFF_COMMAND_REQUIRED');
- }
- return c;
-}
 export function createSyntheticStaffReceiver(options={}){
  if(options.enabled!==true)return async()=>fail('STAFF_RECEIVER_DISABLED');
  const key=hmac(options.hopKey),clock=options.nowSeconds??(()=>Date.now()/1000);
@@ -34,7 +28,7 @@ export function createVersionedStaffHandler(options={}){
  if(options.enabled!==true)return async()=>response(503,{error:'STAFF_COMMAND_DISABLED'});
  const hop=hmac(options.hopKey),actor=hmac(options.actorKey),clock=options.nowSeconds??(()=>Date.now()/1000);
  if(options.hopKey===options.actorKey||typeof options.sendEnvelope!=='function')fail('STAFF_TRANSPORT_REQUIRED');
- const gate=createAccessAdminGate({enabled:true,project:PROJECT,teamDomain:STAGING_ISSUER,requestOrigin:STAGING_ORIGIN,audience:options.audience,nowSeconds:clock,fetcher:options.fetcher,onAuthorized:async(request,identity)=>{
+ const gate=createAccessAdminGate({enabled:true,project:PROJECT,teamDomain:STAGING_ISSUER,requestOrigin:STAGING_ORIGIN,audience:options.audience,requestPath:options.requestPath,nowSeconds:clock,fetcher:options.fetcher,onAuthorized:async(request,identity)=>{
   let c;try{c=validateStaffCommand(JSON.parse(await readBounded(request.body,8192)));}catch{fail('STAFF_COMMAND_REQUIRED');}
   const actorId=hex(await crypto.subtle.sign('HMAC',await actor,enc.encode(JSON.stringify([STAGING_ISSUER,options.audience,identity.subject]))));
   const issuedAt=Math.floor(clock());if(!Number.isSafeInteger(issuedAt)||issuedAt-identity.authorizedAt>=30)fail('STAFF_ENVELOPE_REFUSED');
