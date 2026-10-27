@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-27",
+  "status": "OFFLINE_AUTHORIZATION_REVIEW_PASSED",
+  "verified": false,
+  "productionWrites": 0,
+  "customerRowsRead": 0,
+  "notifications": 0,
+  "deployments": 0,
+  "hostedJwtVerificationTested": false,
+  "websiteCommit": "55938bc73cd762be614a300ef54bacaedda5f6b0",
+  "tests": {
+    "Europe/London": {
+      "entries": 29,
+      "passed": 29
+    },
+    "UTC": {
+      "entries": 29,
+      "passed": 29
+    }
+  },
+  "sourceSha256": {
+    "staging-events/admin-authorization-gate.cjs": "8da6b45d056e0bfd30eec5f927822c45052bbdcafee7486bba4b460c50000ce6",
+    "staging-events/admin-authorization-gate.test.cjs": "e2e54ec2ef1443a5d0f917c4543d84c42fce389626e97d154ba06f2bb2c45d1f",
+    "staging-events/admin-authorization-lifecycle.test.cjs": "f3bc1319a228f54212ac3d7ac53754b8b53da71388ff51cef30668294367bd77",
+    "staging-events/authorization-source-characterization.test.cjs": "8c5e456fa45d725622582d073c243d7c2f3ba3a67baaf3f7a6933fde3465dc85",
+    "fixtures/authorization-source-characterization-27-oct.json": "09bbe67d0185b8f92c336bdc277e2b91b61197940b118db596a5ff50d2348fd0"
+  },
+  "findings": [
+    "guest email/phone lookup can update existing customer profile",
+    "admin caller sends no bearer; proxy forwards shared service secret without in-handler identity verification",
+    "public customer SELECT/UPDATE policies remain permissive",
+    "order-confirm v22 source ProtocolError; lifecycle coverage incomplete"
+  ],
+  "unresolved": [
+    "external Cloudflare Access policy",
+    "real verifier adapter and synthetic admin identity staging rehearsal",
+    "guest submission versus profile ownership and private delivery address snapshot",
+    "order-confirm source/current response contract",
+    "production capture write approval and full writer coverage"
+  ]
+}
