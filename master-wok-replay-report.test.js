@@ -8,6 +8,25 @@ test('report is disabled before reading input or invoking assessment',()=>{
  const source=new Proxy({},{get(){throw Error('must not read');}});
  assert.equal(createReplayReport(source,{assess(){assert.fail();}}).status,'DISABLED');
 });
+test('input fingerprints ignore JSON key order but detect changed recorded decisions',()=>{
+ const options={enabled:true,dataOrigin:'SYNTHETIC',assess:()=>({status:'GREEN',reasonCode:'HYPOTHETICAL_REPLAY'})};
+ const first=createReplayReport(fixture,options);
+ const reordered=Object.fromEntries(Object.entries(fixture).reverse());
+ assert.equal(first.provenance.inputSha256,createReplayReport(reordered,options).provenance.inputSha256);
+ const changed=structuredClone(fixture);changed.events.find(e=>e.actualDecision==='DECLINED').actualDecision='ACCEPTED';
+ assert.notEqual(first.provenance.inputSha256,createReplayReport(changed,options).provenance.inputSha256);
+ assert.equal(first.provenance.assessmentMode,'CUSTOM_ASSESSOR');assert.equal(first.provenance.builtInAssessorSelected,false);
+ assert.equal(first.provenance.dataOriginDeclaration,'SYNTHETIC');assert.equal(first.provenance.originIndependentlyVerified,false);
+ assert.match(first.provenance.implementationSha256,/^[a-f0-9]{64}$/);
+ assert.equal(first.provenance.manifest.length,7);
+});
+test('unclassified source stays explicit and unexpected origin is refused before assessment',()=>{
+ const report=createReplayReport(fixture,{enabled:true});
+ assert.equal(report.provenance.dataOriginDeclaration,'UNCLASSIFIED');
+ assert.equal(report.provenance.assessmentMode,'BUILT_IN_MODEL');
+ const bad=createReplayReport(fixture,{enabled:true,dataOrigin:'PRIVATE_TEXT',assess:()=>assert.fail()});
+ assert.equal(bad.reasonCode,'REPORT_ORIGIN_REQUIRED');assert.equal(JSON.stringify(bad).includes('PRIVATE_TEXT'),false);
+});
 test('matrix counts recorded choices and excludes UNVERIFIED from assessed denominator',()=>{
  const source=structuredClone(fixture),before=structuredClone(source);let n=0;
  const report=createReplayReport(source,{enabled:true,assess:()=>({status:['GREEN','AMBER','UNVERIFIED'][n++%3],reasonCode:'HYPOTHETICAL_REPLAY'})});

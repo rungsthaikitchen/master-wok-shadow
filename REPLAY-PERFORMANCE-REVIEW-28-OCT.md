@@ -27,8 +27,8 @@ shown separately and do not become historical decision observations.
 
 ## Regression and synthetic example
 
-Validation: the complete root Node suite passed 196 tests in Europe/London and
-196 tests in UTC, including five new report tests. No hosted test was performed.
+Validation: the complete root Node suite passed 198 tests in Europe/London and
+198 tests in UTC, including seven report tests. No hosted test was performed.
 
 The anonymised synthetic fixture contains five booking decisions. With the real
 engine in Europe/London, four are assessable and one remains UNVERIFIED because a
@@ -42,11 +42,27 @@ assessments become UNVERIFIED rather than silently using the wrong service clock
 Use the explicit UK timezone when generating a usable real-engine report:
 
 ```bash
-TZ=Europe/London MASTER_WOK_REPLAY_REPORT_ENABLED=true node master-wok-replay-report.js < fixtures/chronological-synthetic-service.json
+TZ=Europe/London MASTER_WOK_REPLAY_REPORT_ENABLED=true MASTER_WOK_REPLAY_REPORT_DATA_ORIGIN=SYNTHETIC node master-wok-replay-report.js < fixtures/chronological-synthetic-service.json
 ```
 
 The report is disabled without the flag. Invalid/incomplete logs fail as a whole
 without partial counts. CLI input is capped at 5 MB. No network client is added.
+
+Report schema version 2 adds SHA-256 fingerprints for the canonical input and a
+seven-file implementation manifest (report, replay, adapter, validation boundary,
+menu/model bundle, kitchen engine and shadow scheduler). JSON object key order
+does not change the input fingerprint; array order, values and event content do.
+Node version and effective timezone are retained for reproduction. The manifest
+fingerprints the implementation files on disk; it is not a hosted deployment or
+source-authenticity attestation. Injected custom assessors are explicitly marked
+CUSTOM_ASSESSOR and are not identified by the built-in implementation hash.
+
+Data origin must be declared separately: SYNTHETIC, RECORDED_EVENT_EXPORT or
+UNCLASSIFIED (the default). That declaration is never independently verified by
+this tool. Synthetic runs must remain labelled synthetic even when their event
+contract declares complete decision-log coverage. No customer/order identifiers
+are included in the report, but input hashes are not a substitute for anonymising
+the input before sharing it.
 
 Existing chronological regressions confirm immediate proposal replacement,
 acceptance without a second reservation, rejection release, stale-response refusal,
