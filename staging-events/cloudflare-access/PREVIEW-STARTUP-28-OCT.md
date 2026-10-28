@@ -75,3 +75,51 @@ new fixed UUIDs in `fixtures/preview-browser-28-oct-v2.json`, separate version-2
 seed/activation/cleanup SQL, and `/data/preview-browser-28-oct-v2/budget.sqlite3`.
 Receiver and default-disabled Pages build now bind to that new fixture. This is
 a new trial candidate, not a reset or retry of a spent journal.
+
+## Version-two hosted result and verified final closure
+
+The corrected receiver's disabled preparation deployment
+`18c80f8d-49f2-43a0-a972-dfe69ed92cb8` completed successfully and logged
+DISABLED / sourceRequests 0. Version-two activation migration
+`synthetic_preview_browser_v2_activation_28_oct` was applied for a new window
+ending 28 October 06:43:08 UTC. Temporary domain ID
+`8bc899ab-49dc-4247-82e3-06d2820d1188` targeted the exact staging service on 8080.
+
+Enabled deployment `c95abe5d-27cc-469a-9a43-59f28ab4a634` failed before runtime
+startup. Its build log at 06:38:06 UTC reported an internal build-daemon failure:
+listing workers failed because the buildkit socket network connection closed.
+This is hosted infrastructure failure evidence; it is not evidence of a new
+application error or successful hosted lifecycle verification. No browser test
+actions were requested. Keep the corrected code and regression coverage; the
+actual hosted connection remains unverified pending a successful build/run.
+
+The trial was closed early rather than extended. Cleanup migration
+`synthetic_preview_browser_v2_cleanup_28_oct` was applied and the temporary domain
+deleted. The receiver enable flag is false with deployment skipped. Pages cleanup
+commit `ad998caa6069fada55a4f1a0229ed83ca34264b9` restores exact disabled tree
+`f0d569cc53e4d637dac94d5b9abcfa10ec966de0`; Cloudflare Pages reports SUCCESS.
+
+An independent final closure check on 28 October after the window confirmed:
+
+- enabledStreams 0, activeHolds 0, runtime reader/writer sessions 0;
+- the version-two fixture is disabled, eventCount 2, auditRows 0;
+- all seven temporary booking-reader column privileges are false;
+- reader route id/current_stream/generation privileges are false;
+- reader/writer audit privileges, writer route SELECT, staff and routed function
+  execution privileges are false; all three temporary policies are absent;
+- Railway lists no service/custom domains; no further removal or grant changes
+  are necessary;
+- website main remains `9e944039a7d1dca9d6a2e2f3995cac589c93ea27`.
+
+Both fixture histories and all existing journals are preserved. The version-one
+spent journal was read but never reset; no operation reset/deleted version two's
+journal. The receiver hard expiry is an independent fail-closed safeguard, not a
+substitute for verified route/grant cleanup. Earlier hashed trial previews are
+expired and cannot reach the removed service domain. No production writes or
+customer messages occurred. There is no outstanding cleanup blocker.
+
+Before another trial, verify Railway can build successfully and inspect the
+version-two journal without consuming or resetting it. Never infer an unused
+budget solely from a failed deployment status. Use a fresh reviewed fixture and
+journal if an allowance was consumed; do not start or extend another trial as
+part of cleanup.
