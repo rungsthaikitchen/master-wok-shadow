@@ -123,3 +123,37 @@ version-two journal without consuming or resetting it. Never infer an unused
 budget solely from a failed deployment status. Use a fresh reviewed fixture and
 journal if an allowance was consumed; do not start or extend another trial as
 part of cleanup.
+
+## 07:09 UTC disabled diagnostic build attempt
+
+On owner instruction to proceed, the exact staging service was rechecked:
+no service/custom domains, source still pinned to 5db370a, no staged changes.
+The preview enable flag was explicitly set false with skipDeploys true.
+
+A private diagnostic start command was requested and deployment
+c5b78ac2-b96c-4103-9962-8c9902f64cfc was triggered from the prior successful
+disabled deployment. It fetched and unpacked the source snapshot, then FAILED
+at BUILD_IMAGE before any runtime log. Railway returned no automated diagnosis,
+no failedReason and only the generic image-build failure error. Do not infer
+this is the identical buildkit error from the earlier attempt.
+
+The deployment context reports the original receiver start command rather than
+the diagnostic override. A redeployment of the old snapshot therefore does not
+prove the diagnostic override was applied. Neither receiver nor diagnostic was
+observed running; the version-two journal remains uninspected and its allowance
+must not be assumed unused. A later diagnostic must verify its actual deployed
+start command as well as its read-only result.
+
+After the failed build, the service start configuration was restored to
+python railway-shadow/preview_browser_receiver.py without redeployment.
+The enable flag remains false; no domain, grants, stream activation, fixture
+writes, notifications, browser trial or expiry extension was introduced.
+Existing journals and fixture evidence were not reset or deleted.
+
+Targeted regression checks passed: 15 Node tests and 18 Python tests in each of
+Europe/London and UTC. The local generated Pages artifact was restored to the
+default-disabled build. No product code or website branch was changed.
+
+Next dependency: a successful build with the private diagnostic command actually
+in its deployment snapshot, followed by read-only journal inspection. Only then
+prepare a separately bounded hosted browser trial.
