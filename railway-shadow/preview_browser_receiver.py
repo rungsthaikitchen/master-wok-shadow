@@ -4,6 +4,8 @@ import hmac
 import json
 import os
 import re
+import sqlite3
+import sys
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
@@ -145,6 +147,38 @@ def main(env=None):
  finally:server.server_close()
  print(json.dumps(dict(status='EXPIRED',attempts=budget.summary(),productionWrites=0,notifications=0)),flush=True)
 
+def safe_reason(error):
+ allowed={'PREVIEW_SCOPE_REFUSED','PREVIEW_OTHER_FLAG_REFUSED','PREVIEW_DEADLINE_REFUSED','PREVIEW_SERVER_KEY_REQUIRED','STAGING_DATABASE_CONNECTION_REQUIRED','DATABASE_ROLE_UNPROVEN','CUTOVER_TRIAL_PRIVILEGES_REFUSED','PREVIEW_PATH_REFUSED','PREVIEW_FRESH_FIXTURE_REQUIRED','CUTOVER_TRIAL_BUDGET_REFUSED','CUTOVER_TRIAL_BUDGET_EXHAUSTED','PREVIEW_TRIAL_EXPIRED','PREVIEW_DIAGNOSTIC_DISABLED_REQUIRED'}
+ if isinstance(error,EventCaptureError) and str(error) in allowed:return str(error)
+ code=getattr(error,'sqlstate',None)
+ if code in ('28P01','42501','42P01','55P03','57014'):return 'DATABASE_'+code
+ if isinstance(error,PermissionError):return 'LOCAL_ACCESS_REFUSED'
+ return 'PREVIEW_RECEIVER_FAILED'
+
+def diagnose(env=None,*,connect=None,clock=time.time,directory=DIRECTORY):
+ """Private one-off diagnostic: no HTTP, writes, budget consumption or resets."""
+ env=os.environ if env is None else env
+ if env.get('MASTER_WOK_PREVIEW_BROWSER_ENABLED')!='false':refuse('PREVIEW_DIAGNOSTIC_DISABLED_REQUIRED')
+ # Validate the enabled configuration with a synthetic diagnostic-only deadline;
+ # no listener or trial is created, and the stored trial deadline is untouched.
+ now=clock();config=configuration(dict(env,MASTER_WOK_PREVIEW_BROWSER_ENABLED='true',MASTER_WOK_PREVIEW_BROWSER_END_EPOCH=str(int(now)+300)),now)
+ path=directory/'budget.sqlite3'
+ if any(p.is_symlink() for p in (path,*path.parents)):refuse('PREVIEW_PATH_REFUSED')
+ budget=None
+ if path.exists():
+  with sqlite3.connect(path.as_uri()+'?mode=ro',uri=True) as db:budget=dict(db.execute('SELECT kind,used FROM attempts'))
+ if connect is None:
+  import psycopg
+  connect=psycopg.connect
+ with connect(**config['reader']) as conn:
+  conn.execute('SET TRANSACTION READ ONLY');role_check(conn,'reader')
+  row=conn.execute('SELECT event_count,enabled FROM master_wok_event_test.streams WHERE id=%s::uuid',[FIXTURE['streamId']]).fetchone()
+ if row is None:refuse('PREVIEW_FRESH_FIXTURE_REQUIRED')
+ return dict(status='DIAGNOSED',scope='PRIVATE_STAGING_READ_ONLY',configurationVerified=True,roleVerified=True,fixtureEventCount=row[0],fixtureEnabled=row[1],budget=budget,productionWrites=0,notifications=0)
+
 if __name__=='__main__':
- try:main()
- except Exception:print(json.dumps(dict(status='REFUSED',reasonCode='PREVIEW_RECEIVER_FAILED')),flush=True);raise SystemExit(1)
+ try:
+  if sys.argv[1:]==['--diagnose']:print(json.dumps(diagnose()),flush=True)
+  elif sys.argv[1:]:refuse()
+  else:main()
+ except Exception as error:print(json.dumps(dict(status='REFUSED',reasonCode=safe_reason(error))),flush=True);raise SystemExit(1)
