@@ -1,0 +1,13 @@
+{
+  "serviceDate": "2026-10-28",
+  "streamId": "795f3b0b-08e0-5d22-8071-a97e9cd52912",
+  "routeId": "3d31312d-cb9b-53d0-b69b-801b5bbc5698",
+  "orderId": "7186eb1f-b4a5-5f02-b932-05ebe1303885",
+  "alias": "synthetic-preview-browser-28-oct-v2",
+  "targets": [
+    "2026-10-28T18:00:00Z",
+    "2026-10-28T19:00:00Z",
+    "2026-10-28T19:30:00Z",
+    "2026-10-28T20:00:00Z"
+  ]
+}

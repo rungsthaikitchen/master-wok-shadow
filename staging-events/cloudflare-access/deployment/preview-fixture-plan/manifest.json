@@ -4,10 +4,10 @@
   },
   "fixture": {
     "serviceDate": "2026-10-28",
-    "streamId": "2d6768d3-3e60-57c2-b9c4-0ce1ae0ebf31",
-    "routeId": "ca06cfc7-889b-5732-a723-7f15fe5511ef",
-    "orderId": "dddaf759-d42e-5ee0-a15a-1ebc81d04ead",
-    "alias": "synthetic-preview-browser-28-oct-v1",
+    "streamId": "795f3b0b-08e0-5d22-8071-a97e9cd52912",
+    "routeId": "3d31312d-cb9b-53d0-b69b-801b5bbc5698",
+    "orderId": "7186eb1f-b4a5-5f02-b932-05ebe1303885",
+    "alias": "synthetic-preview-browser-28-oct-v2",
     "targets": [
       "2026-10-28T18:00:00Z",
       "2026-10-28T19:00:00Z",
@@ -19,10 +19,10 @@
     "index.html": "bf0e87686e23f11a07c2bbd1476e57f9c1aa2bf3fead741b27e55e623e5997b6",
     "_headers": "94bcf795999aa0753e8be4e638452bd12ec32bc41e0328bf86b64d5acb128c40",
     "_routes.json": "1ae51d055c7305b204c9de514f9a23d4da3533179861e0a365a94d156215a3bf",
-    "admin-staging/master-wok.html": "2def338bc92117c18e7a97bc3aab7021866162f9f17657d07b6ed1605e859976",
+    "admin-staging/master-wok.html": "64aecee6e4e84eb502de0fa3031b0049242dd28bfdb912a733a1d6f9a8760061",
     "admin-staging/staff-browser.css": "aea0dc7d9fe96c9efb4d0da46cbf43439a2b1d86802cd44633fa2d9a96292142",
     "admin-staging/staff-browser.js": "340b32ceef8582b9930b5e35e0dae8298f72394cd4ab6f52adc5872c17e506b4",
-    "functions/admin-api/staff-command-v1.js": "613448bb213bb3576bb777450ec92db9d6bc915867792ef468b4b1e76e81e263",
-    "functions/admin-api/staff-state-v1.js": "613448bb213bb3576bb777450ec92db9d6bc915867792ef468b4b1e76e81e263"
+    "functions/admin-api/staff-command-v1.js": "de841e540d9b286fa53b4031524b68a88e2d10a0e99893801c678ee3f50ff72b",
+    "functions/admin-api/staff-state-v1.js": "de841e540d9b286fa53b4031524b68a88e2d10a0e99893801c678ee3f50ff72b"
   }
 }

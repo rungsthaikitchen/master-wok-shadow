@@ -47,3 +47,31 @@ and proof that diagnostics do not alter the durable budget or enable/listen.
 The local generated preview package was restored to its default-disabled build.
 Do not delete/reset a started budget after diagnosis. If startup consumed its
 one-start allowance, a future trial needs a new reviewed fixture/journal version.
+
+## Identified cause and corrected candidate
+
+Private diagnostic deployment `e71f5284-79ad-4b68-827c-b5348242d3ed` completed
+successfully: configurationVerified/roleVerified true; fixture disabled with two
+events; budget showed started 1 and preflight 1. This confirms valid key format,
+staging reader connectivity and that the start allowance was consumed. It does
+not expose the key or prove that the hop key matches Cloudflare's copy.
+
+An independent administrator privilege query found the missing prerequisite:
+the reader had no SELECT privilege on command_routes, including each of id,
+current_stream and generation. Its existing RLS SELECT policy was present.
+Startup requires those columns to join the fixed route and verify generation.
+The previous local role fixture had granted whole-table SELECT, masking this
+hosted discrepancy.
+
+The corrected version-2 activation grants only those three reader columns and
+cleanup revokes them. The regression now explicitly revokes the broad baseline
+reader grant before activation, executes the exact startup route/audit query as
+the reader and verifies that unrelated scope-column access is still denied.
+Cleanup verifies the new column privilege is removed. Full Node suite: 83 passed
+in UK time and UTC; Python suite: 18 passed in each timezone.
+
+Version 1's journal and events are retained unchanged. The next candidate uses
+new fixed UUIDs in `fixtures/preview-browser-28-oct-v2.json`, separate version-2
+seed/activation/cleanup SQL, and `/data/preview-browser-28-oct-v2/budget.sqlite3`.
+Receiver and default-disabled Pages build now bind to that new fixture. This is
+a new trial candidate, not a reset or retry of a spent journal.

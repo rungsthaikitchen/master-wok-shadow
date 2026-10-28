@@ -14,8 +14,8 @@ from event_capture_journal import EventCaptureError
 from event_cutover_trial import Budget as BaseBudget, role_check
 from event_runtime_transport import connection_parameters
 
-FIXTURE=json.loads((Path(__file__).resolve().parent.parent/'fixtures/preview-browser-28-oct-v1.json').read_text())
-DIRECTORY=Path('/data/preview-browser-28-oct-v1')
+FIXTURE=json.loads((Path(__file__).resolve().parent.parent/'fixtures/preview-browser-28-oct-v2.json').read_text())
+DIRECTORY=Path('/data/preview-browser-28-oct-v2')
 END_LIMIT=1793205000  # 28 October 2026 16:30 UTC: never overlap fixture cooking.
 APPLY='SELECT master_wok_event_test.apply_staff_command(%s::uuid,%s::uuid,%s::text,%s::uuid,%s::integer,%s::text,%s::timestamptz)'
 STATE="""SELECT b.status,coalesce(b.proposed_time,b.confirmed_time,b.preferred_time),

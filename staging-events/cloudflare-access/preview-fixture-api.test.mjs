@@ -63,7 +63,7 @@ test('private state fields and transport errors cannot be returned to browser',a
  const b=setup({api:{sendEnvelope:async()=>{throw Error('PRIVATE credentials');}}});const e=await b.send('command',b.command());assert.equal(e.status,502);assert.equal((await e.text()).includes('PRIVATE'),false);
 });
 test('Python Railway receiver accepts exact JavaScript signed envelopes',async()=>{
- const f=JSON.parse(fs.readFileSync(new URL('../../fixtures/preview-browser-28-oct-v1.json',import.meta.url),'utf8'));
+ const f=JSON.parse(fs.readFileSync(new URL('../../fixtures/preview-browser-28-oct-v2.json',import.meta.url),'utf8'));
  const base={enabled:true,fixture:{orderId:f.orderId,targets:f.targets},endEpoch:1600,nowSeconds:()=>1000,hopKey,actorKey};
  const api=createPreviewFixtureApi({...base,fetcher:async()=>new Response(JSON.stringify({keys:[jwk]})),sendEnvelope:async signed=>{
   const script="import json,sys;from preview_browser_receiver import validate_envelope;x=json.load(sys.stdin);e=validate_envelope(x['signed'],bytes.fromhex(x['key']),1000);print(json.dumps({'status':'RECORDED','revision':3}))";
@@ -81,15 +81,19 @@ test('fresh SQL fixture stays disabled, temporary read ACL is fixture scoped, cl
   await d.db.exec(load('handlers.sql'));
   await d.db.exec(load('runtime-role-proposal.sql').split('\n').filter(line=>!line.startsWith('CREATE ROLE')).join('\n'));
   await d.db.exec(load('booking-store-role.sql'));
-  await d.db.exec(load('preview-browser-fixture.sql'));
+  await d.db.exec('REVOKE SELECT ON master_wok_event_test.command_routes FROM master_wok_event_reader_login');
+  await d.db.exec(load('preview-browser-v2-fixture.sql'));
   assert.equal(await d.scalar('SELECT count(*)::int FROM master_wok_event_test.streams WHERE enabled'),0);
-  await d.db.exec(load('preview-browser-activate.sql'));
+  await d.db.exec(load('preview-browser-v2-activate.sql'));
   await d.db.exec('SET ROLE master_wok_event_reader_login');
+  assert.deepEqual(await d.q("SELECT s.event_count,(SELECT count(*)::int FROM master_wok_event_test.staff_commands a WHERE a.route_id=r.id) AS audit_count FROM master_wok_event_test.command_routes r JOIN master_wok_event_test.streams s ON s.id=r.current_stream WHERE r.id=$1::uuid AND r.generation=0 AND s.id=$2::uuid AND s.enabled AND s.scope='SYNTHETIC_STAGING_EVENTS' AND s.service_date=$3::date",['3d31312d-cb9b-53d0-b69b-801b5bbc5698','795f3b0b-08e0-5d22-8071-a97e9cd52912','2026-10-28']),[{event_count:2,audit_count:0}]);
   assert.equal(await d.scalar('SELECT count(*)::int FROM master_wok_event_test.booking_rows'),1);
+  await assert.rejects(d.q('SELECT scope FROM master_wok_event_test.command_routes'),/permission denied/);
   await d.db.exec('RESET ROLE');
-  await d.db.exec(load('preview-browser-cleanup.sql'));
+  await d.db.exec(load('preview-browser-v2-cleanup.sql'));
   assert.equal(await d.scalar('SELECT count(*)::int FROM master_wok_event_test.streams WHERE enabled'),0);
   assert.equal(await d.scalar("SELECT has_column_privilege('master_wok_event_reader_login','master_wok_event_test.booking_rows','status','SELECT')"),false);
+  assert.equal(await d.scalar("SELECT has_column_privilege('master_wok_event_reader_login','master_wok_event_test.command_routes','generation','SELECT')"),false);
   assert.equal(await d.scalar("SELECT has_function_privilege('master_wok_event_writer_login','master_wok_event_test.apply_staff_command(uuid,uuid,text,uuid,integer,text,timestamptz)','EXECUTE')"),false);
  }finally{await d.db.close();}
 });
