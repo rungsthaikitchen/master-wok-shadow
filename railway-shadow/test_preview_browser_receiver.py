@@ -43,10 +43,20 @@ class Tests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as directory:
    directory=Path(directory);budget=p.Budget(directory/'budget.sqlite3',1600,clock=lambda:1000);budget.take('started');before=budget.summary()
    conn=Connection((2,False));cfg=dict(reader={'user':'test-reader'})
-   with patch.object(p,'configuration',return_value=cfg),patch.object(p,'role_check'),patch.object(p,'serve',side_effect=AssertionError('HTTP opened')):
+   with patch.object(p,'connection_configuration',return_value=cfg),patch.object(p,'role_check'),patch.object(p,'serve',side_effect=AssertionError('HTTP opened')):
     result=p.diagnose({'MASTER_WOK_PREVIEW_BROWSER_ENABLED':'false'},connect=lambda **_:conn,clock=lambda:1000,directory=directory)
    self.assertEqual(result['fixtureEnabled'],False);self.assertEqual(result['budget'],{'started':1});self.assertEqual(budget.summary(),before);self.assertEqual(conn.queries[0][0],'SET TRANSACTION READ ONLY')
    with self.assertRaises(p.EventCaptureError):p.diagnose({'MASTER_WOK_PREVIEW_BROWSER_ENABLED':'true'})
+ def test_expired_trial_can_be_diagnosed_but_cannot_be_started(self):
+  env=dict(MASTER_WOK_PREVIEW_BROWSER_ENABLED='false',MASTER_WOK_PREVIEW_BROWSER_END_EPOCH='1',MASTER_WOK_PREVIEW_HOP_KEY=KEY.hex(),RAILWAY_PROJECT_ID='7821ad5b-f5c2-4ab4-9206-c3d76eefd4c8',RAILWAY_ENVIRONMENT_ID='c1b8fad6-dbfc-4188-b4b5-a5dbfbf53279',RAILWAY_SERVICE_ID='012e5ef6-6225-4ab3-95f5-894583db7e83',MASTER_WOK_EVENT_RUNTIME_SCOPE='SYNTHETIC_STAGING_EVENTS')
+  with tempfile.TemporaryDirectory() as directory,patch.object(p,'connection_parameters',side_effect=lambda _,kind:dict(kind=kind)),patch.object(p,'role_check'),patch.object(p,'serve',side_effect=AssertionError('HTTP opened')):
+   conn=Connection((2,False));before=dict(env)
+   result=p.diagnose(env,connect=lambda **_:conn,clock=lambda:p.END_LIMIT+86400,directory=Path(directory))
+   self.assertEqual(result['budget'],None);self.assertEqual(env,before);self.assertEqual(conn.queries[0][0],'SET TRANSACTION READ ONLY')
+   self.assertFalse((Path(directory)/'budget.sqlite3').exists())
+   with self.assertRaises(p.EventCaptureError):p.configuration(dict(env,MASTER_WOK_PREVIEW_BROWSER_ENABLED='true'),p.END_LIMIT+86400)
+   for bad in [dict(RAILWAY_ENVIRONMENT_ID='production'),dict(MASTER_WOK_EVENT_RUNTIME_ENABLED='true')]:
+    with self.assertRaises(p.EventCaptureError):p.diagnose(dict(env,**bad),connect=lambda **_:self.fail('connection opened'),directory=Path(directory))
  def test_configuration_pins_environment_fresh_deadline_and_other_flags(self):
   env=dict(MASTER_WOK_PREVIEW_BROWSER_ENABLED='true',MASTER_WOK_PREVIEW_BROWSER_END_EPOCH='1600',MASTER_WOK_PREVIEW_HOP_KEY=KEY.hex(),RAILWAY_PROJECT_ID='7821ad5b-f5c2-4ab4-9206-c3d76eefd4c8',RAILWAY_ENVIRONMENT_ID='c1b8fad6-dbfc-4188-b4b5-a5dbfbf53279',RAILWAY_SERVICE_ID='012e5ef6-6225-4ab3-95f5-894583db7e83',MASTER_WOK_EVENT_RUNTIME_SCOPE='SYNTHETIC_STAGING_EVENTS')
   with patch.object(p,'connection_parameters',side_effect=lambda d,k:dict(kind=k)):

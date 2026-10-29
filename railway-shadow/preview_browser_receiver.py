@@ -30,18 +30,21 @@ STATE="""SELECT b.status,coalesce(b.proposed_time,b.confirmed_time,b.preferred_t
 def refuse(code='PREVIEW_FIXTURE_REFUSED'):
  raise EventCaptureError(code)
 
-def configuration(env,now=None):
- if env.get('MASTER_WOK_PREVIEW_BROWSER_ENABLED')!='true':return None
- now=time.time() if now is None else now
+def connection_configuration(env):
  expected={'RAILWAY_PROJECT_ID':'7821ad5b-f5c2-4ab4-9206-c3d76eefd4c8','RAILWAY_ENVIRONMENT_ID':'c1b8fad6-dbfc-4188-b4b5-a5dbfbf53279','RAILWAY_SERVICE_ID':'012e5ef6-6225-4ab3-95f5-894583db7e83','MASTER_WOK_EVENT_RUNTIME_SCOPE':'SYNTHETIC_STAGING_EVENTS'}
  if any(env.get(k)!=v for k,v in expected.items()):refuse('PREVIEW_SCOPE_REFUSED')
  if any(k.startswith('MASTER_WOK_') and k.endswith('_ENABLED') and k!='MASTER_WOK_PREVIEW_BROWSER_ENABLED' and v!='false' for k,v in env.items()):refuse('PREVIEW_OTHER_FLAG_REFUSED')
+ key=env.get('MASTER_WOK_PREVIEW_HOP_KEY','')
+ if re.fullmatch('[a-f0-9]{64}',key) is None:refuse('PREVIEW_SERVER_KEY_REQUIRED')
+ return dict(key=bytes.fromhex(key),reader=connection_parameters(env.get('MASTER_WOK_EVENT_READER_DSN'),'reader'),writer=connection_parameters(env.get('MASTER_WOK_EVENT_WRITER_DSN'),'writer'))
+
+def configuration(env,now=None):
+ if env.get('MASTER_WOK_PREVIEW_BROWSER_ENABLED')!='true':return None
+ now=time.time() if now is None else now
  try:deadline=int(env.get('MASTER_WOK_PREVIEW_BROWSER_END_EPOCH','0'))
  except (TypeError,ValueError):refuse('PREVIEW_DEADLINE_REFUSED')
  if not now<deadline<=now+600 or deadline>=END_LIMIT:refuse('PREVIEW_DEADLINE_REFUSED')
- key=env.get('MASTER_WOK_PREVIEW_HOP_KEY','')
- if re.fullmatch('[a-f0-9]{64}',key) is None:refuse('PREVIEW_SERVER_KEY_REQUIRED')
- return dict(deadline=deadline,key=bytes.fromhex(key),reader=connection_parameters(env.get('MASTER_WOK_EVENT_READER_DSN'),'reader'),writer=connection_parameters(env.get('MASTER_WOK_EVENT_WRITER_DSN'),'writer'))
+ return dict(connection_configuration(env),deadline=deadline)
 
 class Budget(BaseBudget):
  LIMITS={'started':1,'request':160,'state':60,'command':20,'preflight':1}
@@ -159,9 +162,9 @@ def diagnose(env=None,*,connect=None,clock=time.time,directory=DIRECTORY):
  """Private one-off diagnostic: no HTTP, writes, budget consumption or resets."""
  env=os.environ if env is None else env
  if env.get('MASTER_WOK_PREVIEW_BROWSER_ENABLED')!='false':refuse('PREVIEW_DIAGNOSTIC_DISABLED_REQUIRED')
- # Validate the enabled configuration with a synthetic diagnostic-only deadline;
- # no listener or trial is created, and the stored trial deadline is untouched.
- now=clock();config=configuration(dict(env,MASTER_WOK_PREVIEW_BROWSER_ENABLED='true',MASTER_WOK_PREVIEW_BROWSER_END_EPOCH=str(int(now)+300)),now)
+ # Diagnostics remain read-only after expiry. Validate scope/roles/connections,
+ # without inventing a new active deadline or weakening configuration()/main().
+ config=connection_configuration(env)
  path=directory/'budget.sqlite3'
  if any(p.is_symlink() for p in (path,*path.parents)):refuse('PREVIEW_PATH_REFUSED')
  budget=None
