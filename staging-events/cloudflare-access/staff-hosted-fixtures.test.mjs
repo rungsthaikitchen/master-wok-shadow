@@ -6,8 +6,11 @@ const require=createRequire(import.meta.url),{database}=require('../command-rout
 test('hosted fixture seed and temporary ACL scripts apply cleanly; cleanup disables only those streams',async()=>{
  const d=await database();try{
   const read=n=>fs.readFileSync(new URL('../'+n,import.meta.url),'utf8');
-  await d.db.exec(read('staff-command-candidate.sql'));await d.db.exec(read('staff-command-trial-fixtures.sql'));await d.db.exec(read('staff-command-trial-role.sql'));
-  const f=JSON.parse(fs.readFileSync(new URL('../../fixtures/staff-command-trial-27-oct-v1.json',import.meta.url),'utf8'));
+  // Exercise the historical seed/ACL structure on a future local service day.
+  // Retain the committed hosted fixture and its expiry unchanged.
+  const day=await d.scalar("SELECT ((clock_timestamp() AT TIME ZONE 'Europe/London')::date+1)::text");
+  await d.db.exec(read('staff-command-candidate.sql'));await d.db.exec(read('staff-command-trial-fixtures.sql').replaceAll('2026-10-28',day));await d.db.exec(read('staff-command-trial-role.sql'));
+  const f=JSON.parse(fs.readFileSync(new URL('../../fixtures/staff-command-trial-27-oct-v1.json',import.meta.url),'utf8')).map(row=>({...row,day}));
   assert.equal(await d.scalar('SELECT count(*)::int FROM master_wok_event_test.streams WHERE enabled'),6);
   assert.equal(await d.scalar('SELECT count(*)::int FROM master_wok_event_test.events'),12);
   assert.equal(await d.scalar('SELECT count(*)::int FROM master_wok_event_test.reservations'),6);

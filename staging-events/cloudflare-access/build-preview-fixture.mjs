@@ -9,10 +9,10 @@ const args=process.argv.slice(2),config={enabled:false};
 if(args.length){
  if(args.length!==5||args[0]!=='--enable'||args[1]!=='--end-epoch'||args[3]!=='--endpoint')throw Error('EXPLICIT_TRIAL_ARGUMENTS_REQUIRED');
  const endEpoch=Number(args[2]),now=Math.floor(Date.now()/1000);
- if(!Number.isSafeInteger(endEpoch)||!(now<endEpoch&&endEpoch<=now+600)||endEpoch>=1793205000)throw Error('FRESH_TEN_MINUTE_DEADLINE_REQUIRED');
+ if(!Number.isSafeInteger(endEpoch)||!(now<endEpoch&&endEpoch<=now+600)||endEpoch>=1793291400)throw Error('FRESH_TEN_MINUTE_DEADLINE_REQUIRED');
  Object.assign(config,{enabled:true,endEpoch,endpoint:previewEndpoint(args[4])});
 }
-const f=JSON.parse(fs.readFileSync(new URL('../../fixtures/preview-browser-28-oct-v2.json',root),'utf8'));
+const f=JSON.parse(fs.readFileSync(new URL('../../fixtures/preview-browser-29-oct-v3.json',root),'utf8'));
 fs.mkdirSync(new URL('functions/admin-api/',out),{recursive:true});fs.mkdirSync(new URL('admin-staging/',out),{recursive:true});
 const source=`import {createPreviewFixtureApi} from './preview-fixture-api.mjs';import {createPreviewFixtureHttp} from './preview-fixture-http.mjs';const config=${JSON.stringify(config)};const fixture=${JSON.stringify({orderId:f.orderId,targets:f.targets})};const disabled=createPreviewFixtureApi();let handler;export function onRequest(context){if(!config.enabled)return disabled(context.request);try{handler??=createPreviewFixtureApi({enabled:true,fixture,endEpoch:config.endEpoch,hopKey:context.env.MASTER_WOK_PREVIEW_HOP_KEY,actorKey:context.env.MASTER_WOK_PREVIEW_ACTOR_KEY,sendEnvelope:createPreviewFixtureHttp({enabled:true,endpoint:config.endpoint})});return handler(context.request);}catch{return new Response(JSON.stringify({error:'STAFF_BROWSER_STAGING_DISABLED'}),{status:503,headers:{'Content-Type':'application/json','Cache-Control':'no-store'}});}}`;
 const license=fs.readFileSync(new URL('node_modules/jose/LICENSE.md',root),'utf8');

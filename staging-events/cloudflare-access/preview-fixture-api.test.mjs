@@ -13,7 +13,7 @@ const hopKey=randomBytes(32).toString('hex'),actorKey=randomBytes(32).toString('
 const pair=await generateKeyPair('RS256'),jwk={...await exportJWK(pair.publicKey),kid:'fixture',alg:'RS256',use:'sig'};
 const token=extra=>new SignJWT({iss:P.teamDomain,aud:[P.audience],sub:'synthetic-staff',type:'app',iat:900,nbf:900,exp:2000,email:'PRIVATE@example.invalid',...extra}).setProtectedHeader({alg:'RS256',kid:'fixture'}).sign(pair.privateKey);
 const identity=await token(),otherIdentity=await token({sub:'another-staff'});
-const fixture={orderId:'12345678-1234-1234-1234-123456789abc',targets:['2026-10-28T19:00:00Z','2026-10-28T19:30:00Z']};
+const fixture={orderId:'12345678-1234-1234-1234-123456789abc',targets:['2026-10-29T19:00:00Z','2026-10-29T19:30:00Z']};
 function setup(extra={}){
  const s={now:1000,reads:0,writes:0,budgets:0,sends:0,keys:0,last:null};
  const base={enabled:true,fixture:structuredClone(fixture),endEpoch:1600,nowSeconds:()=>s.now,hopKey,actorKey};
@@ -43,13 +43,13 @@ test('wrong application, identity, origin, fixture, target and caller actor cann
  const a=setup();
  for(const auth of ['forged',await token({aud:['a'.repeat(64)]}),await token({type:'org'})])assert.equal((await a.send('state',{orderId:fixture.orderId},auth)).status,403);
  assert.equal((await a.send('state',{orderId:fixture.orderId},identity,'https://other.rungsthaikitchen.pages.dev')).status,403);
- for(const c of [{...a.command(),orderId:randomUUID()},{...a.command(),target:'2026-10-28T21:00:00Z'},{...a.command(),actorId:'a'.repeat(64)}])assert.equal((await a.send('command',c)).status,400);
+ for(const c of [{...a.command(),orderId:randomUUID()},{...a.command(),target:'2026-10-29T21:00:00Z'},{...a.command(),actorId:'a'.repeat(64)}])assert.equal((await a.send('command',c)).status,400);
  assert.equal((await a.send('state',{orderId:randomUUID()})).status,400);assert.equal(a.s.sends,0);assert.equal(a.s.budgets,0);
 });
 test('receiver independently rejects forged, future, expired and other fixture envelopes before budget',async()=>{
  const a=setup();await a.send('command',a.command());const first=a.s.last,before=a.s.budgets;
  await assert.rejects(a.receiver({...first,body:first.body+' '}),/PREVIEW_FIXTURE_REFUSED/);
- for(const patch of [{issuedAt:1001},{issuedAt:970},{input:{...a.command(),orderId:randomUUID()}},{input:{...a.command(),target:'2026-10-28T21:00:00Z'}}]){
+ for(const patch of [{issuedAt:1001},{issuedAt:970},{input:{...a.command(),orderId:randomUUID()}},{input:{...a.command(),target:'2026-10-29T21:00:00Z'}}]){
   const e={...JSON.parse(first.body),...patch},signed=await signPreview(previewHmac(hopKey),JSON.stringify(e));await assert.rejects(a.receiver(signed),/PREVIEW_FIXTURE_REFUSED/);
  }assert.equal(a.s.budgets,before);
 });
@@ -63,7 +63,7 @@ test('private state fields and transport errors cannot be returned to browser',a
  const b=setup({api:{sendEnvelope:async()=>{throw Error('PRIVATE credentials');}}});const e=await b.send('command',b.command());assert.equal(e.status,502);assert.equal((await e.text()).includes('PRIVATE'),false);
 });
 test('Python Railway receiver accepts exact JavaScript signed envelopes',async()=>{
- const f=JSON.parse(fs.readFileSync(new URL('../../fixtures/preview-browser-28-oct-v2.json',import.meta.url),'utf8'));
+ const f=JSON.parse(fs.readFileSync(new URL('../../fixtures/preview-browser-29-oct-v3.json',import.meta.url),'utf8'));
  const base={enabled:true,fixture:{orderId:f.orderId,targets:f.targets},endEpoch:1600,nowSeconds:()=>1000,hopKey,actorKey};
  const api=createPreviewFixtureApi({...base,fetcher:async()=>new Response(JSON.stringify({keys:[jwk]})),sendEnvelope:async signed=>{
   const script="import json,sys;from preview_browser_receiver import validate_envelope;x=json.load(sys.stdin);e=validate_envelope(x['signed'],bytes.fromhex(x['key']),1000);print(json.dumps({'status':'RECORDED','revision':3}))";
@@ -82,15 +82,15 @@ test('fresh SQL fixture stays disabled, temporary read ACL is fixture scoped, cl
   await d.db.exec(load('runtime-role-proposal.sql').split('\n').filter(line=>!line.startsWith('CREATE ROLE')).join('\n'));
   await d.db.exec(load('booking-store-role.sql'));
   await d.db.exec('REVOKE SELECT ON master_wok_event_test.command_routes FROM master_wok_event_reader_login');
-  await d.db.exec(load('preview-browser-v2-fixture.sql'));
+  await d.db.exec(load('preview-browser-v3-fixture.sql'));
   assert.equal(await d.scalar('SELECT count(*)::int FROM master_wok_event_test.streams WHERE enabled'),0);
-  await d.db.exec(load('preview-browser-v2-activate.sql'));
+  await d.db.exec(load('preview-browser-v3-activate.sql'));
   await d.db.exec('SET ROLE master_wok_event_reader_login');
-  assert.deepEqual(await d.q("SELECT s.event_count,(SELECT count(*)::int FROM master_wok_event_test.staff_commands a WHERE a.route_id=r.id) AS audit_count FROM master_wok_event_test.command_routes r JOIN master_wok_event_test.streams s ON s.id=r.current_stream WHERE r.id=$1::uuid AND r.generation=0 AND s.id=$2::uuid AND s.enabled AND s.scope='SYNTHETIC_STAGING_EVENTS' AND s.service_date=$3::date",['3d31312d-cb9b-53d0-b69b-801b5bbc5698','795f3b0b-08e0-5d22-8071-a97e9cd52912','2026-10-28']),[{event_count:2,audit_count:0}]);
+  assert.deepEqual(await d.q("SELECT s.event_count,(SELECT count(*)::int FROM master_wok_event_test.staff_commands a WHERE a.route_id=r.id) AS audit_count FROM master_wok_event_test.command_routes r JOIN master_wok_event_test.streams s ON s.id=r.current_stream WHERE r.id=$1::uuid AND r.generation=0 AND s.id=$2::uuid AND s.enabled AND s.scope='SYNTHETIC_STAGING_EVENTS' AND s.service_date=$3::date",['97f09d20-db85-5f05-ad93-2087d9f2501e','4cbf42dd-4829-5216-b91c-ac4e0d907191','2026-10-29']),[{event_count:2,audit_count:0}]);
   assert.equal(await d.scalar('SELECT count(*)::int FROM master_wok_event_test.booking_rows'),1);
   await assert.rejects(d.q('SELECT scope FROM master_wok_event_test.command_routes'),/permission denied/);
   await d.db.exec('RESET ROLE');
-  await d.db.exec(load('preview-browser-v2-cleanup.sql'));
+  await d.db.exec(load('preview-browser-v3-cleanup.sql'));
   assert.equal(await d.scalar('SELECT count(*)::int FROM master_wok_event_test.streams WHERE enabled'),0);
   assert.equal(await d.scalar("SELECT has_column_privilege('master_wok_event_reader_login','master_wok_event_test.booking_rows','status','SELECT')"),false);
   assert.equal(await d.scalar("SELECT has_column_privilege('master_wok_event_reader_login','master_wok_event_test.command_routes','generation','SELECT')"),false);

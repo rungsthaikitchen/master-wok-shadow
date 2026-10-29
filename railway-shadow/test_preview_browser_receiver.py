@@ -29,7 +29,7 @@ class Connection:
 
 class Tests(unittest.TestCase):
  def receiver(self,result=None):
-  counter=Counter();conn=Connection(result or ('proposed',datetime(2026,10,28,19,tzinfo=timezone.utc),2));opens=[]
+  counter=Counter();conn=Connection(result or ('proposed',datetime.fromisoformat(p.FIXTURE['targets'][1].replace('Z','+00:00')),2));opens=[]
   def connect(**kwargs):opens.append(kwargs);return conn
   receiver=p.Receiver(dict(key=KEY,deadline=1600,reader={'user':'test-reader'},writer={'user':'test-writer'}),counter,connect=connect,clock=lambda:1000)
   return receiver,counter,conn,opens
