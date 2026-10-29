@@ -45,7 +45,24 @@ applied. The fixture is disabled and no temporary policies were introduced.
 Both Pages and receiver enforce a fresh window of at most ten minutes. The absolute
 cutoff is 29 October 16:30 UTC; after that, prepare another dated fixture rather
 than extending the old candidate. Pages artifacts are built disabled. Website main
-and the isolated preview branch have not been changed in this preparation.
+is unchanged.
+
+## Hosted disabled preparation verified
+
+Receiver deployment 28272286-d19a-4de3-a2f0-3dc4eb3c5a74 completed SUCCESS for
+source bff2f78d43cd5fffa19705aa46b84a72cf951671. Its configured start command is
+python railway-shadow/preview_browser_receiver.py, restart NEVER, existing /data
+volume retained. Runtime logged DISABLED / sourceRequests 0. No public domain
+exists and no version-three journal has been started by this preparation.
+
+The isolated website preview branch was still exactly ad998caa6069fada55a4f1a0229ed83ca34264b9
+before modification. Commit 25cd9271ef14dc59426ba9c1784d2a72fc8826ab updates its
+eight preview files to the new fixture, both APIs disabled. Disabled tree:
+3efb79a0fc15eef29a55dc6c9948c65133f7cdca. Cloudflare Pages check completed
+SUCCESS; hashed preview https://c07eb240.rungsthaikitchen.pages.dev and branch
+preview https://preview-staff-browser-2026-1.rungsthaikitchen.pages.dev.
+No main branch update or production action occurred. The owner must be signed
+into the preview Access application before opening a bounded test window.
 
 Validation: 83 Node tests and 19 Python tests passed in both Europe/London and UTC.
 The Python state stub now derives its target from the selected fixture. A separate
