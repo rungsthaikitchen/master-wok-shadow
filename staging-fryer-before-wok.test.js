@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const {planFryerBeforeWok}=require('./staging-fryer-before-wok');
-const orders=[{orderId:'A',readyMinute:1140}];
+const orders=[{orderId:'A',readyMinute:1140,placedAt:new Date(2026,9,17,17,30)}];
 const rows=(qty=1)=>[{id:'A',items:[{item_id:'stir-crispy',qty,modifiers:[]}]}];
 const wok=start=>({status:'FEASIBLE_PROTOTYPE',jobs:[{itemId:'stir-crispy',orderIds:['A'],start}]});
 test('three crispy chicken portions fry before their wok starts',()=>{
