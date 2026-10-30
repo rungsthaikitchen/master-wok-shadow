@@ -28,7 +28,9 @@ test('different modifiers are never combined',()=>{
  const x=sample(2);x.rows[1].items[0].modifiers=[{id:'chicken'}];
  const r=schedule(x.orders,x.rows);
  assert.equal(r.productionBatches,2);
- assert.equal(r.status,'UNVERIFIED');
+ assert.equal(r.status,'FEASIBLE_PROTOTYPE');
+ assert.ok(r.jobs.every(j=>j.portions===1));
+ assert.ok(r.jobs[0].finish+1<=r.jobs[1].start);
 });
 
 test('two identical Pad Thai portions use a ten-minute noodle batch',()=>{
