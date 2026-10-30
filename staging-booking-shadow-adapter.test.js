@@ -45,7 +45,7 @@ test('standalone spring rolls do not consume wok capacity',()=>{
  assert.equal(r.bookingApprovalAllowed,false);
 });
 
-test('busy nineteen-hundred Panang candidate reports a specific scheduling blocker',()=>{
+test('eleventh Panang can fit through batching without booking approval',()=>{
  const orders=[],rows=[];
  for(let i=0;i<10;i++){
   const id='busy-'+i;
@@ -53,6 +53,20 @@ test('busy nineteen-hundred Panang candidate reports a specific scheduling block
   rows.push({id,items:[line('panang-curry')]});
  }
  const r=compareBookingShadow({orders,rows,candidate});
+ assert.equal(r.status,'VALIDATED_SHADOW_PROTOTYPE');
+ assert.equal(r.curryHoldPolicy,'EXCEPTION_20_MINUTES');
+ assert.equal(r.planFailureReason,null);
+ assert.equal(r.bookingApprovalAllowed,false);
+});
+test('late eleventh Panang fails closed with a specific blocker',()=>{
+ const orders=[],rows=[];
+ for(let i=0;i<10;i++){
+  const id='late-'+i;
+  orders.push({orderId:id,readyMinute:1140,placedAt:new Date(2026,9,17,18,50)});
+  rows.push({id,items:[line('panang-curry')]});
+ }
+ const r=compareBookingShadow({orders,rows,candidate:{order:{...candidate.order,
+  placedAt:new Date(2026,9,17,18,50)},row:candidate.row}});
  assert.equal(r.status,'UNVERIFIED');
  assert.equal(typeof r.planFailureReason,'string');
  assert.equal(r.bookingApprovalAllowed,false);
