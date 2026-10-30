@@ -37,32 +37,49 @@ function scheduleCrossOrderPanang(orders,rows) {
  const jobs=[];
  for(const g of groups.values()) {
    const portions=[...g.portions].sort((a,b)=>a.placedAt-b.placedAt);
-   // Conservative: only portions already placed by batch start can participate.
-   // Start with maximal groups; do not claim optimality if they cannot fit.
-   const batches=[];
    const max=MAX_BY_GROUP[g.group];
-   for(let i=0;i<portions.length;i+=max)batches.push(portions.slice(i,i+max));
-   let cursor=g.readyMinute;
-   const planned=[];
-   for(let i=batches.length-1;i>=0;i--) {
-     const batch=batches[i],duration=DURATION_BY_GROUP[g.group][batch.length];
-     const finish=cursor,start=finish-duration;
-     const latestPlacement=Math.max(...batch.map(p=>p.placedAt.getHours()*60+p.placedAt.getMinutes()));
-     const holding=g.readyMinute-finish;
-     const limit=CURRIES.has(g.itemId)?HOLD_MINUTES:10;
-     planned.unshift({start,finish,readyMinute:g.readyMinute,itemId:g.itemId,group:g.group,portions:batch.length,
-       orderIds:[...new Set(batch.map(p=>p.orderId))],holdingMinutes:holding,
-       placementSatisfied:latestPlacement<=start,holdingSatisfied:holding<=limit,holdingLimitMinutes:limit});
-     cursor=start-1;
+   for(let i=0;i<portions.length;i+=max){
+     const batch=portions.slice(i,i+max);
+     const duration=DURATION_BY_GROUP[g.group][batch.length];
+     const placement=Math.max(...batch.map(p=>p.placedAt.getHours()*60+p.placedAt.getMinutes()));
+     const holdingLimitMinutes=CURRIES.has(g.itemId)?HOLD_MINUTES:10;
+     const earliest=Math.max(990,placement,g.readyMinute-holdingLimitMinutes-duration);
+     const latest=g.readyMinute-duration;
+     jobs.push({itemId:g.itemId,group:g.group,readyMinute:g.readyMinute,
+       portions:batch.length,orderIds:[...new Set(batch.map(p=>p.orderId))],
+       duration,earliest,latest,holdingLimitMinutes});
    }
-   jobs.push(...planned);
  }
- const chronological=[...jobs].sort((a,b)=>a.start-b.start);
- const noOverlap=chronological.every((j,i)=>i===0||j.start>=chronological[i-1].finish+1);
- const feasible=noOverlap&&chronological.every(j=>j.placementSatisfied&&j.holdingSatisfied);
+ if(jobs.length>32)return {status:'UNVERIFIED',reason:'SEARCH_SIZE_LIMIT',bookingApprovalAllowed:false};
+ if(jobs.some(j=>j.earliest>j.latest||j.latest+j.duration>1320))
+   return {status:'UNVERIFIED',reason:'IMPOSSIBLE_BATCH_WINDOW',bookingApprovalAllowed:false};
+ // Single shared wok. Enumerate feasible start minutes; never accept a clash.
+ // Search is bounded and reports UNVERIFIED rather than assuming feasibility.
+ const occupied=[];
+ let nodes=0,exhausted=false;
+ function search(remaining){
+   if(!remaining.length)return true;
+   if(++nodes>100000){exhausted=true;return false;}
+   // Most constrained job first; tie-break by promised ready time.
+   const candidates=[...remaining].sort((a,b)=>(a.latest-a.earliest)-(b.latest-b.earliest)||a.readyMinute-b.readyMinute);
+   for(const job of candidates){
+     for(let t=job.latest;t>=job.earliest;t--){
+       const finish=t+job.duration;
+       if(occupied.some(o=>t<o.finish+1&&finish+1>o.start))continue;
+       occupied.push({...job,start:t,finish,holdingMinutes:job.readyMinute-finish,
+         placementSatisfied:true,holdingSatisfied:true});
+       if(search(remaining.filter(x=>x!==job)))return true;
+       occupied.pop();
+       if(exhausted)return false;
+     }
+   }
+   return false;
+ }
+ const feasible=search(jobs);
+ const chronological=feasible?[...occupied].sort((a,b)=>a.start-b.start):[];
  return {status:feasible?'FEASIBLE_PROTOTYPE':'UNVERIFIED',
-   reason:feasible?'STRICT_IDENTICAL_DISH_BATCH_PLAN':'BATCH_CONSTRAINT_FAILED',
-   holdingLimitMinutes:HOLD_MINUTES,productionBatches:chronological.length,
-   jobs:chronological,noOverlap,bookingApprovalAllowed:false};
+   reason:feasible?'SHARED_WOK_TIMELINE':exhausted?'SEARCH_LIMIT':'NO_SHARED_TIMELINE',
+   holdingLimitMinutes:HOLD_MINUTES,productionBatches:jobs.length,
+   jobs:chronological,noOverlap:feasible,nodes,bookingApprovalAllowed:false};
 }
 module.exports={scheduleCrossOrderPanang};
