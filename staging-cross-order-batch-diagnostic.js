@@ -21,7 +21,18 @@ function diagnostic(orders,rows){
    const batches=[];let remaining=g.portions;
    while(remaining){const n=Math.min(4,remaining);batches.push({portions:n,minutes:FAST_MINUTES[n]});remaining-=n;}
    const totalMinutes=batches.reduce((n,b)=>n+b.minutes,0)+Math.max(0,batches.length-1);
-   buckets.push({readyMinute:g.readyMinute,itemId:g.itemId,portions:g.portions,batches,
+   // Back-plan contiguous batches so the last one finishes exactly at ready time.
+   // Each batch's finish is the holding clock start for its portions.
+   let cursor=g.readyMinute;
+   const backplanned=[...batches].reverse().map((batch,index)=>{
+     const finish=cursor;
+     const start=finish-batch.minutes;
+     cursor=start-(index<batches.length-1?1:0);
+     return {...batch,startMinute:start,finishMinute:finish,holdingMinutes:g.readyMinute-finish};
+   }).reverse();
+   const maximumHoldingMinutes=Math.max(...backplanned.map(b=>b.holdingMinutes));
+   buckets.push({readyMinute:g.readyMinute,itemId:g.itemId,portions:g.portions,batches,backplanned,
+     maximumHoldingMinutes,holdingLimitMinutes:10,withinHoldingLimit:maximumHoldingMinutes<=10,
      productionMinutesIncludingResets:totalMinutes,
      earliestFinishIfStartedAtReadyMinus10:g.readyMinute-10+totalMinutes,
      fitsTenMinuteHoldingWindow:totalMinutes<=10});
