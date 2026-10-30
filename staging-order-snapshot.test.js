@@ -1,0 +1,10 @@
+'use strict';
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const {normalizeStagingOrders}=require('./staging-order-snapshot');
+const model={hasItem:id=>id==='salt-chicken',classifyBasket:lines=>({lines})};
+const base={id:'o1',created_at:'2026-11-01T16:30:00Z',preferred_time:'2026-11-01T19:00:00Z',status:'confirmed',local_ready_minute:1140,local_service_date:'2026-11-01',items:[{item_id:'salt-chicken',qty:1,modifiers:[]}]};
+test('valid staging order maps to classification',()=>{const out=normalizeStagingOrders({rows:[base],model,serviceDate:'2026-11-01'});assert.equal(out[0].readyMinute,1140);assert.equal(out[0].classification.lines[0].itemId,'salt-chicken');});
+test('missing items fails closed',()=>assert.throws(()=>normalizeStagingOrders({rows:[{...base,items:[]}],model,serviceDate:'2026-11-01'}),/INCOMPLETE_ORDER/));
+test('unsupported catalog ID fails closed',()=>assert.throws(()=>normalizeStagingOrders({rows:[{...base,items:[{item_id:'unknown',qty:1}]}],model,serviceDate:'2026-11-01'}),/INVALID_ITEM/));
+test('wrong service date fails closed',()=>assert.throws(()=>normalizeStagingOrders({rows:[{...base,local_service_date:'2026-11-02'}],model,serviceDate:'2026-11-01'}),/INVALID_LOCAL_TIME/));
