@@ -109,7 +109,7 @@ test('mixed service with fryer-dependent dish fails closed',()=>{
  const r=schedule(x.orders,x.rows);
  assert.equal(r.status,'UNVERIFIED');
  assert.equal(r.reason,'UNSUPPORTED_MIXED_PRODUCTION');
- assert.equal(r.bookingApprovalAllowed,undefined);
+ assert.equal(r.bookingApprovalAllowed,false);
 });
 test('mixed service with impossible late placement fails closed',()=>{
  const x=mixedFixture();
