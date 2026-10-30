@@ -9,12 +9,13 @@ const DURATION_BY_GROUP={fast:{1:5,2:6,3:8,4:10},noodle:{1:8,2:10},salad:{1:10,2
 const MAX_BY_GROUP={fast:4,noodle:2,salad:4};
 const CURRIES=new Set(['massaman-curry','panang-curry','rung-curry','green-curry','red-curry']);
 function productionGroup(itemId){
- if(CURRIES.has(itemId)||['tom-yum','tom-kha','stir-basil','stir-ginger','stir-cashew','stir-sweetsour','stir-yellow','stir-chilli','stir-pepper','egg-rice','coconut-rice'].includes(itemId))return 'fast';
+ if(CURRIES.has(itemId)||['tom-yum','tom-kha','stir-crispy','salt-chicken','salt-chickenchips','salt-chips','stir-basil','stir-ginger','stir-cashew','stir-sweetsour','stir-yellow','stir-chilli','stir-pepper','egg-rice','coconut-rice'].includes(itemId))return 'fast';
  if(['pad-thai','chef-pad-thai','pad-kee-mao','pad-see-ew','fried-rice'].includes(itemId))return 'noodle';
  if(['papaya-salad','beef-salad','pork-salad','laab'].includes(itemId))return 'salad';
  return null;
 }
-function scheduleCrossOrderPanang(orders,rows) {
+function scheduleCrossOrderPanang(orders,rows,options={}) {
+ const allowFryerDependent=options.allowFryerDependent===true;
  const known=new Map(orders.map(o=>[String(o.orderId),o]));
  const groups=new Map(),unsupported=[];
  for(const row of rows) {
@@ -23,6 +24,9 @@ function scheduleCrossOrderPanang(orders,rows) {
    for(const line of row.items||[]) {
      if(NO_WOK.has(line.item_id)) continue;
      const group=productionGroup(line.item_id);
+     if(!allowFryerDependent && ['stir-crispy','salt-chicken','salt-chickenchips','salt-chips'].includes(line.item_id)) {
+       unsupported.push(String(row.id));continue;
+     }
      if(!group||!Number.isInteger(line.qty)||line.qty<=0||
        !Array.isArray(line.modifiers)) {
        unsupported.push(String(row.id));continue;
