@@ -9,7 +9,7 @@ function planFryerBeforeWok(orders,rows,wokPlan){
  if(inventory.unmodelled.length)return {status:'UNVERIFIED',reason:'FRY_RECIPES_UNMODELLED',inventory,jobs:[],bookingApprovalAllowed:false};
  if(!wokPlan||wokPlan.status!=='FEASIBLE_PROTOTYPE')
   return {status:'UNVERIFIED',reason:'WOK_PLAN_UNVERIFIED',inventory,jobs:[],bookingApprovalAllowed:false};
- const portions=[];
+ const placements=new Map(orders.map(o=>[String(o.orderId),o.placedAt instanceof Date\n  ?o.placedAt.getHours()*60+o.placedAt.getMinutes():NaN]));\n const portions=[];
  for(const dep of inventory.dependencies){
   const matches=(wokPlan.jobs||[]).filter(w=>w.itemId===dep.itemId&&(w.orderIds||[]).includes(dep.orderId));
   // We cannot safely map a portion to a particular wok batch if ambiguous.
@@ -37,7 +37,7 @@ function planFryerBeforeWok(orders,rows,wokPlan){
     if(chosen&&chosen.size===Math.min(3,remaining.length))break;
    }
    if(!chosen)return {status:'UNVERIFIED',reason:'FRY_BEFORE_WOK_CAPACITY_UNVERIFIED',inventory,jobs:[],bookingApprovalAllowed:false};
-   const assigned=remaining.splice(0,chosen.size);
+   const assigned=remaining.slice(0,chosen.size);\n   if(assigned.some(p=>!Number.isFinite(placements.get(String(p.orderId)))||chosen.start<placements.get(String(p.orderId))))\n    return {status:'UNVERIFIED',reason:'FRY_BEFORE_ORDER_PLACED',inventory,jobs:[],bookingApprovalAllowed:false};\n   remaining.splice(0,chosen.size);
    const job={type:assigned[0].type,basket:chosen.basket.id,portions:assigned.length,
     orderIds:[...new Set(assigned.map(p=>p.orderId))],itemIds:[...new Set(assigned.map(p=>p.itemId))],
     start:chosen.start,finish:chosen.start+FRY_MINUTES,wokStart:assigned[0].deadline};
