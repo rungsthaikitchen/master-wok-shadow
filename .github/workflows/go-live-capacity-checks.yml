@@ -1,0 +1,21 @@
+name: Master Wok go-live adapter checks
+on:
+  pull_request:
+    paths:
+      - 'go-live-capacity-*.js'
+      - 'master-wok.js'
+      - 'master-wok-model-bundle.js'
+      - '.github/workflows/go-live-capacity-checks.yml'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run adapter and real-engine integration tests
+        run: node --test go-live-capacity-adapter.test.js go-live-capacity-integration.test.js
