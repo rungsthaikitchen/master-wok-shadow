@@ -67,24 +67,28 @@ function replay(snapshot) {
       checkedOrders:comparison.checkedOrders||null,
       bookingApprovalAllowed:false});
   }
-  // Synthetic additional bookings against the full committed staging workload.
-  // Assumes a 17:30 London placement; NOT an actual historical availability decision.
+  // Read-only synthetic candidates against the full committed workload.
+  // Compare early and late placement times; no legacy availability decisions.
   const candidateScenarios=[];
+  const [year,month,day]=snapshot.serviceDate.split('-').map(Number);
   for(const itemId of ['panang-curry','pad-thai','stir-crispy']){
-    for(const readyMinute of [1140,1170,1200]){
-      const id='shadow-synthetic-'+itemId+'-'+readyMinute;
-      const [year,month,day]=snapshot.serviceDate.split('-').map(Number);
-      const order={orderId:id,readyMinute,placedAt:new Date(year,month-1,day,17,30)};
-      const row={id,items:[{item_id:itemId,qty:1,modifiers:[]}]};
-      const result=compareBookingShadow({orders:normalized,rows:committed,
-        candidate:{order,row},legacyDecision:null});
-      candidateScenarios.push({itemId,readyMinute,status:result.status,
-        reason:result.reason,validationIssues:result.validationIssues||[],
-        bookingApprovalAllowed:false});
+    for(const [readyMinute,placements] of [[1140,[1050,1130]],[1170,[1050,1150]],[1200,[1050,1180]]]){
+      for(const placementMinute of placements){
+        const id='shadow-synthetic-'+itemId+'-'+readyMinute+'-'+placementMinute;
+        const order={orderId:id,readyMinute,placedAt:new Date(year,month-1,day,
+          Math.floor(placementMinute/60),placementMinute%60)};
+        const row={id,items:[{item_id:itemId,qty:1,modifiers:[]}]};
+        const result=compareBookingShadow({orders:normalized,rows:committed,
+          candidate:{order,row},legacyDecision:null});
+        candidateScenarios.push({itemId,readyMinute,placementMinute,status:result.status,
+          reason:result.reason,planFailureReason:result.planFailureReason||null,
+          curryHoldPolicy:result.curryHoldPolicy||null,
+          validationIssues:result.validationIssues||[],bookingApprovalAllowed:false});
+      }
     }
   }
   return {serviceDate:snapshot.serviceDate,committed:normalized.length,scheduled:scheduled.length,noWokReservation,excluded,
-    candidateScenarios:{placementTime:'17:30 London (synthetic)',scenarios:candidateScenarios,legacyDecisionAvailable:false},
+    candidateScenarios:{placementTime:'17:30 or 10-20 minutes before ready time, London (synthetic)',scenarios:candidateScenarios,legacyDecisionAvailable:false},
     historicalShadow:{tested:shadowHistory.length,validated:shadowHistory.filter(x=>x.status==='VALIDATED_SHADOW_PROTOTYPE').length,
       unverified:shadowHistory.filter(x=>x.status!=='VALIDATED_SHADOW_PROTOTYPE').length,
       comparisons:shadowHistory,legacyDecisionAvailable:false},
