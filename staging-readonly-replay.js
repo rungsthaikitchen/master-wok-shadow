@@ -8,6 +8,7 @@ const path=require('node:path');
 const {normalizeStagingOrders}=require('./staging-order-snapshot');
 const {londonPlacement}=require('./staging-booking-integration');
 const {diagnostic}=require('./staging-cross-order-batch-diagnostic');
+const {scheduleCrossOrderPanang}=require('./staging-cross-order-scheduler');
 function replay(snapshot) {
   const context=vm.createContext({window:{},Date});
   for(const file of ['master-wok-model-bundle.js','master-wok.js'])
@@ -53,6 +54,7 @@ function replay(snapshot) {
     jobsByReadyMinute:minuteBuckets,
     crossOrderBatchingApplied:false,
     strictPanangBatchDiagnostic:diagnostic(scheduled,committed),
+    crossOrderPrototype:scheduleCrossOrderPanang(scheduled,committed),
     reason:baseline.reason||null};
 }
 if(require.main===module) {
