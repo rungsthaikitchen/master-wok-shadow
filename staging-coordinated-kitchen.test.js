@@ -7,8 +7,7 @@ const rows=items=>[{id:'A',items}];
 const line=(item_id,qty=1)=>({item_id,qty,modifiers:[]});
 test('default wok scheduler still fails closed on crispy chicken',()=>{
  const r=scheduleCrossOrderPanang(orders,rows([line('stir-crispy')]));
- assert.equal(r.status,'COORDINATED_PROTOTYPE');
- assert.equal(r.wok.jobs.length,1);
+ assert.equal(r.status,'UNVERIFIED');
  assert.equal(r.bookingApprovalAllowed,false);
 });
 test('coordinated staging prototype places crispy chicken frying before wok',()=>{
@@ -19,6 +18,7 @@ test('coordinated staging prototype places crispy chicken frying before wok',()=
 });
 test('standalone fried starters do not block coordinated wok work',()=>{
  const r=planCoordinatedKitchen(orders,rows([line('stir-crispy'),line('veg-spring-rolls')]));
- assert.equal(r.status,'UNVERIFIED');
+ assert.equal(r.status,'COORDINATED_PROTOTYPE');
+ assert.equal(r.wok.jobs.length,1);
  assert.equal(r.bookingApprovalAllowed,false);
 });
