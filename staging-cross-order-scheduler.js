@@ -82,11 +82,33 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
    }
    return false;
  }
- const feasible=search(jobs);
+ // Fast deterministic construction: latest-deadline-first placement avoids
+ // factorial permutations of otherwise interchangeable same-time batches.
+ // Only accept if every job fits; otherwise retain the exhaustive safe search.
+ function fastConstruct(){
+   const ordered=[...jobs].sort((a,b)=>a.latest-b.latest||
+     (a.latest-a.earliest)-(b.latest-b.earliest)||b.duration-a.duration);
+   const built=[];
+   for(const job of ordered){
+     let placed=false;
+     for(let t=job.latest;t>=job.earliest;t--){
+       const finish=t+job.duration;
+       if(built.some(o=>t<o.finish+1&&finish+1>o.start))continue;
+       built.push({...job,start:t,finish,holdingMinutes:job.readyMinute-finish,
+         placementSatisfied:true,holdingSatisfied:true});
+       placed=true;break;
+     }
+     if(!placed)return false;
+   }
+   occupied.push(...built);
+   return true;
+ }
+ const fastFeasible=fastConstruct();
+ const feasible=fastFeasible||search(jobs);
  const chronological=feasible?[...occupied].sort((a,b)=>a.start-b.start):[];
  return {status:feasible?'FEASIBLE_PROTOTYPE':'UNVERIFIED',
    reason:feasible?'SHARED_WOK_TIMELINE':exhausted?'SEARCH_LIMIT':'NO_SHARED_TIMELINE',
    holdingLimitMinutes:curryHoldMinutes,productionBatches:jobs.length,
-   jobs:chronological,noOverlap:feasible,nodes,bookingApprovalAllowed:false};
+   jobs:chronological,noOverlap:feasible,nodes,searchMethod:fastFeasible?'DETERMINISTIC_FAST_PATH':'BOUNDED_BACKTRACKING',bookingApprovalAllowed:false};
 }
 module.exports={scheduleCrossOrderPanang};
