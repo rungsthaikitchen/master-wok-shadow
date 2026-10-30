@@ -60,6 +60,28 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
  if(jobs.length>32)return {status:'UNVERIFIED',reason:'SEARCH_SIZE_LIMIT',bookingApprovalAllowed:false};
  if(jobs.some(j=>j.earliest>j.latest||j.latest+j.duration>1320))
    return {status:'UNVERIFIED',reason:'IMPOSSIBLE_BATCH_WINDOW',bookingApprovalAllowed:false};
+ // Necessary workload bound for the current fixed batch partition. If even the
+ // widest possible start-to-finish span cannot accommodate the cooking plus
+ // mandatory one-minute resets, no permutation of these batches can fit.
+ // This does not prove that a different batch partition would be impossible.
+ const deadlineBuckets=new Map();
+ for(const job of jobs){
+   if(!deadlineBuckets.has(job.readyMinute))deadlineBuckets.set(job.readyMinute,[]);
+   deadlineBuckets.get(job.readyMinute).push(job);
+ }
+ const impossibleDeadline=[...deadlineBuckets.entries()].map(([readyMinute,batches])=>{
+   const required=batches.reduce((sum,j)=>sum+j.duration,0)+batches.length-1;
+   const available=Math.max(...batches.map(j=>j.latest+j.duration))-
+     Math.min(...batches.map(j=>j.earliest));
+   return {readyMinute,requiredMinutes:required,availableMinutes:available,
+     batches:batches.length};
+ }).find(x=>x.requiredMinutes>x.availableMinutes);
+ if(impossibleDeadline){
+   if(options.batchLatestFirst!==true)
+     return scheduleCrossOrderPanang(orders,rows,{...options,batchLatestFirst:true});
+   return {status:'UNVERIFIED',reason:'FIXED_BATCH_CAPACITY_EXCEEDED',
+     capacityDiagnostic:impossibleDeadline,bookingApprovalAllowed:false};
+ }
  // Single shared wok. Enumerate feasible start minutes; never accept a clash.
  // Search is bounded and reports UNVERIFIED rather than assuming feasibility.
  const occupied=[];
