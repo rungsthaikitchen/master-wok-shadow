@@ -17,9 +17,23 @@ function replay(snapshot) {
   const excluded=snapshot.orders.length-committed.length;
   const normalized=normalizeStagingOrders({rows:committed,model,serviceDate:snapshot.serviceDate})
     .map(o=>({...o,placedAt:londonPlacement(o.placedAt)}));
-  // Replay existing commitments only: no hypothetical order, no booking writes.
-  const baseline=engine.schedule(normalized);
-  return {serviceDate:snapshot.serviceDate,committed:normalized.length,excluded,
+  // Zero-duration, known catalog baskets have no scheduled wok reservation.
+  // Preserve them in the replay totals; never fabricate cooking minutes.
+  const scheduled=[];
+  let noWokReservation=0;
+  for(const order of normalized) {
+    const pressure=model.calculateCombinedKitchenPressure([order.classification]);
+    const raw=pressure?.productionWindow?.rawMinutes;
+    const reserved=pressure?.productionWindow?.reservedMinutes;
+    if(!Number.isFinite(raw)||!Number.isFinite(reserved)||raw<0||reserved<0)
+      throw Error('INVALID_PRODUCTION_DURATION');
+    if(raw===0 && reserved===0) { noWokReservation++; continue; }
+    if(raw===0 || reserved===0) throw Error('INCONSISTENT_PRODUCTION_DURATION');
+    scheduled.push(order);
+  }
+  // Read-only baseline of production-requiring commitments only.
+  const baseline=engine.schedule(scheduled,{serviceDate:snapshot.serviceDate});
+  return {serviceDate:snapshot.serviceDate,committed:normalized.length,scheduled:scheduled.length,noWokReservation,excluded,
     feasible:baseline.feasible===true,exhausted:baseline.exhausted===true,
     reason:baseline.reason||null};
 }
