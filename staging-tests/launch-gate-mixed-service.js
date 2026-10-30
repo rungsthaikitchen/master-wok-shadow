@@ -1,6 +1,6 @@
 'use strict';
 // Launch gate: display the actual mixed-service result, not merely a passing test.
-const {planCoordinatedKitchen}=require('./staging-coordinated-kitchen');
+const {planCoordinatedKitchen}=require('../staging-coordinated-kitchen');
 const at=(h,m)=>new Date(2026,9,17,h,m);
 const orders=[
  {orderId:'A',readyMinute:1140,placedAt:at(17,30)},
