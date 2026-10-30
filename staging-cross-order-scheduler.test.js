@@ -45,7 +45,10 @@ test('different dishes never share a batch even within fast group',()=>{
  const x=sample(2);x.rows[1].items[0].item_id='green-curry';
  const r=schedule(x.orders,x.rows);
  assert.equal(r.productionBatches,2);
- assert.equal(r.status,'UNVERIFIED');
+ assert.equal(r.status,'FEASIBLE_PROTOTYPE');
+ assert.deepEqual(new Set(r.jobs.map(j=>j.itemId)),new Set(['panang-curry','green-curry']));
+ assert.ok(r.jobs.every(j=>j.portions===1));
+ assert.ok(r.jobs[0].finish+1<=r.jobs[1].start);
 });
 test('salad batch respects four portion maximum',()=>{
  const x=sample(4);for(const row of x.rows)row.items[0].item_id='papaya-salad';
