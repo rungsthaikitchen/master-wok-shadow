@@ -10,6 +10,7 @@ const {londonPlacement}=require('./staging-booking-integration');
 const {diagnostic}=require('./staging-cross-order-batch-diagnostic');
 const {scheduleCrossOrderPanang}=require('./staging-cross-order-scheduler');
 const {diagnoseFryer}=require('./staging-fryer-diagnostic');
+const {compareBookingShadow}=require('./staging-booking-shadow-adapter');
 function replay(snapshot) {
   const context=vm.createContext({window:{},Date});
   for(const file of ['master-wok-model-bundle.js','master-wok.js'])
@@ -48,7 +49,28 @@ function replay(snapshot) {
     const key=String(order.readyMinute);
     minuteBuckets[key]=(minuteBuckets[key]||0)+1;
   }
+  // Historical shadow: replay each accepted order as the candidate against only
+  // earlier accepted orders. This is NOT evidence of the legacy slot decision.
+  const chronological=committed.map((row,i)=>({row,order:normalized[i]}))
+    .sort((a,b)=>new Date(a.row.created_at)-new Date(b.row.created_at));
+  const shadowHistory=[];
+  for(let i=0;i<chronological.length;i++){
+    const {row,order}=chronological[i];
+    const earlier=chronological.slice(0,i);
+    const comparison=compareBookingShadow({
+      orders:earlier.map(x=>x.order),rows:earlier.map(x=>x.row),
+      candidate:{order,row},legacyDecision:null
+    });
+    shadowHistory.push({sequence:i+1,readyMinute:order.readyMinute,
+      status:comparison.status,reason:comparison.reason,
+      validationIssues:comparison.validationIssues||[],
+      checkedOrders:comparison.checkedOrders||null,
+      bookingApprovalAllowed:false});
+  }
   return {serviceDate:snapshot.serviceDate,committed:normalized.length,scheduled:scheduled.length,noWokReservation,excluded,
+    historicalShadow:{tested:shadowHistory.length,validated:shadowHistory.filter(x=>x.status==='VALIDATED_SHADOW_PROTOTYPE').length,
+      unverified:shadowHistory.filter(x=>x.status!=='VALIDATED_SHADOW_PROTOTYPE').length,
+      comparisons:shadowHistory,legacyDecisionAvailable:false},
     feasible:baseline.feasible===true,exhausted:baseline.exhausted===true,
     rawFeasible:rawBaseline.feasible===true,rawExhausted:rawBaseline.exhausted===true,
     conservativeNodes:baseline.nodes,rawNodes:rawBaseline.nodes,
