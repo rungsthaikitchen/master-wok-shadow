@@ -44,3 +44,21 @@ test('standalone spring rolls do not consume wok capacity',()=>{
  assert.equal(r.status,'VALIDATED_SHADOW_PROTOTYPE');
  assert.equal(r.bookingApprovalAllowed,false);
 });
+
+test('busy nineteen-hundred Panang candidate reports a specific scheduling blocker',()=>{
+ const orders=[],rows=[];
+ for(let i=0;i<10;i++){
+  const id='busy-'+i;
+  orders.push({orderId:id,readyMinute:1140,placedAt:new Date(2026,9,17,17,0)});
+  rows.push({id,items:[line('panang-curry')]});
+ }
+ const r=compareBookingShadow({orders,rows,candidate});
+ assert.equal(r.status,'UNVERIFIED');
+ assert.equal(typeof r.planFailureReason,'string');
+ assert.equal(r.bookingApprovalAllowed,false);
+});
+test('light Panang candidate reports preferred curry holding policy',()=>{
+ const r=compareBookingShadow({orders:[],rows:[],candidate});
+ assert.equal(r.curryHoldPolicy,'PREFERRED_10_MINUTES');
+ assert.equal(r.planFailureReason,null);
+});
