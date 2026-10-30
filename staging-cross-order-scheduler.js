@@ -43,7 +43,7 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
  if(unsupported.length)return {status:'UNVERIFIED',reason:'UNSUPPORTED_MIXED_PRODUCTION',unsupported,bookingApprovalAllowed:false};
  const jobs=[];
  for(const g of groups.values()) {
-   const portions=[...g.portions].sort((a,b)=>a.placedAt-b.placedAt);
+   const portions=[...g.portions].sort((a,b)=>options.batchLatestFirst===true?b.placedAt-a.placedAt:a.placedAt-b.placedAt);
    const max=MAX_BY_GROUP[g.group];
    for(let i=0;i<portions.length;i+=max){
      const batch=portions.slice(i,i+max);
@@ -110,9 +110,19 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
  const fastFeasible=fastConstruct(deadlineOrder)||fastConstruct(constrainedOrder);
  const feasible=fastFeasible||search(jobs);
  const chronological=feasible?[...occupied].sort((a,b)=>a.start-b.start):[];
+ // A fixed early-arrival grouping can conceal feasible schedules when later
+ // portions need different batch companions. Retry with latest arrivals grouped
+ // first, but only after the original search has failed. Never approve a booking.
+ if(!feasible && options.batchLatestFirst!==true && !unsupported.length){
+   const alternate=scheduleCrossOrderPanang(orders,rows,{...options,batchLatestFirst:true});
+   if(alternate.status==='FEASIBLE_PROTOTYPE')return {...alternate,batchingMethod:'LATEST_PLACEMENT_FIRST'};
+   if(alternate.reason!=='SEARCH_LIMIT' && alternate.reason!=='SEARCH_SIZE_LIMIT')
+     return {...alternate,batchingMethod:'LATEST_PLACEMENT_FIRST'};
+ }
+
  return {status:feasible?'FEASIBLE_PROTOTYPE':'UNVERIFIED',
    reason:feasible?'SHARED_WOK_TIMELINE':exhausted?'SEARCH_LIMIT':'NO_SHARED_TIMELINE',
    holdingLimitMinutes:curryHoldMinutes,productionBatches:jobs.length,
-   jobs:chronological,noOverlap:feasible,nodes,searchMethod:fastFeasible?'DETERMINISTIC_FAST_PATH':'BOUNDED_BACKTRACKING',bookingApprovalAllowed:false};
+   jobs:chronological,noOverlap:feasible,nodes,searchMethod:fastFeasible?'DETERMINISTIC_FAST_PATH':'BOUNDED_BACKTRACKING',batchingMethod:options.batchLatestFirst===true?'LATEST_PLACEMENT_FIRST':'EARLIEST_PLACEMENT_FIRST',bookingApprovalAllowed:false};
 }
 module.exports={scheduleCrossOrderPanang};
