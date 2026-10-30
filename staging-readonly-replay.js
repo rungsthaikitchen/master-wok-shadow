@@ -67,7 +67,24 @@ function replay(snapshot) {
       checkedOrders:comparison.checkedOrders||null,
       bookingApprovalAllowed:false});
   }
+  // Synthetic additional bookings against the full committed staging workload.
+  // Assumes a 17:30 London placement; NOT an actual historical availability decision.
+  const candidateScenarios=[];
+  for(const itemId of ['panang-curry','pad-thai','stir-crispy']){
+    for(const readyMinute of [1140,1170,1200]){
+      const id='shadow-synthetic-'+itemId+'-'+readyMinute;
+      const [year,month,day]=snapshot.serviceDate.split('-').map(Number);
+      const order={orderId:id,readyMinute,placedAt:new Date(year,month-1,day,17,30)};
+      const row={id,items:[{item_id:itemId,qty:1,modifiers:[]}]};
+      const result=compareBookingShadow({orders:normalized,rows:committed,
+        candidate:{order,row},legacyDecision:null});
+      candidateScenarios.push({itemId,readyMinute,status:result.status,
+        reason:result.reason,validationIssues:result.validationIssues||[],
+        bookingApprovalAllowed:false});
+    }
+  }
   return {serviceDate:snapshot.serviceDate,committed:normalized.length,scheduled:scheduled.length,noWokReservation,excluded,
+    candidateScenarios:{placementTime:'17:30 London (synthetic)',scenarios:candidateScenarios,legacyDecisionAvailable:false},
     historicalShadow:{tested:shadowHistory.length,validated:shadowHistory.filter(x=>x.status==='VALIDATED_SHADOW_PROTOTYPE').length,
       unverified:shadowHistory.filter(x=>x.status!=='VALIDATED_SHADOW_PROTOTYPE').length,
       comparisons:shadowHistory,legacyDecisionAvailable:false},
