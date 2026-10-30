@@ -83,6 +83,7 @@ function replay(snapshot) {
         candidateScenarios.push({itemId,readyMinute,placementMinute,status:result.status,
           reason:result.reason,planFailureReason:result.planFailureReason||null,
           curryHoldPolicy:result.curryHoldPolicy||null,
+          deadlinePressure:result.status==='UNVERIFIED'?result.deadlinePressure:null,
           validationIssues:result.validationIssues||[],bookingApprovalAllowed:false});
       }
     }
