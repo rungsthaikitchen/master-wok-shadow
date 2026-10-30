@@ -33,7 +33,7 @@ function scheduleCrossOrderPanang(orders,rows) {
      for(let i=0;i<line.qty;i++)g.portions.push({orderId:String(row.id),placedAt:order.placedAt});
    }
  }
- if(unsupported.length)return {status:'UNVERIFIED',reason:'UNSUPPORTED_MIXED_PRODUCTION',unsupported};
+ if(unsupported.length)return {status:'UNVERIFIED',reason:'UNSUPPORTED_MIXED_PRODUCTION',unsupported,bookingApprovalAllowed:false};
  const jobs=[];
  for(const g of groups.values()) {
    const portions=[...g.portions].sort((a,b)=>a.placedAt-b.placedAt);
