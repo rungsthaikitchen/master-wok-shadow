@@ -73,3 +73,48 @@ test('same deadline and insufficient holding fails closed',()=>{
  assert.equal(r.status,'UNVERIFIED');
  assert.equal(r.bookingApprovalAllowed,false);
 });
+
+function mixedFixture(){
+ const orders=[
+  {orderId:'a',readyMinute:1110,placedAt:new Date(2026,9,17,17,0)},
+  {orderId:'b',readyMinute:1140,placedAt:new Date(2026,9,17,17,10)},
+  {orderId:'c',readyMinute:1170,placedAt:new Date(2026,9,17,17,20)}
+ ];
+ const line=(item_id,qty=1,modifiers=[])=>({item_id,qty,modifiers});
+ const rows=[
+  {id:'a',items:[line('panang-curry',2),line('jasmine-rice')]},
+  {id:'b',items:[line('green-curry'),line('pad-thai')]},
+  {id:'c',items:[line('stir-basil'),line('papaya-salad')]}
+ ];
+ return {orders,rows};
+}
+test('mixed multi-line service across three ready times fits shared wok',()=>{
+ const x=mixedFixture(),r=schedule(x.orders,x.rows);
+ assert.equal(r.status,'FEASIBLE_PROTOTYPE');
+ assert.equal(r.productionBatches,5);
+ assert.deepEqual(new Set(r.jobs.map(j=>j.itemId)),
+   new Set(['panang-curry','green-curry','pad-thai','stir-basil','papaya-salad']));
+ for(let i=0;i<r.jobs.length;i++){
+  const j=r.jobs[i];
+  assert.ok(j.start>=990&&j.finish<=1320);
+  assert.ok(j.finish<=j.readyMinute);
+  assert.ok(j.holdingMinutes<=j.holdingLimitMinutes);
+  if(i)assert.ok(r.jobs[i-1].finish+1<=j.start);
+ }
+ assert.equal(r.bookingApprovalAllowed,false);
+});
+test('mixed service with fryer-dependent dish fails closed',()=>{
+ const x=mixedFixture();
+ x.rows[2].items.push({item_id:'stir-crispy',qty:1,modifiers:[]});
+ const r=schedule(x.orders,x.rows);
+ assert.equal(r.status,'UNVERIFIED');
+ assert.equal(r.reason,'UNSUPPORTED_MIXED_PRODUCTION');
+ assert.equal(r.bookingApprovalAllowed,undefined);
+});
+test('mixed service with impossible late placement fails closed',()=>{
+ const x=mixedFixture();
+ x.orders[1].placedAt=new Date(2026,9,17,18,59);
+ const r=schedule(x.orders,x.rows);
+ assert.equal(r.status,'UNVERIFIED');
+ assert.equal(r.bookingApprovalAllowed,false);
+});
