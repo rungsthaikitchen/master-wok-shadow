@@ -31,10 +31,26 @@ function replay(snapshot) {
     if(raw===0 || reserved===0) throw Error('INCONSISTENT_PRODUCTION_DURATION');
     scheduled.push(order);
   }
-  // Read-only baseline of production-requiring commitments only.
+  // Compare the conservative and raw-duration baselines without relaxing either.
   const baseline=engine.schedule(scheduled,{serviceDate:snapshot.serviceDate});
+  const rawOrders=scheduled.map(order=>{
+    const pressure=model.calculateCombinedKitchenPressure([order.classification]);
+    return {...order,durationOverride:pressure.productionWindow.rawMinutes};
+  });
+  const rawBaseline=engine.schedule(rawOrders,{serviceDate:snapshot.serviceDate});
+  // Diagnostic lower bound: distinct orders remain distinct jobs. This is NOT
+  // cross-order batching, and does not change acceptance decisions.
+  const minuteBuckets={};
+  for(const order of scheduled) {
+    const key=String(order.readyMinute);
+    minuteBuckets[key]=(minuteBuckets[key]||0)+1;
+  }
   return {serviceDate:snapshot.serviceDate,committed:normalized.length,scheduled:scheduled.length,noWokReservation,excluded,
     feasible:baseline.feasible===true,exhausted:baseline.exhausted===true,
+    rawFeasible:rawBaseline.feasible===true,rawExhausted:rawBaseline.exhausted===true,
+    conservativeNodes:baseline.nodes,rawNodes:rawBaseline.nodes,
+    jobsByReadyMinute:minuteBuckets,
+    crossOrderBatchingApplied:false,
     reason:baseline.reason||null};
 }
 if(require.main===module) {
