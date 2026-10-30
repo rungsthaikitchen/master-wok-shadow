@@ -1,6 +1,7 @@
 'use strict';
 // Launch gate: display the actual mixed-service result, not merely a passing test.
 const {planCoordinatedKitchen}=require('../staging-coordinated-kitchen');
+const {validateKitchenTimeline}=require('../staging-kitchen-launch-validator');
 const at=(h,m)=>new Date(2026,9,17,h,m);
 const orders=[
  {orderId:'A',readyMinute:1140,placedAt:at(17,30)},
@@ -16,8 +17,10 @@ const rows=[
  {id:'D',items:[line('green-curry')]}
 ];
 const result=planCoordinatedKitchen(orders,rows);
+const validation=validateKitchenTimeline(orders,result);
 console.log(JSON.stringify({
  status:result.status,reason:result.reason,
+ validationStatus:validation.status,validationIssues:validation.issues,
  wokStatus:result.wok&&result.wok.status,
  wokReason:result.wok&&result.wok.reason,
  fryerStatus:result.fryer&&result.fryer.status,
