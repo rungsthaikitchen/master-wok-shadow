@@ -23,26 +23,34 @@ def main():
         return 2
     script=Path(__file__).with_name("replay_staging_day.py")
     print("date       fetched committed scheduled original raw    cross-order           batches nodes  note",flush=True)
+    scanned=0
+    populated=0
+    errors=0
     for offset in range((end-start).days+1):
+        scanned+=1
         day=(start+datetime.timedelta(days=offset)).isoformat()
         result=subprocess.run([sys.executable,str(script),day],capture_output=True,text=True,timeout=90)
         if result.returncode:
+            errors+=1
             print(f"{day} ERROR {result.stderr.strip() or result.stdout.strip()}",flush=True)
             continue
         try:
             payload=json.loads(result.stdout[result.stdout.index("{"):])
         except (ValueError,json.JSONDecodeError) as exc:
+            errors+=1
             print(f"{day} PARSE_ERROR {exc}",flush=True)
             continue
         proto=payload.get("crossOrderPrototype") or {}
         fetched=payload["committed"]+payload["excluded"]
         if not fetched:
             continue
+        populated+=1
         print(f"{day} {fetched:7d} {payload['committed']:9d} {payload['scheduled']:9d} "
               f"{str(payload['feasible']):8s} {str(payload['rawFeasible']):6s} "
               f"{proto.get('status','?'):21s} {str(proto.get('productionBatches','-')):7s} "
               f"{str(proto.get('nodes','-')):5s} {proto.get('reason','')}",flush=True)
-    return 0
+    print(f"COMPLETE: {scanned} dates scanned, {populated} with staging orders, {errors} errors.",flush=True)
+    return 1 if errors else 0
 
 if __name__=="__main__":
     raise SystemExit(main())
