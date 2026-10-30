@@ -40,8 +40,8 @@ def main():
             continue
         print(f"{day} {fetched:7d} {payload['committed']:9d} {payload['scheduled']:9d} "
               f"{str(payload['feasible']):8s} {str(payload['rawFeasible']):6s} "
-              f"{proto.get('status','?'):21s} {proto.get('productionBatches','-')!s:7s} "
-              f"{proto.get('nodes','-')!s:5s} {proto.get('reason','')}",flush=True)
+              f"{proto.get('status','?'):21s} {str(proto.get('productionBatches','-')):7s} "
+              f"{str(proto.get('nodes','-')):5s} {proto.get('reason','')}",flush=True)
     return 0
 
 if __name__=="__main__":
