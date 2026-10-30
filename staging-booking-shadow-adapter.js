@@ -31,6 +31,7 @@ function compareBookingShadow({orders,rows,candidate,legacyDecision}){
   // Diagnostic only: distinguish impossible windows, search limits and fryer blockers.
   planFailureReason:validated?null:(plan.wok?.reason||plan.fryer?.reason||plan.reason),
   curryHoldPolicy:validated?plan.curryHoldPolicy:null,
+  deadlinePressure:plan.wok?.deadlinePressure||null,
   bookingApprovalAllowed:false};
 }
 module.exports={compareBookingShadow};
