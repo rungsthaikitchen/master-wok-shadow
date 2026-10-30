@@ -8,6 +8,7 @@ on:
       - 'staging-order-snapshot*.js'
       - 'staging-order-reader*.js'
       - 'staging-booking-integration*.js'
+      - 'staging-readonly-replay*.js'
       - 'master-wok.js'
       - 'master-wok-model-bundle.js'
       - '.github/workflows/go-live-capacity-checks.yml'
@@ -23,4 +24,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run adapter and real-engine integration tests
-        run: node --test go-live-capacity-adapter.test.js go-live-capacity-integration.test.js booking-serialization-harness.test.js master-wok-transaction-writer.test.js staging-order-snapshot.test.js staging-order-reader.test.js staging-booking-integration.test.js
+        run: node --test go-live-capacity-adapter.test.js go-live-capacity-integration.test.js booking-serialization-harness.test.js master-wok-transaction-writer.test.js staging-order-snapshot.test.js staging-order-reader.test.js staging-booking-integration.test.js staging-readonly-replay.test.js
