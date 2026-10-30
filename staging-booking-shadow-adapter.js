@@ -28,6 +28,9 @@ function compareBookingShadow({orders,rows,candidate,legacyDecision}){
   candidateOrderId:id,committedOrders:orders.length,
   checkedOrders:combinedOrders.length,planStatus:plan.status,
   validationStatus:validation.status,validationIssues:validation.issues,
+  // Diagnostic only: distinguish impossible windows, search limits and fryer blockers.
+  planFailureReason:validated?null:(plan.wok?.reason||plan.fryer?.reason||plan.reason),
+  curryHoldPolicy:validated?plan.curryHoldPolicy:null,
   bookingApprovalAllowed:false};
 }
 module.exports={compareBookingShadow};
