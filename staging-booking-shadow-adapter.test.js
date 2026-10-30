@@ -25,9 +25,9 @@ test('duplicate candidate fails closed',()=>{
  assert.equal(r.status,'UNVERIFIED');
  assert.equal(r.reason,'INVALID_CANDIDATE');
 });
-test('unknown fried starter fails closed',()=>{
+test('unknown menu item fails closed',()=>{
  const r=compareBookingShadow({orders:[],rows:[],candidate:{
-  order:candidate.order,row:{id:'new',items:[line('veg-spring-rolls')]}
+  order:candidate.order,row:{id:'new',items:[line('unrecognised-menu-item')]}
  }});
  assert.equal(r.shadowDecision,'UNVERIFIED');
  assert.equal(r.bookingApprovalAllowed,false);
@@ -35,4 +35,12 @@ test('unknown fried starter fails closed',()=>{
 test('incomplete committed snapshot fails closed',()=>{
  const r=compareBookingShadow({orders:[{orderId:'missing',readyMinute:1140,placedAt}],rows:[],candidate});
  assert.equal(r.reason,'INCOMPLETE_COMMITTED_SNAPSHOT');
+});
+
+test('standalone spring rolls do not consume wok capacity',()=>{
+ const r=compareBookingShadow({orders:[],rows:[],candidate:{
+  order:candidate.order,row:{id:'new',items:[line('veg-spring-rolls')]}
+ }});
+ assert.equal(r.status,'VALIDATED_SHADOW_PROTOTYPE');
+ assert.equal(r.bookingApprovalAllowed,false);
 });
