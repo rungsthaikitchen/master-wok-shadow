@@ -85,11 +85,9 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
  // Fast deterministic construction: latest-deadline-first placement avoids
  // factorial permutations of otherwise interchangeable same-time batches.
  // Only accept if every job fits; otherwise retain the exhaustive safe search.
- function fastConstruct(){
-   const ordered=[...jobs].sort((a,b)=>a.latest-b.latest||
-     (a.latest-a.earliest)-(b.latest-b.earliest)||b.duration-a.duration);
+ function fastConstruct(ordering){
    const built=[];
-   for(const job of ordered){
+   for(const job of ordering){
      let placed=false;
      for(let t=job.latest;t>=job.earliest;t--){
        const finish=t+job.duration;
@@ -103,7 +101,13 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
    occupied.push(...built);
    return true;
  }
- const fastFeasible=fastConstruct();
+ // Try later deadlines first, placing each batch backwards from its deadline.
+ // Fall back to the constrained-first order and then the original search.
+ const deadlineOrder=[...jobs].sort((a,b)=>b.latest-a.latest||
+   b.earliest-a.earliest||b.duration-a.duration);
+ const constrainedOrder=[...jobs].sort((a,b)=>(a.latest-a.earliest)-(b.latest-b.earliest)||
+   a.readyMinute-b.readyMinute||b.duration-a.duration);
+ const fastFeasible=fastConstruct(deadlineOrder)||fastConstruct(constrainedOrder);
  const feasible=fastFeasible||search(jobs);
  const chronological=feasible?[...occupied].sort((a,b)=>a.start-b.start):[];
  return {status:feasible?'FEASIBLE_PROTOTYPE':'UNVERIFIED',
