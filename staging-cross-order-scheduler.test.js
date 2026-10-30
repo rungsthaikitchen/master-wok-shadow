@@ -20,8 +20,8 @@ test('orders placed after required cooking starts fail closed',()=>{
  const x=sample(10,'2026-10-17T18:50:00Z');
  assert.equal(schedule(x.orders,x.rows).status,'UNVERIFIED');
 });
-test('unmodelled dish fails closed',()=>{
- const x=sample(1);x.rows[0].items[0].item_id='pad-thai';
+test('fryer-dependent dish fails closed',()=>{
+ const x=sample(1);x.rows[0].items[0].item_id='stir-crispy';
  assert.equal(schedule(x.orders,x.rows).reason,'UNSUPPORTED_MIXED_PRODUCTION');
 });
 test('different modifiers are never combined',()=>{
@@ -29,4 +29,26 @@ test('different modifiers are never combined',()=>{
  const r=schedule(x.orders,x.rows);
  assert.equal(r.productionBatches,2);
  assert.equal(r.status,'UNVERIFIED');
+});
+
+test('two identical Pad Thai portions use a ten-minute noodle batch',()=>{
+ const x=sample(2);for(const row of x.rows)row.items[0].item_id='pad-thai';
+ const r=schedule(x.orders,x.rows);
+ assert.equal(r.status,'FEASIBLE_PROTOTYPE');
+ assert.equal(r.productionBatches,1);
+ assert.equal(r.jobs[0].group,'noodle');
+ assert.equal(r.jobs[0].finish-r.jobs[0].start,10);
+});
+test('different dishes never share a batch even within fast group',()=>{
+ const x=sample(2);x.rows[1].items[0].item_id='green-curry';
+ const r=schedule(x.orders,x.rows);
+ assert.equal(r.productionBatches,2);
+ assert.equal(r.status,'UNVERIFIED');
+});
+test('salad batch respects four portion maximum',()=>{
+ const x=sample(4);for(const row of x.rows)row.items[0].item_id='papaya-salad';
+ const r=schedule(x.orders,x.rows);
+ assert.equal(r.status,'FEASIBLE_PROTOTYPE');
+ assert.equal(r.productionBatches,1);
+ assert.equal(r.jobs[0].finish-r.jobs[0].start,15);
 });
