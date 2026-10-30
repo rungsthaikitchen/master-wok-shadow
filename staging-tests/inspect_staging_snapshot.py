@@ -22,7 +22,7 @@ where coalesce(o.confirmed_time,o.proposed_time,o.preferred_time)
   and coalesce(o.confirmed_time,o.proposed_time,o.preferred_time)
       < ((%s::date+1)::timestamp at time zone 'Europe/London')
   and lower(coalesce(o.status,'')) not in ('cancelled','declined','rejected')
-  and coalesce(o.is_test,false)=false
+  and (%s::boolean or coalesce(o.is_test,false)=false)
 group by o.id,o.created_at,o.status,o.confirmed_time,o.proposed_time,o.preferred_time
 order by o.created_at,o.id
 """
@@ -33,6 +33,10 @@ def main():
         print("STAGING_DATABASE_URL not set. No connection attempted.")
         return 2
     day = sys.argv[1] if len(sys.argv) > 1 else "2026-10-30"
+    include_test = len(sys.argv) == 3 and sys.argv[2] == "--include-test"
+    if len(sys.argv) > 3 or (len(sys.argv) == 3 and not include_test):
+        print("Usage: inspect_staging_snapshot.py YYYY-MM-DD [--include-test]")
+        return 2
     import datetime
     try:
         datetime.date.fromisoformat(day)
@@ -42,9 +46,9 @@ def main():
     with psycopg.connect(url, connect_timeout=10) as conn:
         with conn.cursor() as cur:
             cur.execute("BEGIN READ ONLY")
-            cur.execute(SQL, (day, day))
+            cur.execute(SQL, (day, day, include_test))
             rows = cur.fetchall()
-            print(f"STAGING READ-ONLY snapshot for {day}: {len(rows)} orders")
+            print(f"STAGING READ-ONLY snapshot for {day} (include_test={include_test}): {len(rows)} orders")
             for _id, _created, status, local_date, minute, item_count in rows:
                 # No customer or order identifiers printed.
                 print(f"  status={status}, local_date={local_date}, minute={minute}, items={item_count}")
