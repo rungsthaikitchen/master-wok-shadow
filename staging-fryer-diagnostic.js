@@ -1,5 +1,6 @@
 'use strict';
 // Staging-only inventory of fryer dependencies; does not schedule or approve.
+const {OUT_OF_SCOPE}=require('./staging-out-of-scope-items');
 const FIXED = {
   'stir-crispy': {crispyChicken:1},
   'salt-chicken': {crispyChicken:1},
@@ -10,8 +11,6 @@ const MODS = {
   tofu:'tofu','extra-tofu':'tofu',
   'batter-chicken':'batteredChicken','extra-bchicken':'batteredChicken'
 };
-const FRY_ONLY = new Set(['chips','fried-tofu','veg-spring-rolls',
-  'chicken-spring-rolls','fish-cakes','fried-prawns','pork-dumplings']);
 function diagnoseFryer(orders,rows) {
   const known=new Map(orders.map(o=>[String(o.orderId),o]));
   const dependencies=[],unmodelled=[];
@@ -28,6 +27,7 @@ function diagnoseFryer(orders,rows) {
         unmodelled.push({orderId:String(row.id),reason:'INVALID_LINE'});
         continue;
       }
+      if(OUT_OF_SCOPE.has(line.item_id))continue;
       const counts={};
       for(const [type,count] of Object.entries(FIXED[line.item_id]||{}))
         counts[type]=count*line.qty;
@@ -39,15 +39,13 @@ function diagnoseFryer(orders,rows) {
         const type=MODS[mod.id];
         if(type) counts[type]=(counts[type]||0)+line.qty;
       }
-      if(FRY_ONLY.has(line.item_id))
-        unmodelled.push({orderId:String(row.id),itemId:line.item_id,reason:'FRY_ONLY_TIMING_UNKNOWN'});
       if(Object.keys(counts).length)
         dependencies.push({orderId:String(row.id),itemId:line.item_id,
           readyMinute:order.readyMinute,counts});
     }
   }
   return {status:dependencies.length||unmodelled.length?'UNVERIFIED':'NO_RECOGNISED_FRY_DEPENDENCIES',
-    reason:unmodelled.length?'FRY_ONLY_TIMING_UNKNOWN':
+    reason:unmodelled.length?'INVALID_FRY_INPUT':
       dependencies.length?'FRY_TIMELINE_NOT_SCHEDULED':'NO_FRY_WORK_IDENTIFIED',
     dependencies,unmodelled,bookingApprovalAllowed:false};
 }
