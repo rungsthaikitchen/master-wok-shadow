@@ -9,6 +9,7 @@ const {normalizeStagingOrders}=require('./staging-order-snapshot');
 const {londonPlacement}=require('./staging-booking-integration');
 const {diagnostic}=require('./staging-cross-order-batch-diagnostic');
 const {scheduleCrossOrderPanang}=require('./staging-cross-order-scheduler');
+const {diagnoseFryer}=require('./staging-fryer-diagnostic');
 function replay(snapshot) {
   const context=vm.createContext({window:{},Date});
   for(const file of ['master-wok-model-bundle.js','master-wok.js'])
@@ -55,6 +56,7 @@ function replay(snapshot) {
     crossOrderBatchingApplied:false,
     strictPanangBatchDiagnostic:diagnostic(scheduled,committed),
     crossOrderPrototype:scheduleCrossOrderPanang(scheduled,committed),
+    fryerDiagnostic:diagnoseFryer(normalized,committed),
     reason:baseline.reason||null};
 }
 if(require.main===module) {
