@@ -16,6 +16,7 @@ function productionGroup(itemId){
 }
 function scheduleCrossOrderPanang(orders,rows,options={}) {
  const allowFryerDependent=options.allowFryerDependent===true;
+ const curryHoldMinutes=options.curryHoldMinutes===10?10:20;
  const known=new Map(orders.map(o=>[String(o.orderId),o]));
  const groups=new Map(),unsupported=[];
  for(const row of rows) {
@@ -46,7 +47,7 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
      const batch=portions.slice(i,i+max);
      const duration=DURATION_BY_GROUP[g.group][batch.length];
      const placement=Math.max(...batch.map(p=>p.placedAt.getHours()*60+p.placedAt.getMinutes()));
-     const holdingLimitMinutes=CURRIES.has(g.itemId)?HOLD_MINUTES:10;
+     const holdingLimitMinutes=CURRIES.has(g.itemId)?curryHoldMinutes:10;
      const earliest=Math.max(990,placement,g.readyMinute-holdingLimitMinutes-duration);
      const latest=g.readyMinute-duration;
      jobs.push({itemId:g.itemId,group:g.group,readyMinute:g.readyMinute,
@@ -83,7 +84,7 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
  const chronological=feasible?[...occupied].sort((a,b)=>a.start-b.start):[];
  return {status:feasible?'FEASIBLE_PROTOTYPE':'UNVERIFIED',
    reason:feasible?'SHARED_WOK_TIMELINE':exhausted?'SEARCH_LIMIT':'NO_SHARED_TIMELINE',
-   holdingLimitMinutes:HOLD_MINUTES,productionBatches:jobs.length,
+   holdingLimitMinutes:curryHoldMinutes,productionBatches:jobs.length,
    jobs:chronological,noOverlap:feasible,nodes,bookingApprovalAllowed:false};
 }
 module.exports={scheduleCrossOrderPanang};
