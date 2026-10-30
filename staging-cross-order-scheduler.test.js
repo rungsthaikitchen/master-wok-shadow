@@ -52,3 +52,19 @@ test('salad batch respects four portion maximum',()=>{
  assert.equal(r.productionBatches,1);
  assert.equal(r.jobs[0].finish-r.jobs[0].start,15);
 });
+
+test('shared wok resolves overlapping independent backplans by moving a batch',()=>{
+ const x=sample(2);
+ x.rows[1].items[0].item_id='pad-thai';
+ const r=schedule(x.orders,x.rows);
+ assert.equal(r.status,'FEASIBLE_PROTOTYPE');
+ assert.equal(r.jobs.length,2);
+ assert.ok(r.jobs[0].finish+1<=r.jobs[1].start);
+});
+test('same deadline and insufficient holding fails closed',()=>{
+ const x=sample(4);
+ for(const row of x.rows)row.items[0].item_id='pad-thai';
+ const r=schedule(x.orders,x.rows);
+ assert.equal(r.status,'UNVERIFIED');
+ assert.equal(r.bookingApprovalAllowed,false);
+});
