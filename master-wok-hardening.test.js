@@ -45,7 +45,7 @@ test('durable store survives reopen, deduplicates concurrent retries and refuses
   const store=await createRecordStore(dir);
   const observer=createLiveShadowObserver({enabled:true,assess:good,persist:store.persist});
   const results=await Promise.all(Array.from({length:12},()=>observer.observe(event)));
-  assert.ok(results.every(r=>r.observed));
+  assert.ok(results.every(r=>r.observed), 'Concurrent observer results: '+JSON.stringify(results));
   const reopened=await createRecordStore(dir);
   const records=await reopened.readAll();
   assert.equal(records.length,1);
