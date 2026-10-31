@@ -16,7 +16,7 @@ async function main(){
  const ref='hvrqgufqjslvgiohgkvu';
  const direct=host==='db.'+ref+'.supabase.co'&&user==='postgres';
  const pooler=/^aws-[0-9]+-[a-z0-9-]+[.]pooler[.]supabase[.]com$/.test(host)&&user==='postgres.'+ref;
- if(!direct&&!pooler)throw Error('NOT_VERIFIED_STAGING_DATABASE_HOST_OR_USER','INVALID_REPLAY_OPTION');
+ if(!direct&&!pooler)throw Error('NOT_VERIFIED_STAGING_DATABASE_HOST_OR_USER');
  const {Client}=require('pg');
  const client=new Client({connectionString:raw,connectionTimeoutMillis:10000});
  try{
@@ -29,8 +29,7 @@ async function main(){
    await client.query('ROLLBACK');
   }
   if(rows.length===0){
-   process.stdout.write(JSON.stringify({serviceDate,includeTestOrders,ordersFetched:0,status:'NO_STAGING_DATA',bookingApprovalAllowed:false})+'
-');
+   process.stdout.write(JSON.stringify({serviceDate,includeTestOrders,ordersFetched:0,status:'NO_STAGING_DATA',bookingApprovalAllowed:false})+'\n');
    return;
   }
   const result=replay({serviceDate,orders:rows});
@@ -45,14 +44,12 @@ async function main(){
    fryerStatus:result.fryerDiagnostic?.status||'NOT_REPORTED',
    bookingApprovalAllowed:false,legacyDecisionAvailable:false
   };
-  process.stdout.write(JSON.stringify(summary,null,2)+'
-');
+  process.stdout.write(JSON.stringify(summary,null,2)+'\n');
  }finally{await client.end();}
 }
 main().catch(error=>{
  // Avoid printing connection strings, SQL or customer data from lower-level errors.
  const safe=new Set(['SERVICE_DATE_REQUIRED_YYYY_MM_DD','STAGING_CONFIRMATION_REQUIRED','STAGING_DATABASE_URL_REQUIRED','NOT_VERIFIED_STAGING_DATABASE_HOST_OR_USER']);
- process.stderr.write('STAGING_HISTORICAL_REPLAY_UNVERIFIED: '+(safe.has(error.message)?error.message:'REPLAY_OR_DATABASE_ERROR')+'
-');
+ process.stderr.write('STAGING_HISTORICAL_REPLAY_UNVERIFIED: '+(safe.has(error.message)?error.message:'REPLAY_OR_DATABASE_ERROR')+'\n');
  process.exitCode=1;
 });
