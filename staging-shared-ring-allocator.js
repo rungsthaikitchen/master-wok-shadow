@@ -3,8 +3,14 @@
 // Physical feasibility does not validate chef attention or approve bookings.
 const CURRIES=new Set(['massaman-curry','panang-curry','rung-curry','green-curry','red-curry']);
 const SMALL=new Set(['stir-basil','stir-ginger','stir-cashew','stir-sweetsour','stir-yellow','stir-chilli','stir-pepper']);
+const PAN=new Set(['tom-yum','tom-kha']);
+const SMALL_FINISH=new Set(['stir-crispy','salt-chicken','salt-chickenchips','salt-chips','egg-rice','coconut-rice']);
+const NO_RING=new Set(['beef-salad','papaya-salad','pork-salad','laab']);
 const LARGE=new Set(['pad-thai','chef-pad-thai','pad-kee-mao','pad-see-ew','fried-rice']);
 function eligible(itemId){
+ if(NO_RING.has(itemId))return [];
+ if(PAN.has(itemId))return ['pan-1','pan-2','pan-3'];
+ if(SMALL_FINISH.has(itemId))return ['small-1','small-2','large-1','large-2'];
  if(CURRIES.has(itemId))return ['pan-1','pan-2','pan-3'];
  if(SMALL.has(itemId))return ['small-1','small-2','large-1','large-2'];
  if(LARGE.has(itemId))return ['large-1','large-2'];
@@ -17,6 +23,7 @@ function allocateSharedRings(jobs){
  for(const job of jobs){
   const vessels=eligible(job.itemId);
   if(!vessels)return fail('VESSEL_ELIGIBILITY_UNVERIFIED');
+  if(vessels.length===0)return fail('NON_RING_WORK_REQUIRES_SEPARATE_CAPACITY_MODEL');
   if(!Number.isInteger(job.duration)||job.duration<1||!Number.isInteger(job.earliest)||
     !Number.isInteger(job.latest)||job.earliest<990||job.latest+job.duration>1320||
     job.earliest>job.latest)return fail('INVALID_WINDOW');
