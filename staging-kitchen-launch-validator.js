@@ -49,11 +49,27 @@ function validateKitchenTimeline(orders,plan,rows){
    if(!Number.isInteger(job.portions)||job.portions<=0){
     issues.push({code:'INVALID_PORTION_COUNT',itemId:job.itemId});continue;
    }
-   if(!Array.isArray(job.orderIds)||job.orderIds.length!==1){
-    issues.push({code:'CROSS_ORDER_PORTION_ALLOCATION_UNVERIFIED',itemId:job.itemId});continue;
+   const allocations=job.portionAllocations;
+   if(!Array.isArray(allocations)||!allocations.length){
+    issues.push({code:'PORTION_ALLOCATION_MISSING',itemId:job.itemId});continue;
    }
-   const key=JSON.stringify([String(job.orderIds[0]),job.itemId]);
-   actual.set(key,(actual.get(key)||0)+job.portions);
+   const seen=new Set();
+   let allocated=0,valid=true;
+   for(const allocation of allocations){
+    const id=String(allocation?.orderId);
+    if(!allocation||!Number.isInteger(allocation.qty)||allocation.qty<=0||
+       seen.has(id)||!(job.orderIds||[]).some(x=>String(x)===id)){
+      issues.push({code:'INVALID_PORTION_ALLOCATION',itemId:job.itemId});valid=false;continue;
+    }
+    seen.add(id);allocated+=allocation.qty;
+   }
+   if(allocated!==job.portions||seen.size!==(job.orderIds||[]).length){
+    issues.push({code:'PORTION_ALLOCATION_TOTAL_MISMATCH',itemId:job.itemId});valid=false;
+   }
+   if(valid)for(const allocation of allocations){
+    const key=JSON.stringify([String(allocation.orderId),job.itemId]);
+    actual.set(key,(actual.get(key)||0)+allocation.qty);
+   }
   }
   for(const [key,qty] of expected){
    if(actual.get(key)!==qty)issues.push({code:'PORTION_COVERAGE_MISMATCH',key,expected:qty,actual:actual.get(key)||0});
