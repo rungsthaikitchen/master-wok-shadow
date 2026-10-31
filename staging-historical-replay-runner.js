@@ -29,25 +29,30 @@ async function main(){
    await client.query('ROLLBACK');
   }
   if(rows.length===0){
-   process.stdout.write(JSON.stringify({serviceDate,includeTestOrders,ordersFetched:0,status:'NO_STAGING_DATA',bookingApprovalAllowed:false})+'\n');
+   process.stdout.write(JSON.stringify({serviceDate,includeTestOrders,ordersFetched:0,status:'NO_STAGING_DATA',bookingApprovalAllowed:false})+'
+');
    return;
   }
   const result=replay({serviceDate,orders:rows});
   const summary={
    serviceDate,includeTestOrders,ordersFetched:rows.length,committed:result.committed,
    scheduled:result.scheduled,noWokReservation:result.noWokReservation,excluded:result.excluded,
-   feasible:result.feasible,rawFeasible:result.rawFeasible,baselineReason:result.reason,\n   baselineJobsByReadyMinute:result.jobsByReadyMinute,\n   crossOrderPrototype:{status:result.crossOrderPrototype?.status||'NOT_REPORTED',reason:result.crossOrderPrototype?.reason||null,productionBatches:result.crossOrderPrototype?.productionBatches??null,searchMethod:result.crossOrderPrototype?.searchMethod||null,capacityDiagnostic:result.crossOrderPrototype?.capacityDiagnostic||null,deadlinePressure:(result.crossOrderPrototype?.deadlinePressure||[]).map(p=>({readyMinute:p.readyMinute,batches:p.batches,cookingMinutes:p.cookingMinutes,minimumMinutesIncludingResets:p.minimumMinutesIncludingResets,earliestBatchStart:p.earliestBatchStart,latestBatchFinish:p.latestBatchFinish}))},
+   feasible:result.feasible,rawFeasible:result.rawFeasible,baselineReason:result.reason,
+   baselineJobsByReadyMinute:result.jobsByReadyMinute,
+   crossOrderPrototype:{status:result.crossOrderPrototype?.status||'NOT_REPORTED',reason:result.crossOrderPrototype?.reason||null,productionBatches:result.crossOrderPrototype?.productionBatches??null,searchMethod:result.crossOrderPrototype?.searchMethod||null,capacityDiagnostic:result.crossOrderPrototype?.capacityDiagnostic||null,deadlinePressure:(result.crossOrderPrototype?.deadlinePressure||[]).map(p=>({readyMinute:p.readyMinute,batches:p.batches,cookingMinutes:p.cookingMinutes,minimumMinutesIncludingResets:p.minimumMinutesIncludingResets,earliestBatchStart:p.earliestBatchStart,latestBatchFinish:p.latestBatchFinish}))},
    historicalShadow:{tested:result.historicalShadow.tested,validated:result.historicalShadow.validated,unverified:result.historicalShadow.unverified},
    websiteBridgeReplay:{tested:result.websiteBridgeReplay.tested,validated:result.websiteBridgeReplay.validated,unverified:result.websiteBridgeReplay.unverified},
    fryerStatus:result.fryerDiagnostic?.status||'NOT_REPORTED',
    bookingApprovalAllowed:false,legacyDecisionAvailable:false
   };
-  process.stdout.write(JSON.stringify(summary,null,2)+'\n');
+  process.stdout.write(JSON.stringify(summary,null,2)+'
+');
  }finally{await client.end();}
 }
 main().catch(error=>{
  // Avoid printing connection strings, SQL or customer data from lower-level errors.
  const safe=new Set(['SERVICE_DATE_REQUIRED_YYYY_MM_DD','STAGING_CONFIRMATION_REQUIRED','STAGING_DATABASE_URL_REQUIRED','NOT_VERIFIED_STAGING_DATABASE_HOST_OR_USER']);
- process.stderr.write('STAGING_HISTORICAL_REPLAY_UNVERIFIED: '+(safe.has(error.message)?error.message:'REPLAY_OR_DATABASE_ERROR')+'\n');
+ process.stderr.write('STAGING_HISTORICAL_REPLAY_UNVERIFIED: '+(safe.has(error.message)?error.message:'REPLAY_OR_DATABASE_ERROR')+'
+');
  process.exitCode=1;
 });
