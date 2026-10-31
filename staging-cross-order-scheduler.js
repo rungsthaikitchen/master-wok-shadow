@@ -54,6 +54,7 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
      const latest=g.readyMinute-duration;
      jobs.push({itemId:g.itemId,group:g.group,readyMinute:g.readyMinute,
        portions:batch.length,orderIds:[...new Set(batch.map(p=>p.orderId))],
+       portionAllocations:[...new Set(batch.map(p=>p.orderId))].map(orderId=>({orderId,qty:batch.filter(p=>p.orderId===orderId).length})),
        duration,earliest,latest,holdingLimitMinutes});
    }
  }
