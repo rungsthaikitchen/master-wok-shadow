@@ -12,7 +12,7 @@ function conn(log){
 const base=({log,bookingMode,masterWokAssess,engine})=>({
  connection:conn(log),serviceDate:'2026-11-01',key:'test-key',
  candidate:{orderId:'new',placedAt:'2026-11-01T17:30:00Z',readyMinute:1140},
- model:{},engine:engine||{assessCapacityV1:()=>({status:'GREEN'})},
+ model:{classifyBasket:()=>({})},engine:engine||{assessCapacityV1:()=>({status:'GREEN'})},
  lookupKey:async()=>null,persist:async()=>{log.push('PERSIST');},
  bookingMode,masterWokAssess
 });
