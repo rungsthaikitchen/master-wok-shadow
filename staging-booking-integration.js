@@ -2,6 +2,7 @@
 const {readStagingOrders}=require('./staging-order-reader');
 const {normalizeStagingOrders}=require('./staging-order-snapshot');
 const {reserveWithMasterWok}=require('./master-wok-transaction-writer');
+const {chooseBookingAssessment}=require('./staging-booking-mode');
 
 // Staging integration seam. Database writes remain INJECTED and must insert
 // header, items and reservation together on the locked connection.
@@ -19,10 +20,19 @@ function londonPlacement(instant) {
 function normalizePlacedAt(orders) {
   return orders.map(order=>({...order,placedAt:londonPlacement(order.placedAt)}));
 }
-async function bookStagingCandidate({connection,serviceDate,key,candidate,model,engine,lookupKey,persist}) {
+async function bookStagingCandidate({connection,serviceDate,key,candidate,model,engine,lookupKey,persist,bookingMode='LEGACY',masterWokAssess}) {
   if(!model || !engine || typeof engine.assessCapacityV1!=='function' ||
       typeof lookupKey!=='function' || typeof persist!=='function') {
     return {status:'UNVERIFIED',committed:false,reason:'INVALID_REQUEST'};
+  }
+  // Select the trusted mode before opening a transaction. Unknown modes fail closed.
+  let assessBooking;
+  try {
+    assessBooking=chooseBookingAssessment({mode:bookingMode,
+      legacyAssess:({acceptedOrders,proposedOrder})=>engine.assessCapacityV1({acceptedOrders,proposedOrder}),
+      masterWokAssess});
+  } catch (_) {
+    return {status:'UNVERIFIED',committed:false,reason:'INVALID_BOOKING_MODE'};
   }
   return reserveWithMasterWok({
     connection,serviceDate,key,candidate,
@@ -34,7 +44,7 @@ async function bookStagingCandidate({connection,serviceDate,key,candidate,model,
     },
     assess:async({acceptedOrders,proposedOrder})=>{
       const localCandidate={...proposedOrder,placedAt:londonPlacement(proposedOrder.placedAt)};
-      return engine.assessCapacityV1({acceptedOrders,proposedOrder:localCandidate});
+      return assessBooking({acceptedOrders,proposedOrder:localCandidate});
     },
     persist
   });
