@@ -4,7 +4,11 @@
 // Neither result authorises booking or substitutes for hot-holding controls.
 const {scheduleCrossOrderPanang}=require('./staging-cross-order-scheduler');
 const {planFryerBeforeWok}=require('./staging-fryer-before-wok');
+const {diagnoseFryer}=require('./staging-fryer-diagnostic');
 function planCoordinatedKitchen(orders,rows){
+ const inventory=diagnoseFryer(orders,rows);
+ if(inventory.unmodelled.length)
+  return {status:'UNVERIFIED',reason:'FRY_RECIPES_UNMODELLED',inventory,bookingApprovalAllowed:false};
  let last=null;
  for(const curryHoldMinutes of [10,20]){
   const wok=scheduleCrossOrderPanang(orders,rows,{allowFryerDependent:true,curryHoldMinutes});
