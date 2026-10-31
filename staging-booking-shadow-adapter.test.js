@@ -37,11 +37,12 @@ test('incomplete committed snapshot fails closed',()=>{
  assert.equal(r.reason,'INCOMPLETE_COMMITTED_SNAPSHOT');
 });
 
-test('standalone spring rolls do not consume wok capacity',()=>{
+test('standalone spring rolls do not consume wok capacity but block unverified fryer load',()=>{
  const r=compareBookingShadow({orders:[],rows:[],candidate:{
   order:candidate.order,row:{id:'new',items:[line('veg-spring-rolls')]}
  }});
- assert.equal(r.status,'VALIDATED_SHADOW_PROTOTYPE');
+ assert.equal(r.status,'UNVERIFIED');
+ assert.equal(r.planFailureReason,'FRY_RECIPES_UNMODELLED');
  assert.equal(r.bookingApprovalAllowed,false);
 });
 
