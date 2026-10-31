@@ -2,7 +2,8 @@
 // Staging-only inventory of fryer dependencies; does not schedule or approve.
 const {OUT_OF_SCOPE}=require('./staging-out-of-scope-items');
 // These standalone items use fryer capacity but have no verified timing model.
-const UNMODELLED_FRIED=new Set(['chips','veg-spring-rolls','chicken-spring-rolls','fried-tofu','fish-cakes','pork-dumplings','fried-prawns']);
+const UNMODELLED_FRIED=new Set(['chips','fried-tofu','fish-cakes','pork-dumplings','fried-prawns']);
+const SPRING_ROLLS=new Set(['veg-spring-rolls','chicken-spring-rolls']);
 const FIXED = {
   'stir-crispy': {crispyChicken:1},
   'salt-chicken': {crispyChicken:1},
@@ -31,6 +32,12 @@ function diagnoseFryer(orders,rows) {
       }
       if(UNMODELLED_FRIED.has(line.item_id)) {
         unmodelled.push({orderId:String(row.id),itemId:line.item_id,reason:'FRY_RECIPE_UNMODELLED'});
+        continue;
+      }
+      if(SPRING_ROLLS.has(line.item_id)){
+        dependencies.push({orderId:String(row.id),itemId:line.item_id,
+          readyMinute:order.readyMinute,standalone:true,
+          durationMinutes:7,counts:{springRollBatch:line.qty}});
         continue;
       }
       if(OUT_OF_SCOPE.has(line.item_id))continue;
