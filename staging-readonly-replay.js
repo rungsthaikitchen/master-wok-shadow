@@ -11,6 +11,7 @@ const {diagnostic}=require('./staging-cross-order-batch-diagnostic');
 const {scheduleCrossOrderPanang}=require('./staging-cross-order-scheduler');
 const {diagnoseFryer}=require('./staging-fryer-diagnostic');
 const {compareBookingShadow}=require('./staging-booking-shadow-adapter');
+const {compareStagingSnapshot}=require('./staging-snapshot-shadow-bridge');
 function replay(snapshot) {
   const context=vm.createContext({window:{},Date});
   for(const file of ['master-wok-model-bundle.js','master-wok.js'])
@@ -67,6 +68,17 @@ function replay(snapshot) {
       checkedOrders:comparison.checkedOrders||null,
       bookingApprovalAllowed:false});
   }
+  // Independently exercise the website-shaped adapter against actual staging
+  // snapshot rows. This is not a comparison with original legacy decisions.
+  const websiteBridgeComparisons=[];
+  for(let i=0;i<chronological.length;i++){
+    const current=chronological[i];
+    const earlier=chronological.slice(0,i).map(x=>x.row);
+    const result=compareStagingSnapshot({committedRows:earlier,
+      candidateRow:current.row,legacyDecision:null});
+    websiteBridgeComparisons.push({sequence:i+1,status:result.status,
+      reason:result.reason,bookingApprovalAllowed:result.bookingApprovalAllowed});
+  }
   // Read-only synthetic candidates against the full committed workload.
   // Compare early and late placement times; no legacy availability decisions.
   const candidateScenarios=[];
@@ -90,6 +102,10 @@ function replay(snapshot) {
   }
   return {serviceDate:snapshot.serviceDate,committed:normalized.length,scheduled:scheduled.length,noWokReservation,excluded,
     candidateScenarios:{placementTime:'17:30 or 10-20 minutes before ready time, London (synthetic)',scenarios:candidateScenarios,legacyDecisionAvailable:false},
+    websiteBridgeReplay:{tested:websiteBridgeComparisons.length,
+      validated:websiteBridgeComparisons.filter(x=>x.status==='VALIDATED_SHADOW_PROTOTYPE').length,
+      unverified:websiteBridgeComparisons.filter(x=>x.status!=='VALIDATED_SHADOW_PROTOTYPE').length,
+      comparisons:websiteBridgeComparisons,legacyDecisionAvailable:false},
     historicalShadow:{tested:shadowHistory.length,validated:shadowHistory.filter(x=>x.status==='VALIDATED_SHADOW_PROTOTYPE').length,
       unverified:shadowHistory.filter(x=>x.status!=='VALIDATED_SHADOW_PROTOTYPE').length,
       comparisons:shadowHistory,legacyDecisionAvailable:false},
