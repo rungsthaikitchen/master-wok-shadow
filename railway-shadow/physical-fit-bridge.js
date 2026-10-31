@@ -4,6 +4,7 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {scheduleCrossOrderPanang}=require('../staging-cross-order-scheduler');
 const {plan}=require('../staging-combined-friday-replay');
+const {londonPlacement}=require('../staging-booking-integration');
 function run(input){
  const fail=reason=>({status:'UNVERIFIED',reason,bookingApprovalAllowed:false});
  if(!input||!/^\d{4}-\d{2}-\d{2}$/.test(input.serviceDate||'')||
@@ -18,7 +19,7 @@ function run(input){
      !Array.isArray(row.lines)||!row.lines.length||row.lines.length>100)return fail('INVALID_ORDER');
   const date=new Date(row.placedAt);
   if(!Number.isFinite(date.getTime()))return fail('INVALID_PLACEMENT');
-  const london=new Date(date.toLocaleString('en-US',{timeZone:'Europe/London'}));
+  const london=londonPlacement(date);
   const items=[];
   for(const line of row.lines){
    if(!line||!ctx.window.MasterWokModelV1.hasItem(line.itemId)||
