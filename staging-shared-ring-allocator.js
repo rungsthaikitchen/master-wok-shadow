@@ -8,7 +8,7 @@ const SMALL_FINISH=new Set(['stir-crispy','salt-chicken','salt-chickenchips','sa
 const NO_RING=new Set(['beef-salad','papaya-salad','pork-salad','laab']);
 const LARGE=new Set(['pad-thai','chef-pad-thai','pad-kee-mao','pad-see-ew','fried-rice']);
 function eligible(itemId){
- if(NO_RING.has(itemId))return [];
+ if(NO_RING.has(itemId))return ['cold-prep-1'];
  if(PAN.has(itemId))return ['pan-1','pan-2','pan-3'];
  if(SMALL_FINISH.has(itemId))return ['small-1','small-2','large-1','large-2'];
  if(CURRIES.has(itemId))return ['pan-1','pan-2','pan-3'];
@@ -18,13 +18,12 @@ function eligible(itemId){
 }
 function allocateSharedRings(jobs){
  const fail=(reason)=>({status:'UNVERIFIED',reason,bookingApprovalAllowed:false});
- if(!Array.isArray(jobs)||jobs.length>32)return fail('SIZE_LIMIT');
+ if(!Array.isArray(jobs)||jobs.length>64)return fail('SIZE_LIMIT');
  const pending=[];
  for(const job of jobs){
   const vessels=eligible(job.itemId);
   if(!vessels)return fail('VESSEL_ELIGIBILITY_UNVERIFIED');
-  if(vessels.length===0)return fail('NON_RING_WORK_REQUIRES_SEPARATE_CAPACITY_MODEL');
-  if(!Number.isInteger(job.duration)||job.duration<1||!Number.isInteger(job.earliest)||
+    if(!Number.isInteger(job.duration)||job.duration<1||!Number.isInteger(job.earliest)||
     !Number.isInteger(job.latest)||job.earliest<990||job.latest+job.duration>1320||
     job.earliest>job.latest)return fail('INVALID_WINDOW');
   pending.push({...job,vessels});
@@ -33,7 +32,7 @@ function allocateSharedRings(jobs){
  const placed=[];let nodes=0,exhausted=false;
  function fits(vessel,start,finish){
   if(placed.some(j=>j.vessel===vessel&&start<j.finish+1&&finish+1>j.start))return false;
-  for(let t=start;t<finish;t++)if(placed.filter(j=>j.start<=t&&t<j.finish).length>=4)return false;
+  for(let t=start;t<finish;t++)if(vessel!=='cold-prep-1' && placed.filter(j=>j.vessel!=='cold-prep-1'&&j.start<=t&&t<j.finish).length>=4)return false;
   return true;
  }
  function search(i){
@@ -55,6 +54,6 @@ function allocateSharedRings(jobs){
  if(!search(0))return fail(exhausted?'SEARCH_LIMIT':'NO_PHYSICAL_TIMELINE');
  return {status:'PHYSICAL_FIT_PROTOTYPE',reason:'FOUR_SHARED_RINGS',
   jobs:placed.sort((a,b)=>a.start-b.start),ringCapacity:4,
-  chefConcurrencyVerified:false,bookingApprovalAllowed:false};
+  chefConcurrencyVerified:false,coldPrepCapacityAssumed:1,bookingApprovalAllowed:false};
 }
 module.exports={allocateSharedRings,eligible};
