@@ -5,6 +5,8 @@ const {readStagingOrders}=require('./staging-order-reader');
 const {replay}=require('./staging-readonly-replay');
 async function main(){
  const serviceDate=process.argv[2];
+ const includeTestOrders=process.argv[3]==='--include-test-orders';
+ if(process.argv.length>4 || (process.argv[3] && !includeTestOrders))throw Error('INVALID_REPLAY_OPTION');
  if(!/^\d{4}-\d{2}-\d{2}$/.test(serviceDate||''))throw Error('SERVICE_DATE_REQUIRED_YYYY_MM_DD');
  if(process.env.CONFIRM_STAGING_ONLY!=='YES')throw Error('STAGING_CONFIRMATION_REQUIRED');
  const raw=process.env.STAGING_DATABASE_URL;
@@ -14,7 +16,7 @@ async function main(){
  const ref='hvrqgufqjslvgiohgkvu';
  const direct=host==='db.'+ref+'.supabase.co'&&user==='postgres';
  const pooler=/^aws-[0-9]+-[a-z0-9-]+[.]pooler[.]supabase[.]com$/.test(host)&&user==='postgres.'+ref;
- if(!direct&&!pooler)throw Error('NOT_VERIFIED_STAGING_DATABASE_HOST_OR_USER');
+ if(!direct&&!pooler)throw Error('NOT_VERIFIED_STAGING_DATABASE_HOST_OR_USER','INVALID_REPLAY_OPTION');
  const {Client}=require('pg');
  const client=new Client({connectionString:raw,connectionTimeoutMillis:10000});
  try{
@@ -22,17 +24,17 @@ async function main(){
   await client.query('BEGIN READ ONLY');
   let rows;
   try{
-   rows=await readStagingOrders(client,serviceDate);
+   rows=await readStagingOrders(client,serviceDate,{includeTestOrders});
   }finally{
    await client.query('ROLLBACK');
   }
   if(rows.length===0){
-   process.stdout.write(JSON.stringify({serviceDate,ordersFetched:0,status:'NO_STAGING_DATA',bookingApprovalAllowed:false})+'\n');
+   process.stdout.write(JSON.stringify({serviceDate,includeTestOrders,ordersFetched:0,status:'NO_STAGING_DATA',bookingApprovalAllowed:false})+'\n');
    return;
   }
   const result=replay({serviceDate,orders:rows});
   const summary={
-   serviceDate,ordersFetched:rows.length,committed:result.committed,
+   serviceDate,includeTestOrders,ordersFetched:rows.length,committed:result.committed,
    scheduled:result.scheduled,noWokReservation:result.noWokReservation,excluded:result.excluded,
    feasible:result.feasible,rawFeasible:result.rawFeasible,
    historicalShadow:{tested:result.historicalShadow.tested,validated:result.historicalShadow.validated,unverified:result.historicalShadow.unverified},
