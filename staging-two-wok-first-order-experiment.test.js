@@ -39,3 +39,22 @@ test('different Pad See Ew modifiers fail closed',()=>{
  x.rows[0].items[2].modifiers=['no-chilli'];
  assert.equal(firstOrderTwoWokExperiment(x.orders,x.rows).status,'UNVERIFIED');
 });
+
+test('same constrained sequence shifts with the promised ready time',()=>{
+ const x=fixture();
+ x.orders[0].readyMinute=1080;
+ const r=firstOrderTwoWokExperiment(x.orders,x.rows);
+ assert.equal(r.status,'COORDINATED_EXPERIMENT');
+ assert.deepEqual(r.wok.jobs.map(j=>j.start),[1060,1071,1077]);
+ assert.ok(r.fryer.jobs.every(j=>j.finish<=1077));
+ assert.equal(r.bookingApprovalAllowed,false);
+});
+test('ready time before 17:00 fails closed',()=>{
+ const x=fixture();
+ x.orders[0].readyMinute=1015;
+ assert.equal(firstOrderTwoWokExperiment(x.orders,x.rows).status,'UNVERIFIED');
+});
+test('later service placement in London clock fails closed',()=>{
+ const x=fixture('2026-07-10T16:11:00Z'); // 17:11 BST
+ assert.equal(firstOrderTwoWokExperiment(x.orders,x.rows).status,'UNVERIFIED');
+});
