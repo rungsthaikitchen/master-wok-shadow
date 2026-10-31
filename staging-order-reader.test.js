@@ -7,7 +7,8 @@ test('reads via supplied transaction connection with date parameter',async()=>{
  const rows=[{id:'a',items:[]}];
  const result=await readStagingOrders({query:async(sql,params)=>{captured={sql,params};return {rows};}},'2026-11-01');
  assert.equal(result,rows);
- assert.deepEqual(captured.params,['2026-11-01']);
+ assert.deepEqual(captured.params,['2026-11-01',false]);
+ assert.match(captured.sql,/\$2::boolean/);
  assert.match(captured.sql,/Europe\/London/);
  assert.match(captured.sql,/order_items/);
  assert.match(captured.sql,/coalesce\(o.confirmed_time, o.proposed_time, o.preferred_time\)/);
