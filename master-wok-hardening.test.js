@@ -43,9 +43,13 @@ test('durable store survives reopen, deduplicates concurrent retries and refuses
   const dir=await fs.mkdtemp(path.join(os.tmpdir(),'mw-'));
   t.after(()=>fs.rm(dir,{recursive:true,force:true}));
   const store=await createRecordStore(dir);
-  const observer=createLiveShadowObserver({enabled:true,assess:good,persist:store.persist});
+  const storageErrors=[];
+  const observer=createLiveShadowObserver({enabled:true,assess:good,persist:async (...args)=>{
+    try { return await store.persist(...args); }
+    catch (error) { storageErrors.push({code:error.code||null,message:error.message}); throw error; }
+  }});
   const results=await Promise.all(Array.from({length:12},()=>observer.observe(event)));
-  assert.ok(results.every(r=>r.observed), 'Concurrent observer results: '+JSON.stringify(results));
+  assert.ok(results.every(r=>r.observed), 'Concurrent observer results: '+JSON.stringify(results)+'; storage errors: '+JSON.stringify(storageErrors));
   const reopened=await createRecordStore(dir);
   const records=await reopened.readAll();
   assert.equal(records.length,1);
