@@ -16,9 +16,9 @@ test('coordinated staging prototype places crispy chicken frying before wok',()=
  assert.equal(r.bookingApprovalAllowed,false);
  assert.ok(r.fryer.jobs.every(f=>f.finish<=r.wok.jobs[0].start));
 });
-test('standalone fried starters do not block coordinated wok work',()=>{
+test('standalone fried starters prevent complete coordinated kitchen validation',()=>{
  const r=planCoordinatedKitchen(orders,rows([line('stir-crispy'),line('veg-spring-rolls')]));
- assert.equal(r.status,'COORDINATED_PROTOTYPE');
- assert.equal(r.wok.jobs.length,1);
+ assert.equal(r.status,'UNVERIFIED');
+ assert.equal(r.reason,'FRY_RECIPES_UNMODELLED');
  assert.equal(r.bookingApprovalAllowed,false);
 });
