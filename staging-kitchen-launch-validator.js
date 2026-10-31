@@ -1,7 +1,8 @@
 'use strict';
 // Staging-only launch safety gate. Never grants booking approval.
 // Validates reported resource intervals and order-placement boundaries.
-function validateKitchenTimeline(orders,plan){
+const {OUT_OF_SCOPE}=require('./staging-out-of-scope-items');
+function validateKitchenTimeline(orders,plan,rows){
  const issues=[];
  const placed=new Map(orders.map(o=>[String(o.orderId),o.placedAt instanceof Date
   ?o.placedAt.getHours()*60+o.placedAt.getMinutes():NaN]));
@@ -25,6 +26,43 @@ function validateKitchenTimeline(orders,plan){
   const a=all[i],b=all[j];
   if(a.resource===b.resource&&a.start<b.finish&&b.start<a.finish)
    issues.push({code:'RESOURCE_OVERLAP',resource:a.resource});
+ }
+ // Portion coverage is provable only for single-order batches with current
+ // job metadata. Cross-order batches need per-order portion allocations.
+ if(Array.isArray(rows)){
+  const expected=new Map();
+  for(const row of rows){
+   if(!row||!Array.isArray(row.items)){
+    issues.push({code:'INVALID_ORDER_LINES'});continue;
+   }
+   for(const line of row.items){
+    if(!line||!Number.isInteger(line.qty)||line.qty<=0||typeof line.item_id!=='string'){
+     issues.push({code:'INVALID_ORDER_LINE',orderId:String(row.id)});continue;
+    }
+    if(OUT_OF_SCOPE.has(line.item_id))continue;
+    const key=JSON.stringify([String(row.id),line.item_id]);
+    expected.set(key,(expected.get(key)||0)+line.qty);
+   }
+  }
+  const actual=new Map();
+  for(const job of wok){
+   if(!Number.isInteger(job.portions)||job.portions<=0){
+    issues.push({code:'INVALID_PORTION_COUNT',itemId:job.itemId});continue;
+   }
+   if(!Array.isArray(job.orderIds)||job.orderIds.length!==1){
+    issues.push({code:'CROSS_ORDER_PORTION_ALLOCATION_UNVERIFIED',itemId:job.itemId});continue;
+   }
+   const key=JSON.stringify([String(job.orderIds[0]),job.itemId]);
+   actual.set(key,(actual.get(key)||0)+job.portions);
+  }
+  for(const [key,qty] of expected){
+   if(actual.get(key)!==qty)issues.push({code:'PORTION_COVERAGE_MISMATCH',key,expected:qty,actual:actual.get(key)||0});
+  }
+  for(const [key,qty] of actual){
+   if(!expected.has(key))issues.push({code:'UNEXPECTED_SCHEDULED_PORTIONS',key,actual:qty});
+  }
+ }else{
+  issues.push({code:'ORDER_LINES_REQUIRED_FOR_COVERAGE'});
  }
  for(const job of fry){
   for(const orderId of job.orderIds||[]){
