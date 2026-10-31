@@ -8,7 +8,9 @@ function firstOrderTwoWokExperiment(orders,rows) {
  const fail=(reason,detail={})=>({status:'UNVERIFIED',reason,...detail,bookingApprovalAllowed:false});
  if(orders.length!==1||rows.length!==1)return fail('FIRST_ORDER_ONLY');
  const order=orders[0],row=rows[0],id=String(row.id);
- if(String(order.orderId)!==id||order.readyMinute!==1050)return fail('ORDER_ID_OR_READY_TIME_MISMATCH');
+ if(String(order.orderId)!==id||!Number.isInteger(order.readyMinute)||order.readyMinute<1020||order.readyMinute>1260)
+  return fail('ORDER_ID_OR_READY_TIME_MISMATCH');
+ const ready=order.readyMinute;
  const lines=(row.items||[]).map(x=>({id:x.item_id,qty:x.qty,modifiers:x.modifiers}));
  if(lines.length!==4||lines.some(x=>!Number.isInteger(x.qty)||x.qty!==1||!Array.isArray(x.modifiers)))
   return fail('UNEXPECTED_ORDER_LINES');
@@ -18,15 +20,17 @@ function firstOrderTwoWokExperiment(orders,rows) {
   return fail('UNSUPPORTED_RECIPE_MIX');
  if(JSON.stringify(lines.filter(x=>x.id==='pad-see-ew').map(x=>x.modifiers)[0])!==JSON.stringify(lines.filter(x=>x.id==='pad-see-ew').map(x=>x.modifiers)[1]))
   return fail('PAD_SEE_EW_MODIFIERS_DIFFER');
- const placement=order.placedAt instanceof Date?order.placedAt.getHours()*60+order.placedAt.getMinutes():NaN;
- if(!Number.isFinite(placement)||placement>1030)return fail('ORDER_PLACED_TOO_LATE');
+ const placement=order.placedAt instanceof Date&&!Number.isNaN(order.placedAt.valueOf())
+  ?Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(order.placedAt).slice(0,2))*60+
+   Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(order.placedAt).slice(3,5)):NaN;
+ if(!Number.isFinite(placement)||placement>ready-20)return fail('ORDER_PLACED_TOO_LATE');
  const jobs=[
-  {itemId:'pad-see-ew',portions:2,orderIds:[id],start:1030,finish:1040,wokStation:1},
-  {itemId:'fried-rice',portions:1,orderIds:[id],start:1041,finish:1049,wokStation:1},
-  {itemId:'salt-chickenchips',portions:1,orderIds:[id],start:1047,finish:1049,wokStation:2}
- ].map(j=>({...j,duration:j.finish-j.start,readyMinute:1050,holdingMinutes:1050-j.finish,
-   portionAllocations:[{orderId:id,qty:j.portions}],placementSatisfied:placement<=j.start,holdingSatisfied:1050-j.finish<=10}));
- if(jobs.some(j=>j.start<START||j.finish>END||j.finish>1050||!j.placementSatisfied||!j.holdingSatisfied))
+  {itemId:'pad-see-ew',portions:2,orderIds:[id],start:ready-20,finish:ready-10,wokStation:1},
+  {itemId:'fried-rice',portions:1,orderIds:[id],start:ready-9,finish:ready-1,wokStation:1},
+  {itemId:'salt-chickenchips',portions:1,orderIds:[id],start:ready-3,finish:ready-1,wokStation:2}
+ ].map(j=>({...j,duration:j.finish-j.start,readyMinute:ready,holdingMinutes:ready-j.finish,
+   portionAllocations:[{orderId:id,qty:j.portions}],placementSatisfied:placement<=j.start,holdingSatisfied:ready-j.finish<=10}));
+ if(jobs.some(j=>j.start<START||j.finish>END||j.finish>ready||!j.placementSatisfied||!j.holdingSatisfied))
   return fail('JOB_WINDOW_INVALID');
  // Explicitly check physical station overlap and a one-minute reset on each station.
  for(let i=0;i<jobs.length;i++)for(let k=i+1;k<jobs.length;k++){
