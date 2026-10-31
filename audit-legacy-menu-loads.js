@@ -7,10 +7,10 @@ const path=require('node:path');
 const DEFAULT={Starter:0,Soup:1,Salad:1,Curry:1,'Stir Fry':1,'Noodles & Rice':1,'Side Dishes':0,'Soft Drinks':0};
 function extractMenuLoads(html){
  const start=html.indexOf('const MENU_CATEGORIES = [');
- const end=html.indexOf('// ---------- Helpers ----------',start);
- if(start<0)throw Error('MENU_NOT_FOUND');
- // Stop at the next state marker if present, otherwise use the rest of HTML.
- const source=html.slice(start,end>start?end:undefined);
+ const end=html.indexOf('\n    ];',start);
+ if(start<0||end<0)throw Error('MENU_BOUNDARY_NOT_FOUND');
+ // Stop at the menu array closing line, before MODIFIERS and other arrays.
+ const source=html.slice(start,end);
  const rows=source.replace(/\/\*[\s\S]*?\*\//g,'').split(/\r?\n/);
  let category=null;const catalog=new Map();
  for(const line of rows){
