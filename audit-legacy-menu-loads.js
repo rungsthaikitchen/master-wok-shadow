@@ -11,7 +11,7 @@ function extractMenuLoads(html){
  if(start<0)throw Error('MENU_NOT_FOUND');
  // Stop at the next state marker if present, otherwise use the rest of HTML.
  const source=html.slice(start,end>start?end:undefined);
- const rows=source.split(/\r?\n/);
+ const rows=source.replace(/\/\*[\s\S]*?\*\//g,'').split(/\r?\n/);
  let category=null;const catalog=new Map();
  for(const line of rows){
   if(/^\s*\/\//.test(line))continue;
