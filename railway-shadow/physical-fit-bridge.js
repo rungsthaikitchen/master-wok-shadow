@@ -15,7 +15,7 @@ function run(input){
  const orders=[],rows=[];
  for(const row of input.rows){
   if(!row||typeof row.orderId!=='string'||!row.orderId||
-     !Number.isInteger(row.readyMinute)||row.readyMinute<0||row.readyMinute>=1440||
+     !Number.isFinite(row.readyMinute)||row.readyMinute<0||row.readyMinute>=1440||
      !Array.isArray(row.lines)||!row.lines.length||row.lines.length>100)return fail('INVALID_ORDER');
   const date=new Date(row.placedAt);
   if(!Number.isFinite(date.getTime()))return fail('INVALID_PLACEMENT');
