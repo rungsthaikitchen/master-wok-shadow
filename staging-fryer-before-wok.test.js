@@ -24,8 +24,10 @@ test('ambiguous mapping to multiple wok batches fails closed',()=>{
  ]});
  assert.equal(r.reason,'FRY_WOK_BATCH_MAPPING_UNVERIFIED');
 });
-test('standalone spring rolls require no prerequisite fryer slot',()=>{
+test('standalone spring rolls have unverified fryer workload',()=>{
  const r=planFryerBeforeWok(orders,[{id:'A',items:[{item_id:'veg-spring-rolls',qty:1,modifiers:[]}]}],wok(1130));
- assert.equal(r.status,'PREREQUISITES_PLACED_PROTOTYPE');
+ assert.equal(r.status,'UNVERIFIED');
+ assert.equal(r.reason,'FRY_RECIPES_UNMODELLED');
  assert.equal(r.jobs.length,0);
+ assert.equal(r.bookingApprovalAllowed,false);
 });
