@@ -1,0 +1,12 @@
+'use strict';
+const assert=require('node:assert/strict');
+const {compareHistoricalDecisions}=require('./staging-booking-decision-comparison');
+assert.throws(()=>compareHistoricalDecisions(null),/INVALID_SNAPSHOT/);
+assert.throws(()=>compareHistoricalDecisions({serviceDate:'bad',orders:[]}),/INVALID_SNAPSHOT/);
+const empty=compareHistoricalDecisions({serviceDate:'2026-10-30',orders:[]});
+assert.equal(empty.ordersCompared,0);
+assert.equal(empty.bookingApprovalAllowed,false);
+assert.equal(empty.comparisonVerified,false);
+assert.equal(empty.decisionHistoryAvailable,false);
+assert.deepEqual(empty.events,[]);
+console.log('PASS: comparison fails closed for invalid and empty inputs');
