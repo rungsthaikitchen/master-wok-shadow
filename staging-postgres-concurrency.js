@@ -12,7 +12,11 @@ async function main(){
  const host=parsed.hostname.toLowerCase();
  // Explicit guard: operator must acknowledge the intended staging target.
  if(process.env.CONFIRM_STAGING_ONLY!=='YES')throw Error('STAGING_CONFIRMATION_REQUIRED');
- if(!host||!host.includes('hvrqgufqjslvgiohgkvu')||host.includes('ubyjrrsvbbqomitpaidb'))throw Error('NOT_VERIFIED_STAGING_DATABASE_HOST');
+ const dbUser=decodeURIComponent(parsed.username);
+ const projectRef='hvrqgufqjslvgiohgkvu';
+ const direct=(host==='db.'+projectRef+'.supabase.co' && dbUser==='postgres');
+ const pooler=(/^aws-[0-9]+-[a-z0-9-]+[.]pooler[.]supabase[.]com$/.test(host) && dbUser==='postgres.'+projectRef);
+ if(!direct && !pooler)throw Error('NOT_VERIFIED_STAGING_DATABASE_HOST_OR_USER');
  const {Pool}=require('pg');
  const pool=new Pool({connectionString:url,max:2,connectionTimeoutMillis:10000});
  const serviceDate='2099-01-02'; // non-production rehearsal date
