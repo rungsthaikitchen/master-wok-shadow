@@ -7,7 +7,8 @@ const path=require('node:path');
 const DEFAULT={Starter:0,Soup:1,Salad:1,Curry:1,'Stir Fry':1,'Noodles & Rice':1,'Side Dishes':0,'Soft Drinks':0};
 function extractMenuLoads(html){
  const start=html.indexOf('const MENU_CATEGORIES = [');
- const end=html.indexOf('\n    ];',start);
+ const closing=/^\s*\];\s*$/m.exec(html.slice(start));
+ const end=closing?start+closing.index:-1;
  if(start<0||end<0)throw Error('MENU_BOUNDARY_NOT_FOUND');
  // Stop at the menu array closing line, before MODIFIERS and other arrays.
  const source=html.slice(start,end);
