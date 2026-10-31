@@ -18,10 +18,11 @@ test('tofu and battered chicken modifiers introduce fryer dependencies',()=>{
  const r=run([{item_id:'stir-basil',qty:2,modifiers:[{id:'tofu'},{id:'extra-bchicken'}]}]);
  assert.deepEqual(r.dependencies[0].counts,{tofu:2,batteredChicken:2});
 });
-test('standalone fried starters are excluded by policy',()=>{
+test('standalone fried starters remain unmodelled fryer workload',()=>{
  const r=run([{item_id:'veg-spring-rolls',qty:1,modifiers:[]}]);
- assert.equal(r.status,'NO_RECOGNISED_FRY_DEPENDENCIES');
- assert.equal(r.unmodelled.length,0);
+ assert.equal(r.status,'UNVERIFIED');
+ assert.deepEqual(r.unmodelled.map(x=>x.itemId),['veg-spring-rolls']);
+ assert.equal(r.bookingApprovalAllowed,false);
 });
 test('plain curry has no recognised fryer dependency',()=>{
  const r=run([{item_id:'panang-curry',qty:1,modifiers:[]}]);
