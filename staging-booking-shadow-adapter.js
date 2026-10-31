@@ -18,7 +18,7 @@ function compareBookingShadow({orders,rows,candidate,legacyDecision}){
     combinedOrders.some(x=>!combinedRows.some(y=>String(y.id)===String(x.orderId))))
   return blocked('INCOMPLETE_COMMITTED_SNAPSHOT');
  const plan=planCoordinatedKitchen(combinedOrders,combinedRows);
- const validation=validateKitchenTimeline(combinedOrders,plan);
+ const validation=validateKitchenTimeline(combinedOrders,plan,combinedRows);
  const validated=plan.status==='COORDINATED_PROTOTYPE'&&
    validation.status==='VALIDATED_STAGING_TIMELINE';
  return {status:validated?'VALIDATED_SHADOW_PROTOTYPE':'UNVERIFIED',
