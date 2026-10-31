@@ -36,7 +36,7 @@ async function main(){
   const summary={
    serviceDate,includeTestOrders,ordersFetched:rows.length,committed:result.committed,
    scheduled:result.scheduled,noWokReservation:result.noWokReservation,excluded:result.excluded,
-   feasible:result.feasible,rawFeasible:result.rawFeasible,
+   feasible:result.feasible,rawFeasible:result.rawFeasible,baselineReason:result.reason,\n   baselineJobsByReadyMinute:result.jobsByReadyMinute,\n   crossOrderPrototype:{status:result.crossOrderPrototype?.status||'NOT_REPORTED',reason:result.crossOrderPrototype?.reason||null,productionBatches:result.crossOrderPrototype?.productionBatches??null,searchMethod:result.crossOrderPrototype?.searchMethod||null,capacityDiagnostic:result.crossOrderPrototype?.capacityDiagnostic||null,deadlinePressure:(result.crossOrderPrototype?.deadlinePressure||[]).map(p=>({readyMinute:p.readyMinute,batches:p.batches,cookingMinutes:p.cookingMinutes,minimumMinutesIncludingResets:p.minimumMinutesIncludingResets,earliestBatchStart:p.earliestBatchStart,latestBatchFinish:p.latestBatchFinish}))},
    historicalShadow:{tested:result.historicalShadow.tested,validated:result.historicalShadow.validated,unverified:result.historicalShadow.unverified},
    websiteBridgeReplay:{tested:result.websiteBridgeReplay.tested,validated:result.websiteBridgeReplay.validated,unverified:result.websiteBridgeReplay.unverified},
    fryerStatus:result.fryerDiagnostic?.status||'NOT_REPORTED',
