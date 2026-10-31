@@ -11,7 +11,7 @@ const menu=`const MENU_CATEGORIES = [
  ]},
  // filler menu entries for completeness threshold
 ${Array.from({length:20},(_,i)=>`  { id:'test-item-${i}', name:'Test' },`).join('\n')}
- ];`;
+ ];\nconst MODIFIERS = [\n { id:'panang-curry', name:'Duplicate modifier' },\n ];`;
 const catalog=extractMenuLoads(menu);
 assert.equal(catalog.get('spring-rolls').kitchenLoad,0);
 assert.equal(catalog.get('salt-chicken').source,'EXPLICIT_MENU_OVERRIDE');
