@@ -58,7 +58,7 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
        duration,earliest,latest,holdingLimitMinutes});
    }
  }
- if(jobs.length>32)return {status:'UNVERIFIED',reason:'SEARCH_SIZE_LIMIT',bookingApprovalAllowed:false};
+ if(jobs.length>(options.sharedRings===true?64:32))return {status:'UNVERIFIED',reason:'SEARCH_SIZE_LIMIT',bookingApprovalAllowed:false};
  if(jobs.some(j=>j.earliest>j.latest||j.latest+j.duration>1320))
    return {status:'UNVERIFIED',reason:'IMPOSSIBLE_BATCH_WINDOW',bookingApprovalAllowed:false};
  // Optional staging-only physical-resource experiment. Keep the legacy
