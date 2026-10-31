@@ -61,6 +61,18 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
  if(jobs.length>32)return {status:'UNVERIFIED',reason:'SEARCH_SIZE_LIMIT',bookingApprovalAllowed:false};
  if(jobs.some(j=>j.earliest>j.latest||j.latest+j.duration>1320))
    return {status:'UNVERIFIED',reason:'IMPOSSIBLE_BATCH_WINDOW',bookingApprovalAllowed:false};
+ // Optional staging-only physical-resource experiment. Keep the legacy
+ // single-wok scheduler untouched unless explicitly requested.
+ if(options.sharedRings===true){
+   const {allocateSharedRings}=require('./staging-shared-ring-allocator');
+   const allocation=allocateSharedRings(jobs);
+   if(allocation.status!=='PHYSICAL_FIT_PROTOTYPE')
+     return {status:'UNVERIFIED',reason:allocation.reason,
+       resourceAllocation:allocation,bookingApprovalAllowed:false};
+   return {status:'PHYSICAL_FIT_PROTOTYPE',reason:'CHEF_ATTENTION_NOT_VERIFIED',
+     jobs:allocation.jobs,productionBatches:jobs.length,
+     resourceAllocation:allocation,bookingApprovalAllowed:false};
+ }
  // Necessary workload bound for the current fixed batch partition. If even the
  // widest possible start-to-finish span cannot accommodate the cooking plus
  // mandatory one-minute resets, no permutation of these batches can fit.
