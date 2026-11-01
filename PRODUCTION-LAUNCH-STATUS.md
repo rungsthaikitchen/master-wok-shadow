@@ -47,7 +47,7 @@ main branch has been changed. Work is saved in three companion draft PRs.
 
 ## Verified evidence and limits
 
-- 219 JavaScript tests in both UTC and Europe/London; 21 Python tests; 21 browser
+- 219 JavaScript tests in both UTC and Europe/London; 21 Python tests; 23 browser
   admin/client/proxy tests. Active inline scripts parse successfully.
 - 53 scenario groups against actual private staging PostgreSQL, including
   concurrency, replay, rollback, protected plans, lifecycle races, loyalty,
@@ -100,3 +100,21 @@ main branch has been changed. Work is saved in three companion draft PRs.
    tests alone do not satisfy this gate.
 6. Present the exact production release/rollback package for explicit approval only
    after these gates pass. No production enablement is requested yet.
+
+## Current admin rehearsal checkpoint
+
+The temporary private runtime v10 now reuses createBookingRuntime and existing
+lifecycle/mutation assessment. RTK-119 was proposed from 18:00 to 18:05 with two
+capacity commitments, accepted through the deployed Railway customer link, then
+replayed without duplicate receipt/notification. One commitment remains; three
+outbox events and zero deliveries. Foreign-order mutation was refused. The prior
+checkout drain/restore evidence above remains historical; staging is temporarily
+MASTER_WOK again until 22:05 UK time for the manual admin screen check.
+
+Preview admin proxies now honor the staging backend and refuse implicit live
+routing. The existing admin screen lists only the run's fixture orders in Preview;
+production's reader remains unchanged. Pages deployment 9791ee37 and Railway
+5e7e6734 both succeeded. Core tests (219), admin/client/proxy tests (23), three
+admin inline scripts and five actual local workerd proxy checks pass. Actual
+Cloudflare admin UI POST is the next manual step, not a completed claim. See
+STAGING-ADMIN-REHEARSAL-RESULT.json and PREVIEW-REHEARSAL-STATE.json.

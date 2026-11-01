@@ -4,7 +4,8 @@
 import pg from 'npm:pg@8.23.1';
 const {Pool}=pg;
 const {beginBookingTransaction}=require('./master-wok-transaction-writer');
-const {createAtomicCheckout}=require('./master-wok-atomic-checkout');
+const {createBookingRuntime}=require('./master-wok-runtime');
+const {createMutationAssessment}=require('./master-wok-mutation-assessment');
 const {createOrderStore}=require('./master-wok-order-store');
 const {createServicePlanStore}=require('./master-wok-service-plan-store');
 const {catalog}=require('./master-wok-commercial');
@@ -13,8 +14,6 @@ const {readCapacityCommitments}=require('./master-wok-commitment-reader');
 const {readBookingAvailability}=require('./master-wok-availability-reader');
 const {assessCombinedBooking}=require('./master-wok-combined-assessment');
 const {createLaunchControl}=require('./master-wok-launch-control');
-const {createBookingHttpHandler}=require('./master-wok-http');
-const {createBasketAvailability}=require('./master-wok-availability');
 require('./master-wok-model-bundle');
 const TOKEN='__CERTIFICATION_TOKEN__',RUN='__BROWSER_RUN__',EMAIL='browser-'+RUN+'@example.invalid';
 const EXPIRES='__BROWSER_EXPIRES__';
@@ -36,8 +35,8 @@ Deno.serve(async req=>{
   const envelope=await req.json();
   const gate=createLaunchControl({schema,releaseId:'private-browser-'+RUN});
   if(envelope.operation==='mode')return Response.json({mode:(await gate.read(pool)).mode},{headers:{'Cache-Control':'no-store'}});
-  const isAvailability=envelope.operation==='availability';
-  const input=['checkout','availability'].includes(envelope.operation)?envelope.payload:envelope;
+  const isAvailability=envelope.operation==='availability',isLifecycle=['admin_action','customer_response'].includes(envelope.operation);
+  const input=['checkout','availability','admin_action','customer_response'].includes(envelope.operation)?envelope.payload:envelope;
   if(!input||typeof input!=='object')return new Response('Fixture required',{status:400});
   if(input.operation==='cleanup'){
    const c=await pool.connect();
@@ -54,31 +53,42 @@ Deno.serve(async req=>{
    return Response.json({success:true,scope:'PRIVATE_STAGING_BROWSER_FIXTURE_CLEANUP'});
    }catch(error){try{await c.query('ROLLBACK');}catch(_){}throw error;}finally{c.release();}
   }
-  if(!Array.isArray(input.items)||
-   input.items.length>8||input.items.some(i=>!catalog.items.some(item=>item.id===i.item_id)||!Number.isInteger(i.qty)||i.qty<1||i.qty>2)||
+  if(envelope.operation==='admin_action'&&input.action==='preview_list_orders'){
+   if((await gate.read(pool)).mode!=='MASTER_WOK')return new Response('Staging admin disabled',{status:503});
+   const result=await pool.query(`SELECT to_jsonb(o)||jsonb_build_object('customers',to_jsonb(c),
+    'order_items',(SELECT coalesce(jsonb_agg(i),'[]'::jsonb) FROM ${schema}.order_items i WHERE i.order_id=o.id)) AS item
+    FROM ${schema}.orders o JOIN ${schema}.customers c ON c.id=o.customer_id
+    WHERE o.idempotency_key LIKE $1 AND c.email=$2 AND NOT o.is_test ORDER BY o.created_at DESC LIMIT 20`,[prefix+'%',EMAIL]);
+   return Response.json({success:true,notification_managed:true,orders:result.rows.map(r=>r.item)});
+  }
+  if(isLifecycle){
+   if(!/^[a-f0-9-]{36}$/i.test(input.orderId||''))return new Response('Fixture only',{status:400});
+   const own=(await pool.query(`SELECT o.id FROM ${schema}.orders o JOIN ${schema}.customers c ON c.id=o.customer_id
+    WHERE o.id=$1 AND o.idempotency_key LIKE $2 AND c.email=$3`,[input.orderId,prefix+'%',EMAIL])).rows[0];
+   if(!own)return new Response('Fixture only',{status:403});
+  }else if(!Array.isArray(input.items)||input.items.length>8||
+   input.items.some(i=>!catalog.items.some(item=>item.id===i.item_id)||!Number.isInteger(i.qty)||i.qty<1||i.qty>2)||
    (!isAvailability&&(input.orderType!=='collection'||input.customer?.email!==EMAIL||typeof input.key!=='string'||input.key.length>64)))return new Response('Fixture only',{status:400});
   const fixtureAssessment=context=>{
    const tested=assessCombinedBooking(context);
    // Confined fixture authorization, never a production certification.
    return tested.status==='VALIDATED_COMBINED_ASSESSMENT'?{...tested,status:'GREEN',bookingApprovalAllowed:true}:tested;
   };
-  const availability=createBasketAvailability({pool,model:globalThis.MasterWokModelV1,
-   assertWriteAllowed:gate.assertWriteAllowed,planStore:createServicePlanStore({schema}),
-   readOrders:(c,d)=>readCapacityCommitments(rewrite(c),d),
-   readAvailability:(c,d)=>readBookingAvailability(rewrite(c),d),assessBooking:fixtureAssessment});
+  const readOrders=(c,d)=>readCapacityCommitments(rewrite(c),d);
+  const readAvailability=(c,d)=>readBookingAvailability(rewrite(c),d);
+  const planStore=createServicePlanStore({schema});
+  const mutation=createMutationAssessment({model:globalThis.MasterWokModelV1,readOrders,readAvailability,planStore});
   const commercial=createCommercialValidator();
-  const checkout=createAtomicCheckout({pool,model:globalThis.MasterWokModelV1,mode:'MASTER_WOK',
-   assertWriteAllowed:gate.assertWriteAllowed,
-   store:createOrderStore({schema}),planStore:createServicePlanStore({schema}),
-   readOrders:(c,d)=>readCapacityCommitments(rewrite(c),d),
-   readAvailability:(c,d)=>readBookingAvailability(rewrite(c),d),
-   validateCommercialOrder:(c,i,state)=>commercial(rewrite(c),i,state),
-   assessBooking:fixtureAssessment});
-  const refuse=async()=>({success:false,committed:false,statusCode:409,reason:'STAGING_CHECKOUT_ONLY'});
-  const handler=createBookingHttpHandler({secret:TOKEN,checkout,availability,
-   lifecycle:{adminAction:refuse,customerResponse:refuse},serviceControl:refuse,readMode:async()=>(await gate.read(pool)).mode});
+  const handler=createBookingRuntime({pool,model:globalThis.MasterWokModelV1,secret:TOKEN,
+   releaseId:'private-browser-'+RUN,schema,readOrders,readAvailability,
+   validateCommercialOrder:(c,i,state)=>commercial(rewrite(c),i,state),assessBooking:fixtureAssessment,
+   assessMutation:async context=>{const result=await mutation(context);
+    return result.status==='VALIDATED_LIFECYCLE_ASSESSMENT'?{...result,status:'GREEN',bookingApprovalAllowed:true}:result;}});
+  // Reuse the exact application runtime; only the private fixture boundary above
+  // can authorize these test assessments. No production bootstrap is enabled.
+  const operation=isLifecycle?envelope.operation:isAvailability?'availability':'checkout';
   return await handler(new Request(req.url,{method:'POST',headers:{'content-type':'application/json','x-master-wok-secret':TOKEN},
-   body:JSON.stringify({operation:isAvailability?'availability':'checkout',payload:isAvailability?input:{...input,key:prefix+input.key}})}));
+   body:JSON.stringify({operation,payload:isLifecycle||isAvailability?input:{...input,key:prefix+input.key}})}));
  }catch(_){return Response.json({success:false,reason:'STAGING_BRIDGE_FAILURE'},{status:503});}
  finally{await pool.end();}
 });
