@@ -4,6 +4,7 @@ const {commitmentTimes}=require('./master-wok-commitment-reader');
 const {localDate}=require('./master-wok-clock');
 const {createServicePlanStore}=require('./master-wok-service-plan-store');
 const {settleMasterWokLoyalty}=require('./master-wok-loyalty-settlement');
+const {enqueueNotification,lifecycleNotification}=require('./master-wok-notification-events');
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const mutableStatus=new Set(['pending','accepted','confirmed','cancelled','completed']);
 function actionPatch(order,input,{actor,now,tokenFactory=()=>crypto.randomUUID().replaceAll('-','')}={}){
@@ -89,6 +90,8 @@ function createLifecycleWriter({pool,assessMutation,mode='LEGACY',schema='public
    if(dates.some(date=>!assessment.plansByDate?.[date]))throw Error('VALIDATED_SERVICE_PLANS_REQUIRED');
    for(const date of dates)await planStore.save(connection,date,assessment.plansByDate[date]);
    const loyalty=await settleMasterWokLoyalty(connection,after,{schema});
+   const event=lifecycleNotification(order,after,input);
+   if(event)await enqueueNotification(connection,{schema,order:after,...event});
    const response={success:true,status:after.status,orderId:input.orderId,
     ...(loyalty.handled?{loyalty_settled:loyalty.settled}:{}),
     ...(actor==='customer'?{title:'Thank you',message:input.action==='customer_accept'?

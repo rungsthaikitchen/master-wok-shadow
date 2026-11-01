@@ -1,0 +1,44 @@
+{
+  "status": "PASS",
+  "scope": "REAL_PYTHON_WORKER_AND_TEMPLATES_OVER_HTTP_TO_PRIVATE_STAGING_DATABASE",
+  "productionReady": false,
+  "productionWrites": 0,
+  "externalProviderCalls": 0,
+  "providerReplacement": "In-process deterministic fixture providers; SDK clients prevented from sending",
+  "transportDeploymentVersion": 3,
+  "transportDeploymentHash": "9e9aa2f89b082c5e79a25e7af61380b5a43b0f7fbb457df8816c59cb561b6234",
+  "disabledTransportVersion": 4,
+  "firstRun": {
+    "processed": true,
+    "status": "sent"
+  },
+  "secondRun": {
+    "processed": false
+  },
+  "databaseProof": {
+    "id": "116710ef-159e-4561-840f-7bd32e75a1a9",
+    "status": "sent",
+    "sent_at": "2026-11-01 10:45:52.652379+00",
+    "deliveries": [
+      {
+        "key": "customer",
+        "status": "sent",
+        "attempts": 1,
+        "providerId": "fixture-accepted-1"
+      },
+      {
+        "key": "staff_push",
+        "status": "sent",
+        "attempts": 1,
+        "providerId": "fixture-accepted-2"
+      }
+    ]
+  },
+  "cleanupConfirmed": true,
+  "limits": [
+    "Worker ran locally against deployed Edge/database, not as a deployed Railway cron",
+    "Database order/event fixture seeded for worker transport test; atomic event creation separately certified in 31 database scenario groups",
+    "Real provider credentials/acceptance and operational monitoring remain release gates",
+    "Staff metadata acknowledgement added after this worker run and separately passed final database suite"
+  ]
+}

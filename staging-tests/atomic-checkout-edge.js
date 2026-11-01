@@ -17,6 +17,7 @@ const {createServiceControlWriter}=require('./master-wok-service-control');
 const {beginBookingTransaction}=require('./master-wok-transaction-writer');
 const {createBookingHttpHandler}=require('./master-wok-http');
 const {createBookingRuntime}=require('./master-wok-runtime');
+const {createNotificationDispatcher,createNotificationHttpHandler}=require('./master-wok-notification-dispatch');
 require('./master-wok-model-bundle');
 const TOKEN='__CERTIFICATION_TOKEN__';
 const schema='master_wok_rehearsal';
@@ -72,6 +73,9 @@ async function run(){
     key text PRIMARY KEY,service_date date NOT NULL,order_id uuid NOT NULL UNIQUE REFERENCES ${schema}.orders,
     fingerprint text NOT NULL,response jsonb NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS capacity_scheduler text NOT NULL DEFAULT 'LEGACY';
+   ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS staff_notified_at timestamptz;
+   ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS staff_notify_attempts integer DEFAULT 0;
+   ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS staff_notify_error text;
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS confirm_token text;
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS paid boolean DEFAULT false;
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS payment_status text DEFAULT 'unpaid';
@@ -108,6 +112,18 @@ async function run(){
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),order_id uuid NOT NULL REFERENCES ${schema}.orders ON DELETE CASCADE,
     event_type text NOT NULL,status text NOT NULL DEFAULT 'pending',created_at timestamptz NOT NULL DEFAULT now(),
     UNIQUE(order_id,event_type));
+   ALTER TABLE ${schema}.master_wok_notification_outbox ADD COLUMN IF NOT EXISTS payload jsonb NOT NULL DEFAULT '{}';
+   ALTER TABLE ${schema}.master_wok_notification_outbox ADD COLUMN IF NOT EXISTS attempts integer NOT NULL DEFAULT 0;
+   ALTER TABLE ${schema}.master_wok_notification_outbox ADD COLUMN IF NOT EXISTS next_attempt_at timestamptz NOT NULL DEFAULT now();
+   ALTER TABLE ${schema}.master_wok_notification_outbox ADD COLUMN IF NOT EXISTS sent_at timestamptz;
+   ALTER TABLE ${schema}.master_wok_notification_outbox ADD COLUMN IF NOT EXISTS lease_token uuid;
+   ALTER TABLE ${schema}.master_wok_notification_outbox ADD COLUMN IF NOT EXISTS leased_until timestamptz;
+   ALTER TABLE ${schema}.master_wok_notification_outbox ADD COLUMN IF NOT EXISTS prepared_messages jsonb;
+   CREATE TABLE IF NOT EXISTS ${schema}.master_wok_notification_deliveries (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),event_id uuid NOT NULL REFERENCES ${schema}.master_wok_notification_outbox ON DELETE CASCADE,
+    delivery_key text NOT NULL,message jsonb NOT NULL,fallback jsonb,status text NOT NULL DEFAULT 'pending',
+    attempts integer NOT NULL DEFAULT 0,next_attempt_at timestamptz NOT NULL DEFAULT now(),provider_id text,
+    UNIQUE(event_id,delivery_key));
    ALTER TABLE ${schema}.loyalty_accounts ADD COLUMN IF NOT EXISTS last_order_at timestamptz;
    ALTER TABLE ${schema}.loyalty_accounts ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
    CREATE TABLE IF NOT EXISTS ${schema}.booking_blackouts (
@@ -356,6 +372,73 @@ async function run(){
   results.push('AUTHENTICATED_HTTP_ENVELOPE_COMMITS_DATABASE_ORDER_AND_REPLAYS_SAME_RECEIPT');
   await clear();
   await pool.query(`DELETE FROM ${schema}.master_wok_launch_control WHERE id=1`);
+  }
+  {
+   const dispatch=createNotificationDispatcher({pool,schema});
+   const source=await make()(request('notification-source','2099-01-02T18:00:00Z','green-curry',1));
+   check(source.committed,'NOTIFICATION_SOURCE_FAILED');
+   const claimed=await Promise.all([dispatch({action:'claim'}),dispatch({action:'claim'})]);
+   check(claimed.filter(r=>r.event).length===1,'CONCURRENT_WORKERS_CLAIMED_SAME_EVENT');
+   const event=claimed.find(r=>r.event).event,context={eventId:event.id,token:event.token};
+   check(event.payload.order_id===source.response.orderId&&event.payload.notification_mode==='order_created','SERVER_NOTIFICATION_SNAPSHOT_MISSING');
+   const messages=[{key:'staff_push',primary:{channel:'pushover',title:'Fixture',body:'No real send'}},
+    {key:'z_customer',primary:{channel:'sms',recipient:'07700900123',body:'Fixture'},
+     fallback:{channel:'email',recipient:'fixture@example.invalid',subject:'Fixture',body:'Fixture'}}];
+   await dispatch({...context,action:'prepare',messages});
+   await dispatch({...context,action:'prepare',messages});
+   const staff=(await dispatch({...context,action:'next'})).delivery;
+   await dispatch({...context,action:'result',deliveryId:staff.id,outcome:'sent',providerId:'fixture-provider-id'});
+   check(!!(await pool.query(`SELECT staff_notified_at FROM ${schema}.orders WHERE id=$1`,[source.response.orderId])).rows[0].staff_notified_at,'LEGACY_STAFF_NOTIFICATION_MARKER_NOT_UPDATED');
+   check((await dispatch({...context,action:'result',deliveryId:staff.id,outcome:'sent'})).replayed,'DELIVERY_ACK_REPLAY_UNSTABLE');
+   const customer=(await dispatch({...context,action:'next'})).delivery;
+   check(customer.message.channel==='sms','CUSTOMER_PREFERENCE_CHANGED');
+   await dispatch({...context,action:'result',deliveryId:customer.id,outcome:'failed'});
+   const fallback=(await dispatch({...context,action:'next'})).delivery;
+   check(fallback.id===customer.id&&fallback.message.channel==='email','DEFINITIVE_FAILURE_FALLBACK_MISSING');
+   await dispatch({...context,action:'result',deliveryId:fallback.id,outcome:'sent'});
+   check((await dispatch({...context,action:'next'})).status==='sent','PARTIAL_CHANNEL_SETTLEMENT_FAILED');
+   check(!(await dispatch({action:'claim'})).event,'ACCEPTED_NOTIFICATION_RESENT');
+   results.push('NOTIFICATION_WORKERS_EXCLUSIVE_CLAIM_STABLE_MANIFEST_AND_ACCEPTED_CHANNEL_NO_RESEND');
+   results.push('CUSTOMER_FALLBACK_ONLY_AFTER_DEFINITIVE_REJECTION_PRESERVES_STAFF_SUCCESS');
+   await clear();
+   const prior=await make()(request('notification-previous-staff','2099-01-02T18:00:00Z','green-curry',1));
+   check(prior.committed,'PRIOR_STAFF_FIXTURE_FAILED');
+   await pool.query(`UPDATE ${schema}.orders SET staff_notified_at=now() WHERE id=$1`,[prior.response.orderId]);
+   const priorEvent=(await dispatch({action:'claim'})).event,priorContext={eventId:priorEvent.id,token:priorEvent.token};
+   await dispatch({...priorContext,action:'prepare',messages:[messages[0]]});
+   check((await dispatch({...priorContext,action:'next'})).status==='sent','LEGACY_STAFF_ALERT_WOULD_BE_DUPLICATED');
+   results.push('LEGACY_STAFF_NOTIFICATION_MARKER_IS_PRESERVED_AND_PREVENTS_DUPLICATE_PUSH');
+   await clear();
+   const unknown=await make()(request('notification-unknown','2099-01-02T18:00:00Z','green-curry',1));
+   check(unknown.committed,'UNKNOWN_SEND_SOURCE_FAILED');
+   const pending=(await dispatch({action:'claim'})).event,c={eventId:pending.id,token:pending.token};
+   await dispatch({...c,action:'prepare',messages:[messages[1]]});
+   await dispatch({...c,action:'next'});
+   // Simulate a provider accepting the send followed by a worker crash before
+   // acknowledgement. Expiry MUST quarantine rather than resend/fallback.
+   await pool.query(`UPDATE ${schema}.master_wok_notification_outbox SET leased_until=now()-interval '1 second' WHERE id=$1`,[pending.id]);
+   check((await dispatch({action:'claim'})).attentionRequired,'EXPIRED_SEND_NOT_QUARANTINED');
+   check(!(await dispatch({action:'claim'})).event,'AMBIGUOUS_SEND_AUTOMATICALLY_RETRIED');
+   const quarantined=(await pool.query(`SELECT status FROM ${schema}.master_wok_notification_deliveries WHERE event_id=$1`,[pending.id])).rows;
+   check(quarantined.length===1&&quarantined[0].status==='uncertain','AMBIGUOUS_SEND_FELL_BACK');
+   results.push('WORKER_CRASH_AFTER_PROVIDER_SEND_QUARANTINES_WITHOUT_RESEND_OR_FALLBACK');
+   await clear();
+   const proposal=await make()(request('notification-proposal','2099-01-02T18:00:00Z','green-curry',1));
+   check(proposal.committed,'NOTIFICATION_PROPOSAL_SETUP_FAILED');
+   const suggested=await lifecycle.adminAction({orderId:proposal.response.orderId,action:'suggest_time',proposedTime:'2099-01-02T19:00:00Z'});
+   check(suggested.committed,'NOTIFICATION_PROPOSAL_FAILED');
+   const snapshot=(await pool.query(`SELECT payload FROM ${schema}.master_wok_notification_outbox WHERE order_id=$1 AND event_type LIKE 'time_suggested:%'`,[proposal.response.orderId])).rows[0]?.payload;
+   check(/^[a-f0-9]{32,64}$/.test(snapshot?.confirm_token||'')&&snapshot.preferred_time==='2099-01-02T19:00:00.000Z','OPAQUE_PROPOSAL_SNAPSHOT_MISSING');
+   check((await lifecycle.adminAction({orderId:proposal.response.orderId,action:'decline'})).committed,'NOTIFICATION_CANCELLATION_FAILED');
+   // Created + proposed events are now obsolete. Neither should be sent.
+   const staleA=await dispatch({action:'claim'}),staleB=await dispatch({action:'claim'});
+   check(staleA.skipped&&staleB.skipped,'SUPERSEDED_NOTIFICATION_NOT_SUPPRESSED');
+   results.push('LIFECYCLE_NOTIFICATION_SNAPSHOTS_USE_OPAQUE_TOKENS_AND_SKIP_CANCELLED_PROPOSALS');
+   await clear();
+   const handler=createNotificationHttpHandler({secret:'notification-fixture-secret-1234567890',dispatch});
+   const denied=await handler(new Request('https://staging.invalid',{method:'POST',headers:{'x-master-wok-secret':'notification-fixture-secret-1234567890'},body:'{"action":"claim"}'}));
+   check(denied.status===401,'BOOKING_SECRET_AUTHORIZED_NOTIFICATION_WORKER');
+   results.push('NOTIFICATION_ENDPOINT_REQUIRES_SEPARATE_WORKER_AUTHENTICATION');
   }
   return {status:'PASS',scope:'PRIVATE_STAGING_ATOMIC_CHECKOUT_REHEARSAL',tests:results,
    productionReady:false,productionWrites:0,publicStagingOrderWrites:0};

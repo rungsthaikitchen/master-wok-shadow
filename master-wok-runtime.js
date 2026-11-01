@@ -8,7 +8,8 @@ const {createLaunchControl}=require('./master-wok-launch-control');
 const {createOrderStore}=require('./master-wok-order-store');
 const {createServicePlanStore}=require('./master-wok-service-plan-store');
 const {createBookingHttpHandler}=require('./master-wok-http');
-function createBookingRuntime({pool,model,secret,releaseId,schema='public',
+const {createNotificationDispatcher,createNotificationHttpHandler}=require('./master-wok-notification-dispatch');
+function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,schema='public',
  validateCommercialOrder,readAvailability,readOrders,assessBooking,assessMutation}={}){
  if(typeof assessMutation!=='function')throw Error('CERTIFIED_LIFECYCLE_ASSESSOR_REQUIRED');
  const gate=createLaunchControl({schema,releaseId});
@@ -17,7 +18,10 @@ function createBookingRuntime({pool,model,secret,releaseId,schema='public',
   assessBooking,...(readOrders?{readOrders}:{}),store:createOrderStore({schema}),planStore:createServicePlanStore({schema})});
  const lifecycle=createLifecycleWriter({...shared,schema,assessMutation});
  const serviceControl=createServiceControlWriter({...shared,schema});
- return createBookingHttpHandler({secret,checkout,lifecycle,serviceControl,
+ const booking=createBookingHttpHandler({secret,checkout,lifecycle,serviceControl,
   readMode:async()=>(await gate.read(pool)).mode});
+ const notifications=notificationSecret?createNotificationHttpHandler({secret:notificationSecret,
+  dispatch:createNotificationDispatcher({pool,schema})}):null;
+ return request=>notifications&&request.headers.has('x-master-wok-notification-secret')?notifications(request):booking(request);
 }
 module.exports={createBookingRuntime};

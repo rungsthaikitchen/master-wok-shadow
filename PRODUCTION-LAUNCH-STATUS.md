@@ -35,10 +35,10 @@ Base reviewed: `e86beafdca2c76ed8b40c7ab8dc0393297b48889`, branch
 ## Verification
 
 - 199/199 JavaScript tests pass in UTC and Europe/London.
-- 12/12 backend Python tests pass with external calls isolated.
+- 20/20 backend Python tests pass with external calls isolated.
 - 10/10 checkout-client/proxy cases pass, including retry, rollback compatibility,
   mode failure and preview-to-production isolation.
-- 25 scenario groups pass against actual staging PostgreSQL using private
+- 31 scenario groups pass against actual staging PostgreSQL using private
   master_wok_rehearsal tables. Coverage includes concurrent real baskets, rollback,
   replay, lifecycle races, real commercial validation, exact-once loyalty, fresh
   connection plan reload, started fryer/wok dependencies and cancellation protection.
@@ -51,7 +51,7 @@ Base reviewed: `e86beafdca2c76ed8b40c7ab8dc0393297b48889`, branch
   one receipt and one queued notification, total GBP9. See
   BROWSER-CHECKOUT-STAGING-RESULT.json. This does not certify the deployed
   Cloudflare/Railway transport or real notification delivery.
-- Generated fixtures were removed; all nine tracked private fixture tables are
+- Generated fixtures were removed; all ten tracked private fixture tables are
   empty. Temporary certification handler is inert HTTP410 with JWT checking restored.
   No production writes or public staging order writes occurred.
 
@@ -84,11 +84,33 @@ HOSTED-GATEWAY-STAGING-RESULT.json (actual hosted gateway). The Cloudflare previ
 build succeeded, but its URL redirects to Cloudflare Access login. No protection
 was bypassed. Actual hosted Pages configuration/access is still required.
 
+## Notification integration follow-up
+
+Checkout/lifecycle transactions now queue server-owned message snapshots with
+opaque response tokens. The dispatcher leases work and records each channel before
+sending. Accepted channels are not resent; explicit rejection may use the existing
+customer fallback. Expired/unknown sends are quarantined rather than duplicated.
+Legacy staff notification markers are preserved. Old browser confirmation/reward
+side effects are fenced for Master Wok orders even after mode rollback.
+
+The Python worker reuses the existing templates through a render-only path and
+uses dedicated worker authentication. It passed a real HTTP/private-database
+rehearsal with fixture email/push providers; a second run found no work. No actual
+SMS/email/push was sent. 31 database scenario groups and 20 Python tests pass.
+See STAGING-NOTIFICATION-RESULT.json, STAGING-NOTIFICATION-WORKER-RESULT.json and
+the backend MASTER-WOK-NOTIFICATIONS.md. Temporary handlers are disabled; all ten
+tracked fixture tables are empty. Production remains unchanged.
+
+Notification code is implemented, but deployed worker scheduling/monitoring,
+provider sandbox acceptance and full hosted lifecycle/rollback are not certified.
+A pending/uncertain notification requires operational visibility; no chef screen
+or extra chef confirmation has been introduced.
+
 ## Minimum remaining work, in order
 
 1. The authenticated runtime composition and hosted gateway are tested; install the
    final certified release runtime and join trusted delivery
-   lookup, notification sender/link tokens, live availability hints, service/blackout
+   lookup, provider sandbox acceptance and worker scheduling/monitoring, live availability hints, service/blackout
    mutations to the same writer; durable launch control is now implemented and rehearsed. The current combined
    assessor deliberately has no production approval authority. Current customer
    availability hints still use the existing conservative model.

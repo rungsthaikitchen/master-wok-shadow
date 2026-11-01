@@ -1,4 +1,5 @@
 'use strict';
+const {enqueueNotification}=require('./master-wok-notification-events');
 // Server-only persistence for the existing RTK order tables. The caller must
 // own the locked transaction and supply a server-validated commercial payload.
 // No browser-provided price, loyalty entitlement or status is trusted here.
@@ -47,8 +48,7 @@ function createOrderStore({schema='public'}={}){
      VALUES ($1,${fields.map((_,i)=>'$'+(i+2)).join(',')})`,
      [id,...fields.map(k=>k==='modifiers'?JSON.stringify(line[k]):line[k])]);
    }
-   await connection.query(`INSERT INTO ${checkedTable(schema,'master_wok_notification_outbox')} (order_id,event_type)
-    VALUES($1,'order_created') ON CONFLICT(order_id,event_type) DO NOTHING`,[id]);
+   await enqueueNotification(connection,{schema,order:{...header,id},mode:'order_created',key:'order_created'});
    const response={orderId:id,serviceDate,status:'pending',orderRef:header.order_ref,customerId:header.customer_id,
     totals:Object.fromEntries(['subtotal','discount','discount_amount','delivery_fee','total','loyalty_discount',
      'loyalty_points_redeem_pending','loyalty_points_earned_pending','loyalty_reward_applied','loyalty_expected_balance']
