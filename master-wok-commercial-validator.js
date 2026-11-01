@@ -1,5 +1,6 @@
 'use strict';
-const {calculateCommercialOrder}=require('./master-wok-commercial');
+const {calculateCommercialOrder,priceBasket}=require('./master-wok-commercial');
+const {createDeliveryQuoter}=require('./master-wok-delivery-quote');
 const phoneKey=value=>{const text=String(value||'').trim();return (text.startsWith('+')?'+':'')+text.replace(/\D/g,'');};
 async function resolveCustomer(connection,contact,orderType){
  if(!contact||typeof contact.name!=='string'||!contact.name.trim()||contact.name.length>200||
@@ -21,7 +22,8 @@ async function resolveCustomer(connection,contact,orderType){
  return (await connection.query(`INSERT INTO public.customers(full_name,email,phone,address)
   VALUES($1,$2,$3,$4) RETURNING id,phone,email`,[contact.name.trim(),email,phone,contact.address||null])).rows[0];
 }
-function createCommercialValidator({quoteDelivery,customerResolver=resolveCustomer}={}){
+function createCommercialValidator({quoteDelivery,deliveryService,customerResolver=resolveCustomer}={}){
+ quoteDelivery=quoteDelivery||(deliveryService?createDeliveryQuoter(deliveryService):undefined);
  return async function validateCommercialOrder(connection,input,state){
   if(input.asapRequested===true||input.is_test===true||input.isTest===true)
    throw Error('CUSTOMER_CANNOT_SET_TEST_OR_ASAP');
@@ -42,7 +44,7 @@ function createCommercialValidator({quoteDelivery,customerResolver=resolveCustom
   let quote=null;
   if(input.orderType==='delivery'){
    if(typeof quoteDelivery!=='function')throw Error('TRUSTED_DELIVERY_QUOTE_REQUIRED');
-   quote=await quoteDelivery({address:input.customer.address,now:state.now});
+   quote=await quoteDelivery({address:input.customer.address,now:state.now,subtotalCents:priceBasket(input.items).subtotalCents});
   }
   const priced=calculateCommercialOrder(input,{now:state.now,discount,
    settledPoints:Number(account?.points_balance||0),reservedPoints:Number(reserved.rows[0]?.points||0),deliveryQuote:quote});
@@ -56,6 +58,8 @@ function createCommercialValidator({quoteDelivery,customerResolver=resolveCustom
   if(!Number.isInteger(assigned)||assigned<1)throw Error('ORDER_REFERENCE_UNAVAILABLE');
   if(code)await connection.query('UPDATE public.discount_codes SET used_count=coalesce(used_count,0)+1 WHERE id=$1',[discount.id]);
   return {...priced,header:{...priced.header,customer_id:customer.id,order_ref:'RTK-'+String(assigned).padStart(3,'0'),
+   ...(input.orderType==='delivery'&&Number.isFinite(quote?.customerLatitude)&&Number.isFinite(quote?.customerLongitude)?
+    {customer_lat:quote.customerLatitude,customer_lng:quote.customerLongitude}:{}),
    ...(input.orderType==='delivery'?{delivery_address:input.customer.address}: {})}};
  };
 }

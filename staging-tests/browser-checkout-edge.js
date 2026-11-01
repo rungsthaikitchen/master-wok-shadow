@@ -12,6 +12,7 @@ const {readBookingAvailability}=require('./master-wok-availability-reader');
 const {assessCombinedBooking}=require('./master-wok-combined-assessment');
 const {createLaunchControl}=require('./master-wok-launch-control');
 const {createBookingHttpHandler}=require('./master-wok-http');
+const {createBasketAvailability}=require('./master-wok-availability');
 require('./master-wok-model-bundle');
 const TOKEN='__CERTIFICATION_TOKEN__',RUN='__BROWSER_RUN__',EMAIL='browser-'+RUN+'@example.invalid';
 const schema='master_wok_rehearsal',prefix='browser-'+RUN+'-';
@@ -31,7 +32,8 @@ Deno.serve(async req=>{
   const envelope=await req.json();
   const gate=createLaunchControl({schema,releaseId:'private-browser-'+RUN});
   if(envelope.operation==='mode')return Response.json({mode:(await gate.read(pool)).mode},{headers:{'Cache-Control':'no-store'}});
-  const input=envelope.operation==='checkout'?envelope.payload:envelope;
+  const isAvailability=envelope.operation==='availability';
+  const input=['checkout','availability'].includes(envelope.operation)?envelope.payload:envelope;
   if(!input||typeof input!=='object')return new Response('Fixture required',{status:400});
   if(input.operation==='cleanup'){
    const dates=(await pool.query(`SELECT service_date::text FROM ${schema}.master_wok_booking_receipts WHERE key LIKE $1`,[prefix+'%'])).rows.map(r=>r.service_date);
@@ -43,9 +45,18 @@ Deno.serve(async req=>{
    await pool.query(`DELETE FROM ${schema}.master_wok_launch_control WHERE approved_release_id=$1`,['private-browser-'+RUN]);
    return Response.json({success:true,scope:'PRIVATE_STAGING_BROWSER_FIXTURE_CLEANUP'});
   }
-  if(input.orderType!=='collection'||input.customer?.email!==EMAIL||!Array.isArray(input.items)||
+  if(!Array.isArray(input.items)||
    input.items.length>3||input.items.some(i=>!['green-curry','panang-curry','stir-crispy','pad-thai'].includes(i.item_id)||i.qty>2)||
-   typeof input.key!=='string'||input.key.length>64)return new Response('Fixture only',{status:400});
+   (!isAvailability&&(input.orderType!=='collection'||input.customer?.email!==EMAIL||typeof input.key!=='string'||input.key.length>64)))return new Response('Fixture only',{status:400});
+  const fixtureAssessment=context=>{
+   const tested=assessCombinedBooking(context);
+   // Confined fixture authorization, never a production certification.
+   return tested.status==='VALIDATED_COMBINED_ASSESSMENT'?{...tested,status:'GREEN',bookingApprovalAllowed:true}:tested;
+  };
+  const availability=createBasketAvailability({pool,model:globalThis.MasterWokModelV1,
+   assertWriteAllowed:gate.assertWriteAllowed,planStore:createServicePlanStore({schema}),
+   readOrders:(c,d)=>readCapacityCommitments(rewrite(c),d),
+   readAvailability:(c,d)=>readBookingAvailability(rewrite(c),d),assessBooking:fixtureAssessment});
   const commercial=createCommercialValidator();
   const checkout=createAtomicCheckout({pool,model:globalThis.MasterWokModelV1,mode:'MASTER_WOK',
    assertWriteAllowed:gate.assertWriteAllowed,
@@ -53,16 +64,12 @@ Deno.serve(async req=>{
    readOrders:(c,d)=>readCapacityCommitments(rewrite(c),d),
    readAvailability:(c,d)=>readBookingAvailability(rewrite(c),d),
    validateCommercialOrder:(c,i,state)=>commercial(rewrite(c),i,state),
-   assessBooking:context=>{
-    const tested=assessCombinedBooking(context);
-    // Explicitly confined staging fixture authorization, never production.
-    return tested.status==='VALIDATED_COMBINED_ASSESSMENT'?{...tested,status:'GREEN',bookingApprovalAllowed:true}:tested;
-   }});
+   assessBooking:fixtureAssessment});
   const refuse=async()=>({success:false,committed:false,statusCode:409,reason:'STAGING_CHECKOUT_ONLY'});
-  const handler=createBookingHttpHandler({secret:TOKEN,checkout,
+  const handler=createBookingHttpHandler({secret:TOKEN,checkout,availability,
    lifecycle:{adminAction:refuse,customerResponse:refuse},serviceControl:refuse,readMode:async()=>(await gate.read(pool)).mode});
   return await handler(new Request(req.url,{method:'POST',headers:{'content-type':'application/json','x-master-wok-secret':TOKEN},
-   body:JSON.stringify({operation:'checkout',payload:{...input,key:prefix+input.key}})}));
+   body:JSON.stringify({operation:isAvailability?'availability':'checkout',payload:isAvailability?input:{...input,key:prefix+input.key}})}));
  }catch(_){return Response.json({success:false,reason:'STAGING_BRIDGE_FAILURE'},{status:503});}
  finally{await pool.end();}
 });

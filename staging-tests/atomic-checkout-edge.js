@@ -18,6 +18,7 @@ const {beginBookingTransaction}=require('./master-wok-transaction-writer');
 const {createBookingHttpHandler}=require('./master-wok-http');
 const {createBookingRuntime}=require('./master-wok-runtime');
 const {createNotificationDispatcher,createNotificationHttpHandler}=require('./master-wok-notification-dispatch');
+const {createBasketAvailability}=require('./master-wok-availability');
 require('./master-wok-model-bundle');
 const TOKEN='__CERTIFICATION_TOKEN__';
 const schema='master_wok_rehearsal';
@@ -86,6 +87,12 @@ async function run(){
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS discount_label text;
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS discount_amount numeric DEFAULT 0;
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS delivery_fee numeric DEFAULT 0;
+   ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS delivery_address text;
+   ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS customer_lat numeric;
+   ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS customer_lng numeric;
+   ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS delivery_straight_line_miles numeric;
+   ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS delivery_route_miles numeric;
+   ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS delivery_distance_source text;
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS loyalty_discount numeric DEFAULT 0;
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS loyalty_points_redeem_pending integer DEFAULT 0;
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS loyalty_points_earned_pending integer DEFAULT 0;
@@ -439,6 +446,62 @@ async function run(){
    const denied=await handler(new Request('https://staging.invalid',{method:'POST',headers:{'x-master-wok-secret':'notification-fixture-secret-1234567890'},body:'{"action":"claim"}'}));
    check(denied.status===401,'BOOKING_SECRET_AUTHORIZED_NOTIFICATION_WORKER');
    results.push('NOTIFICATION_ENDPOINT_REQUIRES_SEPARATE_WORKER_AUTHENTICATION');
+  }
+  {
+   const email=prefix+'delivery@example.invalid',phone='07700900126';
+   let outside=false,routeFails=false;const requests=[];
+   const trusted=createCommercialValidator({deliveryService:{supabaseUrl:'https://hvrqgufqjslvgiohgkvu.supabase.co',publicKey:'sb_publishable_private_fixture',fetch:async(url,options)=>{
+    const body=JSON.parse(options.body),path=new URL(url).pathname;requests.push({path,body});
+    if(path.endsWith('geocode-address'))return {ok:true,json:async()=>({ok:true,customer_lat:outside?54:53.75,customer_lng:-1.58})};
+    if(routeFails)throw Error('Fixture route outage');return {ok:true,json:async()=>({ok:true,routeMiles:1.4})};
+   }}});
+   const delivery=make({validateCommercialOrder:(c,i,state)=>trusted(rewrite(c),i,state)});
+   const input={key:prefix+'delivery',preferredTime:'2099-01-02T18:00:00Z',orderType:'delivery',customer:{name:'Private fixture',email,phone,address:'Fixture address'},
+    items:[{item_id:'green-curry',qty:1,modifiers:[{id:'chicken'}],spice:1}],expectedTotals:{subtotal:9,total:11,delivery_fee:2,discount:0,loyalty_discount:0},
+    customer_lat:0,customer_lng:0,routeMiles:0};
+   try{
+    const booked=await delivery(input);check(booked.committed,'SERVER_DELIVERY_CHECKOUT_FAILED');
+    const saved=(await pool.query(`SELECT customer_lat,customer_lng,delivery_route_miles,delivery_fee,total FROM ${schema}.orders WHERE id=$1`,[booked.response.orderId])).rows[0];
+    check(Number(saved.customer_lat)===53.75&&Number(saved.delivery_route_miles)===1.4&&Number(saved.delivery_fee)===2&&Number(saved.total)===11,'CLIENT_DISTANCE_OR_FEE_WAS_TRUSTED');
+    check(requests[0].body.customer_address==='Fixture address'&&requests[1].body.origin.lat===53.744437,'EXISTING_DELIVERY_SERVICE_CONTRACT_CHANGED');
+    results.push('SERVER_GEOCODE_AND_ROUTE_CONTRACT_JOINED_TO_ATOMIC_DELIVERY_BOOKING_IGNORES_CLIENT_DISTANCE');
+    await clear();requests.length=0;outside=true;
+    const rejected=await delivery({...input,key:prefix+'delivery-outside',items:[{...input.items[0],qty:4}],expectedTotals:{...input.expectedTotals,subtotal:36,total:36,delivery_fee:0}});
+    check(!rejected.committed&&requests.length===1,'FREE_DELIVERY_BYPASSED_RADIUS');
+    results.push('FREE_DELIVERY_STILL_ENFORCES_SERVER_VERIFIED_THREE_MILE_RADIUS');
+    outside=false;routeFails=true;
+    const fallback=await delivery({...input,key:prefix+'delivery-fallback',expectedTotals:{...input.expectedTotals,total:12,delivery_fee:3}});
+    check(fallback.committed&&fallback.response.totals.delivery_fee===3,'ROUTE_OUTAGE_FALLBACK_NOT_PRESERVED');
+    const priceChanged=await delivery({...input,key:prefix+'delivery-stale-price'});
+    check(!priceChanged.committed&&priceChanged.reason==='CHECKOUT_PRICE_CHANGED','CHANGED_FEE_ACCEPTED_WITHOUT_CUSTOMER_REVIEW');
+    results.push('TRUSTED_DELIVERY_FALLBACK_PRESERVED_AND_CHANGED_CHECKOUT_TOTAL_REFUSED');
+   }finally{await clear();await pool.query(`DELETE FROM ${schema}.customers WHERE email=$1`,[email]);}
+  }
+  {
+   const args={pool,model:globalThis.MasterWokModelV1,readAvailability:(c,d)=>readBookingAvailability(rewrite(c),d),
+    readOrders:(c,d)=>readCapacityCommitments(rewrite(c),d),planStore,assertWriteAllowed:async()=>{}};
+   const hint=createBasketAvailability({...args,assessBooking:assess});
+   const items=[{item_id:'pad-thai',qty:2,modifiers:[{id:'chicken'}],spice:null}],times=['2099-01-02T17:05:00.000Z'];
+   const before=(await pool.query(`SELECT count(*)::int n FROM ${schema}.orders`)).rows[0].n;
+   const initial=await hint({times,items});
+   check(initial.success&&initial.hints[0].available&&initial.bookingApprovalAllowed===false,'READ_ONLY_HINT_FAILED');
+   check((await pool.query(`SELECT count(*)::int n FROM ${schema}.orders`)).rows[0].n===before,'AVAILABILITY_CREATED_AN_ORDER');
+   check((await pool.query(`SELECT count(*)::int n FROM ${schema}.master_wok_service_plans`)).rows[0].n===0,'AVAILABILITY_PERSISTED_A_PLAN');
+   const prototype=createBasketAvailability({...args,assessBooking:assessCombinedBooking});
+   check((await prototype({times,items})).hints.every(h=>!h.available),'PROTOTYPE_HINT_BECAME_APPROVAL');
+   results.push('BASKET_AVAILABILITY_ROLLS_BACK_WITHOUT_ORDER_OR_PLAN_AND_REQUIRES_CERTIFIED_ASSESSOR');
+   const source=await make()({...request('hint-race'),items});check(source.committed,'HINT_RACE_SETUP_FAILED');
+   const planBefore=(await pool.query(`SELECT revision FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0].revision;
+   const latest=await hint({times,items});
+   check(latest.success&&!latest.hints[0].available,'AVAILABILITY_DID_NOT_RELOAD_COMMITTED_ORDER');
+   const replayAttempt=await make()({...request('hint-stale'),items});check(!replayAttempt.committed,'OLD_HINT_RESERVED_CAPACITY');
+   check((await pool.query(`SELECT revision FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0].revision===planBefore,'HINT_CHANGED_COMMITTED_PLAN');
+   results.push('FRESH_AVAILABILITY_SEES_CONCURRENT_BOOKING_AND_OLD_HINT_CANNOT_RESERVE_CAPACITY');
+   await clear();
+   const allTimes=Array.from({length:61},(_,i)=>new Date(Date.parse('2099-01-02T17:00:00Z')+i*300000).toISOString());
+   const started=performance.now(),day=await hint({times:allTimes,items});
+   check(day.success&&day.hints.length===61&&performance.now()-started<5000,'WHOLE_DAY_HINT_BUDGET_FAILED');
+   results.push('WHOLE_DAY_NORMAL_AND_OVERRUN_HINTS_USE_ONE_SNAPSHOT_WITH_BOUNDED_REQUEST');
   }
   return {status:'PASS',scope:'PRIVATE_STAGING_ATOMIC_CHECKOUT_REHEARSAL',tests:results,
    productionReady:false,productionWrites:0,publicStagingOrderWrites:0};

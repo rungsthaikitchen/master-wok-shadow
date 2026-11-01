@@ -2,13 +2,16 @@
 
 Status: **staging review only**. This is an implementation checklist, not permission to enable bookings.
 
-**1 November update:** See `PRODUCTION-LAUNCH-STATUS.md` and
-`STAGING-ATOMIC-CHECKOUT-RESULT.json`. A joined server-side checkout transaction
-now persists full headers/items/receipts and passed isolated staging PostgreSQL
-rehearsal with the combined kitchen assessor. The original gaps below remain
-production acceptance gates: actual commercial/lifecycle wiring, complete menu
-coverage, running-service plan protection and full deployed rollback are not yet
-certified. Legacy remains authoritative.
+**1 November update:** The joined runtime now covers atomic checkout/lifecycle,
+protected plans, durable drain, notifications, server delivery validation and
+basket-specific read-only availability through the time picker. 37 real private
+PostgreSQL scenario groups pass; a mobile browser reached deployed Railway and
+Supabase for availability and checkout. See PRODUCTION-LAUNCH-STATUS.md and
+STAGING-AVAILABILITY-RESULT.json for current gates and precise evidence limits.
+The original checklist below remains the acceptance contract, not a claim that
+those components are absent. Production authority remains disabled; full menu,
+slowdown policy, real-provider/hosted Cloudflare tests, complete write fencing and
+full rollback are still release gates. Legacy remains authoritative.
 
 ## Existing proven boundaries
 - `master-wok-transaction-writer.js` obtains a per-service-date PostgreSQL advisory transaction lock before reading commitments and assessing the candidate.

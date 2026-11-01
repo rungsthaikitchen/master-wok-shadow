@@ -1,148 +1,87 @@
 # Production launch status — 1 November 2026
 
-**NO-GO for production. Legacy remains authoritative.**
+**NO-GO for production. Legacy remains authoritative.** No production checkout,
+production Supabase data/schema/functions, production Railway configuration or
+main branch has been changed. Work is saved in three companion draft PRs.
 
-Base reviewed: `e86beafdca2c76ed8b40c7ab8dc0393297b48889`, branch
-`review/go-live-capacity-adapter-2026-10-30`.
+## Implemented and joined
 
-## Completed in review branches
+- Atomic checkout: actual menu baskets/modifiers, server pricing, discounts,
+  customer binding, pending reward reservations, locked commitments, combined
+  wok/fryer assessment, complete header/items, replay receipt, persisted plan and
+  notification intent on one PostgreSQL connection. Failure rolls everything back.
+- Global writer lock, idempotency lock and sorted date locks serialize bookings,
+  lifecycle changes and service/blackout mutations. Durable release-specific mode
+  is checked inside the lock. Drain waits for existing transactions to finish.
+- Persisted plans protect already-started work, including downstream wok work for
+  started frying. Cancellation keeps occupied resources and releases unstarted work.
+  Missing in-service history fails closed; release needs pre-service plan seeding.
+- Lifecycle: proposals hold original and suggested times until acknowledgement;
+  response replay is stable and cancellation races cannot revive orders. New-order
+  loyalty settles once inside completion. Legacy completion retains its callback.
+- Notifications: immutable server-owned snapshots, opaque response tokens,
+  per-channel durable claims, explicit-rejection fallback, accepted-channel dedupe,
+  expiry/unknown-result quarantine, existing staff notification marker compatibility.
+  Python worker reuses current templates. Legacy confirmation/reward side effects
+  are fenced for Master Wok orders even after scheduler rollback.
+- Delivery pricing: existing geocode/route contracts, fixed restaurant origin,
+  server-derived coordinates, three-mile gate before the GBP30 free threshold,
+  existing route bands and GBP3 routing fallback. Changed totals require review.
+- Basket-specific read-only availability is joined through core HTTP, Flask,
+  Pages proxy and existing time picker. It never saves orders/plans or reserves
+  capacity. Checkout reassesses under its own lock. Prototype assessors cannot
+  enable hints. Failed hints disable the picker; mode changes require refreshing.
+- Checkout form and legacy routing are retained. Unknown booking outcomes keep
+  the same key and never silently fall back to another writer. Rollback capacity
+  compatibility retains both pending Master Wok time commitments across dates.
 
-- Atomic checkout joins real baskets, trusted server prices/modifiers/discounts,
-  customer binding, pending loyalty reservations, capacity assessment, order/items,
-  replay receipt, service plan and notification outbox in one PostgreSQL transaction.
-- Global writer lock precedes idempotency and sorted service-date locks. Concurrent
-  bookings, lifecycle changes and replay cannot bypass the same locked snapshot.
-- Combined wok/fryer assessment includes dependencies, lead-time floor and buffer,
-  customer/production hours, blackouts, cancelled/test exclusions and time proposals.
-  Prototype feasibility still cannot approve a customer booking.
-- Persisted service plans protect work already started, including downstream wok
-  dependencies of started frying. Cancellation retains occupied resources and drops
-  unstarted work. Missing historical plans during service fail closed; cutover needs
-  a pre-service plan seed. No extra chef confirmation is introduced.
-- Admin/customer lifecycle writer holds original and proposed times until response;
-  acknowledgement is idempotent and cancellation cannot revive an order. New-order
-  loyalty settles exactly once inside the completion transaction. Legacy orders
-  retain the existing callback. New orders queue notifications transactionally.
-- Flask review adapter exposes an explicit no-cache booking mode and authenticated
-  booking gateway. Defaults remain LEGACY. Uncertain results never fall back to a
-  second writer. No production runtime settings have been changed.
-- Website review code preserves the checkout form, selects the server mode before
-  writes and uses stable retry keys. Unknown outcomes cannot silently create another
-  order, including after rollback. Preview proxies require an explicit staging URL.
-- Legacy capacity reader compatibility includes both pending Master Wok times across
-  dates, tagged by capacity_scheduler. This column must precede website deployment.
+## Verified evidence and limits
 
-## Verification
+- 203 JavaScript tests in both UTC and Europe/London; 21 Python tests; 12 browser
+  client/proxy tests. Active inline scripts parse successfully.
+- 37 scenario groups against actual private staging PostgreSQL, including
+  concurrency, replay, rollback, protected plans, lifecycle races, loyalty,
+  notification partial failures/crash recovery, delivery and read-only time hints.
+  Latest evidence: STAGING-AVAILABILITY-RESULT.json. Earlier focused evidence is
+  preserved in STAGING-DELIVERY-RESULT.json and STAGING-NOTIFICATION-RESULT.json.
+- Real Python notification worker + actual templates + HTTP + staging database
+  passed with fake provider acceptance. Second run found no work. No actual email,
+  SMS or push was sent. See STAGING-NOTIFICATION-WORKER-RESULT.json.
+- Mobile DOM checkout passes in both modes and when availability fails. The
+  updated picker and checkout also ran through actual Pages functions locally,
+  deployed Railway and Supabase: two HTTP200 availability calls, one complete GBP9
+  order, zero separate browser writes and zero old confirmation calls. See
+  HOSTED-AVAILABILITY-CHECKOUT-RESULT.json. This is not hosted Cloudflare certification.
+- Hosted backend replay/drain/LEGACY restore passed earlier; original evidence:
+  HOSTED-GATEWAY-STAGING-RESULT.json. Full website/privilege rollback is not certified.
+- Generated fixtures are removed: all ten tracked private tables are empty.
+  Temporary Edge test handlers are inert HTTP410 with JWT checks restored. Staging
+  backend is restored to LEGACY; no real provider credentials were copied.
 
-- 199/199 JavaScript tests pass in UTC and Europe/London.
-- 20/20 backend Python tests pass with external calls isolated.
-- 10/10 checkout-client/proxy cases pass, including retry, rollback compatibility,
-  mode failure and preview-to-production isolation.
-- 31 scenario groups pass against actual staging PostgreSQL using private
-  master_wok_rehearsal tables. Coverage includes concurrent real baskets, rollback,
-  replay, lifecycle races, real commercial validation, exact-once loyalty, fresh
-  connection plan reload, started fryer/wok dependencies and cancellation protection.
-  See STAGING-PROTECTED-PLAN-RESULT.json for deployment/hash and cleanup evidence.
-- Mobile Chromium checkout passes in both MASTER_WOK and LEGACY modes with external
-  providers intercepted. Master Wok makes one atomic request and zero separate browser
-  database writes; legacy retains its original three mocked writes and confirmation.
-- A browser-generated collection checkout request also passed through a controlled
-  transport bridge into the actual private staging writer: one order, one item,
-  one receipt and one queued notification, total GBP9. See
-  BROWSER-CHECKOUT-STAGING-RESULT.json. This does not certify the deployed
-  Cloudflare/Railway transport or real notification delivery.
-- Generated fixtures were removed; all ten tracked private fixture tables are
-  empty. Temporary certification handler is inert HTTP410 with JWT checking restored.
-  No production writes or public staging order writes occurred.
+## Remaining release gates
 
-## Hosted gateway and shutdown follow-up
-
-The actual Flask review branch was deployed into a new staging-only Railway
-service, fd320f7b-3e1d-4b07-970c-74b75fdc82d3. Its source is pinned to commit
-9dc12b1dfa8703f4abec791053fa797e0fc398d9. No production/database/notification
-credentials were copied. Mobile checkout executed the real Pages proxy functions
-locally, reached deployed Railway and the authenticated staging Edge handler, and
-created one complete GBP9 order. Replaying its key returned the original receipt.
-
-The shared runtime now composes checkout, lifecycle, service controls and a private
-durable launch gate. Every writer rechecks release/mode AFTER the global lock.
-The PostgreSQL drain test observes the drain waiting on an actual advisory lock
-held by an in-flight order. A stale release and post-drain bookings fail closed.
-Service-state and blackout writes use the same lock and preserve legacy values.
-Busy/very-busy capacity semantics still need assessor parity; those modes remain
-blocked by the assessor. No prototype receives production approval authority.
-
-Through deployed Railway, DRAINING refused mode and booking requests with HTTP503;
-restoring LEGACY produced mode LEGACY and disabled POST /book-order with HTTP409.
-The staging service is left in LEGACY (successful deployment
- aec54b09-ce72-4e7f-a250-b6d9e59354c6). Both temporary Edge handlers are inert
-HTTP410 with JWT verification restored. Fixtures were removed. This is a tested
-backend shutdown/restore, not yet a full website/privilege rollback certificate.
-
-Evidence: STAGING-RUNTIME-DRAIN-RESULT.json (25 database scenario groups) and
-HOSTED-GATEWAY-STAGING-RESULT.json (actual hosted gateway). The Cloudflare preview
-build succeeded, but its URL redirects to Cloudflare Access login. No protection
-was bypassed. Actual hosted Pages configuration/access is still required.
-
-## Notification integration follow-up
-
-Checkout/lifecycle transactions now queue server-owned message snapshots with
-opaque response tokens. The dispatcher leases work and records each channel before
-sending. Accepted channels are not resent; explicit rejection may use the existing
-customer fallback. Expired/unknown sends are quarantined rather than duplicated.
-Legacy staff notification markers are preserved. Old browser confirmation/reward
-side effects are fenced for Master Wok orders even after mode rollback.
-
-The Python worker reuses the existing templates through a render-only path and
-uses dedicated worker authentication. It passed a real HTTP/private-database
-rehearsal with fixture email/push providers; a second run found no work. No actual
-SMS/email/push was sent. 31 database scenario groups and 20 Python tests pass.
-See STAGING-NOTIFICATION-RESULT.json, STAGING-NOTIFICATION-WORKER-RESULT.json and
-the backend MASTER-WOK-NOTIFICATIONS.md. Temporary handlers are disabled; all ten
-tracked fixture tables are empty. Production remains unchanged.
-
-Notification code is implemented, but deployed worker scheduling/monitoring,
-provider sandbox acceptance and full hosted lifecycle/rollback are not certified.
-A pending/uncertain notification requires operational visibility; no chef screen
-or extra chef confirmation has been introduced.
-
-## Minimum remaining work, in order
-
-1. The authenticated runtime composition and hosted gateway are tested; install the
-   final certified release runtime and join trusted delivery
-   lookup, provider sandbox acceptance and worker scheduling/monitoring, live availability hints, service/blackout
-   mutations to the same writer; durable launch control is now implemented and rehearsed. The current combined
-   assessor deliberately has no production approval authority. Current customer
-   availability hints still use the existing conservative model.
-2. Finish full-menu recipe/resource rules and existing busy/throttle parity.
-   Unknown recipes and slower service states currently fail closed. Single-wok full
-   attention planning is conservative; multi-ring prototypes are not certified.
-3. Run the actual hosted Cloudflare -> Railway -> Supabase staging chain against a
-   production-shaped schema. Cover delivery, rewards, notices/printing, admin moves,
-   customer acknowledgement, blackouts, test orders, opening/production boundaries
-   and a realistic service with started work. Use notification/payment sandboxes.
-4. Finish durable cutover, direct REST write fencing and full deployed rollback
-   with existing Master Wok orders and uncertain checkout attempts. Capture deployed
-   versions/privileges and seed committed plans before service. Local mode/reader tests and hosted backend drain/restore pass; the full website
-   and privilege rollback remains untested.
-5. Only after those gates pass, present the exact production release and rollback
-   package for explicit approval. No production enablement is requested yet.
-
-### Recipe facts still needed before full-menu certification
-
-Previously recorded rules include seven-minute spring rolls, one-minute satay/
-moo-ping finishing, four-to-five-minute main fryer cycles, and one-minute microwave
-rice preparation before finishing. Do not ask the user to repeat these.
-The remaining standalone recipes lack confirmed capacity-resource timing in the
-reviewed code/history: fish cakes, fried prawns, steamed dumplings, Thai sausage,
-spare ribs and fried eggs. Obtain cooking/reheating method, minutes and maximum
-simultaneous portions. Standalone fried tofu/chips can use the conservative end
-of the already stated fryer cycle, but confirm portion/basket equivalence when
-finalizing starter coverage. Dumplings must not silently be modelled as fried.
-
-## Production approval boundary
-
-No production checkout, production Supabase, Railway production service, main
-branch or existing authoritative scheduler was modified. Do not merge or deploy
-this development work to production. Request explicit cutover approval only after
-all remaining gates pass and a concrete release/rollback package is reviewable.
+1. Full menu/resource coverage and final service rehearsal. Confirm missing cooking
+   method, minutes and maximum simultaneous portions for fish cakes, fried prawns,
+   steamed dumplings, Thai sausage, spare ribs and fried eggs. Already known:
+   spring rolls 7m; satay/moo-ping finish 1m; main frying 4–5m; rice microwave 1m
+   before finishing. Integrate the independent starter/side work without chef prompts.
+   Single-wok full-attention planning is conservative; multi-ring prototypes are
+   not certified. The combined assessor still deliberately grants no production
+   booking authority.
+2. Resolve slowdown policy. Current website displays busy/very_busy notices and
+   stores throttle values, but neither reviewed checkout nor admin Edge source
+   applies them to capacity. Master Wok currently refuses those states. Do not
+   invent duration/capacity multipliers or silently remove an intended slowdown.
+3. Configure and test real staging Google/provider integrations, notification
+   scheduling/backlog/error monitoring and production server/worker startup. Fixture
+   responses certify contracts and transaction behavior, not external delivery.
+4. Complete the actual hosted Cloudflare -> Railway -> Supabase rehearsal. The
+   preview build succeeds but redirects to Cloudflare Access login. Preview access
+   and staging backend environment configuration are needed. Include delivery,
+   customer responses, printing, service changes and a realistic busy service.
+5. Finish direct REST write fencing for every order/control path, capture exact
+   deployed versions/privileges, seed plans and test full website/privilege rollback
+   with existing Master Wok orders and unknown checkout attempts. Backend shutdown
+   tests alone do not satisfy this gate.
+6. Present the exact production release/rollback package for explicit approval only
+   after these gates pass. No production enablement is requested yet.
