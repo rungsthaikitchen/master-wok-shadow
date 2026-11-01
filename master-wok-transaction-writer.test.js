@@ -12,7 +12,7 @@ test('lock precedes state read and commit follows persistence',async()=>{
  });
  assert.equal(result.committed,true);
  assert.deepEqual(log.map(s=>s.startsWith('SELECT pg_advisory')?'LOCK':s),
- ['BEGIN','LOCK','READ','ASSESS','PERSIST','COMMIT']);
+ ['BEGIN','SET TRANSACTION ISOLATION LEVEL READ COMMITTED',"SET LOCAL lock_timeout = '10s'","SET LOCAL statement_timeout = '15s'",'LOCK','LOCK','READ','ASSESS','PERSIST','COMMIT']);
 });
 test('AMBER cannot write',async()=>{
  const log=[];const result=await reserveWithMasterWok({
@@ -41,3 +41,4 @@ test('failed persistence rolls back',async()=>{
  });
  assert.equal(result.committed,false);assert.equal(log.at(-1),'ROLLBACK');
 });
+

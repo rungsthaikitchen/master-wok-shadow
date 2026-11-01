@@ -5,18 +5,23 @@
 const {scheduleCrossOrderPanang}=require('./staging-cross-order-scheduler');
 const {planFryerBeforeWok}=require('./staging-fryer-before-wok');
 const {diagnoseFryer}=require('./staging-fryer-diagnostic');
-function planCoordinatedKitchen(orders,rows){
- const inventory=diagnoseFryer(orders,rows);
+function planCoordinatedKitchen(orders,rows,options={}){
+ const inventory=diagnoseFryer(orders,rows,options);
  if(inventory.unmodelled.length)
   return {status:'UNVERIFIED',reason:'FRY_RECIPES_UNMODELLED',inventory,bookingApprovalAllowed:false};
  let last=null;
  for(const curryHoldMinutes of [10,20]){
-  const wok=scheduleCrossOrderPanang(orders,rows,{allowFryerDependent:true,curryHoldMinutes});
+  let fryer;
+  const wok=scheduleCrossOrderPanang(orders,rows,{allowFryerDependent:true,curryHoldMinutes,
+   blackouts:options.blackouts,notBeforeByOrder:options.notBeforeByOrder,validateComplete:jobs=>{
+    fryer=planFryerBeforeWok(orders,rows,{status:'FEASIBLE_PROTOTYPE',jobs},options);
+    return fryer.status==='PREREQUISITES_PLACED_PROTOTYPE';
+   }});
   if(wok.status!=='FEASIBLE_PROTOTYPE'){
    last={status:'UNVERIFIED',reason:'WOK_PLAN_UNVERIFIED',wok,bookingApprovalAllowed:false};
    continue;
   }
-  const fryer=planFryerBeforeWok(orders,rows,wok);
+  fryer=planFryerBeforeWok(orders,rows,wok,options);
   if(fryer.status!=='PREREQUISITES_PLACED_PROTOTYPE'){
    last={status:'UNVERIFIED',reason:fryer.reason,wok,fryer,bookingApprovalAllowed:false};
    continue;
@@ -31,3 +36,4 @@ function planCoordinatedKitchen(orders,rows){
  return last;
 }
 module.exports={planCoordinatedKitchen};
+

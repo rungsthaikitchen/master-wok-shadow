@@ -4,7 +4,7 @@ const {scheduleCrossOrderPanang:schedule}=require('./staging-cross-order-schedul
 function sample(n,placed='2026-10-17T17:00:00Z',ready=1140){
  const orders=[],rows=[];
  for(let i=0;i<n;i++){
-   const id='o'+i;orders.push({orderId:id,readyMinute:ready,placedAt:new Date(placed)});
+   const id='o'+i;orders.push({orderId:id,readyMinute:ready,placedAt:new Date(placed.replace('Z',''))});
    rows.push({id,items:[{item_id:'panang-curry',qty:1,modifiers:[]}]});
  }
  return {orders,rows};
@@ -118,3 +118,4 @@ test('mixed service with impossible late placement fails closed',()=>{
  assert.equal(r.status,'UNVERIFIED');
  assert.equal(r.bookingApprovalAllowed,false);
 });
+

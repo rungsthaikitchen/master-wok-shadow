@@ -20,7 +20,7 @@ test('locked transaction reads staging rows before engine assessment and persist
   persist:async()=>{steps.push('PERSIST');}
  });
  assert.equal(result.committed,true);
- assert.deepEqual(steps,['BEGIN','LOCK','READ','KEY','ASSESS','PERSIST','COMMIT']);
+ assert.deepEqual(steps,['BEGIN','READ','READ','READ','LOCK','LOCK','READ','KEY','ASSESS','PERSIST','COMMIT']);
 });
 test('missing order items fails closed before engine runs',async()=>{
  let assessed=false;
@@ -33,3 +33,4 @@ test('missing order items fails closed before engine runs',async()=>{
  });
  assert.equal(result.committed,false);assert.equal(assessed,false);
 });
+

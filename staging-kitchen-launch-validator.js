@@ -81,6 +81,11 @@ function validateKitchenTimeline(orders,plan,rows){
   issues.push({code:'ORDER_LINES_REQUIRED_FOR_COVERAGE'});
  }
  for(const job of fry){
+  if(job.standalone){
+   if(!Number.isFinite(job.readyMinute)||job.finish>job.readyMinute)
+    issues.push({code:'STANDALONE_FRY_DEADLINE_UNVERIFIED'});
+   continue;
+  }
   for(const orderId of job.orderIds||[]){
    const candidates=wok.filter(w=>(w.orderIds||[]).includes(orderId)&&
      (job.itemIds||[]).includes(w.itemId));
@@ -92,3 +97,4 @@ function validateKitchenTimeline(orders,plan,rows){
   issues,bookingApprovalAllowed:false};
 }
 module.exports={validateKitchenTimeline};
+

@@ -2,6 +2,14 @@
 
 Status: **staging review only**. This is an implementation checklist, not permission to enable bookings.
 
+**1 November update:** See `PRODUCTION-LAUNCH-STATUS.md` and
+`STAGING-ATOMIC-CHECKOUT-RESULT.json`. A joined server-side checkout transaction
+now persists full headers/items/receipts and passed isolated staging PostgreSQL
+rehearsal with the combined kitchen assessor. The original gaps below remain
+production acceptance gates: actual commercial/lifecycle wiring, complete menu
+coverage, running-service plan protection and full deployed rollback are not yet
+certified. Legacy remains authoritative.
+
 ## Existing proven boundaries
 - `master-wok-transaction-writer.js` obtains a per-service-date PostgreSQL advisory transaction lock before reading commitments and assessing the candidate.
 - Two independent staging connections passed a simplified reservation concurrency test.
@@ -22,3 +30,4 @@ No new chef confirmations, kitchen tablets, dashboards, or RestaurantOS redesign
 
 ## Important safety rule
 Do not convert `PHYSICAL_FIT_PROTOTYPE`, `FRY_PLACED_PROTOTYPE`, or `PROTOTYPE_FIT_LEAD_AND_COLD_FRYER_ONLY` into `GREEN` merely to satisfy the booking-mode gate.
+

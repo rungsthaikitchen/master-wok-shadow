@@ -34,7 +34,9 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
        !Array.isArray(line.modifiers)) {
        unsupported.push(String(row.id));continue;
      }
-     const key=JSON.stringify([order.readyMinute,line.item_id,line.modifiers]);
+     // Spice and kitchen notes are recipe constraints too. Never silently
+     // combine two differently prepared dishes because protein matches.
+     const key=JSON.stringify([order.readyMinute,line.item_id,line.modifiers,line.spice??null,line.item_note??null]);
      if(!groups.has(key))groups.set(key,{readyMinute:order.readyMinute,portions:[],key,group,itemId:line.item_id});
      const g=groups.get(key);
      for(let i=0;i<line.qty;i++)g.portions.push({orderId:String(row.id),placedAt:order.placedAt});
@@ -48,11 +50,11 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
    for(let i=0;i<portions.length;i+=max){
      const batch=portions.slice(i,i+max);
      const duration=DURATION_BY_GROUP[g.group][batch.length];
-     const placement=Math.max(...batch.map(p=>p.placedAt.getHours()*60+p.placedAt.getMinutes()));
+     const placement=Math.max(...batch.map(p=>Math.max(p.placedAt.getHours()*60+p.placedAt.getMinutes(),options.notBeforeByOrder?.[p.orderId]??0)));
      const holdingLimitMinutes=CURRIES.has(g.itemId)?curryHoldMinutes:10;
      const earliest=Math.max(990,placement,g.readyMinute-holdingLimitMinutes-duration);
      const latest=g.readyMinute-duration;
-     jobs.push({itemId:g.itemId,group:g.group,readyMinute:g.readyMinute,
+     jobs.push({itemId:g.itemId,recipeKey:g.key,group:g.group,readyMinute:g.readyMinute,
        portions:batch.length,orderIds:[...new Set(batch.map(p=>p.orderId))],
        portionAllocations:[...new Set(batch.map(p=>p.orderId))].map(orderId=>({orderId,qty:batch.filter(p=>p.orderId===orderId).length})),
        duration,earliest,latest,holdingLimitMinutes});
@@ -98,16 +100,23 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
  // Single shared wok. Enumerate feasible start minutes; never accept a clash.
  // Search is bounded and reports UNVERIFIED rather than assuming feasibility.
  const occupied=[];
+ let completions=0;
+ const complete=()=>{
+  if(++completions>(options.maxCompletions??64)){exhausted=true;return false;}
+  return typeof options.validateComplete!=='function'||options.validateComplete(
+   [...occupied].sort((a,b)=>a.start-b.start))===true;
+ };
  let nodes=0,exhausted=false;
  function search(remaining){
-   if(!remaining.length)return true;
+   if(!remaining.length)return complete();
    if(++nodes>100000){exhausted=true;return false;}
    // Most constrained job first; tie-break by promised ready time.
    const candidates=[...remaining].sort((a,b)=>(a.latest-a.earliest)-(b.latest-b.earliest)||a.readyMinute-b.readyMinute);
    for(const job of candidates){
      for(let t=job.latest;t>=job.earliest;t--){
        const finish=t+job.duration;
-       if(occupied.some(o=>t<o.finish+1&&finish+1>o.start))continue;
+       if(occupied.some(o=>t<o.finish+1&&finish+1>o.start)||
+          (options.blackouts||[]).some(o=>t<o.finish&&finish>o.start))continue;
        occupied.push({...job,start:t,finish,holdingMinutes:job.readyMinute-finish,
          placementSatisfied:true,holdingSatisfied:true});
        if(search(remaining.filter(x=>x!==job)))return true;
@@ -126,7 +135,8 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
      let placed=false;
      for(let t=job.latest;t>=job.earliest;t--){
        const finish=t+job.duration;
-       if(built.some(o=>t<o.finish+1&&finish+1>o.start))continue;
+       if(built.some(o=>t<o.finish+1&&finish+1>o.start)||
+          (options.blackouts||[]).some(o=>t<o.finish&&finish>o.start))continue;
        built.push({...job,start:t,finish,holdingMinutes:job.readyMinute-finish,
          placementSatisfied:true,holdingSatisfied:true});
        placed=true;break;
@@ -134,7 +144,9 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
      if(!placed)return false;
    }
    occupied.push(...built);
-   return true;
+   if(complete())return true;
+   occupied.length=0;
+   return false;
  }
  // Try later deadlines first, placing each batch backwards from its deadline.
  // Fall back to the constrained-first order and then the original search.
@@ -179,3 +191,4 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
    jobs:chronological,noOverlap:feasible,nodes,deadlinePressure,searchMethod:fastFeasible?'DETERMINISTIC_FAST_PATH':'BOUNDED_BACKTRACKING',batchingMethod:options.batchLatestFirst===true?'LATEST_PLACEMENT_FIRST':'EARLIEST_PLACEMENT_FIRST',bookingApprovalAllowed:false};
 }
 module.exports={scheduleCrossOrderPanang};
+

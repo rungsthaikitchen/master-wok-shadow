@@ -18,7 +18,11 @@ function prepareStagingBasket({id,createdAt,serviceDate,readyMinute,items,model}
      !Array.isArray(item.modifiers)||
      item.modifiers.some(m=>!m||typeof m.id!=='string'||!m.id.trim()))
    return fail('INVALID_BASKET_LINE');
-  lines.push({item_id:item.item_id,qty:item.qty,modifiers:item.modifiers.map(m=>({...m}))});
+  if(item.spice!=null&&(!Number.isInteger(item.spice)||item.spice<0||item.spice>3))
+   return fail('INVALID_SPICE');
+  if(item.item_note!=null&&typeof item.item_note!=='string')return fail('INVALID_ITEM_NOTE');
+  lines.push({item_id:item.item_id,qty:item.qty,modifiers:item.modifiers.map(m=>({...m})),
+   ...(item.spice!=null?{spice:item.spice}:{}),...(item.item_note!=null?{item_note:item.item_note}:{})});
  }
  try{
   const classification=model.classifyBasket(lines.map(l=>({itemId:l.item_id,qty:l.qty,mods:l.modifiers})));
@@ -30,3 +34,4 @@ function prepareStagingBasket({id,createdAt,serviceDate,readyMinute,items,model}
  }catch(_){return fail('CLASSIFICATION_FAILED');}
 }
 module.exports={prepareStagingBasket};
+
