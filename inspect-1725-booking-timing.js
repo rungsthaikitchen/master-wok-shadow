@@ -14,7 +14,7 @@ function assess(trace){
  const cycles=trace.fryerCycles.filter(c=>c.start>=placed-30&&c.deadline<=collection&&c.finish<=collection)
   .map(c=>({type:c.type,basket:c.basket,start:clock(c.start),finish:clock(c.finish),
    minutesAfterBooking:c.start-placed,startsBeforeBooking:c.start<placed}));
- const earliest=Math.min(...jobs.map(j=>minute(j.start)),...cycles.map(c=>c.start));
+ const earliest=Math.min(...jobs.map(j=>minute(j.start)),...cycles.map(c=>minute(c.start)));
  const margin=earliest-placed;
  return {slot:trace.slot,bookingMomentUK:trace.bookingMomentUK,
   leadTimeMinutes:collection-placed,
