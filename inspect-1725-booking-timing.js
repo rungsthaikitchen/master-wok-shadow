@@ -2,7 +2,7 @@
 // Read-only offline booking-moment timing diagnostic; no invented RTK lead-time policy.
 const fs=require('node:fs');
 const {inspect}=require('./inspect-1725-slot');
-function minute(s){const m=/^(\d{2}):(\d{2})$/.exec(s);if(!m)throw Error('INVALID_TIME_'+s);return +m[1]*60 + +m[2];}
+function minute(s){const m=/^(\d{2}):(\d{2})$/.exec(s);if(!m)throw Error('INVALID_TIME_'+s);return Number(m[1])*60+Number(m[2]);}
 function clock(n){return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
 function assess(trace){
  const placed=minute(trace.bookingMomentUK);
