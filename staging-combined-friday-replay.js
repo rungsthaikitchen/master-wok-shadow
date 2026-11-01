@@ -59,7 +59,7 @@ function plan(orders,rows,wok){
  return {status:failures.length?'UNVERIFIED':'FRY_PLACED_PROTOTYPE',
   reason:failures.length?'GREEDY_PLACEMENT_INCOMPLETE':'FRY_TIMELINE_FOUND_NOT_JOINTLY_OPTIMISED',
   dependencies:inventory.dependencies.length,cycles:cycles.length,failures,
-  scheduled:cycles.map(c=>({basket:c.basket,type:c.type,start:c.start,finish:c.finish,deadline:c.deadline,portions:c.portions.length})),
+  scheduled:cycles.map(c=>({basket:c.basket,type:c.type,start:c.start,finish:c.finish,deadline:c.deadline,portions:c.portions.length,orderIds:[...new Set(c.portions.map(p=>p.orderId))]})),
   bookingApprovalAllowed:false};
 }
 function replay(snapshot){
