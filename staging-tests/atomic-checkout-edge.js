@@ -503,6 +503,51 @@ async function run(){
    check(day.success&&day.hints.length===61&&performance.now()-started<5000,'WHOLE_DAY_HINT_BUDGET_FAILED');
    results.push('WHOLE_DAY_NORMAL_AND_OVERRUN_HINTS_USE_ONE_SNAPSHOT_WITH_BOUNDED_REQUEST');
   }
+  {
+   const email=prefix+'confirmed-recipes@example.invalid',phone='07700900127';
+   const trusted=createCommercialValidator();
+   const items=[{item_id:'fish-cakes',qty:1,modifiers:[],spice:1},
+    {item_id:'fried-prawns',qty:1,modifiers:[],spice:null},{item_id:'pork-dumplings',qty:1,modifiers:[],spice:null},
+    {item_id:'spare-ribs',qty:1,modifiers:[],spice:null},{item_id:'fried-egg',qty:2,modifiers:[],spice:null},
+    {item_id:'stir-basil',qty:1,modifiers:[{id:'chicken'},{id:'extra-egg'}],spice:1}];
+   const base={orderType:'collection',preferredTime:'2099-01-02T18:00:00Z',items,
+    customer:{name:'Confirmed recipe fixture',email,phone},paymentPreference:'on_arrival',communicationPreference:'sms'};
+   const prices=calculateCommercialOrder(base,{now:'2099-01-02T16:00:00Z'}).header;
+   const input={...base,key:prefix+'confirmed-recipes',expectedTotals:Object.fromEntries(['subtotal','total','discount','loyalty_discount','delivery_fee'].map(k=>[k,prices[k]]))};
+   const build=(extra={})=>make({validateCommercialOrder:(c,i,state)=>trusted(rewrite(c),i,state),...extra});
+   try{
+    const created=await build({pool:clockPool('2099-01-02T16:00:00Z')})(input);
+    check(created.committed,'CONFIRMED_RECIPE_COMMERCIAL_BOOKING_FAILED');
+    const saved=(await pool.query(`SELECT plan FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0].plan;
+    check(saved.auxiliary.jobs.filter(j=>j.resource==='microwave').length===2,'MICROWAVE_CYCLES_NOT_PERSISTED');
+    check(saved.auxiliary.jobs.filter(j=>j.itemId==='fried-egg').reduce((n,j)=>n+j.portions,0)===3,'EXTRA_EGG_NOT_COUNTED');
+    check(saved.auxiliary.jobs.every(j=>j.orderIds.every(id=>id.startsWith(created.response.orderId+'@'))),'AUXILIARY_ORDER_ID_NOT_REMAPPED');
+    check(saved.fryer.jobs.some(j=>j.type==='fishCakeBatch'&&j.finish-j.start===3)&&saved.fryer.jobs.some(j=>j.type==='friedPrawnBatch'&&j.finish-j.start===2),'CONFIRMED_FRY_TIMINGS_NOT_PERSISTED');
+    results.push('ACTUAL_COMMERCIAL_MIXED_STARTER_MAIN_AND_EXTRA_EGG_BASKET_PERSISTS_ALL_RESOURCE_JOBS');
+    const runningJob=saved.auxiliary.jobs.filter(j=>j.resource==='microwave').sort((a,b)=>a.start-b.start)[0];
+    const minute=runningJob.start+1;
+    const clock='2099-01-02T'+String(Math.floor(minute/60)).padStart(2,'0')+':'+String(minute%60).padStart(2,'0')+':00Z';
+    const next=await make({pool:clockPool(clock)})(request('confirmed-next','2099-01-02T19:00:00Z','green-curry',1));
+    check(next.committed,'BOOKING_AROUND_STARTED_MICROWAVE_FAILED');
+    const reloaded=(await pool.query(`SELECT plan FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0].plan;
+    check(reloaded.auxiliary.jobs.some(j=>JSON.stringify(j)===JSON.stringify(runningJob)),'STARTED_MICROWAVE_MOVED_AFTER_RECONNECT');
+    results.push('FRESH_CONNECTION_BOOKING_PRESERVES_STARTED_MICROWAVE_CYCLE');
+    const writer=createLifecycleWriter({pool:clockPool(clock),schema,mode:'MASTER_WOK',assessMutation:async ctx=>{
+     const a=await checkMutation(ctx);return a.status==='VALIDATED_LIFECYCLE_ASSESSMENT'?{...a,status:'GREEN',bookingApprovalAllowed:true}:a;
+    }});
+    check((await writer.adminAction({orderId:created.response.orderId,action:'decline'})).committed,'STARTED_AUXILIARY_CANCELLATION_FAILED');
+    const cancelled=(await pool.query(`SELECT plan FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0].plan;
+    check(cancelled.auxiliary.jobs.some(j=>JSON.stringify(j)===JSON.stringify(runningJob)),'CANCELLATION_ERASED_STARTED_MICROWAVE');
+    results.push('CANCELLATION_PRESERVES_STARTED_AUXILIARY_WORK_WITHOUT_CHEF_CONFIRMATIONS');
+    const beforeFailure=(await pool.query(`SELECT plan,revision FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0];
+    const broken={...planStore,save:async(c,d,p)=>{await planStore.save(c,d,p);throw Error('FIXTURE_AFTER_AUXILIARY_PLAN');}};
+    const failed=await build({pool:clockPool(clock),planStore:broken})({...input,key:prefix+'confirmed-failure',preferredTime:'2099-01-02T20:00:00Z'});
+    check(!failed.committed,'AUXILIARY_PLAN_FAILURE_COMMITTED');
+    check(JSON.stringify((await pool.query(`SELECT plan,revision FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0])===JSON.stringify(beforeFailure),'FAILED_AUXILIARY_PLAN_LEFT_CHANGE');
+    check((await pool.query(`SELECT count(*)::int n FROM ${schema}.orders WHERE idempotency_key=$1`,[prefix+'confirmed-failure'])).rows[0].n===0,'FAILED_AUXILIARY_PLAN_LEFT_ORDER');
+    results.push('FAILURE_AFTER_AUXILIARY_PLAN_WRITE_ROLLS_BACK_FULL_MIXED_BASKET');
+   }finally{await clear();await pool.query(`DELETE FROM ${schema}.customers WHERE email=$1`,[email]);}
+  }
   return {status:'PASS',scope:'PRIVATE_STAGING_ATOMIC_CHECKOUT_REHEARSAL',tests:results,
    productionReady:false,productionWrites:0,publicStagingOrderWrites:0};
  }finally{await clear();await pool.query(`DELETE FROM ${schema}.master_wok_launch_control WHERE approved_release_id=$1`,['private-staging-fixture-release']);await pool.end();}

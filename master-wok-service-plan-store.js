@@ -19,7 +19,7 @@ function createServicePlanStore({schema='public'}={}){
 function remapPlanOrder(plan,oldId,newId){
  if(!plan||oldId===newId)return plan;
  const copy=structuredClone(plan);
- for(const job of [...copy.wok.jobs,...copy.fryer.jobs]){
+ for(const job of [...copy.wok.jobs,...copy.fryer.jobs,...(copy.auxiliary?.jobs||[])]){
   job.orderIds=job.orderIds.map(id=>id===oldId?newId:id);
   for(const a of [...job.portionAllocations||[],...job.allocations||[]])
    if(a.orderId===oldId)a.orderId=newId;

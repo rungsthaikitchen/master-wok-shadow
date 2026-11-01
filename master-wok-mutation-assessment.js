@@ -21,7 +21,7 @@ function createMutationAssessment({model,readAvailability,readOrders=readCapacit
    const previousPlan=await planStore.read(connection,serviceDate);
    const availability=await readAvailability(connection,serviceDate);
    if(!changed.length){
-    const protectedResult=planWithProtectedWork({orders,rows,previousPlan,now,serviceDate});
+    const protectedResult=planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,confirmedStarterRecipes:true});
     if(protectedResult.status!=='VALIDATED_PROTECTED_PLAN')return protectedResult;
     plansByDate[serviceDate]=protectedResult.plan;
     continue;

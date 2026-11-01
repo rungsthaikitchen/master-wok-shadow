@@ -5,8 +5,8 @@ const {planWithProtectedWork}=require('./master-wok-protected-plan');
 const {validateKitchenTimeline}=require('./staging-kitchen-launch-validator');
 const {diagnoseFryer}=require('./staging-fryer-diagnostic');
 const {localDate,relativePlacement}=require('./master-wok-atomic-checkout');
+const {fryerRecipe,fryerCapacity}=require('./master-wok-recipe-rules');
 const DURATIONS={fast:{1:5,2:6,3:8,4:10},noodle:{1:8,2:10},salad:{1:10,2:10,3:15,4:15}};
-const CAPACITY={large:3,'small-1':2,'small-2':2};
 function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate,state},options={}){
  const fail=(reason,extra={})=>({status:'UNVERIFIED',reason,bookingApprovalAllowed:false,...extra});
  try{
@@ -61,6 +61,7 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
   const protectedResult=planWithProtectedWork({orders,rows,serviceDate,now,previousPlan:state.previousPlan,
    newOrderId:id,blackouts,
    standaloneSpringRolls:options.standaloneSpringRolls===true,
+   confirmedStarterRecipes:true,
    notBeforeByOrder:{[id]:Math.max(990,Math.ceil(minute+Math.max(warmup,buffer)))}});
   if(protectedResult.status!=='VALIDATED_PROTECTED_PLAN')return fail(protectedResult.reason);
   const plan=protectedResult.plan,unstartedPlan=protectedResult.futurePlan,unstartedRows=protectedResult.remainingRows;
@@ -73,7 +74,7 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
      job.finish>job.readyMinute||job.readyMinute-job.finish>job.holdingLimitMinutes)
     return fail('INVALID_WOK_JOB');
   }
-  const inventory=diagnoseFryer(orders,unstartedRows,{standaloneSpringRolls:options.standaloneSpringRolls===true});
+  const inventory=diagnoseFryer(orders,unstartedRows,{standaloneSpringRolls:options.standaloneSpringRolls===true,confirmedStarterRecipes:true});
   if(inventory.unmodelled.length)return fail('FRY_RECIPES_UNMODELLED');
   const key=(orderId,itemId,type)=>JSON.stringify([String(orderId),itemId,type]);
   const expected=new Map(),actual=new Map();
@@ -81,8 +82,8 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
    const k=key(d.orderId,d.itemId,type);expected.set(k,(expected.get(k)||0)+count);
   }
   for(const job of unstartedPlan.fryer.jobs){
-   if(!CAPACITY[job.basket]||job.portions>CAPACITY[job.basket]||
-     job.finish-job.start!==(job.type==='springRollBatch'?7:5)||
+   if(!fryerRecipe(job.type)||job.portions>fryerCapacity(job.type,job.basket)||
+     job.finish-job.start!==fryerRecipe(job.type).minutes||
      !Array.isArray(job.allocations)||job.allocations.length!==job.portions)
     return fail('INVALID_FRYER_JOB');
    for(const a of job.allocations){
@@ -93,16 +94,15 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
   }
   if(expected.size!==actual.size||[...expected].some(([k,v])=>actual.get(k)!==v))
    return fail('FRYER_COVERAGE_MISMATCH');
-  const jobs=[...plan.wok.jobs,...plan.fryer.jobs].filter(j=>j.orderIds.includes(id));
+  const jobs=[...plan.wok.jobs,...plan.fryer.jobs,...(plan.auxiliary?.jobs||[])].filter(j=>j.orderIds.includes(id));
   if(!jobs.length)return fail('NO_MODELLED_CANDIDATE_WORK');
   const earliest=Math.min(...jobs.map(j=>j.start)),finish=Math.max(...jobs.map(j=>j.finish));
   // The buffer precedes the first candidate work; fryer warmup is an additional
   // lower bound, not a replacement for the agreed whole-basket lead time.
   if(earliest<Math.max(990,minute+buffer)||finish>ready)return fail('INSUFFICIENT_LEAD_TIME');
   // Independent sides and most starters still need approved resource recipes.
-  const unmodelled=new Set(['chicken-satay','moo-ping','thai-sausage','spare-ribs','fried-egg']);
-  if(rows.some(r=>r.items.some(l=>unmodelled.has(l.item_id)||
-    l.modifiers.some(m=>m.id==='extra-egg'))))return fail('NON_WOK_RECIPE_COVERAGE_REQUIRED');
+  const unmodelled=new Set(['chicken-satay','moo-ping','thai-sausage']);
+  if(rows.some(r=>r.items.some(l=>unmodelled.has(l.item_id))))return fail('NON_WOK_RECIPE_COVERAGE_REQUIRED');
   return {status:'VALIDATED_COMBINED_ASSESSMENT',reason:'STAGING_CERTIFICATION_ONLY',
    plan,leadTime:{earliestCandidateWork:earliest,finalCandidateCompletion:finish,bufferMinutes:buffer},
    bookingApprovalAllowed:false};

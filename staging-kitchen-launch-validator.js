@@ -10,7 +10,7 @@ function validateKitchenTimeline(orders,plan,rows){
   issues.push({code:'COORDINATED_PLAN_MISSING'});
  const wok=(plan&&plan.wok&&plan.wok.jobs)||[];
  const fry=(plan&&plan.fryer&&plan.fryer.jobs)||[];
- const all=[...wok.map(j=>({...j,resource:'wok'})),...fry.map(j=>({...j,resource:j.basket}))];
+ const all=[...wok.map(j=>({...j,resource:'wok'})),...fry.map(j=>({...j,resource:j.basket})),...(plan?.auxiliary?.jobs||[])];
  for(const job of all){
   if(!Number.isFinite(job.start)||!Number.isFinite(job.finish)||job.finish<=job.start||
     job.start<990||job.finish>1320)issues.push({code:'INVALID_INTERVAL',resource:job.resource});

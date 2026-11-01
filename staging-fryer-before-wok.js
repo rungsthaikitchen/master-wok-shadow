@@ -2,6 +2,7 @@
 // Coordinates fryer prerequisites with an attributed wok plan. This remains a
 // staging plan: recipe coverage and launch approval are checked separately.
 const {diagnoseFryer}=require('./staging-fryer-diagnostic');
+const {fryerCapacity}=require('./master-wok-recipe-rules');
 const BASKETS=[{id:'large',capacity:3},{id:'small-1',capacity:2},{id:'small-2',capacity:2}];
 const recipeKey=(ready,line)=>JSON.stringify([ready,line.item_id,line.modifiers,line.spice??null,line.item_note??null]);
 function planFryerBeforeWok(orders,rows,wokPlan,options={}){
@@ -17,9 +18,10 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
   const notBefore=Math.max(990,placed,options.notBeforeByOrder?.[dep.orderId]??0);
   if(!Number.isFinite(notBefore))return fail('INVALID_PLACEMENT');
   if(dep.standalone){
+   const line=(rows.find(r=>String(r.id)===dep.orderId)?.items||[])[dep.lineIndex];
    for(const [type,count] of Object.entries(dep.counts))for(let i=0;i<count;i++)
     portions.push({orderId:dep.orderId,itemId:dep.itemId,type,duration:dep.durationMinutes,
-     deadline:dep.readyMinute,notBefore,standalone:true});
+     deadline:dep.readyMinute,notBefore,standalone:true,recipeKey:recipeKey(order.readyMinute,line)});
    continue;
   }
   // Attribute each line's portions to the exact recipe and wok batch. Repeated
@@ -52,7 +54,7 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
  if(portions.length>150)return fail('FRY_SEARCH_SIZE_LIMIT');
  const buckets=new Map();
  for(const p of portions){
-  const key=JSON.stringify([p.type,p.duration,p.deadline]);
+  const key=JSON.stringify([p.type,p.duration,p.deadline,p.standalone?p.recipeKey:null]);
   if(!buckets.has(key))buckets.set(key,[]);
   buckets.get(key).push(p);
  }
@@ -71,7 +73,7 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
    for(const basket of BASKETS){
     if(jobs.some(j=>j.basket===basket.id&&start<j.finish&&finish>j.start)||
       blocked.some(b=>(!b.basket||b.basket===basket.id)&&start<b.finish&&finish>b.start))continue;
-    for(let size=Math.min(basket.capacity,remaining.length);size>=1;size--){
+    for(let size=Math.min(fryerCapacity(first.type,basket.id),remaining.length);size>=1;size--){
      const assigned=remaining.slice(0,size);
      const job={type:first.type,basket:basket.id,portions:size,start,finish,
       orderIds:[...new Set(assigned.map(p=>p.orderId))],

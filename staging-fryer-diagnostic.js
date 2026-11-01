@@ -14,7 +14,7 @@ const MODS = {
   tofu:'tofu','extra-tofu':'tofu',
   'batter-chicken':'batteredChicken','extra-bchicken':'batteredChicken'
 };
-function diagnoseFryer(orders,rows,{standaloneSpringRolls=false}={}) {
+function diagnoseFryer(orders,rows,{standaloneSpringRolls=false,confirmedStarterRecipes=false}={}) {
   const known=new Map(orders.map(o=>[String(o.orderId),o]));
   const dependencies=[],unmodelled=[];
   for(const row of rows) {
@@ -30,8 +30,16 @@ function diagnoseFryer(orders,rows,{standaloneSpringRolls=false}={}) {
         unmodelled.push({orderId:String(row.id),reason:'INVALID_LINE'});
         continue;
       }
-      if(UNMODELLED_FRIED.has(line.item_id) && !(standaloneSpringRolls && SPRING_ROLLS.has(line.item_id))) {
+      const confirmed=confirmedStarterRecipes&&['fish-cakes','fried-prawns','pork-dumplings','chips','fried-tofu'].includes(line.item_id);
+      if(UNMODELLED_FRIED.has(line.item_id) && !confirmed && !(standaloneSpringRolls && SPRING_ROLLS.has(line.item_id))) {
         unmodelled.push({orderId:String(row.id),itemId:line.item_id,reason:'FRY_RECIPE_UNMODELLED'});
+        continue;
+      }
+      const types={'fish-cakes':'fishCakeBatch','fried-prawns':'friedPrawnBatch','chips':'chips','fried-tofu':'tofu'};
+      if(confirmed&&types[line.item_id]){
+        const {fryerRecipe}=require('./master-wok-recipe-rules');const type=types[line.item_id];
+        dependencies.push({orderId:String(row.id),itemId:line.item_id,lineIndex,
+          readyMinute:order.readyMinute,standalone:true,durationMinutes:fryerRecipe(type).minutes,counts:{[type]:line.qty}});
         continue;
       }
       if(SPRING_ROLLS.has(line.item_id)){

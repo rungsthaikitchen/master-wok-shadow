@@ -37,12 +37,12 @@ main branch has been changed. Work is saved in three companion draft PRs.
 
 ## Verified evidence and limits
 
-- 203 JavaScript tests in both UTC and Europe/London; 21 Python tests; 12 browser
+- 212 JavaScript tests in both UTC and Europe/London; 21 Python tests; 12 browser
   client/proxy tests. Active inline scripts parse successfully.
-- 37 scenario groups against actual private staging PostgreSQL, including
+- 41 scenario groups against actual private staging PostgreSQL, including
   concurrency, replay, rollback, protected plans, lifecycle races, loyalty,
   notification partial failures/crash recovery, delivery and read-only time hints.
-  Latest evidence: STAGING-AVAILABILITY-RESULT.json. Earlier focused evidence is
+  Latest evidence: STAGING-CONFIRMED-RECIPES-RESULT.json. Availability evidence: STAGING-AVAILABILITY-RESULT.json. Earlier focused evidence is
   preserved in STAGING-DELIVERY-RESULT.json and STAGING-NOTIFICATION-RESULT.json.
 - Real Python notification worker + actual templates + HTTP + staging database
   passed with fake provider acceptance. Second run found no work. No actual email,
@@ -60,14 +60,16 @@ main branch has been changed. Work is saved in three companion draft PRs.
 
 ## Remaining release gates
 
-1. Full menu/resource coverage and final service rehearsal. Confirm missing cooking
-   method, minutes and maximum simultaneous portions for fish cakes, fried prawns,
-   steamed dumplings, Thai sausage, spare ribs and fried eggs. Already known:
-   spring rolls 7m; satay/moo-ping finish 1m; main frying 4–5m; rice microwave 1m
-   before finishing. Integrate the independent starter/side work without chef prompts.
-   Single-wok full-attention planning is conservative; multi-ring prototypes are
-   not certified. The combined assessor still deliberately grants no production
-   booking authority.
+1. Finish remaining menu/resource coverage and the final service rehearsal.
+   Fish cakes (3m, 3 small/6 large), prawns (2m, 3/6), dumplings/ribs
+   (microwave 5m, 1 batch/run) and eggs (small wok 2m, max 2) are now integrated
+   and transaction-tested. Thai sausage time/capacity is recorded (3m, 5/10),
+   but its cooking method was omitted and remains blocked. Do not ask David to
+   repeat these timings. See CONFIRMED-KITCHEN-RECIPES.md. Known satay/moo-ping
+   one-minute finishing and rice preheat/finishing still need their remaining
+   resource integration. Single-wok egg serialization is conservative; extra
+   parallel chef capacity is not assumed. The combined assessor deliberately
+   grants no production booking authority.
 2. Resolve slowdown policy. Current website displays busy/very_busy notices and
    stores throttle values, but neither reviewed checkout nor admin Edge source
    applies them to capacity. Master Wok currently refuses those states. Do not
