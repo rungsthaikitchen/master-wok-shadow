@@ -66,9 +66,11 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
   const first=remaining[0];
   for(let start=first.deadline-first.duration;start>=Math.max(990,first.deadline-first.duration-10,first.notBefore);start--){
    const finish=start+first.duration;
-   if((options.blackouts||[]).some(b=>start<b.finish&&finish>b.start))continue;
+   if((options.kitchenBlackouts||options.blackouts||[]).some(b=>start<b.finish&&finish>b.start))continue;
+   const blocked=options.fryerBlackouts||[];
    for(const basket of BASKETS){
-    if(jobs.some(j=>j.basket===basket.id&&start<j.finish&&finish>j.start))continue;
+    if(jobs.some(j=>j.basket===basket.id&&start<j.finish&&finish>j.start)||
+      blocked.some(b=>(!b.basket||b.basket===basket.id)&&start<b.finish&&finish>b.start))continue;
     for(let size=Math.min(basket.capacity,remaining.length);size>=1;size--){
      const assigned=remaining.slice(0,size);
      const job={type:first.type,basket:basket.id,portions:size,start,finish,

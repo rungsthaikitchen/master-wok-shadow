@@ -1,7 +1,7 @@
 'use strict';
 // Complete assessment pipeline for staging certification. A valid schedule is
 // evidence, not a production booking authorization. Remains false by design.
-const {planCoordinatedKitchen}=require('./staging-coordinated-kitchen');
+const {planWithProtectedWork}=require('./master-wok-protected-plan');
 const {validateKitchenTimeline}=require('./staging-kitchen-launch-validator');
 const {diagnoseFryer}=require('./staging-fryer-diagnostic');
 const {localDate,relativePlacement}=require('./master-wok-atomic-checkout');
@@ -18,7 +18,7 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
   if(!/^\d{4}-\d{2}-\d{2}$/.test(serviceDate)||date.toISOString().slice(0,10)!==serviceDate)
    return fail('INVALID_SERVICE_DATE');
   const weekday=date.getUTCDay(),today=localDate(now),ready=proposedOrder.readyMinute;
-  const placed=relativePlacement(now,serviceDate),minute=placed.getHours()*60+placed.getMinutes();
+  const placed=relativePlacement(now,serviceDate),minute=placed.getHours()*60+placed.getMinutes()+placed.getSeconds()/60;
   if(!(availability.openDays||[3,4,5,6]).includes(weekday)||
      (availability.closedDates||[]).includes(serviceDate)||today>serviceDate||ready<1020||ready>1320)
    return fail('OUTSIDE_SERVICE_WINDOW');
@@ -58,27 +58,29 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
    new Set(rows.map(r=>String(r.id))).size!==rows.length||
    orders.some(o=>!rows.some(r=>String(r.id)===String(o.orderId))))return fail('INCOMPLETE_SNAPSHOT');
   const id=String(proposedOrder.orderId),warmup=5,buffer=10;
-  const plan=planCoordinatedKitchen(orders,rows,{blackouts,
+  const protectedResult=planWithProtectedWork({orders,rows,serviceDate,now,previousPlan:state.previousPlan,
+   newOrderId:id,blackouts,
    standaloneSpringRolls:options.standaloneSpringRolls===true,
-   notBeforeByOrder:{[id]:Math.max(990,minute+Math.max(warmup,buffer))}});
-  if(plan.status!=='COORDINATED_PROTOTYPE')return fail(plan.fryer?.reason||plan.wok?.reason||plan.reason);
-  const validation=validateKitchenTimeline(orders,plan,rows);
+   notBeforeByOrder:{[id]:Math.max(990,Math.ceil(minute+Math.max(warmup,buffer)))}});
+  if(protectedResult.status!=='VALIDATED_PROTECTED_PLAN')return fail(protectedResult.reason);
+  const plan=protectedResult.plan,unstartedPlan=protectedResult.futurePlan,unstartedRows=protectedResult.remainingRows;
+  const validation=validateKitchenTimeline(orders,unstartedPlan,unstartedRows);
   if(validation.status!=='VALIDATED_STAGING_TIMELINE')return fail('TIMELINE_VALIDATION_FAILED',{issues:validation.issues});
   // Validate actual durations, deadlines and exact per-order fryer coverage,
   // independently of the allocator's success status.
-  for(const job of plan.wok.jobs){
+  for(const job of unstartedPlan.wok.jobs){
    if(DURATIONS[job.group]?.[job.portions]!==job.finish-job.start||
      job.finish>job.readyMinute||job.readyMinute-job.finish>job.holdingLimitMinutes)
     return fail('INVALID_WOK_JOB');
   }
-  const inventory=diagnoseFryer(orders,rows,{standaloneSpringRolls:options.standaloneSpringRolls===true});
+  const inventory=diagnoseFryer(orders,unstartedRows,{standaloneSpringRolls:options.standaloneSpringRolls===true});
   if(inventory.unmodelled.length)return fail('FRY_RECIPES_UNMODELLED');
   const key=(orderId,itemId,type)=>JSON.stringify([String(orderId),itemId,type]);
   const expected=new Map(),actual=new Map();
   for(const d of inventory.dependencies)for(const [type,count] of Object.entries(d.counts)){
    const k=key(d.orderId,d.itemId,type);expected.set(k,(expected.get(k)||0)+count);
   }
-  for(const job of plan.fryer.jobs){
+  for(const job of unstartedPlan.fryer.jobs){
    if(!CAPACITY[job.basket]||job.portions>CAPACITY[job.basket]||
      job.finish-job.start!==(job.type==='springRollBatch'?7:5)||
      !Array.isArray(job.allocations)||job.allocations.length!==job.portions)

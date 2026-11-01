@@ -5,128 +5,76 @@
 Base reviewed: `e86beafdca2c76ed8b40c7ab8dc0393297b48889`, branch
 `review/go-live-capacity-adapter-2026-10-30`.
 
-## Implemented together
+## Completed in review branches
 
-- Joined existing transaction, raw basket canonicalization, locked snapshot,
-  availability and order persistence at `master-wok-atomic-checkout.js`.
-- Concrete server-side writer inserts header, all lines and immutable idempotency
-  receipt on the same dedicated PostgreSQL connection. Original order ID/response
-  is returned on replay; changed-date key reuse fails closed.
-- Transaction begins in READ COMMITTED, takes key then service-date locks, applies
-  database timeouts, and rolls back on failed assessment or persistence. Explicit
-  `bookingApprovalAllowed=false` cannot write even with a GREEN status.
-- Existing wok search now checks fryer feasibility at each complete arrangement;
-  alternative wok arrangements are searched within explicit bounds. Fryer work
-  has per-order/item attribution, capacity/deadline checks and seven-minute spring
-  rolls behind an opt-in. Unmodelled recipes remain blocked.
-- Spice and item notes participate in batching compatibility and survive the
-  canonical/read boundary. Previous-day preorders release at service-day midnight.
-- Whole candidate wok/fryer span, ten-minute provisional buffer, cold fryer lower
-  bound, production hours, customer/overflow hours, closures, test exclusions and
-  locked control-state checks are joined in `master-wok-combined-assessment.js`.
-- The combined assessor deliberately does not grant production booking authority.
-  Slower service states fail closed pending parity with the existing backend.
+- Atomic checkout joins real baskets, trusted server prices/modifiers/discounts,
+  customer binding, pending loyalty reservations, capacity assessment, order/items,
+  replay receipt, service plan and notification outbox in one PostgreSQL transaction.
+- Global writer lock precedes idempotency and sorted service-date locks. Concurrent
+  bookings, lifecycle changes and replay cannot bypass the same locked snapshot.
+- Combined wok/fryer assessment includes dependencies, lead-time floor and buffer,
+  customer/production hours, blackouts, cancelled/test exclusions and time proposals.
+  Prototype feasibility still cannot approve a customer booking.
+- Persisted service plans protect work already started, including downstream wok
+  dependencies of started frying. Cancellation retains occupied resources and drops
+  unstarted work. Missing historical plans during service fail closed; cutover needs
+  a pre-service plan seed. No extra chef confirmation is introduced.
+- Admin/customer lifecycle writer holds original and proposed times until response;
+  acknowledgement is idempotent and cancellation cannot revive an order. New-order
+  loyalty settles exactly once inside the completion transaction. Legacy orders
+  retain the existing callback. New orders queue notifications transactionally.
+- Flask review adapter exposes an explicit no-cache booking mode and authenticated
+  booking gateway. Defaults remain LEGACY. Uncertain results never fall back to a
+  second writer. No runtime settings have been changed.
+- Website review code preserves the checkout form, selects the server mode before
+  writes and uses stable retry keys. Unknown outcomes cannot silently create another
+  order, including after rollback. Preview proxies require an explicit staging URL.
+- Legacy capacity reader compatibility includes both pending Master Wok times across
+  dates, tagged by capacity_scheduler. This column must precede website deployment.
 
-## Verified
+## Verification
 
-Baseline was 152/159 in Europe/London and 146/159 in UTC. Seven failures reflected
-an incomplete spring-roll opt-in or a stale query-argument assertion; six further
-UTC failures used UTC instants as local-clock fixtures. These are corrected without
-weakening unknown-recipe or booking-authority guards.
-
-The complete Node suite now passes 171/171 in both UTC and Europe/London. New integration
-checks cover raw basket, lead time, spring-roll opt-in, unknown recipe, blackout
-exclusive end, pause/throttle, spice/note compatibility and prior-day placement.
-
-A temporary authenticated Edge runner executed the **actual JavaScript checkout
-transaction and kitchen assessment against staging PostgreSQL**, using private
-`master_wok_rehearsal` tables and generated menu-shaped baskets. The test-only
-commercial validator uses fixture prices and cannot be used for live orders.
-The test-only authority wrapper is confined to these private rehearsal tables.
-
-12 scenario groups passed (HTTP 200, staging pg_net response 2):
-
-1. Concurrent final-capacity baskets: exactly one complete header/items/receipt.
-2. Idempotent replay returns original order ID; cross-date key reuse conflicts.
-3. Error after header/items/receipt persistence rolls back every record.
-4. Concurrent identical retries create one order.
-5. A mixed curry and crispy-chicken basket commits atomically.
-6. Prototype GREEN without authority is refused; legacy mode selects old path.
-7. Locked blackout state refuses the booking.
-8. Cancelled order releases capacity.
-9. Test order does not consume real-order capacity.
-10. Proposed time is counted at its effective time.
-11. Confirmed time is counted at its effective time.
-12. Incomplete existing header fails closed.
-
-These lifecycle checks read state changes made in isolated fixtures. They do not
-certify the real admin/customer mutation endpoints or time acknowledgement flow.
-
-All generated rehearsal headers/items/receipts/blackouts were confirmed removed.
-The runner was replaced with a disabled HTTP 410 implementation and JWT checking
-restored. `pg_net` was enabled in staging to invoke it; no production DDL or data
-writes occurred. Existing public staging orders were not written.
+- 196/196 JavaScript tests pass in UTC and Europe/London.
+- 11/11 backend Python tests pass with external calls isolated.
+- 10/10 checkout-client/proxy cases pass, including retry, rollback compatibility,
+  mode failure and preview-to-production isolation.
+- 21 scenario groups pass against actual staging PostgreSQL using private
+  master_wok_rehearsal tables. Coverage includes concurrent real baskets, rollback,
+  replay, lifecycle races, real commercial validation, exact-once loyalty, fresh
+  connection plan reload, started fryer/wok dependencies and cancellation protection.
+  See STAGING-PROTECTED-PLAN-RESULT.json for deployment/hash and cleanup evidence.
+- Mobile Chromium checkout passes in both MASTER_WOK and LEGACY modes with external
+  providers intercepted. Master Wok makes one atomic request and zero separate browser
+  database writes; legacy retains its original three mocked writes and confirmation.
+- A browser-generated collection checkout request also passed through a controlled
+  transport bridge into the actual private staging writer: one order, one item,
+  one receipt and one queued notification, total GBP9. See
+  BROWSER-CHECKOUT-STAGING-RESULT.json. This does not certify the deployed
+  Cloudflare/Railway transport or real notification delivery.
+- Generated fixtures were removed; all eight tracked private fixture tables are
+  empty. Temporary certification handler is inert HTTP410 with JWT checking restored.
+  No production writes or public staging order writes occurred.
 
 ## Minimum remaining work, in order
 
-1. **Backend access resolved; runtime/browser integration remains.** Access to
-   `rungsthaikitchen/order-backend` was granted and its current Flask handlers,
-   notifications and production hyper-worker source were reviewed. A private
-   backend draft adds feature-gated checkout/admin/customer routing. It is not
-   deployed and the production booking HTTP endpoint is not yet installed.
-   The server catalogue now reflects 44 actual menu items and the current disabled
-   automatic midweek discount, protein/extras/spice rules, route fee bands,
-   £30 pre-discount delivery threshold, £5/100-point reward, SMS default and
-   `in_advance` payment value. The concrete commercial validator was exercised
-   against private staging tables, including customer rollback and outstanding
-   reward reservations. Trusted delivery geocoding/routing remains to be wired.
-2. **Finish lifecycle runtime/notification wiring.** The shared transaction
-   and actual admin/customer order-action writer now exist; a proposal holds both
-   old and new times, acknowledgement is idempotent, and cancellation races cannot
-   revive orders. These passed real staging PostgreSQL tests. Route checkout, admin accept/
-   suggest/status/test changes, customer time acknowledgement, blackouts and
-   service-control changes through the same locking protocol. For moves across
-   dates lock both dates in deterministic order. Prevent direct REST bypass only
-   as part of the approved cutover. Retain old/new time commitments appropriately
-   while awaiting acknowledgement; do not guess the private backend's statuses.
-3. **Running-service continuity and full menu.** Persist/protect committed work
-   plans so already-started work cannot be moved. Confirm remaining standalone
-   fryer recipes and independent starter/egg resource times, finalize holding/
-   buffer rules, and implement the current busy/throttle policy. Single-wok full
+1. Install the real server HTTP runtime behind the gateway. Join trusted delivery
+   lookup, notification sender/link tokens, live availability hints, service/blackout
+   mutations and durable launch control to the same writer. The current combined
+   assessor deliberately has no production approval authority. Current customer
+   availability hints still use the existing conservative model.
+2. Finish full-menu recipe/resource rules and existing busy/throttle parity.
+   Unknown recipes and slower service states currently fail closed. Single-wok full
    attention planning is conservative; multi-ring prototypes are not certified.
-4. **Full browser/production-schema staging rehearsal.** Staging's public order
-   schema is reduced. Test real checkout, totals, delivery, loyalty, notices,
-   printing, admin changes and customer acknowledgement on a production-shaped
-   staging fixture with notification/payment sandboxes. No real customer sends.
-5. **Controlled cutover/rollback.** Add a trusted durable server launch switch and
-   a writer-drain procedure. Capture current Cloudflare/backend/function versions
-   and privileges. Verify rollback with committed Master Wok orders still visible
-   to legacy capacity via their existing kitchen_load fields. The factory's LEGACY
-   setting is tested; a full deployed website/backend rollback is not yet tested.
-
-## Follow-up after backend access was granted
-
-- 188/188 JavaScript tests pass in UTC and Europe/London, plus the existing raw
-  transaction boundary tests. Nine Python tests verify actual Flask registration,
-  default legacy routing, proxy authentication, completion callback preservation,
-  destination restrictions, failure handling and no misleading acceptance page.
-- The shared global writer lock precedes key and sorted service-date locks. This
-  single low-volume kitchen can serialize order changes and future global control
-  changes without a second lock hierarchy. Every actual writer still has to be
-  routed through it before cutover; a lock alone cannot stop direct REST bypass.
-- Staging runner deployment 5 passed 17 scenario groups. See
-  `STAGING-LIFECYCLE-COMMERCIAL-RESULT.json`. It was disabled with deployment 6,
-  JWT verification was restored, and generated headers/items/booking receipts/
-  response receipts/customer/loyalty rows were confirmed removed.
-- Added a local regression for the existing 20-minute minimum customer lead time,
-  in addition to the basket span/buffer checks. That final guard was added after
-  the recorded remote run; both local timezone suites cover it.
-- Customer-time receipts are review-only SQL. No production schema or permissions
-  were changed. Rehearsal authority wrappers remain explicitly test-only.
-- Full release is still blocked on protected committed work plans, complete recipe
-  coverage, the final HTTP/browser integration, notification/loyalty completion
-  parity, real service-control mutations, production-shaped end-to-end tests and
-  a tested deployed rollback. No production enablement is requested yet.
+3. Run the actual hosted Cloudflare -> Railway -> Supabase staging chain against a
+   production-shaped schema. Cover delivery, rewards, notices/printing, admin moves,
+   customer acknowledgement, blackouts, test orders, opening/production boundaries
+   and a realistic service with started work. Use notification/payment sandboxes.
+4. Rehearse durable cutover, direct REST write fencing, writer drain and rollback
+   with existing Master Wok orders and uncertain checkout attempts. Capture deployed
+   versions/privileges and seed committed plans before service. Local mode/reader
+   rollback tests pass; a deployed rollback has not been tested.
+5. Only after those gates pass, present the exact production release and rollback
+   package for explicit approval. No production enablement is requested yet.
 
 ### Recipe facts still needed before full-menu certification
 

@@ -3,7 +3,7 @@
 // through MASTER_WOK_CERTIFICATION_TOKEN; never commit the emitted bundle.
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),seen=new Map();
-const runner=fs.readFileSync(path.join(__dirname,'atomic-checkout-edge.js'),'utf8');
+const runner=fs.readFileSync(path.join(__dirname,process.argv[2]||'atomic-checkout-edge.js'),'utf8');
 const token=process.env.MASTER_WOK_CERTIFICATION_TOKEN;
 if(!/^[a-f0-9]{64}$/.test(token||''))throw Error('TEMPORARY_64_HEX_TOKEN_REQUIRED');
 function add(name){

@@ -37,8 +37,8 @@ function createOrderStore({schema='public'}={}){
     throw Error('INVALID_VALIDATED_ITEMS');
    const fields=Object.keys(header);
    const result=await connection.query(`INSERT INTO ${orders}
-    (${fields.map(k=>'"'+k+'"').join(',')},idempotency_key,status,loyalty_settled)
-    VALUES (${fields.map((_,i)=>'$'+(i+1)).join(',')},$${fields.length+1},'pending',false)
+    (${fields.map(k=>'"'+k+'"').join(',')},idempotency_key,status,loyalty_settled,capacity_scheduler)
+    VALUES (${fields.map((_,i)=>'$'+(i+1)).join(',')},$${fields.length+1},'pending',false,'MASTER_WOK')
     RETURNING id`,[...fields.map(k=>header[k]),key]);
    const id=result.rows[0]?.id;if(!id)throw Error('ORDER_INSERT_FAILED');
    for(const line of lines){
@@ -47,7 +47,12 @@ function createOrderStore({schema='public'}={}){
      VALUES ($1,${fields.map((_,i)=>'$'+(i+2)).join(',')})`,
      [id,...fields.map(k=>k==='modifiers'?JSON.stringify(line[k]):line[k])]);
    }
-   const response={orderId:id,serviceDate,status:'pending'};
+   await connection.query(`INSERT INTO ${checkedTable(schema,'master_wok_notification_outbox')} (order_id,event_type)
+    VALUES($1,'order_created') ON CONFLICT(order_id,event_type) DO NOTHING`,[id]);
+   const response={orderId:id,serviceDate,status:'pending',orderRef:header.order_ref,customerId:header.customer_id,
+    totals:Object.fromEntries(['subtotal','discount','discount_amount','delivery_fee','total','loyalty_discount',
+     'loyalty_points_redeem_pending','loyalty_points_earned_pending','loyalty_reward_applied','loyalty_expected_balance']
+     .filter(k=>header[k]!==undefined).map(k=>[k,header[k]])),notification_status:'queued'};
    await connection.query(`INSERT INTO ${receipts} (key,service_date,order_id,fingerprint,response)
     VALUES ($1,$2,$3,$4,$5::jsonb)`,[key,serviceDate,id,fingerprint,JSON.stringify(response)]);
    return response;

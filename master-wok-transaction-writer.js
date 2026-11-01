@@ -34,7 +34,7 @@ async function reserveWithMasterWok({ connection, serviceDate, key, candidate, r
     }
     // persist MUST atomically insert the complete order, its items, and
     // reservation/idempotency record on this same connection.
-    const response=await persist(connection, { serviceDate, key, candidate:canonical, fingerprint });
+    const response=await persist(connection, { serviceDate, key, candidate:canonical, fingerprint, assessment });
     await connection.query('COMMIT');
     return { status: 'GREEN', committed: true, reason: 'RESERVED', ...(response?{response}:{}) };
   } catch (error) {

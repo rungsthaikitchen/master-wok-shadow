@@ -2,6 +2,8 @@
 const {beginBookingTransaction,lockServiceDates}=require('./master-wok-transaction-writer');
 const {commitmentTimes}=require('./master-wok-commitment-reader');
 const {localDate}=require('./master-wok-clock');
+const {createServicePlanStore}=require('./master-wok-service-plan-store');
+const {settleMasterWokLoyalty}=require('./master-wok-loyalty-settlement');
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const mutableStatus=new Set(['pending','accepted','confirmed','cancelled','completed']);
 function actionPatch(order,input,{actor,now,tokenFactory=()=>crypto.randomUUID().replaceAll('-','')}={}){
@@ -46,6 +48,7 @@ function actionPatch(order,input,{actor,now,tokenFactory=()=>crypto.randomUUID()
 function createLifecycleWriter({pool,assessMutation,mode='LEGACY',schema='public'}={}){
  if(!pool||typeof pool.connect!=='function'||typeof assessMutation!=='function'||
   !['public','master_wok_rehearsal'].includes(schema))throw Error('INVALID_LIFECYCLE_CONFIGURATION');
+ const planStore=createServicePlanStore({schema});
  const orders='"'+schema+'".orders',receipts='"'+schema+'".master_wok_time_responses';
  async function mutate(input,actor){
   const fail=(reason,statusCode=409)=>({success:false,committed:false,reason,statusCode});
@@ -69,7 +72,7 @@ function createLifecycleWriter({pool,assessMutation,mode='LEGACY',schema='public
    if(!order){await connection.query('ROLLBACK');return fail('ORDER_NOT_FOUND',404);}
    const now=(await connection.query('SELECT clock_timestamp() AS now')).rows[0]?.now;
    if(!now||!Number.isFinite(new Date(now).getTime()))throw Error('SERVER_CLOCK_REQUIRED');
-   const patch=actionPatch(order,input,{actor,now});
+   const patch={...actionPatch(order,input,{actor,now}),capacity_scheduler:'MASTER_WOK'};
    const after={...order,...patch};
    const dates=[...new Set([...commitmentTimes(order),...commitmentTimes(after)].map(localDate))].sort();
    await lockServiceDates(connection,dates);
@@ -82,7 +85,11 @@ function createLifecycleWriter({pool,assessMutation,mode='LEGACY',schema='public
    if(assessment?.status!=='GREEN'||assessment.bookingApprovalAllowed!==true){
     await connection.query('ROLLBACK');return fail(assessment?.reason||'UNCERTIFIED_LIFECYCLE_ASSESSMENT');
    }
+   if(dates.some(date=>!assessment.plansByDate?.[date]))throw Error('VALIDATED_SERVICE_PLANS_REQUIRED');
+   for(const date of dates)await planStore.save(connection,date,assessment.plansByDate[date]);
+   const loyalty=await settleMasterWokLoyalty(connection,after,{schema});
    const response={success:true,status:after.status,orderId:input.orderId,
+    ...(loyalty.handled?{loyalty_settled:loyalty.settled}:{}),
     ...(actor==='customer'?{title:'Thank you',message:input.action==='customer_accept'?
      'Your proposed collection/delivery time has been accepted.':'We have noted that this time does not work for you. Please contact the restaurant to arrange another time.'}:{})};
    if(actor==='customer')await connection.query(`INSERT INTO ${receipts}(token,order_id,decision,response) VALUES($1,$2,$3,$4::jsonb)`,

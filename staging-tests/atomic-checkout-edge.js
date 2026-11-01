@@ -4,6 +4,7 @@ import pg from 'npm:pg@8.23.1';
 const {Pool}=pg;
 const {createAtomicCheckout}=require('./master-wok-atomic-checkout');
 const {createOrderStore}=require('./master-wok-order-store');
+const {createServicePlanStore}=require('./master-wok-service-plan-store');
 const {readCapacityCommitments}=require('./master-wok-commitment-reader');
 const {createLifecycleWriter}=require('./master-wok-lifecycle');
 const {createMutationAssessment}=require('./master-wok-mutation-assessment');
@@ -22,7 +23,7 @@ async function run(){
  const pool=new Pool({connectionString:url,max:4,connectionTimeoutMillis:10000});
  const prefix='cert-'+crypto.randomUUID()+'-',date='2099-01-02';
  const results=[];
- const store=createOrderStore({schema});
+ const store=createOrderStore({schema}),planStore=createServicePlanStore({schema});
  const rewrite=c=>({query:(sql,args)=>c.query(sql.replaceAll('public.orders',schema+'.orders')
   .replaceAll('public.order_items',schema+'.order_items')
   .replaceAll('public.booking_blackouts',schema+'.booking_blackouts')
@@ -40,14 +41,15 @@ async function run(){
   // Test-only authorization, confined to a fixed private schema and generated
   // fixtures. No production assessor or launch flag is enabled by this test.
   return result.status==='VALIDATED_COMBINED_ASSESSMENT'?
-   {status:'GREEN',bookingApprovalAllowed:true}:{status:'UNVERIFIED',bookingApprovalAllowed:false};
+   {...result,status:'GREEN',bookingApprovalAllowed:true}:{status:'UNVERIFIED',bookingApprovalAllowed:false};
  };
  const make=(override={})=>createAtomicCheckout({pool,model:globalThis.MasterWokModelV1,
   validateCommercialOrder:commercial,readAvailability:(c,d)=>readBookingAvailability(rewrite(c),d),
-  readOrders:(c,d)=>readCapacityCommitments(rewrite(c),d),store,assessBooking:assess,mode:'MASTER_WOK',...override});
+  readOrders:(c,d)=>readCapacityCommitments(rewrite(c),d),store,planStore,assessBooking:assess,mode:'MASTER_WOK',...override});
  const clear=()=>pool.query(`DELETE FROM ${schema}.master_wok_time_responses WHERE order_id IN (SELECT id FROM ${schema}.orders WHERE idempotency_key LIKE $1)`,[prefix+'%'])
   .then(()=>pool.query(`DELETE FROM ${schema}.master_wok_booking_receipts WHERE key LIKE $1`,[prefix+'%']))
-  .then(()=>pool.query(`DELETE FROM ${schema}.orders WHERE idempotency_key LIKE $1`,[prefix+'%']));
+  .then(()=>pool.query(`DELETE FROM ${schema}.orders WHERE idempotency_key LIKE $1`,[prefix+'%']))
+  .then(()=>pool.query(`DELETE FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date]));
  try{
   await pool.query(`CREATE SCHEMA IF NOT EXISTS ${schema};
    REVOKE ALL ON SCHEMA ${schema} FROM PUBLIC,anon,authenticated;
@@ -64,6 +66,7 @@ async function run(){
    CREATE TABLE IF NOT EXISTS ${schema}.master_wok_booking_receipts (
     key text PRIMARY KEY,service_date date NOT NULL,order_id uuid NOT NULL UNIQUE REFERENCES ${schema}.orders,
     fingerprint text NOT NULL,response jsonb NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
+   ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS capacity_scheduler text NOT NULL DEFAULT 'LEGACY';
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS confirm_token text;
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS paid boolean DEFAULT false;
    ALTER TABLE ${schema}.orders ADD COLUMN IF NOT EXISTS payment_status text DEFAULT 'unpaid';
@@ -94,6 +97,14 @@ async function run(){
    INSERT INTO ${schema}.order_counters(id,current_num) VALUES (1,0) ON CONFLICT(id) DO NOTHING;
    CREATE TABLE IF NOT EXISTS ${schema}.master_wok_time_responses (token text PRIMARY KEY,
     order_id uuid NOT NULL REFERENCES ${schema}.orders,decision text NOT NULL,response jsonb NOT NULL);
+   CREATE TABLE IF NOT EXISTS ${schema}.master_wok_service_plans(service_date date PRIMARY KEY,plan jsonb NOT NULL,
+    revision bigint NOT NULL DEFAULT 1,updated_at timestamptz NOT NULL DEFAULT now());
+   CREATE TABLE IF NOT EXISTS ${schema}.master_wok_notification_outbox (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),order_id uuid NOT NULL REFERENCES ${schema}.orders ON DELETE CASCADE,
+    event_type text NOT NULL,status text NOT NULL DEFAULT 'pending',created_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE(order_id,event_type));
+   ALTER TABLE ${schema}.loyalty_accounts ADD COLUMN IF NOT EXISTS last_order_at timestamptz;
+   ALTER TABLE ${schema}.loyalty_accounts ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
    CREATE TABLE IF NOT EXISTS ${schema}.booking_blackouts (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),kind text NOT NULL,start_at timestamptz NOT NULL,
     end_at timestamptz NOT NULL,active boolean NOT NULL DEFAULT true);
@@ -161,10 +172,10 @@ async function run(){
   results.push('INCOMPLETE_COMMITTED_HEADER_FAILS_CLOSED');await clear();
   const checkMutation=createMutationAssessment({model:globalThis.MasterWokModelV1,
    readOrders:(c,d)=>readCapacityCommitments(rewrite(c),d),
-   readAvailability:(c,d)=>readBookingAvailability(rewrite(c),d)});
+   readAvailability:(c,d)=>readBookingAvailability(rewrite(c),d),planStore});
   const lifecycle=createLifecycleWriter({pool,schema,mode:'MASTER_WOK',assessMutation:async context=>{
    const r=await checkMutation(context);
-   return r.status==='VALIDATED_LIFECYCLE_ASSESSMENT'?{status:'GREEN',bookingApprovalAllowed:true}:r;
+   return r.status==='VALIDATED_LIFECYCLE_ASSESSMENT'?{...r,status:'GREEN',bookingApprovalAllowed:true}:r;
   }});
   const original=await checkout(request('ack','2099-01-02T18:00:00Z','green-curry',1));
   check(original.committed,'ACK_SETUP_FAILED');
@@ -221,7 +232,12 @@ async function run(){
     FROM ${schema}.orders WHERE id=$1`,[first.response.orderId])).rows[0];
    check(Number(values.total)===4&&values.loyalty_points_redeem_pending===100&&values.loyalty_points_earned_pending===4&&values.payment_preference==='in_advance','COMMERCIAL_FIELDS_CHANGED');
    check((await pool.query(`SELECT points_balance FROM ${schema}.loyalty_accounts WHERE customer_phone=$1`,[phone])).rows[0].points_balance===100,'CHECKOUT_PREMATURELY_REDEEMED_POINTS');
+   const completed=await Promise.all([lifecycle.adminAction({orderId:first.response.orderId,action:'complete'}),
+    lifecycle.adminAction({orderId:first.response.orderId,action:'complete'})]);
+   check(completed.every(r=>r.success&&r.loyalty_settled),'ATOMIC_LOYALTY_COMPLETION_FAILED');
+   check((await pool.query(`SELECT points_balance FROM ${schema}.loyalty_accounts WHERE customer_phone=$1`,[phone])).rows[0].points_balance===4,'COMPLETION_REDEEMED_REWARD_MORE_THAN_ONCE');
    results.push('TRUSTED_COMMERCIAL_VALIDATION_PRICE_TAMPERING_ROLLBACK_AND_PENDING_REWARD_RESERVATION');
+   results.push('CONCURRENT_COMPLETION_SETTLES_NEW_ORDER_LOYALTY_EXACTLY_ONCE');
   }finally{
    await clear();await pool.query(`DELETE FROM ${schema}.customers WHERE email=$1`,[email]);
    await pool.query(`DELETE FROM ${schema}.loyalty_accounts WHERE customer_phone=$1`,[phone]);
@@ -229,6 +245,40 @@ async function run(){
 
 
 
+  const clockPool=instant=>({connect:async()=>{
+   const client=await pool.connect();return {release:()=>client.release(),query:(sql,args)=>
+    sql==='SELECT clock_timestamp() AS now'?client.query('SELECT $1::timestamptz AS now',[instant]):client.query(sql,args)};
+  }});
+  const fresh=await make({pool:clockPool('2099-01-02T16:00:00Z')})(request('protected-original','2099-01-02T18:00:00Z','stir-crispy',1));
+  check(fresh.committed,'PROTECTED_PLAN_SETUP_FAILED');
+  const persisted=(await pool.query(`SELECT plan,revision FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0];
+  const previousJob=persisted.plan.wok.jobs.find(j=>j.orderIds.includes(fresh.response.orderId+'@2099-01-02T18:00:00.000Z'));
+  check(!!previousJob,'CANDIDATE_PLAN_ID_NOT_REMAPPED');
+  const begun=persisted.plan.fryer.jobs[0].start+1;
+  const clock='2099-01-02T'+String(Math.floor(begun/60)).padStart(2,'0')+':'+String(begun%60).padStart(2,'0')+':00Z';
+  const freshConnectionCheckout=make({pool:clockPool(clock)});
+  const nextBooking=await freshConnectionCheckout(request('protected-next','2099-01-02T19:00:00Z','green-curry',1));
+  check(nextBooking.committed,'BOOKING_AROUND_STARTED_WORK_FAILED');
+  const savedPlanRecord=(await pool.query(`SELECT plan,revision FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0];
+  check(Number(savedPlanRecord.revision)===Number(persisted.revision)+1,'SERVICE_PLAN_REVISION_NOT_ATOMIC');
+  check(JSON.stringify(savedPlanRecord.plan.wok.jobs.find(j=>j.orderIds.includes(previousJob.orderIds[0])))===JSON.stringify(previousJob),'STARTED_WOK_MOVED_AFTER_RECONNECT');
+  results.push('SAVED_PLAN_RELOADED_ON_FRESH_CONNECTION_AND_STARTED_DEPENDENCY_REMAINS_FIXED');
+  const failedPlanStore={...planStore,save:async(c,d,plan)=>{await planStore.save(c,d,plan);throw Error('INJECTED_AFTER_PLAN_WRITE');}};
+  const failedPlan=await make({pool:clockPool(clock),planStore:failedPlanStore})(request('protected-failed','2099-01-02T20:00:00Z','green-curry',1));
+  check(!failedPlan.committed,'PLAN_WRITE_FAILURE_COMMITTED_ORDER');
+  const afterFailure=(await pool.query(`SELECT plan,revision FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0];
+  check(JSON.stringify(afterFailure)===JSON.stringify(savedPlanRecord),'FAILED_BOOKING_LEFT_SERVICE_PLAN_CHANGE');
+  check((await pool.query(`SELECT count(*)::int AS n FROM ${schema}.orders WHERE idempotency_key=$1`,[prefix+'protected-failed'])).rows[0].n===0,'FAILED_PLAN_LEFT_ORDER');
+  results.push('FAILURE_AFTER_PLAN_WRITE_ROLLS_BACK_ORDER_ITEMS_RECEIPT_AND_PLAN');
+  const liveLifecycle=createLifecycleWriter({pool:clockPool(clock),schema,mode:'MASTER_WOK',assessMutation:async context=>{
+   const assessed=await checkMutation(context);
+   return assessed.status==='VALIDATED_LIFECYCLE_ASSESSMENT'?{...assessed,status:'GREEN',bookingApprovalAllowed:true}:assessed;
+  }});
+  check((await liveLifecycle.adminAction({orderId:fresh.response.orderId,action:'decline'})).committed,'STARTED_ORDER_CANCELLATION_FAILED');
+  const afterCancellation=(await pool.query(`SELECT plan FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0].plan;
+  check(JSON.stringify(afterCancellation.wok.jobs.find(j=>j.orderIds.includes(previousJob.orderIds[0])))===JSON.stringify(previousJob),'CANCELLATION_FREED_STARTED_RESOURCES');
+  results.push('CANCELLATION_PRESERVES_STARTED_RESOURCE_ALLOCATION_IN_COMMITTED_PLAN');
+  await clear();
   return {status:'PASS',scope:'PRIVATE_STAGING_ATOMIC_CHECKOUT_REHEARSAL',tests:results,
    productionReady:false,productionWrites:0,publicStagingOrderWrites:0};
  }finally{await clear();await pool.end();}

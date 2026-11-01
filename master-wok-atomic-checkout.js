@@ -7,9 +7,10 @@ const {normalizeStagingOrders}=require('./staging-order-snapshot');
 const {londonPlacement}=require('./staging-booking-integration');
 const {prepareStagingBasket}=require('./staging-canonical-basket');
 const {createOrderStore}=require('./master-wok-order-store');
+const {createServicePlanStore,remapPlanOrder}=require('./master-wok-service-plan-store');
 const {localDate,relativePlacement}=require('./master-wok-clock');
 function createAtomicCheckout({pool,model,validateCommercialOrder,readAvailability,assessBooking,
- store=createOrderStore(),readOrders=readCapacityCommitments,mode='LEGACY'}={}){
+ store=createOrderStore(),planStore=createServicePlanStore(),readOrders=readCapacityCommitments,mode='LEGACY'}={}){
  if(!pool||typeof pool.connect!=='function'||!model||
   typeof validateCommercialOrder!=='function'||typeof readAvailability!=='function'||
   typeof assessBooking!=='function')throw Error('MISSING_TRUSTED_CHECKOUT_DEPENDENCY');
@@ -32,12 +33,13 @@ function createAtomicCheckout({pool,model,validateCommercialOrder,readAvailabili
      const rawRows=await readOrders(c,serviceDate);
      const acceptedOrders=normalizeStagingOrders({rows:rawRows,model,serviceDate})
       .map(o=>({...o,placedAt:relativePlacement(o.placedAt,serviceDate)}));
+     const previousPlan=await planStore.read(c,serviceDate);
      const availability=await readAvailability(c,serviceDate);
      if(!availability)throw Error('MISSING_AUTHORITATIVE_AVAILABILITY');
      const clock=await c.query('SELECT clock_timestamp() AS now');
      const now=clock.rows[0]?.now;
      if(!now||!Number.isFinite(new Date(now).getTime()))throw Error('INVALID_SERVER_CLOCK');
-     return {acceptedOrders,rawRows,availability,now};
+     return {acceptedOrders,rawRows,availability,now,previousPlan};
     },
     prepareCandidate:async(input,c,state)=>{
      // Commercial validation must derive prices, delivery, discounts and loyalty
@@ -63,7 +65,14 @@ function createAtomicCheckout({pool,model,validateCommercialOrder,readAvailabili
      return result?.bookingApprovalAllowed===true?result:
       {status:'UNVERIFIED',bookingApprovalAllowed:false,reason:'UNCERTIFIED_BOOKING_ASSESSMENT'};
     },
-    persist:store.persist
+    persist:async(c,data)=>{
+     if(!data.assessment?.plan)throw Error('VALIDATED_SERVICE_PLAN_REQUIRED');
+     const response=await store.persist(c,data);
+     const savedId=String(response.orderId)+'@'+new Date(data.candidate.validatedHeader.preferred_time).toISOString();
+     const plan=remapPlanOrder(data.assessment.plan,data.candidate.orderId,savedId);
+     await planStore.save(c,serviceDate,plan);
+     return response;
+    }
    });
   }finally{connection.release();}
  };
