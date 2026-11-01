@@ -61,7 +61,7 @@ if(require.main===module){
  const output='master-wok-combined-offline-slots.html';
  fs.writeFileSync(output,render(result));
  console.log('Created '+output+'; physicalFit='+result.rows.filter(r=>r.masterWok==='PROTOTYPE_FIT').length+
-  '; meetsProposedLeadTime='+result.rows.filter(r=>r.combined==='PROTOTYPE_FIT_LEAD_AND_COLD_FRYER_ONLY').length+
+  '; meetsLeadAndColdFryer='+result.rows.filter(r=>r.combined==='PROTOTYPE_FIT_LEAD_AND_COLD_FRYER_ONLY').length+
   '; bookingApprovalAllowed=false');
 }
 module.exports={run,render};
