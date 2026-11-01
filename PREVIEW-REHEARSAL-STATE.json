@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-01",
+  "state": "AWAITING_MANUAL_HOSTED_PREVIEW_CHECKOUT",
+  "productionReady": false,
+  "productionWrites": 0,
+  "project": "hvrqgufqjslvgiohgkvu",
+  "schema": "master_wok_rehearsal",
+  "run": "26efcf42871d88c3",
+  "releaseId": "private-browser-26efcf42871d88c3",
+  "expiresAt": "2026-11-01T18:21:34.251058+00:00",
+  "fixtureEmail": "browser-26efcf42871d88c3@example.invalid",
+  "fixturePrefix": "browser-26efcf42871d88c3-",
+  "preview": "https://review-master-wok-checkout-i.rungsthaikitchen.pages.dev",
+  "coreModelVersion": "combined-kitchen-protected-v3",
+  "edge": {
+    "name": "master-wok-booking",
+    "version": 7,
+    "bundleSha256": "9bac636a587c4a4acb086787e21f1f6ba25d207b57dff77bac2b82783f37c8c1",
+    "verifyJwt": false,
+    "authentication": "Dedicated server header secret; fixed staging project; fixture identity; bounded basket; two-hour expiry."
+  },
+  "railway": {
+    "project": "7821ad5b-f5c2-4ab4-9206-c3d76eefd4c8",
+    "environment": "c1b8fad6-dbfc-4188-b4b5-a5dbfbf53279",
+    "service": "fd320f7b-3e1d-4b07-970c-74b75fdc82d3",
+    "deployment": "f052ca01-4fca-45ce-b917-811d1d3dda2c",
+    "status": "SUCCESS",
+    "mode": "MASTER_WOK"
+  },
+  "verified": {
+    "directStagingGatewayMode": "MASTER_WOK",
+    "edgeModeRequest": 28,
+    "availabilityRequest": 29,
+    "availabilityHttp": 200,
+    "availabilityTrue": "2026-11-04T18:00:00.000Z",
+    "foreignIdentityRequest": 30,
+    "foreignIdentityHttp": 400,
+    "ordersBeforeUserTest": 0,
+    "writeFence": "Installed only in private staging schema; mode RLS enabled."
+  },
+  "pending": [
+    "Actual authenticated Cloudflare preview checkout with fixture identity.",
+    "Verify complete order/items/receipt/plan/outbox in private schema.",
+    "Hosted unknown-attempt and deployment rollback; remaining admin/provider/printing service certification."
+  ],
+  "cleanup": [
+    "Dedicated connection: beginBookingTransaction, assert fixture release, delete only this prefix and fixture email, commit. The guarded cleanup operation already implements this.",
+    "Restore dedicated Railway staging gateway MASTER_WOK_BOOKING_MODE=LEGACY and verify SUCCESS/mode.",
+    "Disable temporary master-wok-booking handler to HTTP410 with verify_jwt true. Preserve committed production data (none is written).",
+    "Retain private staging write fence in LEGACY for later staging certification; do not run destructive fixture certification while this rehearsal is active."
+  ]
+}

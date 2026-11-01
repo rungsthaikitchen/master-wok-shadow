@@ -18,4 +18,4 @@ for(const match of runner.matchAll(/require\(['"](\.\/[^'"]+)['"]\)/g))add(match
 const factories=[...seen].map(([name,source])=>JSON.stringify(name)+':function(module,exports,require){\n'+source+'\n}');
 process.stdout.write('const factories={\n'+factories.join(',\n')+'\n};\n'+
  'const cache={};\nfunction require(id){if(cache[id])return cache[id].exports;const module={exports:{}};cache[id]=module;factories[id](module,module.exports,require);return module.exports;}\n'+
- runner.replace('__CERTIFICATION_TOKEN__',token).replace('__WRITE_FENCE_SQL__',()=>JSON.stringify(fs.readFileSync(path.join(root,'sql/booking-write-fence.sql'),'utf8'))));
+ runner.replace('__CERTIFICATION_TOKEN__',token).replace('__BROWSER_RUN__',()=>process.env.MASTER_WOK_BROWSER_RUN||'__BROWSER_RUN__').replace('__BROWSER_EXPIRES__',()=>process.env.MASTER_WOK_BROWSER_EXPIRES||'__BROWSER_EXPIRES__').replace('__WRITE_FENCE_SQL__',()=>JSON.stringify(fs.readFileSync(path.join(root,'sql/booking-write-fence.sql'),'utf8'))));

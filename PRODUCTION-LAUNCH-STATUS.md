@@ -64,9 +64,13 @@ main branch has been changed. Work is saved in three companion draft PRs.
   HOSTED-AVAILABILITY-CHECKOUT-RESULT.json. This is not hosted Cloudflare certification.
 - Hosted backend replay/drain/LEGACY restore passed earlier; original evidence:
   HOSTED-GATEWAY-STAGING-RESULT.json. Full website/privilege rollback is not certified.
-- Generated fixtures are removed: all ten tracked private tables are empty.
-  Temporary Edge test handlers are inert HTTP410 with JWT checks restored. Staging
-  backend is restored to LEGACY; no real provider credentials were copied.
+- Current temporary rehearsal: the private browser writer is active for its
+  fixed fixture identity until 18:21 UK time on 1 November. The dedicated staging
+  gateway deployment f052ca01 is SUCCESS and reports MASTER_WOK; private write
+  fences and mode RLS are installed. Mode/availability and foreign-identity refusal
+  pass; orders remain empty before the user test. Certification handler v44 stays
+  inert/JWT-protected. No provider credentials were copied. See
+  PREVIEW-REHEARSAL-STATE.json for exact scope and cleanup.
 
 ## Remaining release gates
 
@@ -82,8 +86,9 @@ main branch has been changed. Work is saved in three companion draft PRs.
    scheduling/backlog/error monitoring and production server/worker startup. Fixture
    responses certify contracts and transaction behavior, not external delivery.
 4. Complete the actual hosted Cloudflare -> Railway -> Supabase rehearsal. The
-   preview build succeeds but redirects to Cloudflare Access login. Preview access
-   and staging backend environment configuration are needed. Include delivery,
+   preview mode check now reaches Railway after correcting Workers-incompatible
+   redirect options, reproduced in real local workerd. David can access the preview
+   in his own browser; authenticated hosted checkout is the current manual step. Include delivery,
    customer responses, printing, service changes and a realistic busy service.
 5. Deploy and certify the reviewed write fence and admin routing in the full hosted
    environment, capture exact deployed versions/privileges, seed plans and test

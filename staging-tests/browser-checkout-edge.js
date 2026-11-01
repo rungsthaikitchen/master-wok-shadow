@@ -3,9 +3,11 @@
 // are allowed. No notification provider is called and no live booking authority.
 import pg from 'npm:pg@8.23.1';
 const {Pool}=pg;
+const {beginBookingTransaction}=require('./master-wok-transaction-writer');
 const {createAtomicCheckout}=require('./master-wok-atomic-checkout');
 const {createOrderStore}=require('./master-wok-order-store');
 const {createServicePlanStore}=require('./master-wok-service-plan-store');
+const {catalog}=require('./master-wok-commercial');
 const {createCommercialValidator}=require('./master-wok-commercial-validator');
 const {readCapacityCommitments}=require('./master-wok-commitment-reader');
 const {readBookingAvailability}=require('./master-wok-availability-reader');
@@ -15,11 +17,13 @@ const {createBookingHttpHandler}=require('./master-wok-http');
 const {createBasketAvailability}=require('./master-wok-availability');
 require('./master-wok-model-bundle');
 const TOKEN='__CERTIFICATION_TOKEN__',RUN='__BROWSER_RUN__',EMAIL='browser-'+RUN+'@example.invalid';
+const EXPIRES='__BROWSER_EXPIRES__';
 const schema='master_wok_rehearsal',prefix='browser-'+RUN+'-';
 Deno.serve(async req=>{
  if(!/^[a-f0-9]{64}$/.test(TOKEN)||!/^[a-f0-9]{16}$/.test(RUN))return new Response('Unbuilt staging fixture',{status:403});
  if(req.headers.get('authorization')!=='Bearer '+TOKEN&&req.headers.get('x-master-wok-secret')!==TOKEN)return new Response('Forbidden',{status:403});
  if(Deno.env.get('SUPABASE_URL')!=='https://hvrqgufqjslvgiohgkvu.supabase.co')return new Response('Staging required',{status:403});
+ if(!Number.isFinite(Date.parse(EXPIRES))||Date.now()>Date.parse(EXPIRES))return new Response('Staging rehearsal expired',{status:410});
  if(req.method!=='POST')return new Response('POST required',{status:405});
  const pool=new Pool({connectionString:Deno.env.get('SUPABASE_DB_URL'),max:2,connectionTimeoutMillis:10000});
  const rewrite=c=>({query:(sql,args)=>c.query(sql
@@ -36,17 +40,22 @@ Deno.serve(async req=>{
   const input=['checkout','availability'].includes(envelope.operation)?envelope.payload:envelope;
   if(!input||typeof input!=='object')return new Response('Fixture required',{status:400});
   if(input.operation==='cleanup'){
-   const dates=(await pool.query(`SELECT service_date::text FROM ${schema}.master_wok_booking_receipts WHERE key LIKE $1`,[prefix+'%'])).rows.map(r=>r.service_date);
-   await pool.query(`DELETE FROM ${schema}.master_wok_time_responses WHERE order_id IN(SELECT id FROM ${schema}.orders WHERE idempotency_key LIKE $1)`,[prefix+'%']);
-   await pool.query(`DELETE FROM ${schema}.master_wok_booking_receipts WHERE key LIKE $1`,[prefix+'%']);
-   await pool.query(`DELETE FROM ${schema}.orders WHERE idempotency_key LIKE $1`,[prefix+'%']);
-   await pool.query(`DELETE FROM ${schema}.customers c WHERE email=$1 AND NOT EXISTS(SELECT 1 FROM ${schema}.orders o WHERE o.customer_id=c.id)`,[EMAIL]);
-   for(const date of dates)await pool.query(`DELETE FROM ${schema}.master_wok_service_plans WHERE service_date=$1 AND NOT EXISTS(SELECT 1 FROM ${schema}.orders WHERE (coalesce(confirmed_time,proposed_time,preferred_time) AT TIME ZONE 'Europe/London')::date=$1::date)`,[date]);
-   await pool.query(`DELETE FROM ${schema}.master_wok_launch_control WHERE approved_release_id=$1`,['private-browser-'+RUN]);
+   const c=await pool.connect();
+   try{
+   await beginBookingTransaction(c);await gate.assertWriteAllowed(c);
+   const dates=(await c.query(`SELECT service_date::text FROM ${schema}.master_wok_booking_receipts WHERE key LIKE $1`,[prefix+'%'])).rows.map(r=>r.service_date);
+   await c.query(`DELETE FROM ${schema}.master_wok_time_responses WHERE order_id IN(SELECT id FROM ${schema}.orders WHERE idempotency_key LIKE $1)`,[prefix+'%']);
+   await c.query(`DELETE FROM ${schema}.master_wok_booking_receipts WHERE key LIKE $1`,[prefix+'%']);
+   await c.query(`DELETE FROM ${schema}.orders WHERE idempotency_key LIKE $1`,[prefix+'%']);
+   await c.query(`DELETE FROM ${schema}.customers c WHERE email=$1 AND NOT EXISTS(SELECT 1 FROM ${schema}.orders o WHERE o.customer_id=c.id)`,[EMAIL]);
+   for(const date of dates)await c.query(`DELETE FROM ${schema}.master_wok_service_plans WHERE service_date=$1 AND NOT EXISTS(SELECT 1 FROM ${schema}.orders WHERE (coalesce(confirmed_time,proposed_time,preferred_time) AT TIME ZONE 'Europe/London')::date=$1::date)`,[date]);
+   await c.query(`DELETE FROM ${schema}.master_wok_launch_control WHERE approved_release_id=$1`,['private-browser-'+RUN]);
+   await c.query('COMMIT');
    return Response.json({success:true,scope:'PRIVATE_STAGING_BROWSER_FIXTURE_CLEANUP'});
+   }catch(error){try{await c.query('ROLLBACK');}catch(_){}throw error;}finally{c.release();}
   }
   if(!Array.isArray(input.items)||
-   input.items.length>3||input.items.some(i=>!['green-curry','panang-curry','stir-crispy','pad-thai'].includes(i.item_id)||i.qty>2)||
+   input.items.length>8||input.items.some(i=>!catalog.items.some(item=>item.id===i.item_id)||!Number.isInteger(i.qty)||i.qty<1||i.qty>2)||
    (!isAvailability&&(input.orderType!=='collection'||input.customer?.email!==EMAIL||typeof input.key!=='string'||input.key.length>64)))return new Response('Fixture only',{status:400});
   const fixtureAssessment=context=>{
    const tested=assessCombinedBooking(context);
