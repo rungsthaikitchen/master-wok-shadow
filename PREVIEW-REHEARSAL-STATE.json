@@ -1,6 +1,6 @@
 {
   "date": "2026-11-01",
-  "state": "AWAITING_MANUAL_HOSTED_PREVIEW_CHECKOUT",
+  "state": "HOSTED_CHECKOUT_PASSED_RESTORED_LEGACY",
   "productionReady": false,
   "productionWrites": 0,
   "project": "hvrqgufqjslvgiohgkvu",
@@ -14,18 +14,19 @@
   "coreModelVersion": "combined-kitchen-protected-v3",
   "edge": {
     "name": "master-wok-booking",
-    "version": 8,
-    "bundleSha256": "3cde35ea2d4acc2ed6bc3d4497bfde17039e6810636af01e33487f3a84cd43d0",
-    "verifyJwt": false,
-    "authentication": "Dedicated server header secret; fixed staging project; fixture identity; bounded basket; two-hour expiry."
+    "version": 9,
+    "bundleSha256": "8ca57de924178bfad9299165fe5b870357f67c0df5f855b34873aadbc04f4693",
+    "verifyJwt": true,
+    "authentication": "Handler disabled HTTP410; JWT checks restored.",
+    "disabledHandlerStatus": 410
   },
   "railway": {
     "project": "7821ad5b-f5c2-4ab4-9206-c3d76eefd4c8",
     "environment": "c1b8fad6-dbfc-4188-b4b5-a5dbfbf53279",
     "service": "fd320f7b-3e1d-4b07-970c-74b75fdc82d3",
-    "deployment": "f052ca01-4fca-45ce-b917-811d1d3dda2c",
+    "deployment": "c30f0278-3e45-46c8-8810-42a34ff7a3fc",
     "status": "SUCCESS",
-    "mode": "MASTER_WOK"
+    "mode": "LEGACY"
   },
   "verified": {
     "directStagingGatewayMode": "MASTER_WOK",
@@ -40,14 +41,22 @@
     "renewedEdgeModeRequest": 31
   },
   "pending": [
-    "Actual authenticated Cloudflare preview checkout with fixture identity.",
-    "Verify complete order/items/receipt/plan/outbox in private schema.",
-    "Hosted unknown-attempt and deployment rollback; remaining admin/provider/printing service certification."
+    "Hosted admin/lifecycle/customer-response paths; delivery/provider/printing rehearsal.",
+    "Real notification worker configuration/monitoring and production server startup.",
+    "Final whole-service and full website/privilege rollback certification.",
+    "Explicit approval for exact production release."
   ],
   "cleanup": [
     "Dedicated connection: beginBookingTransaction, assert fixture release, delete only this prefix and fixture email, commit. The guarded cleanup operation already implements this.",
     "Restore dedicated Railway staging gateway MASTER_WOK_BOOKING_MODE=LEGACY and verify SUCCESS/mode.",
     "Disable temporary master-wok-booking handler to HTTP410 with verify_jwt true. Preserve committed production data (none is written).",
     "Retain private staging write fence in LEGACY for later staging certification; do not run destructive fixture certification while this rehearsal is active."
-  ]
+  ],
+  "completed": [
+    "Authenticated hosted preview collection checkout RTK-119 verified in private database.",
+    "One item, matching receipt, saved kitchen plan, pending outbox event and zero notification deliveries.",
+    "Staging drain returned HTTP503; deployed LEGACY restore returned HTTP200.",
+    "Test order, receipt and plan preserved unchanged; production fixture customer/order counts zero."
+  ],
+  "evidence": "HOSTED-MANUAL-CHECKOUT-RESULT.json"
 }

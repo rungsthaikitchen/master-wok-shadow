@@ -47,7 +47,7 @@ main branch has been changed. Work is saved in three companion draft PRs.
 
 ## Verified evidence and limits
 
-- 219 JavaScript tests in both UTC and Europe/London; 21 Python tests; 18 browser
+- 219 JavaScript tests in both UTC and Europe/London; 21 Python tests; 21 browser
   admin/client/proxy tests. Active inline scripts parse successfully.
 - 53 scenario groups against actual private staging PostgreSQL, including
   concurrency, replay, rollback, protected plans, lifecycle races, loyalty,
@@ -64,13 +64,16 @@ main branch has been changed. Work is saved in three companion draft PRs.
   HOSTED-AVAILABILITY-CHECKOUT-RESULT.json. This is not hosted Cloudflare certification.
 - Hosted backend replay/drain/LEGACY restore passed earlier; original evidence:
   HOSTED-GATEWAY-STAGING-RESULT.json. Full website/privilege rollback is not certified.
-- Current temporary rehearsal: the private browser writer is active for its
-  fixed fixture identity until 21:30 UK time on 1 November. The dedicated staging
-  gateway deployment f052ca01 is SUCCESS and reports MASTER_WOK; private write
-  fences and mode RLS are installed. Mode/availability and foreign-identity refusal
-  pass; orders remain empty before the user test. Certification handler v44 stays
-  inert/JWT-protected. No provider credentials were copied. See
-  PREVIEW-REHEARSAL-STATE.json for exact scope and cleanup.
+- Actual authenticated Cloudflare-hosted checkout now passes: RTK-119, one £9
+  Green Curry/chicken item, matching booking receipt, persisted 17:55–18:00 job
+  and one pending notification event with zero deliveries. The user saw the
+  existing confirmation UI. Production has zero matching fixture customers/orders
+  (SELECT-only check). See HOSTED-MANUAL-CHECKOUT-RESULT.json.
+- Staging drain returned HTTP503; the restored gateway deployment c30f0278 is
+  SUCCESS and returns LEGACY/HTTP200. Order, receipt and plan digest are unchanged.
+  Temporary writer v9 is inert HTTP410/JWT-protected. Fixture retained for review;
+  private write fence remains installed in LEGACY. No real providers ran.
+
 
 ## Remaining release gates
 
@@ -87,8 +90,8 @@ main branch has been changed. Work is saved in three companion draft PRs.
    responses certify contracts and transaction behavior, not external delivery.
 4. Complete the actual hosted Cloudflare -> Railway -> Supabase rehearsal. The
    preview mode check now reaches Railway after correcting Workers-incompatible
-   redirect options, reproduced in real local workerd. David can access the preview
-   in his own browser; authenticated hosted checkout is the current manual step. Include delivery,
+   redirect options, reproduced in real local workerd. David completed the authenticated collection checkout; remaining hosted admin,
+   customer-response, provider, delivery and printer paths still need rehearsal. Include delivery,
    customer responses, printing, service changes and a realistic busy service.
 5. Deploy and certify the reviewed write fence and admin routing in the full hosted
    environment, capture exact deployed versions/privileges, seed plans and test
