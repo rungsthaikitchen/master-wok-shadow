@@ -12,6 +12,11 @@ const {calculateCommercialOrder}=require('./master-wok-commercial');
 const {createCommercialValidator}=require('./master-wok-commercial-validator');
 const {readBookingAvailability}=require('./master-wok-availability-reader');
 const {assessCombinedBooking}=require('./master-wok-combined-assessment');
+const {createLaunchControl}=require('./master-wok-launch-control');
+const {createServiceControlWriter}=require('./master-wok-service-control');
+const {beginBookingTransaction}=require('./master-wok-transaction-writer');
+const {createBookingHttpHandler}=require('./master-wok-http');
+const {createBookingRuntime}=require('./master-wok-runtime');
 require('./master-wok-model-bundle');
 const TOKEN='__CERTIFICATION_TOKEN__';
 const schema='master_wok_rehearsal';
@@ -110,6 +115,11 @@ async function run(){
     end_at timestamptz NOT NULL,active boolean NOT NULL DEFAULT true);
    CREATE TABLE IF NOT EXISTS ${schema}.service_state (
     id integer PRIMARY KEY,mode text NOT NULL,capacity_throttle numeric NOT NULL,effective_until timestamptz);
+   ALTER TABLE ${schema}.service_state ADD COLUMN IF NOT EXISTS customer_message text;
+   ALTER TABLE ${schema}.service_state ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+   ALTER TABLE ${schema}.booking_blackouts ADD COLUMN IF NOT EXISTS message text;
+   CREATE TABLE IF NOT EXISTS ${schema}.master_wok_launch_control (
+    id integer PRIMARY KEY,mode text NOT NULL,approved_release_id text,revision bigint NOT NULL DEFAULT 1);
    INSERT INTO ${schema}.service_state(id,mode,capacity_throttle) VALUES (1,'normal',0)
     ON CONFLICT(id) DO NOTHING;
    REVOKE ALL ON ALL TABLES IN SCHEMA ${schema} FROM PUBLIC,anon,authenticated;`);
@@ -279,9 +289,77 @@ async function run(){
   check(JSON.stringify(afterCancellation.wok.jobs.find(j=>j.orderIds.includes(previousJob.orderIds[0])))===JSON.stringify(previousJob),'CANCELLATION_FREED_STARTED_RESOURCES');
   results.push('CANCELLATION_PRESERVES_STARTED_RESOURCE_ALLOCATION_IN_COMMITTED_PLAN');
   await clear();
+  {
+  // Private fixture release identity is deliberately NOT a production approval.
+  const releaseId='private-staging-fixture-release';
+  const gate=createLaunchControl({schema,releaseId});
+  await pool.query(`INSERT INTO ${schema}.master_wok_launch_control(id,mode,approved_release_id)
+   VALUES(1,'LEGACY',$1) ON CONFLICT(id) DO UPDATE SET mode='LEGACY',approved_release_id=$1`,[releaseId]);
+  const gatedCheckout=make({assertWriteAllowed:gate.assertWriteAllowed});
+  check(!(await gatedCheckout(request('gate-off'))).committed,'DURABLE_LEGACY_GATE_BYPASSED');
+  await pool.query(`UPDATE ${schema}.master_wok_launch_control SET mode='MASTER_WOK' WHERE id=1`);
+  const stale=make({assertWriteAllowed:createLaunchControl({schema,releaseId:'different-release-id'}).assertWriteAllowed});
+  check(!(await stale(request('gate-stale'))).committed,'STALE_RELEASE_GATE_BYPASSED');
+  let entered,unblock;
+  const inside=new Promise(resolve=>{entered=resolve;}),continueWrite=new Promise(resolve=>{unblock=resolve;});
+  const slow=make({assertWriteAllowed:gate.assertWriteAllowed,store:{...store,persist:async(c,data)=>{
+   const result=await store.persist(c,data);entered();await continueWrite;return result;
+  }}});
+  const booking=slow(request('gate-inflight'));
+  await inside;
+  const drain=await pool.connect(),pid=(await drain.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;
+  const draining=(async()=>{await beginBookingTransaction(drain);
+   await drain.query(`UPDATE ${schema}.master_wok_launch_control SET mode='DRAINING',revision=revision+1 WHERE id=1`);
+   await drain.query('COMMIT');})();
+  let waiting=false;
+  for(let attempt=0;attempt<50;attempt++){
+   const state=(await pool.query('SELECT wait_event FROM pg_stat_activity WHERE pid=$1',[pid])).rows[0];
+   if(state?.wait_event==='advisory'){waiting=true;break;}
+   await new Promise(resolve=>setTimeout(resolve,20));
+  }
+  unblock();const committed=await booking;await draining;drain.release();
+  check(waiting&&committed.committed,'DRAIN_DID_NOT_WAIT_FOR_EXISTING_BOOKING');
+  check(!(await gatedCheckout(request('gate-after-drain'))).committed,'WRITE_COMMITTED_AFTER_DRAIN');
+  check((await pool.query(`SELECT count(*)::int AS n FROM ${schema}.orders WHERE idempotency_key LIKE $1`,[prefix+'gate-%'])).rows[0].n===1,'GATE_LEFT_UNEXPECTED_ORDERS');
+  results.push('DURABLE_GATE_REFUSES_LEGACY_STALE_RELEASE_AND_POST_DRAIN_WRITES');
+  results.push('DRAIN_WAITS_FOR_INFLIGHT_TRANSACTION_BEFORE_DISABLING_WRITER');
+  await clear();
+  await pool.query(`UPDATE ${schema}.master_wok_launch_control SET mode='MASTER_WOK' WHERE id=1`);
+  const controls=createServiceControlWriter({pool,schema,assertWriteAllowed:gate.assertWriteAllowed});
+  check((await controls({action:'set_service_state',mode:'paused',customer_message:'Fixture pause'})).ok,'SERVICE_PAUSE_WRITE_FAILED');
+  check(!(await gatedCheckout(request('pause'))).committed,'LOCKED_PAUSE_IGNORED');
+  for(const [mode,throttle] of [['busy',0.5],['very_busy',1]]){
+   const changed=await controls({action:'set_service_state',mode});
+   check(changed.ok&&Number(changed.service_state[0].capacity_throttle)===throttle,'LEGACY_THROTTLE_VALUE_CHANGED');
+  }
+  check((await controls({action:'set_service_state',mode:'normal'})).ok,'SERVICE_NORMAL_WRITE_FAILED');
+  check(!(await controls({action:'create_blackout',kind:'closed',start_at:date+'T17:10:00Z',end_at:date+'T17:00:00Z'})).ok,'INVALID_BLACKOUT_COMMITTED');
+  const closed=await controls({action:'create_blackout',kind:'fully_booked',start_at:date+'T17:00:00Z',end_at:date+'T17:06:00Z',message:'Private fixture'});
+  check(closed.ok&&!(await gatedCheckout(request('closed'))).committed,'LOCKED_BLACKOUT_IGNORED');
+  check((await controls({action:'deactivate_blackout',blackout_id:closed.blackout[0].id})).ok,'BLACKOUT_DEACTIVATION_FAILED');
+  await pool.query(`DELETE FROM ${schema}.booking_blackouts WHERE id=$1`,[closed.blackout[0].id]);
+  results.push('SERVICE_AND_BLACKOUT_MUTATIONS_SHARE_BOOKING_LOCK_AND_PRESERVE_MODE_VALUES');
+  const http=createBookingRuntime({pool,model:globalThis.MasterWokModelV1,secret:TOKEN,releaseId,schema,
+   validateCommercialOrder:commercial,readAvailability:(c,d)=>readBookingAvailability(rewrite(c),d),
+   readOrders:(c,d)=>readCapacityCommitments(rewrite(c),d),assessBooking:assess,
+   assessMutation:async context=>{const result=await checkMutation(context);
+    return result.status==='VALIDATED_LIFECYCLE_ASSESSMENT'?{...result,status:'GREEN',bookingApprovalAllowed:true}:result;}});
+  const httpInput={operation:'checkout',payload:request('http-booking')};
+  const call=async input=>http(new Request('https://staging.invalid/master-wok-booking',{method:'POST',
+   headers:{'content-type':'application/json','x-master-wok-secret':TOKEN},body:JSON.stringify(input)}));
+  const reserved=await call(httpInput),reservedBody=await reserved.json();
+  check(reserved.status===200&&reservedBody.success&&reservedBody.orderId,'HTTP_CHECKOUT_TO_DATABASE_FAILED');
+  const replay=await call(httpInput),replayed=await replay.json();
+  check(replay.status===200&&replayed.replayed&&replayed.orderId===reservedBody.orderId,'HTTP_REPLAY_NOT_STABLE');
+  const modeResponse=await call({operation:'mode'});
+  check((await modeResponse.json()).mode==='MASTER_WOK','HTTP_DURABLE_MODE_MISSING');
+  results.push('AUTHENTICATED_HTTP_ENVELOPE_COMMITS_DATABASE_ORDER_AND_REPLAYS_SAME_RECEIPT');
+  await clear();
+  await pool.query(`DELETE FROM ${schema}.master_wok_launch_control WHERE id=1`);
+  }
   return {status:'PASS',scope:'PRIVATE_STAGING_ATOMIC_CHECKOUT_REHEARSAL',tests:results,
    productionReady:false,productionWrites:0,publicStagingOrderWrites:0};
- }finally{await clear();await pool.end();}
+ }finally{await clear();await pool.query(`DELETE FROM ${schema}.master_wok_launch_control WHERE approved_release_id=$1`,['private-staging-fixture-release']);await pool.end();}
 }
 Deno.serve(async req=>{
  if(req.headers.get('authorization')!=='Bearer '+TOKEN)return new Response('Forbidden',{status:403});

@@ -10,7 +10,7 @@ const {createOrderStore}=require('./master-wok-order-store');
 const {createServicePlanStore,remapPlanOrder}=require('./master-wok-service-plan-store');
 const {localDate,relativePlacement}=require('./master-wok-clock');
 function createAtomicCheckout({pool,model,validateCommercialOrder,readAvailability,assessBooking,
- store=createOrderStore(),planStore=createServicePlanStore(),readOrders=readCapacityCommitments,mode='LEGACY'}={}){
+ store=createOrderStore(),planStore=createServicePlanStore(),readOrders=readCapacityCommitments,mode='LEGACY',assertWriteAllowed=async()=>{}}={}){
  if(!pool||typeof pool.connect!=='function'||!model||
   typeof validateCommercialOrder!=='function'||typeof readAvailability!=='function'||
   typeof assessBooking!=='function')throw Error('MISSING_TRUSTED_CHECKOUT_DEPENDENCY');
@@ -28,6 +28,7 @@ function createAtomicCheckout({pool,model,validateCommercialOrder,readAvailabili
   try{
    return await reserveWithMasterWok({connection,serviceDate,key:request.key,candidate:request,
     readCommitted:async(c)=>{
+     await assertWriteAllowed(c);
      const existingKey=await store.lookupKey(c,request.key);
      if(existingKey)return {acceptedOrders:[],existingKey};
      const rawRows=await readOrders(c,serviceDate);

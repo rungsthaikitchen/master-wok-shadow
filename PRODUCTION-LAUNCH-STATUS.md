@@ -25,7 +25,7 @@ Base reviewed: `e86beafdca2c76ed8b40c7ab8dc0393297b48889`, branch
   retain the existing callback. New orders queue notifications transactionally.
 - Flask review adapter exposes an explicit no-cache booking mode and authenticated
   booking gateway. Defaults remain LEGACY. Uncertain results never fall back to a
-  second writer. No runtime settings have been changed.
+  second writer. No production runtime settings have been changed.
 - Website review code preserves the checkout form, selects the server mode before
   writes and uses stable retry keys. Unknown outcomes cannot silently create another
   order, including after rollback. Preview proxies require an explicit staging URL.
@@ -34,11 +34,11 @@ Base reviewed: `e86beafdca2c76ed8b40c7ab8dc0393297b48889`, branch
 
 ## Verification
 
-- 196/196 JavaScript tests pass in UTC and Europe/London.
-- 11/11 backend Python tests pass with external calls isolated.
+- 199/199 JavaScript tests pass in UTC and Europe/London.
+- 12/12 backend Python tests pass with external calls isolated.
 - 10/10 checkout-client/proxy cases pass, including retry, rollback compatibility,
   mode failure and preview-to-production isolation.
-- 21 scenario groups pass against actual staging PostgreSQL using private
+- 25 scenario groups pass against actual staging PostgreSQL using private
   master_wok_rehearsal tables. Coverage includes concurrent real baskets, rollback,
   replay, lifecycle races, real commercial validation, exact-once loyalty, fresh
   connection plan reload, started fryer/wok dependencies and cancellation protection.
@@ -51,15 +51,45 @@ Base reviewed: `e86beafdca2c76ed8b40c7ab8dc0393297b48889`, branch
   one receipt and one queued notification, total GBP9. See
   BROWSER-CHECKOUT-STAGING-RESULT.json. This does not certify the deployed
   Cloudflare/Railway transport or real notification delivery.
-- Generated fixtures were removed; all eight tracked private fixture tables are
+- Generated fixtures were removed; all nine tracked private fixture tables are
   empty. Temporary certification handler is inert HTTP410 with JWT checking restored.
   No production writes or public staging order writes occurred.
 
+## Hosted gateway and shutdown follow-up
+
+The actual Flask review branch was deployed into a new staging-only Railway
+service, fd320f7b-3e1d-4b07-970c-74b75fdc82d3. Its source is pinned to commit
+9dc12b1dfa8703f4abec791053fa797e0fc398d9. No production/database/notification
+credentials were copied. Mobile checkout executed the real Pages proxy functions
+locally, reached deployed Railway and the authenticated staging Edge handler, and
+created one complete GBP9 order. Replaying its key returned the original receipt.
+
+The shared runtime now composes checkout, lifecycle, service controls and a private
+durable launch gate. Every writer rechecks release/mode AFTER the global lock.
+The PostgreSQL drain test observes the drain waiting on an actual advisory lock
+held by an in-flight order. A stale release and post-drain bookings fail closed.
+Service-state and blackout writes use the same lock and preserve legacy values.
+Busy/very-busy capacity semantics still need assessor parity; those modes remain
+blocked by the assessor. No prototype receives production approval authority.
+
+Through deployed Railway, DRAINING refused mode and booking requests with HTTP503;
+restoring LEGACY produced mode LEGACY and disabled POST /book-order with HTTP409.
+The staging service is left in LEGACY (successful deployment
+ aec54b09-ce72-4e7f-a250-b6d9e59354c6). Both temporary Edge handlers are inert
+HTTP410 with JWT verification restored. Fixtures were removed. This is a tested
+backend shutdown/restore, not yet a full website/privilege rollback certificate.
+
+Evidence: STAGING-RUNTIME-DRAIN-RESULT.json (25 database scenario groups) and
+HOSTED-GATEWAY-STAGING-RESULT.json (actual hosted gateway). The Cloudflare preview
+build succeeded, but its URL redirects to Cloudflare Access login. No protection
+was bypassed. Actual hosted Pages configuration/access is still required.
+
 ## Minimum remaining work, in order
 
-1. Install the real server HTTP runtime behind the gateway. Join trusted delivery
+1. The authenticated runtime composition and hosted gateway are tested; install the
+   final certified release runtime and join trusted delivery
    lookup, notification sender/link tokens, live availability hints, service/blackout
-   mutations and durable launch control to the same writer. The current combined
+   mutations to the same writer; durable launch control is now implemented and rehearsed. The current combined
    assessor deliberately has no production approval authority. Current customer
    availability hints still use the existing conservative model.
 2. Finish full-menu recipe/resource rules and existing busy/throttle parity.
@@ -69,10 +99,10 @@ Base reviewed: `e86beafdca2c76ed8b40c7ab8dc0393297b48889`, branch
    production-shaped schema. Cover delivery, rewards, notices/printing, admin moves,
    customer acknowledgement, blackouts, test orders, opening/production boundaries
    and a realistic service with started work. Use notification/payment sandboxes.
-4. Rehearse durable cutover, direct REST write fencing, writer drain and rollback
+4. Finish durable cutover, direct REST write fencing and full deployed rollback
    with existing Master Wok orders and uncertain checkout attempts. Capture deployed
-   versions/privileges and seed committed plans before service. Local mode/reader
-   rollback tests pass; a deployed rollback has not been tested.
+   versions/privileges and seed committed plans before service. Local mode/reader tests and hosted backend drain/restore pass; the full website
+   and privilege rollback remains untested.
 5. Only after those gates pass, present the exact production release and rollback
    package for explicit approval. No production enablement is requested yet.
 

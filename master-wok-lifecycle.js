@@ -45,7 +45,7 @@ function actionPatch(order,input,{actor,now,tokenFactory=()=>crypto.randomUUID()
   default:throw Error('UNKNOWN_ORDER_ACTION');
  }
 }
-function createLifecycleWriter({pool,assessMutation,mode='LEGACY',schema='public'}={}){
+function createLifecycleWriter({pool,assessMutation,mode='LEGACY',schema='public',assertWriteAllowed=async()=>{}}={}){
  if(!pool||typeof pool.connect!=='function'||typeof assessMutation!=='function'||
   !['public','master_wok_rehearsal'].includes(schema))throw Error('INVALID_LIFECYCLE_CONFIGURATION');
  const planStore=createServicePlanStore({schema});
@@ -60,6 +60,7 @@ function createLifecycleWriter({pool,assessMutation,mode='LEGACY',schema='public
   try{connection=await pool.connect();}catch(_){return fail('DATABASE_UNAVAILABLE',503);}
   try{
    await beginBookingTransaction(connection,{key:'order:'+input.orderId});
+   await assertWriteAllowed(connection);
    if(actor==='customer'){
     const prior=(await connection.query(`SELECT order_id,decision,response FROM ${receipts} WHERE token=$1`,[input.token])).rows[0];
     if(prior){
