@@ -65,7 +65,7 @@ main branch has been changed. Work is saved in three companion draft PRs.
 - Hosted backend replay/drain/LEGACY restore passed earlier; original evidence:
   HOSTED-GATEWAY-STAGING-RESULT.json. Full website/privilege rollback is not certified.
 - Current temporary rehearsal: the private browser writer is active for its
-  fixed fixture identity until 18:21 UK time on 1 November. The dedicated staging
+  fixed fixture identity until 21:30 UK time on 1 November. The dedicated staging
   gateway deployment f052ca01 is SUCCESS and reports MASTER_WOK; private write
   fences and mode RLS are installed. Mode/availability and foreign-identity refusal
   pass; orders remain empty before the user test. Certification handler v44 stays

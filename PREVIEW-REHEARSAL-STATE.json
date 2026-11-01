@@ -7,15 +7,15 @@
   "schema": "master_wok_rehearsal",
   "run": "26efcf42871d88c3",
   "releaseId": "private-browser-26efcf42871d88c3",
-  "expiresAt": "2026-11-01T18:21:34.251058+00:00",
+  "expiresAt": "2026-11-01T21:30:51.155Z",
   "fixtureEmail": "browser-26efcf42871d88c3@example.invalid",
   "fixturePrefix": "browser-26efcf42871d88c3-",
   "preview": "https://review-master-wok-checkout-i.rungsthaikitchen.pages.dev",
   "coreModelVersion": "combined-kitchen-protected-v3",
   "edge": {
     "name": "master-wok-booking",
-    "version": 7,
-    "bundleSha256": "9bac636a587c4a4acb086787e21f1f6ba25d207b57dff77bac2b82783f37c8c1",
+    "version": 8,
+    "bundleSha256": "3cde35ea2d4acc2ed6bc3d4497bfde17039e6810636af01e33487f3a84cd43d0",
     "verifyJwt": false,
     "authentication": "Dedicated server header secret; fixed staging project; fixture identity; bounded basket; two-hour expiry."
   },
@@ -36,7 +36,8 @@
     "foreignIdentityRequest": 30,
     "foreignIdentityHttp": 400,
     "ordersBeforeUserTest": 0,
-    "writeFence": "Installed only in private staging schema; mode RLS enabled."
+    "writeFence": "Installed only in private staging schema; mode RLS enabled.",
+    "renewedEdgeModeRequest": 31
   },
   "pending": [
     "Actual authenticated Cloudflare preview checkout with fixture identity.",
