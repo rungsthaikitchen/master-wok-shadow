@@ -40,11 +40,11 @@ async function bookStagingCandidate({connection,serviceDate,key,candidate,model,
       const rows=await readStagingOrders(conn,ctx.serviceDate);
       const acceptedOrders=normalizePlacedAt(normalizeStagingOrders({rows,model,serviceDate:ctx.serviceDate}));
       const existingKey=await lookupKey(conn,ctx.key);
-      return {acceptedOrders,existingKey};
+      return {acceptedOrders,existingKey,rawRows:rows};
     },
-    assess:async({acceptedOrders,proposedOrder})=>{
+    assess:async({acceptedOrders,proposedOrder,rawRows})=>{
       const localCandidate={...proposedOrder,placedAt:londonPlacement(proposedOrder.placedAt)};
-      return assessBooking({acceptedOrders,proposedOrder:localCandidate});
+      return assessBooking({acceptedOrders,proposedOrder:localCandidate,rawRows});
     },
     persist
   });
