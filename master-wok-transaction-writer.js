@@ -25,7 +25,7 @@ async function reserveWithMasterWok({ connection, serviceDate, key, candidate, r
         ? { status: 'GREEN', committed: false, reason: 'REPLAY' }
         : { status: 'UNVERIFIED', committed: false, reason: 'IDEMPOTENCY_CONFLICT' };
     }
-    const assessment = await assess({ acceptedOrders: state.acceptedOrders, proposedOrder: candidate });
+    const assessment = await assess({ acceptedOrders: state.acceptedOrders, proposedOrder: candidate, rawRows: state.rawRows });
     if (assessment?.status !== 'GREEN') {
       await connection.query('ROLLBACK');
       return { status: assessment?.status === 'AMBER' ? 'AMBER' : 'UNVERIFIED', committed: false, reason: 'REVIEW_REQUIRED' };
