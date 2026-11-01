@@ -74,3 +74,48 @@ test('prior v1 plans retain their started work while unknown model versions fail
  const fixed=protectStartedWork(first.plan,1140);assert.equal(fixed.wok.length,1);assert.equal(fixed.fryer.length,1);assert.deepEqual(fixed.auxiliary,[]);
  first.plan.modelVersion='unrecognised';assert.throws(()=>protectStartedWork(first.plan,1140),/INVALID_COMMITTED_PLAN/);
 });
+
+test('rice preheats share the microwave and finish before their exact wok batch',()=>{
+ const a=input([line('egg-rice',2),line('coconut-rice'),line('pork-dumplings')]);
+ const p=plan(a.row.items);assert.equal(p.status,'COORDINATED_PROTOTYPE');
+ const rice=p.auxiliary.jobs.filter(j=>['egg-rice','coconut-rice'].includes(j.itemId));
+ assert.equal(rice.length,3);
+ for(const j of rice){assert.equal(j.resource,'microwave');assert.equal(j.finish-j.start,1);
+  for(const allocation of j.allocations){assert.ok(j.finish<=allocation.deadline);
+   assert.ok(p.wok.jobs.some(w=>w.itemId===j.itemId&&w.start===allocation.deadline));}}
+ assert.equal(validateAuxiliaryWork([a.order],[a.row],p.auxiliary.jobs,{mainJobs:p.wok.jobs}),true);
+ const missing=p.auxiliary.jobs.filter(j=>j!==rice[0]);
+ assert.equal(validateAuxiliaryWork([a.order],[a.row],missing,{mainJobs:p.wok.jobs}),false);
+ const late=structuredClone(p.auxiliary.jobs);const bad=late.find(j=>j.itemId==='egg-rice');
+ bad.start=bad.allocations[0].deadline;bad.finish=bad.start+1;
+ assert.equal(validateAuxiliaryWork([a.order],[a.row],late,{mainJobs:p.wok.jobs}),false);
+});
+test('started rice preheat freezes dependent wok batch and survives cancellation',()=>{
+ const a=input([line('egg-rice')]);
+ const first=planWithProtectedWork({orders:[a.order],rows:[a.row],serviceDate:'2026-11-04',now:'2026-11-04T16:00:00Z',confirmedStarterRecipes:true});
+ assert.equal(first.status,'VALIDATED_PROTECTED_PLAN');
+ const preheat=first.plan.auxiliary.jobs[0],parent=first.plan.wok.jobs[0];
+ const fixed=protectStartedWork(first.plan,preheat.start);assert.equal(fixed.wok.length,1);
+ const clock='2026-11-04T'+String(Math.floor(preheat.start/60)).padStart(2,'0')+':'+String(preheat.start%60).padStart(2,'0')+':00Z';
+ const next=planWithProtectedWork({orders:[a.order],rows:[a.row],serviceDate:'2026-11-04',now:clock,previousPlan:first.plan,confirmedStarterRecipes:true});
+ assert.equal(next.status,'VALIDATED_PROTECTED_PLAN');assert.deepEqual(next.plan.wok.jobs[0],parent);
+ assert.deepEqual(next.plan.auxiliary.jobs[0],preheat);assert.equal(next.futurePlan.auxiliary.jobs.length,0);
+ const cancelled=planWithProtectedWork({orders:[],rows:[],serviceDate:'2026-11-04',now:clock,previousPlan:first.plan,confirmedStarterRecipes:true});
+ assert.equal(cancelled.status,'VALIDATED_PROTECTED_PLAN');assert.deepEqual(cancelled.plan.wok.jobs[0],parent);
+});
+test('satay and moo ping finishing reserve single-chef time against mains and eggs',()=>{
+ const p=plan([line('chicken-satay'),line('moo-ping'),line('fried-egg'),line('green-curry')]);
+ assert.equal(p.status,'COORDINATED_PROTOTYPE');assert.equal(p.auxiliary.jobs.length,3);
+ const all=[...p.wok.jobs,...p.auxiliary.jobs];
+ for(let i=0;i<all.length;i++)for(let k=i+1;k<all.length;k++)
+  assert.ok(all[i].finish+1<=all[k].start||all[k].finish+1<=all[i].start);
+});
+
+test('jasmine and sticky rice always reserve conservative reheating alongside other microwave work',()=>{
+ const p=plan([line('jasmine-rice'),line('sticky-rice'),line('pork-dumplings')]);
+ assert.equal(p.status,'COORDINATED_PROTOTYPE');
+ assert.equal(p.auxiliary.jobs.length,3);
+ for(const j of p.auxiliary.jobs.filter(j=>j.itemId!=='pork-dumplings')){
+  assert.equal(j.resource,'microwave');assert.equal(j.finish-j.start,3);assert.equal(j.portions,1);
+ }
+});

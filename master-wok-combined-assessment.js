@@ -5,7 +5,7 @@ const {planWithProtectedWork}=require('./master-wok-protected-plan');
 const {validateKitchenTimeline}=require('./staging-kitchen-launch-validator');
 const {diagnoseFryer}=require('./staging-fryer-diagnostic');
 const {localDate,relativePlacement}=require('./master-wok-atomic-checkout');
-const {fryerRecipe,fryerCapacity}=require('./master-wok-recipe-rules');
+const {fryerRecipe,fryerCapacity,PREPARED_SIDES}=require('./master-wok-recipe-rules');
 const DURATIONS={fast:{1:5,2:6,3:8,4:10},noodle:{1:8,2:10},salad:{1:10,2:10,3:15,4:15}};
 function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate,state},options={}){
  const fail=(reason,extra={})=>({status:'UNVERIFIED',reason,bookingApprovalAllowed:false,...extra});
@@ -33,9 +33,14 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
    return fail('INVALID_SERVICE_CONTROL_EXPIRY');
   const active=!control.effective_until||new Date(control.effective_until)>now;
   if(active&&control.mode==='paused')return fail('ORDERS_PAUSED');
-  // Do not erase existing slowdown semantics by guessing a new throttle model.
-  if(active&&(Number(control.capacity_throttle)!==0||!['normal','paused'].includes(control.mode)))
+  // David confirmed 1 November: add lead time, do not shrink capacity or
+  // alter cooking durations. Retain the existing persisted mode/throttle values.
+  const serviceModes={normal:{throttle:0,extra:0},busy:{throttle:0.5,extra:15},very_busy:{throttle:1,extra:30}};
+  const policy=active?serviceModes[control.mode]:serviceModes.normal;
+  if(!policy||(active&&Number(control.capacity_throttle)!==policy.throttle))
    return fail('SERVICE_THROTTLE_INTEGRATION_REQUIRED');
+  const extraLead=policy.extra;
+  if(ready-minute<20+extraLead)return fail('BELOW_SERVICE_MINIMUM_LEAD');
   const readyAt=new Date(proposedOrder.validatedHeader.preferred_time);
   const blackouts=[];
   for(const b of availability.blackouts){
@@ -57,10 +62,10 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
   if(orders.length!==rows.length||new Set(orders.map(o=>String(o.orderId))).size!==orders.length||
    new Set(rows.map(r=>String(r.id))).size!==rows.length||
    orders.some(o=>!rows.some(r=>String(r.id)===String(o.orderId))))return fail('INCOMPLETE_SNAPSHOT');
-  const id=String(proposedOrder.orderId),warmup=5,buffer=10;
+  const id=String(proposedOrder.orderId),warmup=5,buffer=10+extraLead;
   const protectedResult=planWithProtectedWork({orders,rows,serviceDate,now,previousPlan:state.previousPlan,
    newOrderId:id,blackouts,
-   standaloneSpringRolls:options.standaloneSpringRolls===true,
+   standaloneSpringRolls:true,
    confirmedStarterRecipes:true,
    notBeforeByOrder:{[id]:Math.max(990,Math.ceil(minute+Math.max(warmup,buffer)))}});
   if(protectedResult.status!=='VALIDATED_PROTECTED_PLAN')return fail(protectedResult.reason);
@@ -74,7 +79,7 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
      job.finish>job.readyMinute||job.readyMinute-job.finish>job.holdingLimitMinutes)
     return fail('INVALID_WOK_JOB');
   }
-  const inventory=diagnoseFryer(orders,unstartedRows,{standaloneSpringRolls:options.standaloneSpringRolls===true,confirmedStarterRecipes:true});
+  const inventory=diagnoseFryer(orders,unstartedRows,{standaloneSpringRolls:true,confirmedStarterRecipes:true});
   if(inventory.unmodelled.length)return fail('FRY_RECIPES_UNMODELLED');
   const key=(orderId,itemId,type)=>JSON.stringify([String(orderId),itemId,type]);
   const expected=new Map(),actual=new Map();
@@ -95,16 +100,15 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
   if(expected.size!==actual.size||[...expected].some(([k,v])=>actual.get(k)!==v))
    return fail('FRYER_COVERAGE_MISMATCH');
   const jobs=[...plan.wok.jobs,...plan.fryer.jobs,...(plan.auxiliary?.jobs||[])].filter(j=>j.orderIds.includes(id));
-  if(!jobs.length)return fail('NO_MODELLED_CANDIDATE_WORK');
-  const earliest=Math.min(...jobs.map(j=>j.start)),finish=Math.max(...jobs.map(j=>j.finish));
+  const preparedOnly=proposedOrder.rawRow.items.length>0&&proposedOrder.rawRow.items.every(l=>PREPARED_SIDES.has(l.item_id));
+  if(!jobs.length&&!preparedOnly)return fail('NO_MODELLED_CANDIDATE_WORK');
+  const earliest=jobs.length?Math.min(...jobs.map(j=>j.start)):Math.max(990,Math.ceil(minute+buffer));
+  const finish=jobs.length?Math.max(...jobs.map(j=>j.finish)):earliest;
   // The buffer precedes the first candidate work; fryer warmup is an additional
   // lower bound, not a replacement for the agreed whole-basket lead time.
   if(earliest<Math.max(990,minute+buffer)||finish>ready)return fail('INSUFFICIENT_LEAD_TIME');
-  // Independent sides and most starters still need approved resource recipes.
-  const unmodelled=new Set(['chicken-satay','moo-ping']);
-  if(rows.some(r=>r.items.some(l=>unmodelled.has(l.item_id))))return fail('NON_WOK_RECIPE_COVERAGE_REQUIRED');
   return {status:'VALIDATED_COMBINED_ASSESSMENT',reason:'STAGING_CERTIFICATION_ONLY',
-   plan,leadTime:{earliestCandidateWork:earliest,finalCandidateCompletion:finish,bufferMinutes:buffer},
+   plan,leadTime:{earliestCandidateWork:earliest,finalCandidateCompletion:finish,bufferMinutes:buffer,extraServiceLeadMinutes:extraLead,minimumLeadMinutes:20+extraLead},
    bookingApprovalAllowed:false};
  }catch(_){return fail('COMBINED_ASSESSMENT_FAILED');}
 }

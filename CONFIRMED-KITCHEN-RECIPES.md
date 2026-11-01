@@ -36,3 +36,24 @@ restored. Production remains unchanged and legacy authoritative.
 
 Thai sausage deep frying was subsequently confirmed by David in the same session.
 It now shares fryer baskets with the other recipes using its own 5/10 batch limits.
+
+Further launch facts confirmed by David, 1 November:
+
+- Jasmine/sticky rice may be freshly available or reheated to order for 2m30.
+  Always reserve one microwave cycle per serving; round to 3 minutes on the
+  scheduler's integer-minute grid. Fresh availability needs no staff toggle.
+- Prawn crackers are prepared before service. No per-order cooking job is needed;
+  ordinary customer lead-time, hours and blackout rules still apply.
+- Existing satay/moo-ping finishing is one minute per serving, conservatively
+  serialized on the same chef/wok timeline as mains and eggs.
+- Existing egg/coconut rice one-minute preheat is a predecessor of its exact wok
+  batch. Starting preheat freezes that batch, including across reconnects.
+- Busy adds 15 minutes and Very Busy adds 30 minutes to normal whole-basket lead
+  time, with cooking durations and kitchen capacity unchanged. Existing stored
+  mode/throttle values remain compatible; pause and expiry still work.
+
+Latest verification: all 44 current priced menu items individually commit full
+orders in private staging. Mixed rice/starter work, preheat dependency restart and
+Busy/Very Busy hint/checkout consistency also pass. 219 JavaScript tests in both
+timezones and 53 joined PostgreSQL scenario groups pass. See
+STAGING-FULL-MENU-RESULT.json. These checks do not enable production bookings.

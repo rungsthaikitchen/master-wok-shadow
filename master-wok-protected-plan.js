@@ -7,13 +7,13 @@ const {OUT_OF_SCOPE}=require('./staging-out-of-scope-items');
 const {localDate,relativePlacement}=require('./master-wok-clock');
 const {validateAuxiliaryWork}=require('./master-wok-auxiliary-work');
 const {AUXILIARY}=require('./master-wok-recipe-rules');
-const MODEL_VERSION='combined-kitchen-protected-v2';
+const MODEL_VERSION='combined-kitchen-protected-v3';
 const recipeKey=(ready,line)=>JSON.stringify([ready,line.item_id,line.modifiers,line.spice??null,line.item_note??null]);
 const overlaps=(a,b,reset=0)=>a.start<b.finish+reset&&a.finish+reset>b.start;
 function protectStartedWork(previous,asOfMinute){
  if(!Number.isFinite(asOfMinute)||asOfMinute<0||asOfMinute>1440)throw Error('INVALID_PLAN_CLOCK');
  if(!previous)return {wok:[],fryer:[],auxiliary:[]};
- if(previous.schemaVersion!==1||![MODEL_VERSION,'combined-kitchen-protected-v1'].includes(previous.modelVersion)||!Array.isArray(previous.wok?.jobs)||!Array.isArray(previous.fryer?.jobs)||
+ if(previous.schemaVersion!==1||![MODEL_VERSION,'combined-kitchen-protected-v2','combined-kitchen-protected-v1'].includes(previous.modelVersion)||!Array.isArray(previous.wok?.jobs)||!Array.isArray(previous.fryer?.jobs)||
   (previous.auxiliary&&!Array.isArray(previous.auxiliary.jobs)))
   throw Error('INVALID_COMMITTED_PLAN');
  const all=[...previous.wok.jobs.map(j=>({...j,resource:'wok'})),
@@ -34,6 +34,7 @@ function protectStartedWork(previous,asOfMinute){
   if(all[i].resource===all[j].resource&&overlaps(all[i],all[j],all[i].resource==='wok'?1:0))
    throw Error('COMMITTED_PLAN_RESOURCE_CLASH');
  const wok=new Set(previous.wok.jobs.filter(j=>j.start<=asOfMinute));
+ const auxiliary=new Set((previous.auxiliary?.jobs||[]).filter(j=>j.start<=asOfMinute));
  const fryer=new Set(previous.fryer.jobs.filter(j=>j.start<=asOfMinute));
  function linked(f,w){return !f.standalone&&(f.allocations||[]).some(a=>
   a.deadline===w.start&&a.itemId===w.itemId&&w.orderIds.includes(a.orderId)&&
@@ -43,6 +44,17 @@ function protectStartedWork(previous,asOfMinute){
  let changed=true;
  while(changed){
   changed=false;
+  for(const a of auxiliary)if(AUXILIARY[a.itemId]?.beforeMain){
+   const parents=previous.wok.jobs.filter(w=>w.itemId===a.itemId&&w.recipeKey===a.sourceRecipeKey&&
+    a.allocations.some(p=>p.deadline===w.start&&w.orderIds.includes(p.orderId)));
+   if(!parents.length)throw Error('COMMITTED_FRY_DEPENDENCY_MISSING');
+   for(const w of parents)if(!wok.has(w)){wok.add(w);changed=true;}
+  }
+  for(const w of wok)for(const a of previous.auxiliary?.jobs||[])
+   if(AUXILIARY[a.itemId]?.beforeMain&&a.itemId===w.itemId&&a.sourceRecipeKey===w.recipeKey&&
+    a.allocations.some(p=>p.deadline===w.start&&w.orderIds.includes(p.orderId))&&!auxiliary.has(a)){
+    auxiliary.add(a);changed=true;
+   }
   for(const f of fryer)if(!f.standalone){
    const parents=previous.wok.jobs.filter(w=>linked(f,w));
    if(!parents.length)throw Error('COMMITTED_FRY_DEPENDENCY_MISSING');
@@ -51,7 +63,7 @@ function protectStartedWork(previous,asOfMinute){
   for(const w of wok)for(const f of previous.fryer.jobs)
    if(linked(f,w)&&!fryer.has(f)){fryer.add(f);changed=true;}
  }
- return {wok:[...wok],fryer:[...fryer],auxiliary:(previous.auxiliary?.jobs||[]).filter(j=>j.start<=asOfMinute)};
+ return {wok:[...wok],fryer:[...fryer],auxiliary:[...auxiliary]};
 }
 function subtractProtectedPortions(orders,rows,fixed){
  const known=new Map(orders.map(o=>[String(o.orderId),o]));
@@ -106,7 +118,7 @@ function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...opti
   if(future.status!=='COORDINATED_PROTOTYPE')return fail(future.fryer?.reason||future.wok?.reason||future.reason);
   const validation=validateKitchenTimeline(remaining.orders,future,remaining.rows);
   if(validation.status!=='VALIDATED_STAGING_TIMELINE')return fail('REMAINING_PLAN_COVERAGE_INVALID',{issues:validation.issues});
-  if(options.confirmedStarterRecipes&&!validateAuxiliaryWork(orders,rows,future.auxiliary.jobs,{notBeforeByOrder,fixedAuxiliary:fixed.auxiliary}))
+  if(options.confirmedStarterRecipes&&!validateAuxiliaryWork(orders,rows,future.auxiliary.jobs,{notBeforeByOrder,fixedAuxiliary:fixed.auxiliary,mainJobs:[...fixed.wok,...future.wok.jobs]}))
    return fail('AUXILIARY_COVERAGE_INVALID');
   // Keep the original immutable job objects in the persisted full plan. Future
   // allocations are independently validated against exactly the unstarted lines.

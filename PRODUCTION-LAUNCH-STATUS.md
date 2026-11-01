@@ -47,12 +47,12 @@ main branch has been changed. Work is saved in three companion draft PRs.
 
 ## Verified evidence and limits
 
-- 212 JavaScript tests in both UTC and Europe/London; 21 Python tests; 18 browser
+- 219 JavaScript tests in both UTC and Europe/London; 21 Python tests; 18 browser
   admin/client/proxy tests. Active inline scripts parse successfully.
-- 49 scenario groups against actual private staging PostgreSQL, including
+- 53 scenario groups against actual private staging PostgreSQL, including
   concurrency, replay, rollback, protected plans, lifecycle races, loyalty,
   notification partial failures/crash recovery, delivery and read-only time hints.
-  Latest evidence: STAGING-WRITE-FENCE-RESULT.json. Recipe evidence: STAGING-THAI-SAUSAGE-RESULT.json. Prior recipe evidence: STAGING-CONFIRMED-RECIPES-RESULT.json. Availability evidence: STAGING-AVAILABILITY-RESULT.json. Earlier focused evidence is
+  Latest evidence: STAGING-FULL-MENU-RESULT.json. Fence evidence: STAGING-WRITE-FENCE-RESULT.json. Recipe evidence: STAGING-THAI-SAUSAGE-RESULT.json. Prior recipe evidence: STAGING-CONFIRMED-RECIPES-RESULT.json. Availability evidence: STAGING-AVAILABILITY-RESULT.json. Earlier focused evidence is
   preserved in STAGING-DELIVERY-RESULT.json and STAGING-NOTIFICATION-RESULT.json.
 - Real Python notification worker + actual templates + HTTP + staging database
   passed with fake provider acceptance. Second run found no work. No actual email,
@@ -70,20 +70,14 @@ main branch has been changed. Work is saved in three companion draft PRs.
 
 ## Remaining release gates
 
-1. Finish remaining menu/resource coverage and the final service rehearsal.
-   Fish cakes (3m, 3 small/6 large), prawns (2m, 3/6), dumplings/ribs
-   (microwave 5m, 1 batch/run) and eggs (small wok 2m, max 2) are now integrated
-   and transaction-tested. Thai sausage is now confirmed deep fried (3m,
-   5 small/10 large batches) and integrated into the shared fryer. All six supplied
-   recipe rules are confirmed; do not ask David to repeat them. See CONFIRMED-KITCHEN-RECIPES.md. Known satay/moo-ping
-   one-minute finishing and rice preheat/finishing still need their remaining
-   resource integration. Single-wok egg serialization is conservative; extra
-   parallel chef capacity is not assumed. The combined assessor deliberately
-   grants no production booking authority.
-2. Resolve slowdown policy. Current website displays busy/very_busy notices and
-   stores throttle values, but neither reviewed checkout nor admin Edge source
-   applies them to capacity. Master Wok currently refuses those states. Do not
-   invent duration/capacity multipliers or silently remove an intended slowdown.
+1. Complete a realistic final-service rehearsal using the now-covered menu. All
+   44 current priced menu items have individually committed in staging; mixed rice,
+   starters and dependency restart are joined. Rice reheating is conservatively
+   rounded to three minutes per serving. See CONFIRMED-KITCHEN-RECIPES.md and
+   STAGING-FULL-MENU-RESULT.json. Extra chef capacity is not assumed.
+2. Busy policy is now decided and implemented: Busy +15 minutes, Very Busy +30
+   minutes, with unchanged cooking durations/capacity. Verify the existing hosted
+   admin controls and customer messages in the release rehearsal.
 3. Configure and test real staging Google/provider integrations, notification
    scheduling/backlog/error monitoring and production server/worker startup. Fixture
    responses certify contracts and transaction behavior, not external delivery.

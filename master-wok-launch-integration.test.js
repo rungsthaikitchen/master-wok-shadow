@@ -22,15 +22,18 @@ test('actual basket has joint work coverage and whole-basket lead time but no bo
  assert.equal(r.bookingApprovalAllowed,false);
  assert.ok(r.leadTime.earliestCandidateWork<r.plan.wok.jobs[0].start);
 });
-test('spring roll opt-in schedules seven minutes and verifies standalone coverage',()=>{
+test('confirmed spring roll recipe schedules seven minutes and verifies standalone coverage',()=>{
  const r=assessCombinedBooking(context([{item_id:'veg-spring-rolls',qty:1,modifiers:[]}]),{standaloneSpringRolls:true});
  assert.equal(r.status,'VALIDATED_COMBINED_ASSESSMENT');
  assert.equal(r.plan.fryer.jobs[0].finish-r.plan.fryer.jobs[0].start,7);
  assert.equal(r.bookingApprovalAllowed,false);
 });
-test('independent finishing recipes without resource coverage fail closed',()=>{
- assert.equal(assessCombinedBooking(context([{item_id:'moo-ping',qty:1,modifiers:[]}])).status,'UNVERIFIED');
- assert.equal(assessCombinedBooking(context([{item_id:'chicken-satay',qty:1,modifiers:[]}])).status,'UNVERIFIED');
+test('known one-minute starter finishing has resource coverage without booking authority',()=>{
+ for(const item_id of ['moo-ping','chicken-satay']){
+  const result=assessCombinedBooking(context([{item_id,qty:1,modifiers:[]}]));
+  assert.equal(result.status,'VALIDATED_COMBINED_ASSESSMENT');assert.equal(result.bookingApprovalAllowed,false);
+  assert.equal(result.plan.auxiliary.jobs[0].finish-result.plan.auxiliary.jobs[0].start,1);
+ }
 });
 test('ready-time blackouts have exclusive end boundaries',()=>{
  const c=context();c.state.availability.blackouts=[{active:true,kind:'fully_booked',start_at:'2026-10-30T18:55:00Z',end_at:'2026-10-30T19:00:00Z'}];
@@ -89,4 +92,31 @@ test('request data cannot enable the server-side checkout mode',async()=>{
 test('small baskets cannot bypass the existing twenty-minute customer lead time',()=>{
  const c=context([{item_id:'panang-curry',qty:1,modifiers:[]}]);c.state.now='2026-10-30T18:41:00Z';
  assert.equal(assessCombinedBooking(c).reason,'BELOW_EXISTING_MINIMUM_LEAD');
+});
+
+test('approved busy policy adds 15 or 30 minutes without changing cooking duration',()=>{
+ for(const [mode,capacity_throttle,extra] of [['normal',0,0],['busy',0.5,15],['very_busy',1,30]]){
+  const c=context([{item_id:'fried-egg',qty:1,modifiers:[]}]);
+  c.state.availability.serviceState={mode,capacity_throttle};
+  const fit=assessCombinedBooking(c);assert.equal(fit.status,'VALIDATED_COMBINED_ASSESSMENT');
+  assert.equal(fit.leadTime.minimumLeadMinutes,20+extra);assert.equal(fit.leadTime.bufferMinutes,10+extra);
+  assert.equal(fit.plan.auxiliary.jobs[0].finish-fit.plan.auxiliary.jobs[0].start,2);
+  c.state.now=new Date(Date.parse(c.proposedOrder.validatedHeader.preferred_time)-(19+extra)*60000).toISOString();
+  assert.equal(assessCombinedBooking(c).status,'UNVERIFIED');
+  c.state.now=new Date(Date.parse(c.proposedOrder.validatedHeader.preferred_time)-(20+extra)*60000).toISOString();
+  assert.equal(assessCombinedBooking(c).status,'VALIDATED_COMBINED_ASSESSMENT');
+ }
+});
+test('expired busy mode returns to normal and unknown controls fail closed',()=>{
+ const c=context();c.state.availability.serviceState={mode:'busy',capacity_throttle:0.5,effective_until:'2026-10-30T16:59:00Z'};
+ assert.equal(assessCombinedBooking(c).leadTime.extraServiceLeadMinutes,0);
+ c.state.availability.serviceState={mode:'unknown',capacity_throttle:0};
+ assert.equal(assessCombinedBooking(c).status,'UNVERIFIED');
+});
+
+test('preprepared crackers need no cooking resource but keep normal lead and opening rules',()=>{
+ const c=context([{item_id:'prawn-crackers',qty:1,modifiers:[]}]);
+ const r=assessCombinedBooking(c);assert.equal(r.status,'VALIDATED_COMBINED_ASSESSMENT');assert.equal(r.bookingApprovalAllowed,false);
+ assert.equal(r.plan.wok.jobs.length+r.plan.fryer.jobs.length+r.plan.auxiliary.jobs.length,0);
+ c.state.now='2026-10-30T18:50:00Z';assert.equal(assessCombinedBooking(c).status,'UNVERIFIED');
 });

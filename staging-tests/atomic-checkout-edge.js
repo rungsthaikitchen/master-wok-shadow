@@ -645,6 +645,59 @@ async function run(){
     results.push('MISSING_CONTROL_FAILS_CLOSED_AND_LEGACY_RESTORATION_PRESERVES_COMMITTED_MASTER_WOK_ORDER');
    }finally{await pool.query(cleanup);await pool.query(`ALTER TABLE ${schema}.master_wok_launch_control DISABLE ROW LEVEL SECURITY`);await clear();}
   }
+  {
+   const email=prefix+'full-menu@example.invalid',phone='07700900128',trusted=createCommercialValidator();
+   const build=clock=>make({pool:clockPool(clock),validateCommercialOrder:(c,i,state)=>trusted(rewrite(c),i,state)});
+   const inputFor=(items,key,preferredTime='2099-01-02T18:00:00Z',now='2099-01-02T16:00:00Z')=>{
+    const base={orderType:'collection',preferredTime,items,customer:{name:'Full menu fixture',email,phone},
+     paymentPreference:'on_arrival',communicationPreference:'sms'};
+    const prices=calculateCommercialOrder(base,{now}).header;
+    return {...base,key:prefix+key,expectedTotals:Object.fromEntries(['subtotal','total','discount','loyalty_discount','delivery_fee'].map(k=>[k,prices[k]]))};
+   };
+   try{
+    const {catalog}=require('./master-wok-commercial');
+    for(const item of catalog.items){
+     const input=inputFor([{item_id:item.id,qty:1,modifiers:item.modifierRequired?[{id:item.allowedModifiers[0]}]:[],spice:item.spiceRequired?1:null}],'menu-'+item.id);
+     const result=await build('2099-01-02T16:00:00Z')(input);
+     check(result.committed,'FULL_MENU_BOOKING_FAILED:'+item.id+':'+result.reason);
+     check((await pool.query(`SELECT count(*)::int n FROM ${schema}.order_items WHERE order_id=$1`,[result.response.orderId])).rows[0].n===1,'FULL_MENU_ITEM_MISSING');
+     await clear();
+    }
+    results.push('ALL_44_ACTUAL_MENU_ITEMS_COMMIT_PRICED_BASKET_HEADER_ITEM_RECEIPT_AND_PLAN_IN_PRIVATE_STAGING');
+    const riceItems=['egg-rice','coconut-rice','jasmine-rice','sticky-rice','pork-dumplings','chicken-satay','moo-ping'].map(item_id=>({item_id,qty:1,modifiers:[],spice:null}));
+    const mixed=await build('2099-01-02T16:00:00Z')(inputFor(riceItems,'joined-rice'));
+    check(mixed.committed,'JOINED_RICE_BOOKING_FAILED');
+    const saved=(await pool.query(`SELECT plan FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0].plan;
+    check(saved.auxiliary.jobs.filter(j=>j.resource==='microwave').length===5,'RICE_MICROWAVE_COVERAGE_INCOMPLETE');
+    const preheat=saved.auxiliary.jobs.find(j=>j.itemId==='egg-rice');
+    check(preheat&&preheat.allocations.every(a=>preheat.finish<=a.deadline),'RICE_PREHEAT_AFTER_WOK');
+    check(saved.auxiliary.jobs.filter(j=>['jasmine-rice','sticky-rice'].includes(j.itemId)).every(j=>j.finish-j.start===3),'REHEAT_NOT_CONSERVATIVELY_ROUNDED');
+    results.push('JOINED_RICE_REHEATING_PREHEAT_STARTER_FINISHING_AND_SHARED_MICROWAVE_PERSIST_IN_ATOMIC_ORDER');
+    const clock='2099-01-02T'+String(Math.floor(preheat.start/60)).padStart(2,'0')+':'+String(preheat.start%60).padStart(2,'0')+':00Z';
+    const next=await build(clock)(inputFor([{item_id:'green-curry',qty:1,modifiers:[{id:'chicken'}],spice:1}],'after-preheat','2099-01-02T20:00:00Z',clock));
+    check(next.committed,'POST_PREHEAT_BOOKING_FAILED');
+    const resumed=(await pool.query(`SELECT plan FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows[0].plan;
+    const parent=saved.wok.jobs.find(j=>j.itemId==='egg-rice');
+    check(resumed.wok.jobs.some(j=>JSON.stringify(j)===JSON.stringify(parent)),'STARTED_PREHEAT_MOVED_PARENT_WOK');
+    results.push('FRESH_CONNECTION_BOOKING_AFTER_STARTED_RICE_PREHEAT_PRESERVES_EXACT_PARENT_WOK_BATCH');
+    await clear();
+    const hint=createBasketAvailability({pool:clockPool('2099-01-02T17:10:00Z'),model:globalThis.MasterWokModelV1,
+     readAvailability:(c,d)=>readBookingAvailability(rewrite(c),d),readOrders:(c,d)=>readCapacityCommitments(rewrite(c),d),
+     planStore,assertWriteAllowed:async()=>{},assessBooking:assess});
+    for(const [mode,throttle,early,later] of [['busy',0.5,'2099-01-02T17:40:00Z','2099-01-02T17:45:00Z'],['very_busy',1,'2099-01-02T17:55:00Z','2099-01-02T18:00:00Z']]){
+     await pool.query(`UPDATE ${schema}.service_state SET mode=$1,capacity_throttle=$2,effective_until=null WHERE id=1`,[mode,throttle]);
+     const items=[{item_id:'fried-egg',qty:1,modifiers:[],spice:null}],hints=await hint({items,times:[early,later]});
+     check(hints.success&&!hints.hints[0].available&&hints.hints[1].available,'BUSY_HINT_POLICY_FAILED:'+mode);
+     check(!(await build('2099-01-02T17:10:00Z')(inputFor(items,'busy-early-'+mode,early))).committed,'BUSY_EARLY_BOOKING_ACCEPTED');
+     check((await build('2099-01-02T17:10:00Z')(inputFor(items,'busy-later-'+mode,later))).committed,'BUSY_VALID_BOOKING_REFUSED');
+     await clear();
+    }
+    results.push('APPROVED_BUSY_15_VERY_BUSY_30_EXTRA_LEAD_AGREES_BETWEEN_DATABASE_TIME_HINTS_AND_ATOMIC_CHECKOUT');
+   }finally{
+    await pool.query(`UPDATE ${schema}.service_state SET mode='normal',capacity_throttle=0,effective_until=null WHERE id=1`);
+    await clear();await pool.query(`DELETE FROM ${schema}.customers WHERE email=$1`,[email]);
+   }
+  }
   return {status:'PASS',scope:'PRIVATE_STAGING_ATOMIC_CHECKOUT_REHEARSAL',tests:results,
    productionReady:false,productionWrites:0,publicStagingOrderWrites:0};
  }finally{await clear();await pool.query(`DELETE FROM ${schema}.master_wok_launch_control WHERE approved_release_id=$1`,['private-staging-fixture-release']);await pool.end();}
