@@ -69,13 +69,21 @@ writes occurred. Existing public staging orders were not written.
 
 ## Minimum remaining work, in order
 
-1. **Backend access / actual checkout integration.** GitHub returns 404 for the
-   Railway-configured private `rungsthaikitchen/order-backend` repository. Need
-   read/development access through the GitHub connection. Current website and
-   Cloudflare proxy sources were inspected read-only. Commercial validation
-   (prices/modifiers, delivery, discounts, loyalty and customer binding), payment
-   and notifications must use actual backend rules, not the rehearsal validator.
-2. **One writer for every lifecycle mutation.** Route checkout, admin accept/
+1. **Backend access resolved; runtime/browser integration remains.** Access to
+   `rungsthaikitchen/order-backend` was granted and its current Flask handlers,
+   notifications and production hyper-worker source were reviewed. A private
+   backend draft adds feature-gated checkout/admin/customer routing. It is not
+   deployed and the production booking HTTP endpoint is not yet installed.
+   The server catalogue now reflects 44 actual menu items and the current disabled
+   automatic midweek discount, protein/extras/spice rules, route fee bands,
+   £30 pre-discount delivery threshold, £5/100-point reward, SMS default and
+   `in_advance` payment value. The concrete commercial validator was exercised
+   against private staging tables, including customer rollback and outstanding
+   reward reservations. Trusted delivery geocoding/routing remains to be wired.
+2. **Finish lifecycle runtime/notification wiring.** The shared transaction
+   and actual admin/customer order-action writer now exist; a proposal holds both
+   old and new times, acknowledgement is idempotent, and cancellation races cannot
+   revive orders. These passed real staging PostgreSQL tests. Route checkout, admin accept/
    suggest/status/test changes, customer time acknowledgement, blackouts and
    service-control changes through the same locking protocol. For moves across
    dates lock both dates in deterministic order. Prevent direct REST bypass only
@@ -95,6 +103,42 @@ writes occurred. Existing public staging orders were not written.
    and privileges. Verify rollback with committed Master Wok orders still visible
    to legacy capacity via their existing kitchen_load fields. The factory's LEGACY
    setting is tested; a full deployed website/backend rollback is not yet tested.
+
+## Follow-up after backend access was granted
+
+- 188/188 JavaScript tests pass in UTC and Europe/London, plus the existing raw
+  transaction boundary tests. Nine Python tests verify actual Flask registration,
+  default legacy routing, proxy authentication, completion callback preservation,
+  destination restrictions, failure handling and no misleading acceptance page.
+- The shared global writer lock precedes key and sorted service-date locks. This
+  single low-volume kitchen can serialize order changes and future global control
+  changes without a second lock hierarchy. Every actual writer still has to be
+  routed through it before cutover; a lock alone cannot stop direct REST bypass.
+- Staging runner deployment 5 passed 17 scenario groups. See
+  `STAGING-LIFECYCLE-COMMERCIAL-RESULT.json`. It was disabled with deployment 6,
+  JWT verification was restored, and generated headers/items/booking receipts/
+  response receipts/customer/loyalty rows were confirmed removed.
+- Added a local regression for the existing 20-minute minimum customer lead time,
+  in addition to the basket span/buffer checks. That final guard was added after
+  the recorded remote run; both local timezone suites cover it.
+- Customer-time receipts are review-only SQL. No production schema or permissions
+  were changed. Rehearsal authority wrappers remain explicitly test-only.
+- Full release is still blocked on protected committed work plans, complete recipe
+  coverage, the final HTTP/browser integration, notification/loyalty completion
+  parity, real service-control mutations, production-shaped end-to-end tests and
+  a tested deployed rollback. No production enablement is requested yet.
+
+### Recipe facts still needed before full-menu certification
+
+Previously recorded rules include seven-minute spring rolls, one-minute satay/
+moo-ping finishing, four-to-five-minute main fryer cycles, and one-minute microwave
+rice preparation before finishing. Do not ask the user to repeat these.
+The remaining standalone recipes lack confirmed capacity-resource timing in the
+reviewed code/history: fish cakes, fried prawns, steamed dumplings, Thai sausage,
+spare ribs and fried eggs. Obtain cooking/reheating method, minutes and maximum
+simultaneous portions. Standalone fried tofu/chips can use the conservative end
+of the already stated fryer cycle, but confirm portion/basket equivalence when
+finalizing starter coverage. Dumplings must not silently be modelled as fried.
 
 ## Production approval boundary
 

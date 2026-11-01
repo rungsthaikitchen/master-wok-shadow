@@ -22,6 +22,9 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
   if(!(availability.openDays||[3,4,5,6]).includes(weekday)||
      (availability.closedDates||[]).includes(serviceDate)||today>serviceDate||ready<1020||ready>1320)
    return fail('OUTSIDE_SERVICE_WINDOW');
+  // Preserve the current website's LEAD_MINUTES=20 as a floor, even when a
+  // small basket's cooking span plus buffer would fit a shorter window.
+  if(ready-minute<20)return fail('BELOW_EXISTING_MINIMUM_LEAD');
   // Existing same-day overflow rule: late promises are offered only while
   // today's normal ordering window is still open. Production ends at 22:00.
   if(ready>1260&&(today!==serviceDate||minute>=1260))return fail('OVERRUN_NOT_AVAILABLE');

@@ -85,3 +85,8 @@ test('request data cannot enable the server-side checkout mode',async()=>{
  assert.equal((await checkout({mode:'MASTER_WOK',bookingApprovalAllowed:true})).status,'LEGACY');
  assert.equal(connections,0);
 });
+
+test('small baskets cannot bypass the existing twenty-minute customer lead time',()=>{
+ const c=context([{item_id:'panang-curry',qty:1,modifiers:[]}]);c.state.now='2026-10-30T18:41:00Z';
+ assert.equal(assessCombinedBooking(c).reason,'BELOW_EXISTING_MINIMUM_LEAD');
+});
