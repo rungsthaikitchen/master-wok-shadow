@@ -35,14 +35,24 @@ main branch has been changed. Work is saved in three companion draft PRs.
   the same key and never silently fall back to another writer. Rollback capacity
   compatibility retains both pending Master Wok time commitments across dates.
 
+- Database write fence SQL covers orders, items, service state and blackouts,
+  including service-role REST bypass. API roles cannot approve launch mode.
+  Authoritative transactions require a direct trusted SQL role and transaction-local
+  marker. Legacy SQL writes share the kitchen lock; drain blocks capacity changes
+  while allowing narrow trusted staff-notification/loyalty bookkeeping. Notification
+  dispatch locks the kitchen before outbox rows to avoid lock inversion.
+- Existing admin status controls route through the gateway in Master Wok mode.
+  Lifecycle responses identify server-owned notifications, suppressing duplicate
+  browser sends. Legacy status/loyalty behavior is retained.
+
 ## Verified evidence and limits
 
-- 212 JavaScript tests in both UTC and Europe/London; 21 Python tests; 12 browser
-  client/proxy tests. Active inline scripts parse successfully.
-- 42 scenario groups against actual private staging PostgreSQL, including
+- 212 JavaScript tests in both UTC and Europe/London; 21 Python tests; 18 browser
+  admin/client/proxy tests. Active inline scripts parse successfully.
+- 49 scenario groups against actual private staging PostgreSQL, including
   concurrency, replay, rollback, protected plans, lifecycle races, loyalty,
   notification partial failures/crash recovery, delivery and read-only time hints.
-  Latest evidence: STAGING-THAI-SAUSAGE-RESULT.json. Prior recipe evidence: STAGING-CONFIRMED-RECIPES-RESULT.json. Availability evidence: STAGING-AVAILABILITY-RESULT.json. Earlier focused evidence is
+  Latest evidence: STAGING-WRITE-FENCE-RESULT.json. Recipe evidence: STAGING-THAI-SAUSAGE-RESULT.json. Prior recipe evidence: STAGING-CONFIRMED-RECIPES-RESULT.json. Availability evidence: STAGING-AVAILABILITY-RESULT.json. Earlier focused evidence is
   preserved in STAGING-DELIVERY-RESULT.json and STAGING-NOTIFICATION-RESULT.json.
 - Real Python notification worker + actual templates + HTTP + staging database
   passed with fake provider acceptance. Second run found no work. No actual email,
@@ -81,8 +91,9 @@ main branch has been changed. Work is saved in three companion draft PRs.
    preview build succeeds but redirects to Cloudflare Access login. Preview access
    and staging backend environment configuration are needed. Include delivery,
    customer responses, printing, service changes and a realistic busy service.
-5. Finish direct REST write fencing for every order/control path, capture exact
-   deployed versions/privileges, seed plans and test full website/privilege rollback
+5. Deploy and certify the reviewed write fence and admin routing in the full hosted
+   environment, capture exact deployed versions/privileges, seed plans and test
+   full website/privilege rollback
    with existing Master Wok orders and unknown checkout attempts. Backend shutdown
    tests alone do not satisfy this gate.
 6. Present the exact production release/rollback package for explicit approval only

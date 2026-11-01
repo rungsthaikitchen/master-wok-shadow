@@ -4,13 +4,13 @@ Status: **staging review only**. This is an implementation checklist, not permis
 
 **1 November update:** The joined runtime now covers atomic checkout/lifecycle,
 protected plans, durable drain, notifications, server delivery validation and
-basket-specific read-only availability through the time picker. 42 real private
+basket-specific read-only availability through the time picker. 49 real private
 PostgreSQL scenario groups pass; a mobile browser reached deployed Railway and
 Supabase for availability and checkout. See PRODUCTION-LAUNCH-STATUS.md and
-STAGING-CONFIRMED-RECIPES-RESULT.json for current gates and precise evidence limits.
+STAGING-WRITE-FENCE-RESULT.json for current gates and precise evidence limits.
 The original checklist below remains the acceptance contract, not a claim that
 those components are absent. Production authority remains disabled; full menu,
-slowdown policy, real-provider/hosted Cloudflare tests, complete write fencing and
+slowdown policy, real-provider/hosted Cloudflare tests, hosted write-fence certification and
 full rollback are still release gates. Legacy remains authoritative.
 
 ## Existing proven boundaries

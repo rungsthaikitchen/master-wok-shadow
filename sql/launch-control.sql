@@ -9,7 +9,7 @@ CREATE TABLE public.master_wok_launch_control (
 );
 INSERT INTO public.master_wok_launch_control(id) VALUES(1);
 ALTER TABLE public.master_wok_launch_control ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.master_wok_launch_control FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON public.master_wok_launch_control FROM PUBLIC,anon,authenticated,service_role;
 
 -- Release/drain operator protocol, only after explicit release approval:
 -- BEGIN;

@@ -63,9 +63,15 @@ async function beginBookingTransaction(connection,{key,serviceDates=[]}={}){
   // One kitchen has very low booking-write volume. Serializing authoritative
   // writers also covers global service controls and arbitrary-date blackouts,
   // without introducing a second lock hierarchy or racing flag changes.
-  await connection.query('SELECT pg_advisory_xact_lock(hashtextextended($1::text, 47824))',['rtk-authoritative-booking']);
+  await lockKitchenWriter(connection);
+  // Transaction local, never retained when a pooled connection is released.
+  // The database fence additionally checks the SQL role; this is not a secret.
+  await connection.query("SELECT set_config('master_wok.authoritative_writer','1',true)");
   if(key)await connection.query('SELECT pg_advisory_xact_lock(hashtextextended($1::text, 47823))',[key]);
   await lockServiceDates(connection,serviceDates);
 }
-module.exports = { reserveWithMasterWok, beginBookingTransaction, lockServiceDates };
+async function lockKitchenWriter(connection){
+  await connection.query('SELECT pg_advisory_xact_lock(hashtextextended($1::text, 47824))',['rtk-authoritative-booking']);
+}
+module.exports = { reserveWithMasterWok, beginBookingTransaction, lockServiceDates, lockKitchenWriter };
 

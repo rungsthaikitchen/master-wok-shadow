@@ -550,6 +550,101 @@ async function run(){
     results.push('FAILURE_AFTER_AUXILIARY_PLAN_WRITE_ROLLS_BACK_FULL_MIXED_BASKET');
    }finally{await clear();await pool.query(`DELETE FROM ${schema}.customers WHERE email=$1`,[email]);}
   }
+  {
+   // Exact reviewed migration, fixed private schema only. Always remove the
+   // temporary fence before normal fixture cleanup, including failed assertions.
+   const ddl=__WRITE_FENCE_SQL__.replaceAll('public.',schema+'.');
+   const cleanup=`DROP FUNCTION IF EXISTS ${schema}.master_wok_lock_write() CASCADE;
+    DROP FUNCTION IF EXISTS ${schema}.master_wok_check_write() CASCADE;
+    DROP POLICY IF EXISTS master_wok_mode_read ON ${schema}.master_wok_launch_control;
+    REVOKE SELECT(id,mode) ON ${schema}.master_wok_launch_control FROM anon,authenticated,service_role;`;
+   await pool.query(`INSERT INTO ${schema}.master_wok_launch_control(id,mode,approved_release_id)
+    VALUES(1,'LEGACY','private-staging-fixture-release') ON CONFLICT(id) DO UPDATE SET mode='LEGACY'`);
+   try{
+    await pool.query(ddl);
+    await pool.query(`ALTER TABLE ${schema}.master_wok_launch_control ENABLE ROW LEVEL SECURITY`);
+    const initial=await make()(request('fence-legacy-fixture'));
+    check(initial.committed,'FENCE_LEGACY_SETUP_FAILED');
+    const id=initial.response.orderId;
+    const raw=async(role,sql,{marker=false,allowed=false}={})=>{
+     const c=await pool.connect();let error=null;
+     try{
+      await c.query('BEGIN');
+      await c.query(`GRANT USAGE ON SCHEMA ${schema} TO ${role};
+       GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE ON ${schema}.orders,${schema}.order_items,${schema}.service_state,${schema}.booking_blackouts TO ${role};`);
+      await c.query('SET LOCAL ROLE '+role);
+      if(marker)await c.query("SELECT set_config('master_wok.authoritative_writer','1',true)");
+      try{await c.query(sql,[id]);}catch(e){error=e;}
+     }finally{await c.query('ROLLBACK');c.release();}
+     check(allowed?!error:error?.code==='42501',`FENCE_${role}_${allowed?'ALLOW':'DENY'}_FAILED:${error?.message||'write allowed'}`);
+    };
+    const update=`UPDATE ${schema}.orders SET status='cancelled' WHERE id=$1`;
+    await raw('anon',`SELECT approved_release_id FROM ${schema}.master_wok_launch_control WHERE id=1 AND $1::uuid IS NOT NULL`);
+    await raw('service_role',`UPDATE ${schema}.master_wok_launch_control SET mode='MASTER_WOK' WHERE id=1 AND $1::uuid IS NOT NULL`);
+    await raw('anon',update,{allowed:true});
+    await pool.query(`UPDATE ${schema}.master_wok_launch_control SET mode='MASTER_WOK' WHERE id=1`);
+    for(const role of ['anon','authenticated','service_role','postgres']){
+     await raw(role,update);
+     if(role!=='postgres')await raw(role,update,{marker:true});
+    }
+    await raw('postgres',update,{marker:true,allowed:true});
+    for(const table of ['order_items','service_state','booking_blackouts']){
+     const q=table==='order_items'?`UPDATE ${schema}.${table} SET qty=qty+1 WHERE order_id=$1`:
+      table==='service_state'?`UPDATE ${schema}.${table} SET mode='paused' WHERE id=1 AND $1::uuid IS NOT NULL`:
+      `INSERT INTO ${schema}.${table}(kind,start_at,end_at) SELECT 'closed','2099-01-02T18:00Z','2099-01-02T19:00Z' WHERE $1::uuid IS NOT NULL`;
+     await raw('service_role',q,{marker:true});
+    }
+    results.push('DATABASE_FENCE_BLOCKS_OLD_BROWSER_AUTHENTICATED_AND_SERVICE_ROLE_WRITES_EVEN_WITH_SPOOFED_MARKER');
+    const gate=createLaunchControl({schema,releaseId:'private-staging-fixture-release'});
+    const gated=make({assertWriteAllowed:gate.assertWriteAllowed});
+    const booked=await gated(request('fenced-atomic','2099-01-02T19:00:00Z','green-curry',1));
+    check(booked.committed,'FENCED_ATOMIC_BOOKING_FAILED');
+    const competing=await Promise.all([
+     gated(request('fenced-race-a','2099-01-02T20:00:00Z')),
+     gated(request('fenced-race-b','2099-01-02T20:00:00Z'))]);
+    check(competing.filter(r=>r.committed).length===1,'FENCED_CONCURRENT_BOOKING_OVERBOOKED');
+    results.push('DATABASE_FENCED_CONCURRENT_REAL_BASKETS_STILL_ALLOW_EXACTLY_ONE_COMMIT');
+    const dispatcher=createNotificationDispatcher({pool,schema});
+    const claim=await dispatcher({action:'claim'});
+    check(claim.event,'FENCED_NOTIFICATION_CLAIM_FAILED');
+    const auth={eventId:claim.event.id,token:claim.event.token};
+    await dispatcher({...auth,action:'prepare',messages:[{key:'staff_push',primary:{channel:'pushover',title:'Fixture only',body:'No provider is called'}}]});
+    const sending=await dispatcher({...auth,action:'next'});
+    check(sending.delivery,'FENCED_NOTIFICATION_MANIFEST_FAILED');
+    await dispatcher({...auth,action:'result',deliveryId:sending.delivery.id,outcome:'sent',providerId:'fixture-only-no-external-send'});
+    check((await dispatcher({...auth,action:'next'})).status==='sent','FENCED_NOTIFICATION_ACK_FAILED');
+    results.push('DATABASE_FENCE_ALLOWS_JOINED_OUTBOX_STAFF_ACK_WITHOUT_EXTERNAL_SEND');
+    await raw('postgres',update); // Marker must not leak from committed pooled writer.
+    results.push('FULL_ATOMIC_BOOKING_COMMITS_WITH_FENCE_AND_CONNECTION_MARKER_DOES_NOT_LEAK');
+    // A legacy SQL writer already in flight must finish before a drain can
+    // acquire the same kitchen lock, just like the authoritative writer.
+    const legacy=await pool.connect(),drain=await pool.connect();
+    await pool.query(`UPDATE ${schema}.master_wok_launch_control SET mode='LEGACY' WHERE id=1`);
+    let drained=false,pending;
+    try{
+     await legacy.query('BEGIN');await legacy.query(update,[id]);
+     await drain.query('BEGIN');
+     pending=drain.query("SELECT pg_advisory_xact_lock(hashtextextended('rtk-authoritative-booking',47824))").then(()=>{drained=true;});
+     await new Promise(resolve=>setTimeout(resolve,80));
+     check(!drained,'DRAIN_PASSED_INFLIGHT_LEGACY_SQL_WRITE');
+     await legacy.query('ROLLBACK');await pending;
+     await drain.query(`UPDATE ${schema}.master_wok_launch_control SET mode='DRAINING' WHERE id=1`);
+     await drain.query('COMMIT');
+    }finally{await legacy.query('ROLLBACK');await drain.query('ROLLBACK');legacy.release();drain.release();}
+    results.push('DATABASE_FENCE_SERIALIZES_LEGACY_SQL_WRITER_BEFORE_DRAIN_WITHOUT_ROW_LOCK_INVERSION');
+    check(!(await gated(request('fence-drained'))).committed,'DRAINED_CHECKOUT_COMMITTED');
+    await raw('postgres',update,{marker:true});
+    await raw('service_role',`UPDATE ${schema}.orders SET loyalty_settled=true,staff_notify_attempts=coalesce(staff_notify_attempts,0)+1 WHERE id=$1`,{allowed:true});
+    await raw('anon',`UPDATE ${schema}.orders SET loyalty_settled=true WHERE id=$1`);
+    results.push('DRAIN_BLOCKS_CAPACITY_CHANGES_BUT_PRESERVES_TRUSTED_NOTIFICATION_AND_LOYALTY_BOOKKEEPING');
+    await pool.query(`DELETE FROM ${schema}.master_wok_launch_control WHERE id=1`);
+    await raw('postgres',update,{marker:true});
+    await pool.query(`INSERT INTO ${schema}.master_wok_launch_control(id,mode,approved_release_id) VALUES(1,'LEGACY','private-staging-fixture-release')`);
+    await raw('anon',update,{allowed:true});
+    check((await pool.query(`SELECT count(*)::int n FROM ${schema}.orders WHERE id=$1`,[booked.response.orderId])).rows[0].n===1,'ROLLBACK_LOST_COMMITTED_ORDER');
+    results.push('MISSING_CONTROL_FAILS_CLOSED_AND_LEGACY_RESTORATION_PRESERVES_COMMITTED_MASTER_WOK_ORDER');
+   }finally{await pool.query(cleanup);await pool.query(`ALTER TABLE ${schema}.master_wok_launch_control DISABLE ROW LEVEL SECURITY`);await clear();}
+  }
   return {status:'PASS',scope:'PRIVATE_STAGING_ATOMIC_CHECKOUT_REHEARSAL',tests:results,
    productionReady:false,productionWrites:0,publicStagingOrderWrites:0};
  }finally{await clear();await pool.query(`DELETE FROM ${schema}.master_wok_launch_control WHERE approved_release_id=$1`,['private-staging-fixture-release']);await pool.end();}

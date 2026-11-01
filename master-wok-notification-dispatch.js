@@ -2,6 +2,7 @@
 // Provider calls happen outside database transactions. An expired send or unknown
 // provider outcome is quarantined, never automatically resent. Explicit rejection
 // may select the customer's fallback; accepted channels are never sent again.
+const {lockKitchenWriter}=require('./master-wok-transaction-writer');
 const UUID=/^[0-9a-f-]{36}$/i;
 const stable=value=>JSON.stringify(value,(_key,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.keys(item).sort().map(key=>[key,item[key]])):item);
 function validMessage(m){return m&&['sms','email','pushover'].includes(m.channel)&&
@@ -15,6 +16,10 @@ function createNotificationDispatcher({pool,schema='public'}={}){
   const connection=await pool.connect();
   try{
    await connection.query('BEGIN');await connection.query("SET LOCAL statement_timeout='10s'");
+   // Same lock order as lifecycle: kitchen, then outbox/delivery/order rows.
+   // Never hold an outbox row while waiting for a fenced order update.
+   await connection.query("SET LOCAL lock_timeout='5s'");
+   await lockKitchenWriter(connection);
    let response;
    if(input?.action==='claim'){
     const event=(await connection.query(`SELECT * FROM ${events} WHERE
