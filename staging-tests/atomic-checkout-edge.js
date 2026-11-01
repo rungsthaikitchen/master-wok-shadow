@@ -506,7 +506,7 @@ async function run(){
   {
    const email=prefix+'confirmed-recipes@example.invalid',phone='07700900127';
    const trusted=createCommercialValidator();
-   const items=[{item_id:'fish-cakes',qty:1,modifiers:[],spice:1},
+   const items=[{item_id:'fish-cakes',qty:1,modifiers:[],spice:1},{item_id:'thai-sausage',qty:1,modifiers:[],spice:null},
     {item_id:'fried-prawns',qty:1,modifiers:[],spice:null},{item_id:'pork-dumplings',qty:1,modifiers:[],spice:null},
     {item_id:'spare-ribs',qty:1,modifiers:[],spice:null},{item_id:'fried-egg',qty:2,modifiers:[],spice:null},
     {item_id:'stir-basil',qty:1,modifiers:[{id:'chicken'},{id:'extra-egg'}],spice:1}];
@@ -523,6 +523,8 @@ async function run(){
     check(saved.auxiliary.jobs.filter(j=>j.itemId==='fried-egg').reduce((n,j)=>n+j.portions,0)===3,'EXTRA_EGG_NOT_COUNTED');
     check(saved.auxiliary.jobs.every(j=>j.orderIds.every(id=>id.startsWith(created.response.orderId+'@'))),'AUXILIARY_ORDER_ID_NOT_REMAPPED');
     check(saved.fryer.jobs.some(j=>j.type==='fishCakeBatch'&&j.finish-j.start===3)&&saved.fryer.jobs.some(j=>j.type==='friedPrawnBatch'&&j.finish-j.start===2),'CONFIRMED_FRY_TIMINGS_NOT_PERSISTED');
+    check(saved.fryer.jobs.some(j=>j.type==='thaiSausageBatch'&&j.finish-j.start===3),'CONFIRMED_THAI_SAUSAGE_NOT_SCHEDULED');
+    results.push('CONFIRMED_THAI_SAUSAGE_DEEP_FRY_JOINS_SHARED_FRYER_MIXED_BOOKING');
     results.push('ACTUAL_COMMERCIAL_MIXED_STARTER_MAIN_AND_EXTRA_EGG_BASKET_PERSISTS_ALL_RESOURCE_JOBS');
     const runningJob=saved.auxiliary.jobs.filter(j=>j.resource==='microwave').sort((a,b)=>a.start-b.start)[0];
     const minute=runningJob.start+1;

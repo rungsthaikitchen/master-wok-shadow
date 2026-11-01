@@ -28,8 +28,8 @@ test('spring roll opt-in schedules seven minutes and verifies standalone coverag
  assert.equal(r.plan.fryer.jobs[0].finish-r.plan.fryer.jobs[0].start,7);
  assert.equal(r.bookingApprovalAllowed,false);
 });
-test('unconfirmed cooking methods and independent starter recipes fail closed',()=>{
- assert.equal(assessCombinedBooking(context([{item_id:'thai-sausage',qty:1,modifiers:[]}])).status,'UNVERIFIED');
+test('independent finishing recipes without resource coverage fail closed',()=>{
+ assert.equal(assessCombinedBooking(context([{item_id:'moo-ping',qty:1,modifiers:[]}])).status,'UNVERIFIED');
  assert.equal(assessCombinedBooking(context([{item_id:'chicken-satay',qty:1,modifiers:[]}])).status,'UNVERIFIED');
 });
 test('ready-time blackouts have exclusive end boundaries',()=>{

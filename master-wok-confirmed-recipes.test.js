@@ -5,15 +5,15 @@ const {planWithProtectedWork,protectStartedWork}=require('./master-wok-protected
 const {remapPlanOrder}=require('./master-wok-service-plan-store');
 const {validateAuxiliaryWork}=require('./master-wok-auxiliary-work');
 const {assessCombinedBooking}=require('./master-wok-combined-assessment');
-const {FRYER,UNCONFIRMED}=require('./master-wok-recipe-rules');
+const {FRYER}=require('./master-wok-recipe-rules');
 const line=(item_id,qty=1,modifiers=[])=>({item_id,qty,modifiers,spice:null});
 function input(items,id='a',ready=1140){return {order:{orderId:id,placedAt:new Date(2026,10,4,16,0),readyMinute:ready},row:{id,items}};}
 function plan(items){const a=input(items);return planCoordinatedKitchen([a.order],[a.row],{confirmedStarterRecipes:true});}
-test('fish cakes and prawns use their own durations and basket batch capacities',()=>{
- for(const [item,type,minutes] of [['fish-cakes','fishCakeBatch',3],['fried-prawns','friedPrawnBatch',2]]){
-  const p=plan([line(item,12)]);assert.equal(p.status,'COORDINATED_PROTOTYPE');
-  const jobs=p.fryer.jobs.filter(j=>j.type===type);assert.equal(jobs.reduce((n,j)=>n+j.portions,0),12);
-  for(const j of jobs){assert.equal(j.finish-j.start,minutes);assert.ok(j.portions<=(j.basket==='large'?6:3));}
+test('fish cakes, prawns and sausage use recipe-specific times and basket capacities',()=>{
+ for(const [item,type,minutes,small,large] of [['fish-cakes','fishCakeBatch',3,3,6],['fried-prawns','friedPrawnBatch',2,3,6],['thai-sausage','thaiSausageBatch',3,5,10]]){
+  const qty=large+2*small,p=plan([line(item,qty)]);assert.equal(p.status,'COORDINATED_PROTOTYPE');
+  const jobs=p.fryer.jobs.filter(j=>j.type===type);assert.equal(jobs.reduce((n,j)=>n+j.portions,0),qty);
+  for(const j of jobs){assert.equal(j.finish-j.start,minutes);assert.ok(j.portions<=(j.basket==='large'?large:small));}
  }
  assert.equal(FRYER.crispyChicken.large,3);assert.equal(FRYER.crispyChicken.small,2);
 });
@@ -50,8 +50,7 @@ test('mixed starter assessment includes auxiliary work but never grants booking 
   state:{now:'2026-11-04T16:00:00Z',availability:{blackouts:[],serviceState:{mode:'normal',capacity_throttle:0}}}};
  const p=assessCombinedBooking(context);assert.equal(p.status,'VALIDATED_COMBINED_ASSESSMENT');assert.equal(p.bookingApprovalAllowed,false);
  assert.equal(p.plan.auxiliary.jobs.length,3);assert.equal(p.plan.fryer.jobs.length,2);
- assert.equal(UNCONFIRMED['thai-sausage'].method,null);
- const sausage=input([line('thai-sausage')]);assert.equal(assessCombinedBooking({...context,proposedOrder:{...candidate,rawRow:sausage.row}}).status,'UNVERIFIED');
+ const sausage=input([line('thai-sausage')]);assert.equal(assessCombinedBooking({...context,proposedOrder:{...candidate,rawRow:sausage.row}}).status,'VALIDATED_COMBINED_ASSESSMENT');
 });
 test('future eggs cannot overlap a main-wok batch already cooking',()=>{
  const a=input([line('green-curry')]),b=input([line('fried-egg')],'b');

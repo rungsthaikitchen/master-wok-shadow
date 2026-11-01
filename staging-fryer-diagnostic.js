@@ -30,12 +30,12 @@ function diagnoseFryer(orders,rows,{standaloneSpringRolls=false,confirmedStarter
         unmodelled.push({orderId:String(row.id),reason:'INVALID_LINE'});
         continue;
       }
-      const confirmed=confirmedStarterRecipes&&['fish-cakes','fried-prawns','pork-dumplings','chips','fried-tofu'].includes(line.item_id);
+      const confirmed=confirmedStarterRecipes&&['fish-cakes','fried-prawns','pork-dumplings','chips','fried-tofu','thai-sausage'].includes(line.item_id);
       if(UNMODELLED_FRIED.has(line.item_id) && !confirmed && !(standaloneSpringRolls && SPRING_ROLLS.has(line.item_id))) {
         unmodelled.push({orderId:String(row.id),itemId:line.item_id,reason:'FRY_RECIPE_UNMODELLED'});
         continue;
       }
-      const types={'fish-cakes':'fishCakeBatch','fried-prawns':'friedPrawnBatch','chips':'chips','fried-tofu':'tofu'};
+      const types={'fish-cakes':'fishCakeBatch','fried-prawns':'friedPrawnBatch','chips':'chips','fried-tofu':'tofu','thai-sausage':'thaiSausageBatch'};
       if(confirmed&&types[line.item_id]){
         const {fryerRecipe}=require('./master-wok-recipe-rules');const type=types[line.item_id];
         dependencies.push({orderId:String(row.id),itemId:line.item_id,lineIndex,

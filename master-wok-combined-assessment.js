@@ -101,7 +101,7 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
   // lower bound, not a replacement for the agreed whole-basket lead time.
   if(earliest<Math.max(990,minute+buffer)||finish>ready)return fail('INSUFFICIENT_LEAD_TIME');
   // Independent sides and most starters still need approved resource recipes.
-  const unmodelled=new Set(['chicken-satay','moo-ping','thai-sausage']);
+  const unmodelled=new Set(['chicken-satay','moo-ping']);
   if(rows.some(r=>r.items.some(l=>unmodelled.has(l.item_id))))return fail('NON_WOK_RECIPE_COVERAGE_REQUIRED');
   return {status:'VALIDATED_COMBINED_ASSESSMENT',reason:'STAGING_CERTIFICATION_ONLY',
    plan,leadTime:{earliestCandidateWork:earliest,finalCandidateCompletion:finish,bufferMinutes:buffer},

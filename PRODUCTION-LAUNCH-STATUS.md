@@ -39,10 +39,10 @@ main branch has been changed. Work is saved in three companion draft PRs.
 
 - 212 JavaScript tests in both UTC and Europe/London; 21 Python tests; 12 browser
   client/proxy tests. Active inline scripts parse successfully.
-- 41 scenario groups against actual private staging PostgreSQL, including
+- 42 scenario groups against actual private staging PostgreSQL, including
   concurrency, replay, rollback, protected plans, lifecycle races, loyalty,
   notification partial failures/crash recovery, delivery and read-only time hints.
-  Latest evidence: STAGING-CONFIRMED-RECIPES-RESULT.json. Availability evidence: STAGING-AVAILABILITY-RESULT.json. Earlier focused evidence is
+  Latest evidence: STAGING-THAI-SAUSAGE-RESULT.json. Prior recipe evidence: STAGING-CONFIRMED-RECIPES-RESULT.json. Availability evidence: STAGING-AVAILABILITY-RESULT.json. Earlier focused evidence is
   preserved in STAGING-DELIVERY-RESULT.json and STAGING-NOTIFICATION-RESULT.json.
 - Real Python notification worker + actual templates + HTTP + staging database
   passed with fake provider acceptance. Second run found no work. No actual email,
@@ -63,9 +63,9 @@ main branch has been changed. Work is saved in three companion draft PRs.
 1. Finish remaining menu/resource coverage and the final service rehearsal.
    Fish cakes (3m, 3 small/6 large), prawns (2m, 3/6), dumplings/ribs
    (microwave 5m, 1 batch/run) and eggs (small wok 2m, max 2) are now integrated
-   and transaction-tested. Thai sausage time/capacity is recorded (3m, 5/10),
-   but its cooking method was omitted and remains blocked. Do not ask David to
-   repeat these timings. See CONFIRMED-KITCHEN-RECIPES.md. Known satay/moo-ping
+   and transaction-tested. Thai sausage is now confirmed deep fried (3m,
+   5 small/10 large batches) and integrated into the shared fryer. All six supplied
+   recipe rules are confirmed; do not ask David to repeat them. See CONFIRMED-KITCHEN-RECIPES.md. Known satay/moo-ping
    one-minute finishing and rice preheat/finishing still need their remaining
    resource integration. Single-wok egg serialization is conservative; extra
    parallel chef capacity is not assumed. The combined assessor deliberately
