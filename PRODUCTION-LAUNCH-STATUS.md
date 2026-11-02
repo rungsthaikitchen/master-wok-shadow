@@ -155,3 +155,31 @@ deployment f13e5c9e succeeded at commit 87b9ca1, retaining LEGACY. Deployed
 health and mode checks passed. No production settings or data were changed.
 Real providers, deployed notification scheduling/monitoring, production runtime
 composition and final full release/rollback certification remain gates.
+
+## 2 November continuous notification-worker checkpoint
+
+Backend review commit 6a4be76f126d9875b02fb551bc25f5844ff9d3e6 adds the
+existing worker's `--loop` entrypoint, idle polling, bounded transport backoff,
+SIGTERM/SIGINT shutdown and sanitized operational output. Startup checks transport
+and time-link configuration before claiming. Quarantined expired sends now surface
+`needs_attention` rather than an idle success. Historical uncertain sends remain
+quarantined; no provider replay is added. Operator backlog SQL is documented.
+
+All 27 backend tests pass. A real Python process woke its idle poll on SIGTERM
+and exited cleanly in under three seconds. Disabled `--loop` refuses startup.
+The worker remains undeployed/unconfigured; the staging web gateway stays pinned
+to 87b9ca1 on Gunicorn in LEGACY mode. No provider was called. Production
+configuration read returned only variable names and deployment metadata: Twilio,
+Brevo and Pushover names exist; their values were not retrieved. Production
+backend deployment remains 126fc57f (23 October); no production mutation occurred.
+
+Next controlled provider check requires an explicitly approved mobile recipient
+and authorization for one staging SMS using the existing Twilio account. Use a
+one-off provider probe without claiming/draining RTK-119's five retained events.
+Provider acceptance alone is insufficient; the recipient must confirm arrival.
+This is a test approval, not approval for a production scheduler cutover.
+
+Other independent release work remains: production assessor/runtime composition,
+whole-service/delivery rehearsal, deployed worker and monitoring validation,
+Cloudflare Access boundary verification and complete website/privilege rollback
+certification. Do not present the SMS test as the only remaining launch gate.

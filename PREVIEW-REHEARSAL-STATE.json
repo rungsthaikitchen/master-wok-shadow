@@ -69,5 +69,14 @@
     "queuedNotifications": 5,
     "notificationDeliveries": 0
   },
-  "renewedAt": "2026-11-02T07:17:25Z"
+  "renewedAt": "2026-11-02T07:17:25Z",
+  "worker": {
+    "reviewCommit": "6a4be76f126d9875b02fb551bc25f5844ff9d3e6",
+    "deployed": false,
+    "enabled": false,
+    "backendTests": 27,
+    "realProcessShutdown": "PASS",
+    "realProviderCalls": 0,
+    "nextManualRequirement": "Explicit approval and destination for one staging SMS probe; do not drain historical events."
+  }
 }
