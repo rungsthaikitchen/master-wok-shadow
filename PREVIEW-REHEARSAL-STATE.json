@@ -1,6 +1,6 @@
 {
   "date": "2026-11-01",
-  "state": "AWAITING_PREVIEW_RESTRICTIONS_DISPLAY_CONFIRMATION",
+  "state": "MANUAL_CHECKS_PASSED_REHEARSAL_CLOSED",
   "productionReady": false,
   "productionWrites": 0,
   "project": "hvrqgufqjslvgiohgkvu",
@@ -14,18 +14,20 @@
   "coreModelVersion": "combined-kitchen-protected-v3",
   "edge": {
     "name": "master-wok-booking",
-    "version": 12,
-    "bundleSha256": "35d6ce0a27ffe2c53ec557c9c130f9e6afc4201b15811c92b63867c6c2c75c9f",
-    "verifyJwt": false,
-    "authentication": "Dedicated server secret, fixed staging project/schema, run-bound fixture reads/mutations and two-hour expiry."
+    "version": 13,
+    "bundleSha256": "51e5f68b1da10f907b4ac7f46926af7fdbb9496ede805c076512348598c1d9a7",
+    "verifyJwt": true,
+    "authentication": "Temporary handler replaced with HTTP410 and JWT enforcement restored."
   },
   "railway": {
     "project": "7821ad5b-f5c2-4ab4-9206-c3d76eefd4c8",
     "environment": "c1b8fad6-dbfc-4188-b4b5-a5dbfbf53279",
     "service": "fd320f7b-3e1d-4b07-970c-74b75fdc82d3",
-    "deployment": "382b8049-ded8-495a-9bb2-9e8816b8fee7",
+    "deployment": "f13e5c9e-0b8d-443e-abf2-64897b5c725c",
     "status": "SUCCESS",
-    "mode": "MASTER_WOK"
+    "mode": "LEGACY",
+    "startCommand": "python -m gunicorn -c gunicorn.conf.py server:app",
+    "commit": "87b9ca10e3ca33076e90a70e3690b5042658d941"
   },
   "verified": {
     "directStagingGatewayMode": "MASTER_WOK",
@@ -40,16 +42,12 @@
     "renewedEdgeModeRequest": 31
   },
   "pending": [
-    "Confirm the actual preview restriction list no longer shows the loading error.",
-    "Real notification worker configuration/monitoring and production server startup.",
+    "Real notification worker configuration/monitoring and provider checks.",
     "Final whole-service and full website/privilege rollback certification.",
     "Explicit approval for exact production release."
   ],
   "cleanup": [
-    "Dedicated connection: beginBookingTransaction, assert fixture release, delete only this prefix and fixture email, commit. The guarded cleanup operation already implements this.",
-    "Restore dedicated Railway staging gateway MASTER_WOK_BOOKING_MODE=LEGACY and verify SUCCESS/mode.",
-    "Disable temporary master-wok-booking handler to HTTP410 with verify_jwt true. Preserve committed production data (none is written).",
-    "Retain private staging write fence in LEGACY for later staging certification; do not run destructive fixture certification while this rehearsal is active."
+    "Retain the private test order, receipt, plan and write fence for review; fixture deletion requires the existing scoped cleanup path."
   ],
   "completed": [
     "Authenticated hosted preview collection checkout RTK-119 verified in private database.",
@@ -57,7 +55,10 @@
     "Staging drain returned HTTP503; deployed LEGACY restore returned HTTP200.",
     "Test order, receipt and plan preserved unchanged; production fixture customer/order counts zero.",
     "Actual Cloudflare admin Suggest to 18:10 verified, acknowledged via deployed Railway link, sole capacity commitment retained.",
-    "David confirmed RTK-119 ticket shows 4 November at 18:10."
+    "David confirmed RTK-119 ticket shows 4 November at 18:10.",
+    "David confirmed the refreshed preview restriction list no longer shows the loading error.",
+    "Private launch control restored to LEGACY revision 6; temporary writer disabled with JWT enforcement. RTK-119 retained at 18:10; zero deliveries.",
+    "Dedicated staging gateway Gunicorn deployment f13e5c9e succeeded, retaining LEGACY; local WSGI concurrency/shutdown and 22 backend regression tests passed."
   ],
   "evidence": "STAGING-SERVICE-CONTROL-RESULT.json",
   "currentOrder": {

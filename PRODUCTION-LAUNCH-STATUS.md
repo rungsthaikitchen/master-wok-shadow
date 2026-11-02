@@ -141,3 +141,17 @@ history. Actual preview refresh and physical print at 18:10 are next manual chec
 See STAGING-SERVICE-CONTROL-RESULT.json. Production remains NO-GO and untouched.
 
 2 November manual ticket check: David confirmed RTK-119 shows 4 November at 18:10. Ticket date/time is passed by user report. The actual restriction-list display confirmation remains pending; no production permission is implied.
+
+2 November restrictions check: David confirmed the refreshed preview no longer
+shows the loading error. Both manual checks are passed. Private launch control
+was drained and restored to LEGACY revision 6; gateway deployment 949fe256
+succeeded, and temporary Edge v13 is inert HTTP410 with JWT enforcement restored.
+RTK-119 remains accepted for 4 November 18:10, with zero notification deliveries.
+
+The backend now has a pinned Gunicorn startup candidate: actual WSGI app startup,
+12 concurrent LEGACY mode requests and graceful SIGTERM passed locally, with
+provider credentials absent. All 22 backend tests pass. Dedicated staging
+deployment f13e5c9e succeeded at commit 87b9ca1, retaining LEGACY. Deployed
+health and mode checks passed. No production settings or data were changed.
+Real providers, deployed notification scheduling/monitoring, production runtime
+composition and final full release/rollback certification remain gates.

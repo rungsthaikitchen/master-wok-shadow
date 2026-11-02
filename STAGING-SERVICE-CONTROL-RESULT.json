@@ -169,5 +169,20 @@
     "time": "18:10",
     "reportedAt": "2026-11-02T07:50:00Z",
     "scope": "User confirmation of ticket date/time; no claim about untested print variants."
+  },
+  "manualRestrictionsDisplay": {
+    "result": "PASS",
+    "evidence": "David confirmed the refreshed preview no longer displays the active-restrictions loading error on 2 November 2026."
+  },
+  "rehearsalClosed": {
+    "databaseMode": "LEGACY",
+    "revision": 6,
+    "gatewayLegacyDeployment": "949fe256-706c-4ded-b08b-1ef190becebe",
+    "edgeVersion": 13,
+    "edgeVerifyJwt": true,
+    "edgeHandler": "HTTP410",
+    "retainedOrder": "RTK-119",
+    "confirmedTime": "2026-11-04T18:10:00Z",
+    "notificationDeliveries": 0
   }
 }
