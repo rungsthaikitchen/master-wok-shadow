@@ -161,5 +161,13 @@
     "Service control pause/list/expiry/hint checks ran against the actual deployed private Edge runtime; actual Cloudflare service-control refresh remains the next manual observation.",
     "No real provider notifications, delivery-provider calls or physical printer output in these checks.",
     "Production startup/worker configuration, verified admin Access policy, remaining hosted paths and full release rollback remain gates."
-  ]
+  ],
+  "manualPrintCheck": {
+    "status": "USER_CONFIRMED",
+    "orderRef": "RTK-119",
+    "date": "2026-11-04",
+    "time": "18:10",
+    "reportedAt": "2026-11-02T07:50:00Z",
+    "scope": "User confirmation of ticket date/time; no claim about untested print variants."
+  }
 }

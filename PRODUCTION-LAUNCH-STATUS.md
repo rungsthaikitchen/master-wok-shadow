@@ -139,3 +139,5 @@ Backend deployment 382b8049 and Pages 80ce2b0c succeeded. Local checks: 223 core
 admin scripts parse. Master Wok accepted-time labels now ignore retained proposal
 history. Actual preview refresh and physical print at 18:10 are next manual checks.
 See STAGING-SERVICE-CONTROL-RESULT.json. Production remains NO-GO and untouched.
+
+2 November manual ticket check: David confirmed RTK-119 shows 4 November at 18:10. Ticket date/time is passed by user report. The actual restriction-list display confirmation remains pending; no production permission is implied.

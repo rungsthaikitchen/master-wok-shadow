@@ -1,6 +1,6 @@
 {
   "date": "2026-11-01",
-  "state": "AWAITING_PREVIEW_CONTROL_REFRESH_AND_PHYSICAL_PRINT",
+  "state": "AWAITING_PREVIEW_RESTRICTIONS_DISPLAY_CONFIRMATION",
   "productionReady": false,
   "productionWrites": 0,
   "project": "hvrqgufqjslvgiohgkvu",
@@ -40,7 +40,7 @@
     "renewedEdgeModeRequest": 31
   },
   "pending": [
-    "Refresh actual preview admin to verify restriction list and print RTK-119 at confirmed 18:10.",
+    "Confirm the actual preview restriction list no longer shows the loading error.",
     "Real notification worker configuration/monitoring and production server startup.",
     "Final whole-service and full website/privilege rollback certification.",
     "Explicit approval for exact production release."
@@ -56,7 +56,8 @@
     "One item, matching receipt, saved kitchen plan, pending outbox event and zero notification deliveries.",
     "Staging drain returned HTTP503; deployed LEGACY restore returned HTTP200.",
     "Test order, receipt and plan preserved unchanged; production fixture customer/order counts zero.",
-    "Actual Cloudflare admin Suggest to 18:10 verified, acknowledged via deployed Railway link, sole capacity commitment retained."
+    "Actual Cloudflare admin Suggest to 18:10 verified, acknowledged via deployed Railway link, sole capacity commitment retained.",
+    "David confirmed RTK-119 ticket shows 4 November at 18:10."
   ],
   "evidence": "STAGING-SERVICE-CONTROL-RESULT.json",
   "currentOrder": {
