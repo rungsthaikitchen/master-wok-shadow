@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-02",
+  "status": "SMS_HANDSET_RECEIPT_CONFIRMED",
+  "scope": "ONE_APPROVED_STAGING_SMS_PROVIDER_PROBE",
+  "productionReady": false,
+  "productionMutations": 0,
+  "recipient": "Explicitly supplied and approved by David; ending 9669. Full contact omitted.",
+  "backendCommit": "8292d2c9ae5fa083d987ebff92085c6b6203237e",
+  "probeDeployment": "e4a1cf10-457e-4ae3-baa5-17879ae774da",
+  "probeDeploymentStatus": "SUCCESS",
+  "provider": "Twilio",
+  "providerAcceptedMessages": 1,
+  "providerIdSha256": "1d119a7614a6791449d8c6df4f2d0c4ec2931b33d4a51fa7c41a71ac954b4437",
+  "handsetReceipt": "David explicitly confirmed SMS received in chat.",
+  "outboxEventsClaimed": 0,
+  "customerBookingsCreated": 0,
+  "notificationWorkerEnabled": false,
+  "automaticRestartDuringProbe": "NEVER",
+  "automaticRetries": 0,
+  "restoreDeployment": "955ea8e8-1a87-41e6-88ee-f7e1ae84a801",
+  "restoreStatus": "SUCCESS",
+  "cleanup": "Normal Gunicorn startup restored; probe disabled; temporary recipient and three copied Twilio values cleared to empty strings. No pending staged changes. No SMS result in restored deployment logs.",
+  "limitations": [
+    "One-off existing SMS provider adapter tested; full deployed outbox worker remains unverified.",
+    "Email, Pushover, delivery providers and whole-release rollback still need their release checks."
+  ],
+  "restoredMode": "HTTP200 LEGACY"
+}

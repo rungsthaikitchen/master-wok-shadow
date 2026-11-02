@@ -183,3 +183,21 @@ Other independent release work remains: production assessor/runtime composition,
 whole-service/delivery rehearsal, deployed worker and monitoring validation,
 Cloudflare Access boundary verification and complete website/privilege rollback
 certification. Do not present the SMS test as the only remaining launch gate.
+
+## 2 November approved SMS provider checkpoint
+
+David explicitly approved one test and supplied its destination. Staging probe
+deployment e4a1cf10 at backend 8292d2c9 succeeded. The shared provider adapter
+returned exactly one Twilio accepted-message result, and David confirmed handset
+receipt. No order or outbox event was processed. Automatic container restart was
+disabled for this one-off test. No second send or retry was attempted.
+
+Normal Gunicorn startup restoration, probe disablement and clearing of the
+temporary recipient/three copied Twilio settings were applied; restoration
+deployment 955ea8e8 succeeded. HTTP200 LEGACY and normal Gunicorn startup were
+verified, with no pending staged changes or probe result in restored logs.
+Production was unchanged. This closes
+the isolated SMS provider/handset check, not full deployed outbox worker validation.
+Backend tests: 29. See STAGING-SMS-PROBE-RESULT.json. Full runtime composition,
+whole-service/delivery and worker rehearsal, access boundaries and full rollback
+remain release gates; no production cutover approval is requested.
