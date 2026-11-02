@@ -120,3 +120,22 @@ Cloudflare admin UI POST is the next manual step, not a completed claim. See
 STAGING-ADMIN-REHEARSAL-RESULT.json and PREVIEW-REHEARSAL-STATE.json.
 
 2 November renewal: the same isolated admin rehearsal is reopened until 09:17 UK time today (Edge v11). RTK-119 remains customer-accepted at 18:05 on 4 November; zero notification deliveries. Manual admin Suggest is still pending. Production remains unchanged.
+
+## 2 November service-control checkpoint
+
+David's actual Cloudflare admin Suggest for RTK-119 at 18:10 succeeded. The
+database held 18:05 and 18:10 until acknowledgement; the deployed Railway customer
+link then confirmed 18:10, leaving one commitment, two response receipts, five
+notification events and zero deliveries. No duplicate browser notice was sent by
+the server-owned path.
+
+The screenshot exposed failed restriction reads: in MASTER_WOK mode Flask still
+used a legacy REST reader. Control reads now use the same authenticated writer
+operation/schema as mutations, and the customer service-state Pages proxy honors
+the staging backend. Pause/read/hint, restriction create/list/block/deactivate,
+server-clock expiry and normal restoration passed against deployed private staging.
+Backend deployment 382b8049 and Pages 80ce2b0c succeeded. Local checks: 223 core,
+22 backend and 25 admin/client/proxy tests; six real workerd proxy checks; three
+admin scripts parse. Master Wok accepted-time labels now ignore retained proposal
+history. Actual preview refresh and physical print at 18:10 are next manual checks.
+See STAGING-SERVICE-CONTROL-RESULT.json. Production remains NO-GO and untouched.

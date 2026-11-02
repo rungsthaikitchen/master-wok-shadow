@@ -1,6 +1,6 @@
 {
   "date": "2026-11-01",
-  "state": "AWAITING_MANUAL_PREVIEW_ADMIN_SUGGEST",
+  "state": "AWAITING_PREVIEW_CONTROL_REFRESH_AND_PHYSICAL_PRINT",
   "productionReady": false,
   "productionWrites": 0,
   "project": "hvrqgufqjslvgiohgkvu",
@@ -14,8 +14,8 @@
   "coreModelVersion": "combined-kitchen-protected-v3",
   "edge": {
     "name": "master-wok-booking",
-    "version": 11,
-    "bundleSha256": "65965e70183c22421d58cfdaeef37d3586cfbc0e09e580f7eb0b9c6423fcb7f8",
+    "version": 12,
+    "bundleSha256": "35d6ce0a27ffe2c53ec557c9c130f9e6afc4201b15811c92b63867c6c2c75c9f",
     "verifyJwt": false,
     "authentication": "Dedicated server secret, fixed staging project/schema, run-bound fixture reads/mutations and two-hour expiry."
   },
@@ -23,7 +23,7 @@
     "project": "7821ad5b-f5c2-4ab4-9206-c3d76eefd4c8",
     "environment": "c1b8fad6-dbfc-4188-b4b5-a5dbfbf53279",
     "service": "fd320f7b-3e1d-4b07-970c-74b75fdc82d3",
-    "deployment": "5e7e6734-ae54-4f70-9691-1acdae75e24d",
+    "deployment": "382b8049-ded8-495a-9bb2-9e8816b8fee7",
     "status": "SUCCESS",
     "mode": "MASTER_WOK"
   },
@@ -40,7 +40,7 @@
     "renewedEdgeModeRequest": 31
   },
   "pending": [
-    "Manual preview admin Suggest action through actual Cloudflare Pages; then verify DB and customer response.",
+    "Refresh actual preview admin to verify restriction list and print RTK-119 at confirmed 18:10.",
     "Real notification worker configuration/monitoring and production server startup.",
     "Final whole-service and full website/privilege rollback certification.",
     "Explicit approval for exact production release."
@@ -55,15 +55,16 @@
     "Authenticated hosted preview collection checkout RTK-119 verified in private database.",
     "One item, matching receipt, saved kitchen plan, pending outbox event and zero notification deliveries.",
     "Staging drain returned HTTP503; deployed LEGACY restore returned HTTP200.",
-    "Test order, receipt and plan preserved unchanged; production fixture customer/order counts zero."
+    "Test order, receipt and plan preserved unchanged; production fixture customer/order counts zero.",
+    "Actual Cloudflare admin Suggest to 18:10 verified, acknowledged via deployed Railway link, sole capacity commitment retained."
   ],
-  "evidence": "STAGING-ADMIN-REHEARSAL-RESULT.json",
+  "evidence": "STAGING-SERVICE-CONTROL-RESULT.json",
   "currentOrder": {
     "reference": "RTK-119",
     "status": "customer_accepted_time",
-    "confirmedTime": "2026-11-04T18:05:00Z",
-    "responseReceipts": 1,
-    "queuedNotifications": 3,
+    "confirmedTime": "2026-11-04T18:10:00Z",
+    "responseReceipts": 2,
+    "queuedNotifications": 5,
     "notificationDeliveries": 0
   },
   "renewedAt": "2026-11-02T07:17:25Z"

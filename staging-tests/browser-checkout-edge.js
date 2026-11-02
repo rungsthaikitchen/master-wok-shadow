@@ -35,8 +35,9 @@ Deno.serve(async req=>{
   const envelope=await req.json();
   const gate=createLaunchControl({schema,releaseId:'private-browser-'+RUN});
   if(envelope.operation==='mode')return Response.json({mode:(await gate.read(pool)).mode},{headers:{'Cache-Control':'no-store'}});
+  const isControl=envelope.operation==='service_control';
   const isAvailability=envelope.operation==='availability',isLifecycle=['admin_action','customer_response'].includes(envelope.operation);
-  const input=['checkout','availability','admin_action','customer_response'].includes(envelope.operation)?envelope.payload:envelope;
+  const input=['checkout','availability','admin_action','customer_response','service_control'].includes(envelope.operation)?envelope.payload:envelope;
   if(!input||typeof input!=='object')return new Response('Fixture required',{status:400});
   if(input.operation==='cleanup'){
    const c=await pool.connect();
@@ -61,7 +62,9 @@ Deno.serve(async req=>{
     WHERE o.idempotency_key LIKE $1 AND c.email=$2 AND NOT o.is_test ORDER BY o.created_at DESC LIMIT 20`,[prefix+'%',EMAIL]);
    return Response.json({success:true,notification_managed:true,orders:result.rows.map(r=>r.item)});
   }
-  if(isLifecycle){
+  if(isControl){
+   if(!['get_service_state','list_blackouts','test','set_service_state','create_blackout','deactivate_blackout'].includes(input.action))return new Response('Fixture only',{status:400});
+  }else if(isLifecycle){
    if(!/^[a-f0-9-]{36}$/i.test(input.orderId||''))return new Response('Fixture only',{status:400});
    const own=(await pool.query(`SELECT o.id FROM ${schema}.orders o JOIN ${schema}.customers c ON c.id=o.customer_id
     WHERE o.id=$1 AND o.idempotency_key LIKE $2 AND c.email=$3`,[input.orderId,prefix+'%',EMAIL])).rows[0];
@@ -86,9 +89,9 @@ Deno.serve(async req=>{
     return result.status==='VALIDATED_LIFECYCLE_ASSESSMENT'?{...result,status:'GREEN',bookingApprovalAllowed:true}:result;}});
   // Reuse the exact application runtime; only the private fixture boundary above
   // can authorize these test assessments. No production bootstrap is enabled.
-  const operation=isLifecycle?envelope.operation:isAvailability?'availability':'checkout';
+  const operation=isControl?'service_control':isLifecycle?envelope.operation:isAvailability?'availability':'checkout';
   return await handler(new Request(req.url,{method:'POST',headers:{'content-type':'application/json','x-master-wok-secret':TOKEN},
-   body:JSON.stringify({operation,payload:isLifecycle||isAvailability?input:{...input,key:prefix+input.key}})}));
+   body:JSON.stringify({operation,payload:isControl||isLifecycle||isAvailability?input:{...input,key:prefix+input.key}})}));
  }catch(_){return Response.json({success:false,reason:'STAGING_BRIDGE_FAILURE'},{status:503});}
  finally{await pool.end();}
 });

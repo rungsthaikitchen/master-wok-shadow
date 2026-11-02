@@ -17,12 +17,31 @@ function createServiceControlWriter({pool,schema='public',assertWriteAllowed}={}
   !['public','master_wok_rehearsal'].includes(schema))throw Error('INVALID_SERVICE_CONTROL_CONFIGURATION');
  const table=name=>'"'+schema+'".'+name;
  return async function control(input){
-  if(!input||!['set_service_state','create_blackout','deactivate_blackout'].includes(input.action))
+  if(!input||!['set_service_state','create_blackout','deactivate_blackout','get_service_state','list_blackouts','test'].includes(input.action))
    return {ok:false,committed:false,statusCode:400,reason:'UNSUPPORTED_SERVICE_CONTROL_ACTION'};
   let connection;
   try{
    connection=await pool.connect();await beginBookingTransaction(connection);
    await assertWriteAllowed(connection);
+   if(input.action==='test'){
+    await connection.query('COMMIT');return {ok:true,committed:false,message:'RTK Service Control endpoint is working'};
+   }
+   if(input.action==='get_service_state'){
+    const row=(await connection.query(`SELECT *,clock_timestamp() AS server_now FROM ${table('service_state')} WHERE id=1`)).rows[0];
+    if(!row||!Object.hasOwn(modes,row.mode)||Number(row.capacity_throttle)!==modes[row.mode]||
+     !Number.isFinite(new Date(row.server_now).getTime())||
+     (row.effective_until&&!Number.isFinite(new Date(row.effective_until).getTime())))throw Error('SERVICE_STATE_UNVERIFIED');
+    const {server_now,...state}=row;
+    const expired=!!state.effective_until&&new Date(state.effective_until)<=new Date(server_now);
+    await connection.query('COMMIT');
+    return {ok:true,committed:false,service_state:state,expired,
+     effective_service_state:expired?{...state,mode:'normal',capacity_throttle:0,customer_message:null}:state};
+   }
+   if(input.action==='list_blackouts'){
+    const rows=(await connection.query(`SELECT id,kind,start_at,end_at,message,active FROM ${table('booking_blackouts')}
+     WHERE active=true AND end_at>=clock_timestamp() ORDER BY start_at`)).rows;
+    await connection.query('COMMIT');return {ok:true,committed:false,blackouts:rows};
+   }
    let result;
    if(input.action==='set_service_state'){
     if(!Object.hasOwn(modes,input.mode))throw Error('INVALID_SERVICE_MODE');
