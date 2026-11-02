@@ -118,3 +118,5 @@ production's reader remains unchanged. Pages deployment 9791ee37 and Railway
 admin inline scripts and five actual local workerd proxy checks pass. Actual
 Cloudflare admin UI POST is the next manual step, not a completed claim. See
 STAGING-ADMIN-REHEARSAL-RESULT.json and PREVIEW-REHEARSAL-STATE.json.
+
+2 November renewal: the same isolated admin rehearsal is reopened until 09:17 UK time today (Edge v11). RTK-119 remains customer-accepted at 18:05 on 4 November; zero notification deliveries. Manual admin Suggest is still pending. Production remains unchanged.

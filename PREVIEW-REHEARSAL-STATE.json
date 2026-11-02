@@ -7,15 +7,15 @@
   "schema": "master_wok_rehearsal",
   "run": "26efcf42871d88c3",
   "releaseId": "private-browser-26efcf42871d88c3",
-  "expiresAt": "2026-11-01T22:05:16.039515+00:00",
+  "expiresAt": "2026-11-02T09:17:25.352Z",
   "fixtureEmail": "browser-26efcf42871d88c3@example.invalid",
   "fixturePrefix": "browser-26efcf42871d88c3-",
   "preview": "https://review-master-wok-checkout-i.rungsthaikitchen.pages.dev",
   "coreModelVersion": "combined-kitchen-protected-v3",
   "edge": {
     "name": "master-wok-booking",
-    "version": 10,
-    "bundleSha256": "934d39e8da8f5ec5f28dfc0f23c851317f2487885b5bc86827e26e3cf334ac13",
+    "version": 11,
+    "bundleSha256": "65965e70183c22421d58cfdaeef37d3586cfbc0e09e580f7eb0b9c6423fcb7f8",
     "verifyJwt": false,
     "authentication": "Dedicated server secret, fixed staging project/schema, run-bound fixture reads/mutations and two-hour expiry."
   },
@@ -65,5 +65,6 @@
     "responseReceipts": 1,
     "queuedNotifications": 3,
     "notificationDeliveries": 0
-  }
+  },
+  "renewedAt": "2026-11-02T07:17:25Z"
 }
