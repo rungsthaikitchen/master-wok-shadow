@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-03",
+  "status": "FINAL_HOSTED_CHECKOUT_PENDING",
+  "productionReady": false,
+  "productionWrites": 0,
+  "approvedMessages": {
+    "sms": 1,
+    "email": 1,
+    "kitchenPushover": 1
+  },
+  "realProviderCalls": 0,
+  "providerVariablesPresent": true,
+  "continuousWorkerEnabled": false,
+  "oneShotRestartPolicy": "NEVER",
+  "stagingControl": {
+    "mode": "MASTER_WOK",
+    "revision": 17,
+    "releaseId": "master-wok-launch-2026-11-03"
+  },
+  "edge": {
+    "version": 22,
+    "bundleSha256": "d6b2aadc57aff4ac007dcdb000a188965a97f90b41cbaa089d8f1f1a1fb38831",
+    "ownStrongAuthentication": true
+  },
+  "gatewayDeployment": "d9bc3603-68d1-4855-a1f4-6ea4fefec3d9",
+  "workerStandbyDeployment": "d0d1b730-07d5-4026-828c-31f5087b9ef4",
+  "fixturePrefix": "release-nov3-candidate-live-",
+  "fixtureEmail": "release-nov3-live@example.invalid",
+  "manualCheckout": {
+    "date": "2026-11-04",
+    "time": "18:30",
+    "type": "collection",
+    "item": "green-curry/chicken",
+    "quantity": 1
+  },
+  "pending": [
+    "Owner hosted checkout; bounded outbox sends and receipt checks.",
+    "Close rehearsal, certify exact release and request production approval."
+  ],
+  "deploymentStatus": {
+    "gateway": "SUCCESS",
+    "workerStandby": "SUCCESS"
+  },
+  "availabilityReadOnly": "2026-11-04T18:30Z available; bookingApprovalAllowed=false"
+}
