@@ -119,3 +119,27 @@ test('jasmine and sticky rice always reserve conservative reheating alongside ot
   assert.equal(j.resource,'microwave');assert.equal(j.finish-j.start,3);assert.equal(j.portions,1);
  }
 });
+test('completion and capacity-reducing lifecycle changes retain spring-roll recipe coverage',async()=>{
+ const {createMutationAssessment}=require('./master-wok-mutation-assessment');
+ const {expandCommitments}=require('./master-wok-commitment-reader');
+ require('./master-wok-model-bundle');
+ const before={id:'order-a',created_at:'2026-11-03T12:00:00Z',status:'confirmed',is_test:false,confirmed_time:'2026-11-04T19:00:00Z',
+  items:[line('green-curry'),line('veg-spring-rolls'),line('jasmine-rice')]};
+ const after={...before,status:'completed'},rows=expandCommitments([after],'2026-11-04');
+ const assess=createMutationAssessment({model:globalThis.MasterWokModelV1,readOrders:async()=>rows,
+  readAvailability:async()=>({blackouts:[],serviceState:{mode:'normal',capacity_throttle:0}}),planStore:{read:async()=>null}});
+ const r=await assess({connection:{},before,after,dates:['2026-11-04'],now:'2026-11-03T12:00:00Z'});
+ assert.equal(r.status,'VALIDATED_LIFECYCLE_ASSESSMENT');
+ assert.ok(r.plansByDate['2026-11-04'].fryer.jobs.some(j=>j.type==='springRollBatch'));
+});
+test('preorders cannot spend cold-fryer warmup before production opens at 16:30',()=>{
+ const context=ready=>{const time='2026-11-04T17:'+String(ready-1020).padStart(2,'0')+':00Z';
+  const row=id=>({id,items:[line('green-curry',4,[{id:'tofu'}])]});
+  const order=id=>({orderId:id,placedAt:new Date(2026,10,4,0,0),readyMinute:ready});
+  return {serviceDate:'2026-11-04',acceptedOrders:[order('a')],rawRows:[row('a')],
+   proposedOrder:{...order('b'),rawRow:row('b'),validatedHeader:{preferred_time:time}},
+   state:{now:'2026-11-03T12:00:00Z',availability:{blackouts:[],serviceState:{mode:'normal',capacity_throttle:0}}}};};
+ assert.equal(assessCombinedBooking(context(1020)).status,'UNVERIFIED');
+ const next=assessCombinedBooking(context(1025));assert.equal(next.status,'VALIDATED_COMBINED_ASSESSMENT');
+ assert.ok(next.plan.fryer.jobs.every(j=>j.start>=995));assert.equal(next.bookingApprovalAllowed,false);
+});

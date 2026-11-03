@@ -15,7 +15,7 @@ async function readBody(request,limit){
  const bytes=new Uint8Array(length);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
  return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
 }
-function createBookingHttpHandler({secret,checkout,lifecycle,serviceControl,readMode,availability}={}){
+function createBookingHttpHandler({secret,checkout,lifecycle,serviceControl,readMode,availability,readPreviewOrders}={}){
  if(typeof secret!=='string'||secret.length<32||secret.length>256||typeof checkout!=='function'||
   typeof lifecycle?.adminAction!=='function'||typeof lifecycle?.customerResponse!=='function'||
   typeof serviceControl!=='function'||typeof readMode!=='function')throw Error('INVALID_HTTP_CONFIGURATION');
@@ -36,7 +36,8 @@ function createBookingHttpHandler({secret,checkout,lifecycle,serviceControl,read
    if(!input.payload||Array.isArray(input.payload)||typeof input.payload!=='object')return json({committed:false,error:'INVALID_PAYLOAD'},400);
    const operations={checkout,admin_action:lifecycle.adminAction,customer_response:lifecycle.customerResponse,service_control:serviceControl,...(availability?{availability}:{})};
    if(!Object.hasOwn(operations,input.operation))return json({committed:false,error:'UNKNOWN_OPERATION'},400);
-   const run=operations[input.operation];
+   const run=input.operation==='admin_action'&&input.payload.action==='preview_list_orders'&&readPreviewOrders
+    ?readPreviewOrders:operations[input.operation];
    const result=await run(input.payload);
    if(input.operation==='checkout'){
     if(result?.status==='GREEN'&&result.response?.orderId)return json({...result.response,success:true,committed:result.committed,replayed:result.reason==='REPLAY'});

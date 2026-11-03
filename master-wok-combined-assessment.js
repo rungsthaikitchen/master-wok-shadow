@@ -7,7 +7,7 @@ const {diagnoseFryer}=require('./staging-fryer-diagnostic');
 const {localDate,relativePlacement}=require('./master-wok-atomic-checkout');
 const {fryerRecipe,fryerCapacity,PREPARED_SIDES}=require('./master-wok-recipe-rules');
 const DURATIONS={fast:{1:5,2:6,3:8,4:10},noodle:{1:8,2:10},salad:{1:10,2:10,3:15,4:15}};
-function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate,state},options={}){
+function verifyCombinedCapacity({acceptedOrders,proposedOrder,rawRows,serviceDate,state},options={}){
  const fail=(reason,extra={})=>({status:'UNVERIFIED',reason,bookingApprovalAllowed:false,...extra});
  try{
   const availability=state?.availability,now=new Date(state?.now);
@@ -66,6 +66,7 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
   const protectedResult=planWithProtectedWork({orders,rows,serviceDate,now,previousPlan:state.previousPlan,
    newOrderId:id,blackouts,
    standaloneSpringRolls:true,
+   fryerWarmupMinutes:5,
    confirmedStarterRecipes:true,
    notBeforeByOrder:{[id]:Math.max(990,Math.ceil(minute+Math.max(warmup,buffer)))}});
   if(protectedResult.status!=='VALIDATED_PROTECTED_PLAN')return fail(protectedResult.reason);
@@ -87,7 +88,7 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
    const k=key(d.orderId,d.itemId,type);expected.set(k,(expected.get(k)||0)+count);
   }
   for(const job of unstartedPlan.fryer.jobs){
-   if(!fryerRecipe(job.type)||job.portions>fryerCapacity(job.type,job.basket)||
+   if(job.start<995||!fryerRecipe(job.type)||job.portions>fryerCapacity(job.type,job.basket)||
      job.finish-job.start!==fryerRecipe(job.type).minutes||
      !Array.isArray(job.allocations)||job.allocations.length!==job.portions)
     return fail('INVALID_FRYER_JOB');
@@ -107,9 +108,14 @@ function assessCombinedBooking({acceptedOrders,proposedOrder,rawRows,serviceDate
   // The buffer precedes the first candidate work; fryer warmup is an additional
   // lower bound, not a replacement for the agreed whole-basket lead time.
   if(earliest<Math.max(990,minute+buffer)||finish>ready)return fail('INSUFFICIENT_LEAD_TIME');
-  return {status:'VALIDATED_COMBINED_ASSESSMENT',reason:'STAGING_CERTIFICATION_ONLY',
+  return {status:'VERIFIED_KITCHEN_CAPACITY',reason:'COMPLETE_LOCKED_STATE_VALIDATED',
    plan,leadTime:{earliestCandidateWork:earliest,finalCandidateCompletion:finish,bufferMinutes:buffer,extraServiceLeadMinutes:extraLead,minimumLeadMinutes:20+extraLead},
    bookingApprovalAllowed:false};
  }catch(_){return fail('COMBINED_ASSESSMENT_FAILED');}
 }
-module.exports={assessCombinedBooking};
+function assessCombinedBooking(context,options){
+ const result=verifyCombinedCapacity(context,options);
+ return result.status==='VERIFIED_KITCHEN_CAPACITY'
+  ?{...result,status:'VALIDATED_COMBINED_ASSESSMENT',reason:'STAGING_CERTIFICATION_ONLY'}:result;
+}
+module.exports={assessCombinedBooking,verifyCombinedCapacity};

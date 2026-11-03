@@ -111,7 +111,11 @@ function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...opti
   const notBeforeByOrder=Object.fromEntries(orders.map(o=>[String(o.orderId),
    Math.max(Math.ceil(asOfMinute),options.notBeforeByOrder?.[String(o.orderId)]??0)]));
   const wokBlackouts=[...(options.blackouts||[]),...[...fixed.wok,...fixed.auxiliary.filter(j=>j.resource==='wok')].map(j=>({start:j.start-1,finish:j.finish+1}))];
-  const fryerBlackouts=[...(options.fryerBlackouts||[]),...fixed.fryer.map(j=>({basket:j.basket,start:j.start,finish:j.finish}))];
+  const warmup=options.fryerWarmupMinutes??0;
+  if(!Number.isInteger(warmup)||warmup<0||warmup>15)throw Error('INVALID_FRYER_WARMUP');
+  const fryerBlackouts=[...(options.fryerBlackouts||[]),
+   ...(warmup?['large','small-1','small-2'].map(basket=>({basket,start:990,finish:990+warmup})):[]),
+   ...fixed.fryer.map(j=>({basket:j.basket,start:j.start,finish:j.finish}))];
   const future=planCoordinatedKitchen(remaining.orders,remaining.rows,{...options,
    blackouts:wokBlackouts,kitchenBlackouts:options.blackouts||[],fryerBlackouts,notBeforeByOrder,
    auxiliaryRows:rows,fixedAuxiliary:fixed.auxiliary,fixedWok:fixed.wok});

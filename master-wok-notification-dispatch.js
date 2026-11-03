@@ -9,9 +9,12 @@ function validMessage(m){return m&&['sms','email','pushover'].includes(m.channel
  typeof m.body==='string'&&m.body.length>0&&m.body.length<=16000&&
  (m.channel==='pushover'?typeof m.title==='string':typeof m.recipient==='string'&&m.recipient.length<=320)&&
  (m.channel!=='email'||typeof m.subject==='string');}
-function createNotificationDispatcher({pool,schema='public'}={}){
+function createNotificationDispatcher({pool,schema='public',orderKeyPrefix}={}){
  if(!pool||!['public','master_wok_rehearsal'].includes(schema))throw Error('INVALID_NOTIFICATION_CONFIGURATION');
+ if(orderKeyPrefix!==undefined&&(schema!=='master_wok_rehearsal'||!/^[A-Za-z0-9-]{8,100}-$/.test(orderKeyPrefix)))
+  throw Error('PRIVATE_NOTIFICATION_SCOPE_REQUIRED');
  const events='"'+schema+'".master_wok_notification_outbox',deliveries='"'+schema+'".master_wok_notification_deliveries';
+ const scoped=parameter=>orderKeyPrefix?` AND EXISTS(SELECT 1 FROM "${schema}".orders scope_order WHERE scope_order.id=${events}.order_id AND scope_order.idempotency_key LIKE $${parameter})`:'';
  return async function dispatch(input){
   const connection=await pool.connect();
   try{
@@ -22,9 +25,9 @@ function createNotificationDispatcher({pool,schema='public'}={}){
    await lockKitchenWriter(connection);
    let response;
    if(input?.action==='claim'){
-    const event=(await connection.query(`SELECT * FROM ${events} WHERE
+    const event=(await connection.query(`SELECT * FROM ${events} WHERE (
      (status='pending' AND next_attempt_at<=clock_timestamp()) OR
-     (status='processing' AND leased_until<clock_timestamp()) ORDER BY created_at,id FOR UPDATE SKIP LOCKED LIMIT 1`)).rows[0];
+     (status='processing' AND leased_until<clock_timestamp()))${scoped(1)} ORDER BY created_at,id FOR UPDATE SKIP LOCKED LIMIT 1`,orderKeyPrefix?[orderKeyPrefix+'%']:[])).rows[0];
     if(!event){await connection.query('COMMIT');return {event:null};}
     if(event.status==='processing'){
      const expired=await connection.query(`UPDATE ${deliveries} SET status='uncertain' WHERE event_id=$1 AND status='sending' RETURNING id`,[event.id]);
@@ -46,7 +49,7 @@ function createNotificationDispatcher({pool,schema='public'}={}){
     response={event:{id:event.id,token,payload,prepared:!!event.prepared_messages}};
    }else{
     if(!UUID.test(input?.eventId||'')||!UUID.test(input?.token||''))throw Error('INVALID_NOTIFICATION_CLAIM');
-    const event=(await connection.query(`SELECT *,leased_until>clock_timestamp() AS lease_valid FROM ${events} WHERE id=$1 FOR UPDATE`,[input.eventId])).rows[0];
+    const event=(await connection.query(`SELECT *,leased_until>clock_timestamp() AS lease_valid FROM ${events} WHERE id=$1${scoped(2)} FOR UPDATE`,orderKeyPrefix?[input.eventId,orderKeyPrefix+'%']:[input.eventId])).rows[0];
     if(!event||event.lease_token!==input.token||event.status!=='processing'||!event.lease_valid)throw Error('NOTIFICATION_LEASE_EXPIRED');
     if(input.action==='prepare'){
      const messages=input.messages;

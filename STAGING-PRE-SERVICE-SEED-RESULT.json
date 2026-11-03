@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-03",
+  "requestId": 42,
+  "httpStatus": 200,
+  "status": "PASS",
+  "scope": "REAL_PRIVATE_DATABASE_PRE_SERVICE_SEED",
+  "dryRun": {
+    "ok": true,
+    "committed": false,
+    "serviceDate": "2026-11-05",
+    "releaseId": "seed-rehearsal-02c8f47decd5afd6",
+    "revision": 6,
+    "commitments": 12,
+    "modelVersion": "combined-kitchen-protected-v3",
+    "jobs": {
+      "wok": 16,
+      "fryer": 9,
+      "auxiliary": 16
+    },
+    "bookingApprovalAllowed": false
+  },
+  "concurrent": [
+    {
+      "ok": true,
+      "committed": true,
+      "serviceDate": "2026-11-05",
+      "releaseId": "seed-rehearsal-02c8f47decd5afd6",
+      "revision": 6,
+      "commitments": 12,
+      "modelVersion": "combined-kitchen-protected-v3",
+      "jobs": {
+        "wok": 16,
+        "fryer": 9,
+        "auxiliary": 16
+      },
+      "bookingApprovalAllowed": false
+    },
+    {
+      "ok": false,
+      "committed": false,
+      "reason": "SERVICE_PLAN_ALREADY_EXISTS"
+    }
+  ],
+  "existingLegacyOrders": 12,
+  "basketLines": 36,
+  "persistedPlanRevision": 1,
+  "productionWrites": 0,
+  "notificationsSent": 0,
+  "fixtureCleanup": true,
+  "productionReady": false
+}

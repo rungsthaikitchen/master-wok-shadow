@@ -12,7 +12,7 @@ const {createNotificationDispatcher,createNotificationHttpHandler}=require('./ma
 const {createCommercialValidator}=require('./master-wok-commercial-validator');
 const {createBasketAvailability}=require('./master-wok-availability');
 function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,schema='public',
- validateCommercialOrder,deliveryService,readAvailability,readOrders,assessBooking,assessMutation}={}){
+ validateCommercialOrder,deliveryService,readAvailability,readOrders,assessBooking,assessMutation,notificationOrderKeyPrefix,readPreviewOrders}={}){
  if(typeof assessMutation!=='function')throw Error('CERTIFIED_LIFECYCLE_ASSESSOR_REQUIRED');
  const gate=createLaunchControl({schema,releaseId});
  const shared={pool,mode:'MASTER_WOK',assertWriteAllowed:gate.assertWriteAllowed};
@@ -23,9 +23,13 @@ function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,sc
  const availability=createBasketAvailability({pool,model,readAvailability,assessBooking,
   assertWriteAllowed:gate.assertWriteAllowed,...(readOrders?{readOrders}:{}),planStore:createServicePlanStore({schema})});
  const booking=createBookingHttpHandler({secret,checkout,lifecycle,serviceControl,availability,
+  readPreviewOrders:readPreviewOrders?async()=>{
+   if((await gate.read(pool)).mode!=='MASTER_WOK')throw Error('PREVIEW_READER_DISABLED');
+   return readPreviewOrders();
+  }:undefined,
   readMode:async()=>(await gate.read(pool)).mode});
  const notifications=notificationSecret?createNotificationHttpHandler({secret:notificationSecret,
-  dispatch:createNotificationDispatcher({pool,schema})}):null;
+  dispatch:createNotificationDispatcher({pool,schema,orderKeyPrefix:notificationOrderKeyPrefix})}):null;
  return request=>notifications&&request.headers.has('x-master-wok-notification-secret')?notifications(request):booking(request);
 }
 module.exports={createBookingRuntime};

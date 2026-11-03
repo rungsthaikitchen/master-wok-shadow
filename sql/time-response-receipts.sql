@@ -8,4 +8,4 @@ CREATE TABLE public.master_wok_time_responses (
  created_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE public.master_wok_time_responses ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.master_wok_time_responses FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON public.master_wok_time_responses FROM PUBLIC,anon,authenticated,service_role;

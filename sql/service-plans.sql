@@ -7,4 +7,4 @@ CREATE TABLE public.master_wok_service_plans (
  updated_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE public.master_wok_service_plans ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.master_wok_service_plans FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON public.master_wok_service_plans FROM PUBLIC,anon,authenticated,service_role;

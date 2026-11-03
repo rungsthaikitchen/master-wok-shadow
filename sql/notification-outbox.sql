@@ -17,7 +17,7 @@ CREATE TABLE public.master_wok_notification_outbox (
  UNIQUE(order_id,event_type)
 );
 ALTER TABLE public.master_wok_notification_outbox ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.master_wok_notification_outbox FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON public.master_wok_notification_outbox FROM PUBLIC,anon,authenticated,service_role;
 
 CREATE TABLE public.master_wok_notification_deliveries (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -32,4 +32,4 @@ CREATE TABLE public.master_wok_notification_deliveries (
  UNIQUE(event_id,delivery_key)
 );
 ALTER TABLE public.master_wok_notification_deliveries ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.master_wok_notification_deliveries FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON public.master_wok_notification_deliveries FROM PUBLIC,anon,authenticated,service_role;

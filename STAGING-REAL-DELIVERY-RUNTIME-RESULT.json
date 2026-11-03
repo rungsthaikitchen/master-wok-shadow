@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-03",
+  "requestId": 44,
+  "httpStatus": 200,
+  "status": "PASS",
+  "scope": "JOINED_PRIVATE_ATOMIC_DELIVERY_WITH_REAL_GOOGLE",
+  "ordersCommitted": 2,
+  "receipts": 2,
+  "paidDeliveryFee": 2,
+  "freeDeliveryFee": 0,
+  "replayNoExtraProviderCalls": true,
+  "changedTotalRolledBack": true,
+  "outsideRadiusFreeOrderRefused": true,
+  "calls": [
+    {
+      "function": "geocode-address",
+      "status": 200,
+      "milliseconds": 208
+    },
+    {
+      "function": "get-delivery-route-quote",
+      "status": 200,
+      "milliseconds": 135
+    },
+    {
+      "function": "geocode-address",
+      "status": 200,
+      "milliseconds": 124
+    },
+    {
+      "function": "get-delivery-route-quote",
+      "status": 200,
+      "milliseconds": 90
+    },
+    {
+      "function": "geocode-address",
+      "status": 200,
+      "milliseconds": 186
+    },
+    {
+      "function": "get-delivery-route-quote",
+      "status": 200,
+      "milliseconds": 145
+    },
+    {
+      "function": "geocode-address",
+      "status": 200,
+      "milliseconds": 100
+    },
+    {
+      "function": "geocode-address",
+      "status": 200,
+      "milliseconds": 173
+    }
+  ],
+  "productionMutations": 0,
+  "notificationsSent": 0,
+  "fixtureCleanup": true,
+  "restoredMode": "LEGACY",
+  "productionReady": false
+}
