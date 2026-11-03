@@ -1,6 +1,6 @@
 {
   "date": "2026-11-03",
-  "status": "FINAL_HOSTED_CHECKOUT_PENDING",
+  "status": "BLOCKED_STAGING_PROVIDER_CREDENTIALS",
   "productionReady": false,
   "productionWrites": 0,
   "approvedMessages": {
@@ -8,7 +8,7 @@
     "email": 1,
     "kitchenPushover": 1
   },
-  "realProviderCalls": 0,
+  "realProviderCalls": 2,
   "providerVariablesPresent": true,
   "continuousWorkerEnabled": false,
   "oneShotRestartPolicy": "NEVER",
@@ -34,7 +34,8 @@
     "quantity": 1
   },
   "pending": [
-    "Owner hosted checkout; bounded outbox sends and receipt checks.",
+    "Owner securely corrects staging TWILIO_AUTH_TOKEN and BREVO_API_KEY; read-only preflight before any more sending.",
+    "Owner kitchen receipt confirmation, SMS acceptance and email confirmation remain outstanding.",
     "Close rehearsal, certify exact release and request production approval."
   ],
   "deploymentStatus": {
@@ -54,5 +55,54 @@
     "realProviderCalls": 0,
     "productionLoyaltyWrites": 0,
     "scope": "Inserted missing private account only; no existing balance overwritten. No claim of separate staged loyalty lookup."
+  },
+  "order": {
+    "id": "851bd321-5459-4683-9490-72313d1914fc",
+    "reference": "RTK-149",
+    "total": 4,
+    "loyaltyDiscount": 5,
+    "pointsReserved": 100,
+    "preferredTime": "2026-11-04T18:30:00Z",
+    "proposedTime": "2026-11-04T18:35:00Z",
+    "savedNameWasTestLabel": false
+  },
+  "events": {
+    "orderCreated": "826e5b31-1ece-4356-a90e-23ca5c9d9494",
+    "timeSuggested": "d2f307e9-3de6-4beb-b54b-3b4d3b94f2f1"
+  },
+  "pushDeployment": "3bdb3adb-c306-422e-ae22-f50c6521d219",
+  "emailPhasePrepared": "Private fixture current preference/email changed after immutable SMS snapshot queued; production untouched.",
+  "pushover": {
+    "status": "PROVIDER_ACCEPTED",
+    "realProviderCalls": 1,
+    "fixtureSuppressedCustomerCopies": 1,
+    "outboxStatus": "sent",
+    "ownerReceipt": "PENDING"
+  },
+  "oneShotRehearsalEnabled": false,
+  "sms": {
+    "deployment": "f2b24b3c-8d18-4a7b-a34b-2bc6a6b7d054",
+    "deploymentFinalStatus": "CRASHED",
+    "outboxStatus": "pending",
+    "deliveryChannelAfterRejectedSms": "email",
+    "deliveryStatus": "failed",
+    "realDeliveryConfirmed": false,
+    "emailFallbackBlockedByBudget": true,
+    "automaticRetry": false,
+    "workerProof": {
+      "realProviderCalls": 1,
+      "resultStatus": "pending",
+      "outcome": "FAIL_OR_UNCERTAIN"
+    }
+  },
+  "diagnosticCommit": "5748a758c230704abd8fda2598114be221cd5f1d",
+  "diagnostic": {
+    "deployment": "e19d695a-ec03-4497-afbb-c53ff7308ee7",
+    "status": "SUCCESS",
+    "messageSends": 0,
+    "twilioSidFormatValid": true,
+    "twilioAuthTokenFormatValid": false,
+    "twilioSenderE164": true,
+    "brevoAccountReadHttp": 401
   }
 }
