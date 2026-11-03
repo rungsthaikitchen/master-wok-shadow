@@ -41,5 +41,18 @@
     "gateway": "SUCCESS",
     "workerStandby": "SUCCESS"
   },
-  "availabilityReadOnly": "2026-11-04T18:30Z available; bookingApprovalAllowed=false"
+  "availabilityReadOnly": "2026-11-04T18:30Z available; bookingApprovalAllowed=false",
+  "loyaltyFixture": {
+    "status": "STAGING_BALANCE_ALIGNED_BEFORE_RETRY",
+    "reason": "Existing hosted checkout reads the production read-only loyalty endpoint; isolated writer initially had no corresponding fixture balance.",
+    "readOnlyBalanceSnapshot": 105,
+    "privateFixtureBalance": 105,
+    "expectedSubtotal": 9,
+    "expectedLoyaltyDiscount": 5,
+    "expectedTotal": 4,
+    "failedAttemptOrders": 0,
+    "realProviderCalls": 0,
+    "productionLoyaltyWrites": 0,
+    "scope": "Inserted missing private account only; no existing balance overwritten. No claim of separate staged loyalty lookup."
+  }
 }
