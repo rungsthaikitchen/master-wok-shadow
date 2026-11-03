@@ -1,6 +1,6 @@
 {
   "date": "2026-11-03",
-  "status": "BLOCKED_STAGING_PROVIDER_CREDENTIALS",
+  "status": "SMS_PROVIDER_ACCEPTED_OWNER_ACK_AND_STATIC_BREVO_EGRESS_PENDING",
   "productionReady": false,
   "productionWrites": 0,
   "approvedMessages": {
@@ -8,7 +8,7 @@
     "email": 1,
     "kitchenPushover": 1
   },
-  "realProviderCalls": 2,
+  "realProviderCalls": 3,
   "providerVariablesPresent": true,
   "continuousWorkerEnabled": false,
   "oneShotRestartPolicy": "NEVER",
@@ -34,8 +34,8 @@
     "quantity": 1
   },
   "pending": [
-    "Owner securely corrects staging TWILIO_AUTH_TOKEN and BREVO_API_KEY; read-only preflight before any more sending.",
-    "Owner kitchen receipt confirmation, SMS acceptance and email confirmation remain outstanding.",
+    "Confirm approved SMS provider acceptance and owner acknowledgement.",
+    "Configure stable outbound IPs and authorize them in Brevo; account read must return HTTP200 before the approved confirmation email.",
     "Close rehearsal, certify exact release and request production approval."
   ],
   "deploymentStatus": {
@@ -68,7 +68,8 @@
   },
   "events": {
     "orderCreated": "826e5b31-1ece-4356-a90e-23ca5c9d9494",
-    "timeSuggested": "d2f307e9-3de6-4beb-b54b-3b4d3b94f2f1"
+    "timeSuggested": "d2f307e9-3de6-4beb-b54b-3b4d3b94f2f1",
+    "renewedTimeSuggested": "7debeacd-f54d-4d6b-8360-7433ce3d839c"
   },
   "pushDeployment": "3bdb3adb-c306-422e-ae22-f50c6521d219",
   "emailPhasePrepared": "Private fixture current preference/email changed after immutable SMS snapshot queued; production untouched.",
@@ -77,7 +78,7 @@
     "realProviderCalls": 1,
     "fixtureSuppressedCustomerCopies": 1,
     "outboxStatus": "sent",
-    "ownerReceipt": "PENDING"
+    "ownerReceipt": "CONFIRMED"
   },
   "oneShotRehearsalEnabled": false,
   "sms": {
@@ -93,9 +94,14 @@
       "realProviderCalls": 1,
       "resultStatus": "pending",
       "outcome": "FAIL_OR_UNCERTAIN"
-    }
+    },
+    "renewedEvent": "7debeacd-f54d-4d6b-8360-7433ce3d839c",
+    "renewedDeployment": "ee07826d-6511-40dc-8a0f-4f959db6040a",
+    "renewedStatus": "PASS_PROVIDER_ACCEPTED",
+    "renewedProviderCalls": 1,
+    "ownerReceipt": "PENDING"
   },
-  "diagnosticCommit": "5748a758c230704abd8fda2598114be221cd5f1d",
+  "diagnosticCommit": "43d2971303f9215215631d0602447619c74e9682",
   "diagnostic": {
     "deployment": "e19d695a-ec03-4497-afbb-c53ff7308ee7",
     "status": "SUCCESS",
@@ -104,5 +110,25 @@
     "twilioAuthTokenFormatValid": false,
     "twilioSenderE164": true,
     "brevoAccountReadHttp": 401
+  },
+  "credentialRecheck": {
+    "deployment": "d8e4290a-77ec-4a12-b630-8da1ecee6840",
+    "twilioAccountReadHttp": 200,
+    "twilioAccountStatus": "active",
+    "senderOwned": true,
+    "senderSmsCapable": true,
+    "brevoAccountReadHttp": 401,
+    "messageSends": 0
+  },
+  "brevoAuthorization": {
+    "ownerConfirmed": true,
+    "authorizedIp": "152.55.177.235",
+    "currentBlockedIp": "152.55.177.81",
+    "diagnosticDeployment": "6713ff96-8e07-4f79-b53e-2d5a7f2e1408",
+    "brevoAccountReadHttp": 401,
+    "brevoIpRestriction": true,
+    "brevoKeyNotFound": false,
+    "messageSends": 0,
+    "resolution": "Stable outbound IP assignment and allowlist before final email certification."
   }
 }
