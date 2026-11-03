@@ -1,6 +1,6 @@
 {
   "date": "2026-11-03",
-  "status": "SMS_PROVIDER_ACCEPTED_OWNER_ACK_AND_STATIC_BREVO_EGRESS_PENDING",
+  "status": "HOSTED_CHECKOUT_SMS_AND_CUSTOMER_ACK_PASSED_EMAIL_EGRESS_BLOCKED",
   "productionReady": false,
   "productionWrites": 0,
   "approvedMessages": {
@@ -69,7 +69,8 @@
   "events": {
     "orderCreated": "826e5b31-1ece-4356-a90e-23ca5c9d9494",
     "timeSuggested": "d2f307e9-3de6-4beb-b54b-3b4d3b94f2f1",
-    "renewedTimeSuggested": "7debeacd-f54d-4d6b-8360-7433ce3d839c"
+    "renewedTimeSuggested": "7debeacd-f54d-4d6b-8360-7433ce3d839c",
+    "timeConfirmed": "07322cb9-2ab2-42ac-bb9a-ed72cff904b2"
   },
   "pushDeployment": "3bdb3adb-c306-422e-ae22-f50c6521d219",
   "emailPhasePrepared": "Private fixture current preference/email changed after immutable SMS snapshot queued; production untouched.",
@@ -99,7 +100,7 @@
     "renewedDeployment": "ee07826d-6511-40dc-8a0f-4f959db6040a",
     "renewedStatus": "PASS_PROVIDER_ACCEPTED",
     "renewedProviderCalls": 1,
-    "ownerReceipt": "PENDING"
+    "ownerReceipt": "CONFIRMED_BY_OWNER"
   },
   "diagnosticCommit": "43d2971303f9215215631d0602447619c74e9682",
   "diagnostic": {
@@ -130,5 +131,18 @@
     "brevoKeyNotFound": false,
     "messageSends": 0,
     "resolution": "Stable outbound IP assignment and allowlist before final email certification."
+  },
+  "customerAcknowledgement": {
+    "status": "customer_accepted_time",
+    "confirmedTime": "2026-11-04T18:35:00Z",
+    "databaseVerified": true
+  },
+  "email": {
+    "status": "QUEUED_NOT_SENT",
+    "approvedRecipientVerified": true
+  },
+  "networking": {
+    "ownerScreenshot": "Networking shows outbound IPv6, no static IP control visible. IPv6 remains off.",
+    "plan": "UNVERIFIED; management API does not expose billing tier."
   }
 }
