@@ -1,3 +1,5 @@
+> 3 November update: the release runtime is assembled and private whole-service, concurrent worker, pre-service seeding, real route/geocode and rollback rehearsals passed. Production remains blocked by the DRAFT certificate. Final authenticated hosted flow and approved SMS/email/kitchen Pushover receipts remain outstanding. Current evidence and limits: `STAGING-RELEASE-RUNTIME-RESULT.json` and `PRODUCTION-LAUNCH-STATUS.md`. Historical gaps below are not all still outstanding.
+
 # Master Wok — minimum safe launch integration contract
 
 Status: **staging review only**. This is an implementation checklist, not permission to enable bookings.

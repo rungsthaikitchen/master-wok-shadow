@@ -1,0 +1,195 @@
+{
+  "date": "2026-11-03",
+  "status": "ENGINE_REHEARSAL_PASSED_FINAL_HOSTED_PROVIDER_CHECKS_PENDING",
+  "productionReady": false,
+  "productionBusinessSchemaConfigMutations": 0,
+  "releaseId": "master-wok-launch-2026-11-03",
+  "finalRuntimeSourceSha256": "021fb4dee715caeb07114f7eb8454ac59a6d46867c833bc1581283827b3d087f",
+  "productionCertificateStatus": "DRAFT",
+  "wholeService": {
+    "mixedBaskets": 12,
+    "basketLines": 36,
+    "checks": [
+      "joined-basket-0",
+      "concurrent-same-key-one-commit",
+      "joined-basket-1",
+      "joined-basket-2",
+      "joined-basket-3",
+      "joined-basket-4",
+      "joined-basket-5",
+      "joined-basket-6",
+      "joined-basket-7",
+      "joined-basket-8",
+      "joined-basket-9",
+      "joined-basket-10",
+      "joined-basket-11",
+      "pause-set",
+      "pause-blocks-hints",
+      "normal-restored",
+      "blackout-created",
+      "blackout-blocks-hints",
+      "blackout-deactivated",
+      "physical-overflow-refused",
+      "time-proposal-committed",
+      "completion-committed",
+      "completion-replay-stable",
+      "cancellation-committed",
+      "cold-first-order-committed",
+      "cold-warmup-overflow-refused",
+      "cold-warmup-next-slot-offered"
+    ],
+    "customerAcknowledgementReplay": "PASS",
+    "loyaltyCompletionReplay": "PASS; balance increased by 18 once per completed order",
+    "distinctConcurrentBaskets": {
+      "status": "PASS",
+      "scope": "DISTINCT_CONCURRENT_BASKETS_AT_COLD_START_CAPACITY",
+      "statuses": [
+        409,
+        200
+      ],
+      "committed": 1,
+      "productionMutations": 0
+    },
+    "extraColdBoundaryOrder": 1,
+    "totalCommittedOrdersInFinalRun": 14,
+    "bookingReceipts": 14,
+    "responseReceipts": 1
+  },
+  "workers": {
+    "concurrentWorkers": 2,
+    "results": [
+      {
+        "status": "PASS",
+        "processedEvents": 7,
+        "skippedStaleEvents": 2,
+        "fixtureProviderCalls": 13,
+        "channels": {
+          "email": 7,
+          "pushover": 6
+        },
+        "emptyReplay": {
+          "processed": false
+        },
+        "realProviderCalls": 0,
+        "productionMutations": 0
+      },
+      {
+        "status": "PASS",
+        "processedEvents": 7,
+        "skippedStaleEvents": 1,
+        "fixtureProviderCalls": 13,
+        "channels": {
+          "email": 7,
+          "pushover": 6
+        },
+        "emptyReplay": {
+          "processed": false
+        },
+        "realProviderCalls": 0,
+        "productionMutations": 0
+      },
+      {
+        "status": "PASS",
+        "processedEvents": 1,
+        "skippedStaleEvents": 0,
+        "fixtureProviderCalls": 2,
+        "channels": {
+          "email": 1,
+          "pushover": 1
+        },
+        "emptyReplay": {
+          "processed": false
+        },
+        "realProviderCalls": 0,
+        "productionMutations": 0
+      }
+    ],
+    "fixtureProviderCalls": 28,
+    "realProviderCalls": 0,
+    "ledgerSentChannels": 28,
+    "outboxSent": 15,
+    "outboxSkipped": 2,
+    "retainedOldMessagesUnchanged": true,
+    "railwayLoop": {
+      "enabledFixtureDeployment": "1aadcbe1-f14d-46a4-bf74-02f75bf53555",
+      "badAuthenticationDeployment": "90ddf446-ce0a-4c06-b708-57f82ac95390",
+      "observedBackoffSeconds": [
+        2,
+        4,
+        8,
+        16,
+        32,
+        60
+      ],
+      "realProviderCalls": 0,
+      "currentEnabled": false
+    }
+  },
+  "rollback": {
+    "unknownCommittedReplyLost": true,
+    "drainRetainsUnknownKey": true,
+    "legacyRestoreBlocksDuplicate": true,
+    "legacyRoutes": 0,
+    "unknownOrderAndReceiptCount": 1,
+    "gatewayMasterWokHttp": 200,
+    "gatewayDrainHttp": 503,
+    "gatewayLegacyHttp": 200,
+    "guard": "No unresolved time proposals; retain compatibility website/backend and immutable receipts."
+  },
+  "fixes": [
+    "Spring rolls included when replanning completion/cancellation and other capacity-reducing actions.",
+    "Fryer warmup cannot be spent before the 16:30 production start; 17:00 conflict refused and 17:05 hint feasible.",
+    "Browser preserves uncertainty on a failed mode check after a lost booking reply.",
+    "Actual writer error field displays changed-price review message.",
+    "SMS provider formats UK national numbers without changing stored loyalty/customer phone keys."
+  ],
+  "testedEdgeVersions": {
+    "initialComposition": 15,
+    "springRollFix": 16,
+    "previewAndUnknownOutcome": 17,
+    "finalPhysicalRuntime": 19,
+    "finalPreviewTestFilter": 20,
+    "currentInertVersion": 21
+  },
+  "artifacts": {
+    "coreCodeReviewCommit": "283f34cad7cdbdfbd166f6a70c68a4805f083e34",
+    "gatewayCommit": "c06ada38d31e428448bd36a6c6b5e1b6698eb42a",
+    "workerCommit": "3715a5edba132a330ac2927842b0dfd64a4ff399",
+    "websiteCommit": "2ef374c26a338dec2cb09b1d7b686ada8e78d2a0",
+    "pagesDeployment": "c8f88db7-0e7e-416c-a511-4393b634518c"
+  },
+  "verification": {
+    "coreUTC": 238,
+    "coreEuropeLondon": 238,
+    "backend": 39,
+    "website": 27,
+    "productionAdminAccessUnauthenticated": "Both service-control and order-action POST probes redirect to Cloudflare Access; stateless/empty payload only.",
+    "upcomingDatedProductionOrdersAtReadOnlyPreflight": 0
+  },
+  "retainedFixture": {
+    "reference": "RTK-119",
+    "orderDigestBeforeAndAfter": "c4c4dbceb6c29a96146ac208bf9915ab",
+    "outboxDigestBeforeAndAfter": "6280ccdc56016308ea515bd9774ab135",
+    "outboxEvents": 5
+  },
+  "restoration": {
+    "gatewayMode": "LEGACY",
+    "runtimeMode": "LEGACY",
+    "controlRevision": 16,
+    "edge": "v21 HTTP410; JWT enforcement enabled",
+    "fixtureDisposition": "All 27 release orders retained as is_test=true; zero release capacity orders. RTK-119 and its five queued events unchanged.",
+    "workerEnabled": false,
+    "workerStandbyDeployment": "47e52fe4-a579-4ee6-aeb4-84135794d1ac"
+  },
+  "remaining": [
+    "Authenticated hosted checkout and bounded actual outbox provider rehearsal: one approved kitchen Pushover, one approved SMS time proposal and acceptance, one confirmation email to an approved address.",
+    "Secure provider credentials in the dedicated staging worker; owner receipt checks.",
+    "Final certificate and exact production release approval; production rollout remains unauthorized."
+  ],
+  "limits": [
+    "Workers used fixture providers; the received isolated Twilio probe is separate evidence and does not authorize more sends.",
+    "Lost-response client proof used the real browser client and deployed gateway mode, with a transport adapter to the private runtime; not a claim of an authenticated Cloudflare browser run.",
+    "The final private preview is_test predicate was smoke-tested after physical-runtime v19; production certificate remains DRAFT.",
+    "Physical joined-service tests ran source digest 429ccb93d889da13fc223cfbdc6069970a7919d7ca6a0cc2e387b26c45312641; final digest adds only private preview test-order filtering, separately smoke-tested."
+  ]
+}

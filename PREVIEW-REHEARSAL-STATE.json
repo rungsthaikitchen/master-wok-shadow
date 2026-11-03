@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-01",
-  "state": "MANUAL_CHECKS_PASSED_REHEARSAL_CLOSED",
+  "date": "2026-11-03",
+  "state": "WHOLE_SERVICE_PASSED_FINAL_HOSTED_PROVIDER_CHECKS_PENDING",
   "productionReady": false,
   "productionWrites": 0,
   "project": "hvrqgufqjslvgiohgkvu",
@@ -14,8 +14,8 @@
   "coreModelVersion": "combined-kitchen-protected-v3",
   "edge": {
     "name": "master-wok-booking",
-    "version": 13,
-    "bundleSha256": "51e5f68b1da10f907b4ac7f46926af7fdbb9496ede805c076512348598c1d9a7",
+    "version": 21,
+    "bundleSha256": "eeed5c8fe0c23f2217c476d3c70069d26eb96969eaaad68c824547654709eb22",
     "verifyJwt": true,
     "authentication": "Temporary handler replaced with HTTP410 and JWT enforcement restored."
   },
@@ -23,11 +23,11 @@
     "project": "7821ad5b-f5c2-4ab4-9206-c3d76eefd4c8",
     "environment": "c1b8fad6-dbfc-4188-b4b5-a5dbfbf53279",
     "service": "fd320f7b-3e1d-4b07-970c-74b75fdc82d3",
-    "deployment": "955ea8e8-1a87-41e6-88ee-f7e1ae84a801",
+    "deployment": "a1e00ff2-da95-471c-ba52-ddfb724dbce1",
     "status": "SUCCESS",
     "mode": "LEGACY",
     "startCommand": "python -m gunicorn -c gunicorn.conf.py server:app",
-    "commit": "8292d2c9ae5fa083d987ebff92085c6b6203237e"
+    "commit": "c06ada38d31e428448bd36a6c6b5e1b6698eb42a"
   },
   "verified": {
     "directStagingGatewayMode": "MASTER_WOK",
@@ -42,9 +42,8 @@
     "renewedEdgeModeRequest": 31
   },
   "pending": [
-    "Real notification worker configuration/monitoring and provider checks.",
-    "Final whole-service and full website/privilege rollback certification.",
-    "Explicit approval for exact production release."
+    "Final authenticated hosted flow and approved real provider receipts.",
+    "Exact release certification and explicit production deployment approval."
   ],
   "cleanup": [
     "Retain the private test order, receipt, plan and write fence for review; fixture deletion requires the existing scoped cleanup path."
@@ -72,16 +71,20 @@
   "renewedAt": "2026-11-02T07:17:25Z",
   "worker": {
     "reviewCommit": "6a4be76f126d9875b02fb551bc25f5844ff9d3e6",
-    "deployed": false,
+    "deployed": true,
     "enabled": false,
-    "backendTests": 29,
+    "backendTests": 39,
     "realProcessShutdown": "PASS",
     "realProviderCalls": 1,
-    "nextManualRequirement": "No SMS action pending; David confirmed receipt. Full outbox worker deployment remains unverified."
+    "nextManualRequirement": "Approved bounded full outbox SMS, email and kitchen Pushover rehearsal; credentials and email destination required.",
+    "service": "9bfcff98-728e-4260-b452-9626c509ccac",
+    "deployment": "47e52fe4-a579-4ee6-aeb4-84135794d1ac"
   },
   "smsProbe": {
     "result": "HANDSET_RECEIPT_CONFIRMED",
     "evidence": "STAGING-SMS-PROBE-RESULT.json",
     "cleanup": "Restored LEGACY/Gunicorn, disabled probe, cleared temporary values; SUCCESS."
-  }
+  },
+  "currentControlRevision": 16,
+  "latestEvidence": "STAGING-RELEASE-RUNTIME-RESULT.json"
 }

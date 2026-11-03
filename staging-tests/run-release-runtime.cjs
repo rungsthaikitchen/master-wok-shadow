@@ -16,6 +16,16 @@ const line=id=>{const i=catalog.items.find(i=>i.id===id);return {item_id:id,qty:
  modifiers:i.modifierRequired?[{id:i.allowedModifiers.includes('chicken')?'chicken':i.allowedModifiers[0]}]:[],
  spice:i.spiceEnabled?(i.spiceDefault||i.spiceMin||0):0};};
 (async()=>{
+ if(process.argv[2]==='--race-only'){
+  const input={orderType:'collection',preferredTime:'2026-11-11T17:00:00Z',communicationPreference:'email',
+   customer:{name:'Private concurrent fixture',phone:'07700900123',email:'release-nov3-candidate@example.invalid'},
+   items:[{item_id:'green-curry',qty:4,modifiers:[{id:'tofu'}],spice:1}]};
+  input.expectedTotals=calculateCommercialOrder(input,{now:new Date()}).header;
+  const result=await Promise.all(['a','b'].map(suffix=>call('checkout',{...input,key:prefix+'race-'+suffix})));
+  check(result.filter(r=>r.http===200&&r.body.success).length===1&&result.filter(r=>r.http===409).length===1,'distinct-key-conflict-serialized');
+  const proof={status:'PASS',scope:'DISTINCT_CONCURRENT_BASKETS_AT_COLD_START_CAPACITY',statuses:result.map(r=>r.http),committed:result.filter(r=>r.body.committed).length,productionMutations:0};
+  fs.writeFileSync('/tmp/mw-release-race-proof.json',JSON.stringify(proof,null,2));console.log(JSON.stringify(proof));return;
+ }
  const sets=[['green-curry','jasmine-rice','fish-cakes'],['pad-thai','fried-prawns','sticky-rice'],
   ['stir-crispy','egg-rice','veg-spring-rolls'],['panang-curry','coconut-rice','thai-sausage'],
   ['pad-see-ew','pork-dumplings','jasmine-rice'],['stir-basil','fried-egg','spare-ribs'],

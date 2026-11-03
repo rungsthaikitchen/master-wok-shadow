@@ -6,7 +6,7 @@
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
   "schema": "master_wok_rehearsal",
   "modelVersion": "combined-kitchen-protected-v3",
-  "sourceSha256": "429ccb93d889da13fc223cfbdc6069970a7919d7ca6a0cc2e387b26c45312641",
+  "sourceSha256": "021fb4dee715caeb07114f7eb8454ac59a6d46867c833bc1581283827b3d087f",
   "checks": {
     "atomicConcurrency": "PENDING",
     "physicalCoverage": "PENDING",

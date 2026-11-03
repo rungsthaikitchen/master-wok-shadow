@@ -1,3 +1,19 @@
+# Production launch status — 3 November 2026
+
+**NO-GO pending final hosted provider rehearsal and exact production approval. Legacy remains authoritative; production checkout and Supabase have not been changed.**
+
+The deployable runtime now joins basket assessment, atomic booking, lifecycle actions, delivery pricing, plan seeding and the notification outbox. Private whole-service tests covered 12 mixed baskets / 36 lines, concurrent same-key replay and distinct-key capacity conflict, time acknowledgement, completion, cancellation, service controls, cold fryer boundaries and rollback after a lost response. Real read-only geocode/route calls also passed with atomic delivery bookings.
+
+Two concurrent notification workers delivered 28 fixture channels with durable deduplication. The dedicated Railway staging worker passed startup, authentication-error backoff and disabled standby checks. Real providers were not used in these worker tests. The earlier received SMS probe is separate evidence.
+
+Regression results: 238 core tests in UTC and Europe/London, 39 backend tests and 27 website tests. Fixed spring-roll replanning, fryer warmup boundaries, uncertain checkout responses and UK SMS formatting. Production certification remains DRAFT and cannot authorize bookings.
+
+Staging is restored to LEGACY revision 16, the temporary booking Edge is inert (v21, JWT enforced), and the worker is disabled. All 27 new release fixtures are test orders; RTK-119 and its queued messages remain unchanged. See STAGING-RELEASE-RUNTIME-RESULT.json for precise artifact and test limits.
+
+The remaining owner steps are one bounded hosted flow with an approved kitchen Pushover, SMS acceptance and confirmation email, secure provider settings in the dedicated staging worker, and receipt confirmation. After that, certify the exact artifact and request approval for the concrete production rollout and rollback package.
+
+## Historical checkpoints
+
 # Production launch status — 1 November 2026
 
 **NO-GO for production. Legacy remains authoritative.** No production checkout,

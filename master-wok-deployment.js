@@ -34,7 +34,7 @@ function createDeploymentRuntime({pool,model,certificate,sourceSha256,releaseId,
    const r=await pool.query(`SELECT to_jsonb(o)||jsonb_build_object('customers',to_jsonb(c),
     'order_items',(SELECT coalesce(jsonb_agg(i),'[]'::jsonb) FROM ${schema}.order_items i WHERE i.order_id=o.id)) AS item
     FROM ${schema}.orders o LEFT JOIN ${schema}.customers c ON c.id=o.customer_id
-    WHERE o.idempotency_key LIKE $1 ORDER BY o.created_at DESC LIMIT 20`,[certificate.fixturePrefix+'%']);
+    WHERE o.idempotency_key LIKE $1 AND o.is_test=false ORDER BY o.created_at DESC LIMIT 20`,[certificate.fixturePrefix+'%']);
    return {success:true,notification_managed:true,orders:r.rows.map(row=>row.item)};
   }:undefined,
   validateCommercialOrder:(c,input,state)=>{
