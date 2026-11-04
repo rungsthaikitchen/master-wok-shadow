@@ -34,8 +34,8 @@
     "quantity": 1
   },
   "pending": [
-    "Confirm approved SMS provider acceptance and owner acknowledgement.",
-    "Configure stable outbound IPs and authorize them in Brevo; account read must return HTTP200 before the approved confirmation email.",
+    "Inspect Brevo authorized-IP entries to establish existing mailer access before choosing plan/security or architecture changes.",
+    "One approved confirmation email remains queued; no additional SMS or Pushover authorized.",
     "Close rehearsal, certify exact release and request production approval."
   ],
   "deploymentStatus": {
@@ -143,6 +143,23 @@
   },
   "networking": {
     "ownerScreenshot": "Networking shows outbound IPv6, no static IP control visible. IPv6 remains off.",
-    "plan": "UNVERIFIED; management API does not expose billing tier."
+    "plan": "Hobby; confirmed by owner"
+  },
+  "existingMailerReview": {
+    "date": "2026-11-04",
+    "scope": "READ_ONLY_PRODUCTION_CONFIGURATION_AND_LOGS",
+    "productionDeployment": "126fc57f-cf9b-4254-9dbb-2d49670d0695",
+    "productionCommit": "105b0845f3f4d50542d7daf575b2cd5642837669",
+    "deployedAt": "2026-10-23T21:25:17.469Z",
+    "provider": "Brevo HTTPS /v3/smtp/email",
+    "region": "us-west2",
+    "specialRelayFound": false,
+    "staticOutboundConfigurationExposed": false,
+    "recentSuccessfulBrevoDeliveryProvenByAvailableLogs": false,
+    "brevoAuthorizedListAccessibleThroughConnectedTools": false,
+    "hypothesis": "Existing production source IP or subnet may already be recognized; requires Brevo authorized-IP list verification.",
+    "productionMutations": 0,
+    "messagesSent": 0,
+    "paidUpgradeRequiredByThisReview": false
   }
 }
