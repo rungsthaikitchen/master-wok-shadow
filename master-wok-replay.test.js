@@ -40,3 +40,4 @@ const invalid = replay(serviceDate,[order('LATE','2026-10-15T18:00:00',1110)]);
 assert.equal(invalid.status,'UNVERIFIED');
 assert.match(invalid.reason,/post-service/);
 console.log('PASS: post-service order rejected');
+

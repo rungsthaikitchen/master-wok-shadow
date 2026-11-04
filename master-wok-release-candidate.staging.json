@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "status": "CANDIDATE_FOR_STAGING",
+  "releaseId": "master-wok-launch-2026-11-03",
+  "projectRef": "hvrqgufqjslvgiohgkvu",
+  "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
+  "schema": "master_wok_rehearsal",
+  "modelVersion": "combined-kitchen-protected-v3",
+  "sourceSha256": "021fb4dee715caeb07114f7eb8454ac59a6d46867c833bc1581283827b3d087f",
+  "checks": {
+    "atomicConcurrency": "PENDING",
+    "physicalCoverage": "PENDING",
+    "lifecycle": "PENDING",
+    "writeFence": "PENDING",
+    "commercial": "PENDING",
+    "delivery": "PENDING",
+    "notifications": "PENDING",
+    "wholeService": "PENDING",
+    "rollback": "PENDING"
+  },
+  "fixturePrefix": "release-nov3-candidate-"
+}

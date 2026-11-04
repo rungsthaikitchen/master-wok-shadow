@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "scope": "PRIVATE_STAGING_ATOMIC_CHECKOUT_REHEARSAL",
+  "tests": [
+    "CONCURRENT_REAL_BASKETS_ONE_COMMIT_HEADER_ITEMS_RECEIPT",
+    "IDEMPOTENT_REPLAY_AND_CROSS_DATE_CONFLICT",
+    "ROLLBACK_AFTER_COMPLETE_PERSISTENCE_LEAVES_NO_ORDER",
+    "CONCURRENT_IDENTICAL_RETRY_ONE_ORDER",
+    "MIXED_WOK_AND_FRYER_BASKET_COMMITTED_ATOMICALLY",
+    "PROTOTYPE_REFUSED_AND_LEGACY_FLAG_OFF",
+    "LOCKED_BLACKOUT_REFUSES_BOOKING",
+    "CANCELLED_ORDER_RELEASES_CAPACITY",
+    "TEST_ORDER_EXCLUDED_FROM_REAL_CAPACITY",
+    "PROPOSED_TIME_COUNTED_AT_NEW_SERVICE_TIME",
+    "CONFIRMED_TIME_COUNTED_AT_NEW_SERVICE_TIME",
+    "INCOMPLETE_COMMITTED_HEADER_FAILS_CLOSED"
+  ],
+  "productionReady": false,
+  "productionWrites": 0,
+  "publicStagingOrderWrites": 0,
+  "project": "hvrqgufqjslvgiohgkvu",
+  "function": "master-wok-atomic-certification",
+  "testedDeploymentVersion": 2,
+  "testedDeploymentHash": "da19183f6a0a4381e040f4407c6957899c0d6d49930a6db8bf3ad500cf2118b3",
+  "httpStatus": 200,
+  "pgNetResponseId": 2,
+  "disabledDeploymentVersion": 3,
+  "cleanupCounts": {
+    "headers": 0,
+    "items": 0,
+    "receipts": 0,
+    "blackouts": 0
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "scope": "MOBILE_BROWSER_JSON_TO_PRIVATE_STAGING_WRITER_VIA_CONTROLLED_TRANSPORT_BRIDGE",
+  "productionReady": false,
+  "browser": "Chromium 153.0.8010.0",
+  "viewport": {"width":390,"height":844},
+  "project": "hvrqgufqjslvgiohgkvu",
+  "schema": "master_wok_rehearsal",
+  "testedDeploymentVersion": 12,
+  "testedDeploymentHash": "293babf1ec935f2075d35889d1cb57f752049c98b88d0236f3f1ab66cb483ce6",
+  "pgNetResponseId": 9,
+  "httpStatus": 200,
+  "orderId": "938947f7-74cd-44dc-8ab8-7d0a143fcdb2",
+  "totalGBP": 9,
+  "persisted": {"orders":1,"items":1,"receipts":1,"pendingNotifications":1,"servicePlan":true},
+  "browserSeparateDatabaseWrites": 0,
+  "browserLegacyConfirmationRequests": 0,
+  "browserPageErrors": [],
+  "externalNotificationSends": 0,
+  "productionWrites": 0,
+  "cleanupResponseId": 10,
+  "cleanupConfirmed": true,
+  "temporaryHandlerDisabledWithJWT": true,
+  "limits": [
+    "Maps and external read providers intercepted with fixtures",
+    "Collection basket only; delivery not certified",
+    "Controlled bridge forwarded actual browser JSON, rather than deployed Cloudflare/Railway chain",
+    "Notifications queued, not sent",
+    "Later capacity_scheduler persistence change separately passed all 21 database scenarios in deployment 14"
+  ]
+}
