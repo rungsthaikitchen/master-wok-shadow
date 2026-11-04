@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-03",
-  "status": "HOSTED_CHECKOUT_SMS_AND_CUSTOMER_ACK_PASSED_EMAIL_EGRESS_BLOCKED",
+  "date": "2026-11-04",
+  "status": "ONE_EMAIL_PROCESS_WAITING_FOR_OWNER_BREVO_IP_AUTHORIZATION",
   "productionReady": false,
   "productionWrites": 0,
   "approvedMessages": {
@@ -34,9 +34,9 @@
     "quantity": 1
   },
   "pending": [
-    "Inspect Brevo authorized-IP entries to establish existing mailer access before choosing plan/security or architecture changes.",
-    "One approved confirmation email remains queued; no additional SMS or Pushover authorized.",
-    "Close rehearsal, certify exact release and request production approval."
+    "Authorize the exact blocked source IP reported by the waiting one-email process; no redeploy between account access and the bounded send.",
+    "Owner inbox receipt and closure of private rehearsal.",
+    "Agree ongoing egress authorization handling for Hobby; certify exact release and obtain explicit production approval."
   ],
   "deploymentStatus": {
     "gateway": "SUCCESS",
@@ -81,7 +81,7 @@
     "outboxStatus": "sent",
     "ownerReceipt": "CONFIRMED"
   },
-  "oneShotRehearsalEnabled": false,
+  "oneShotRehearsalEnabled": true,
   "sms": {
     "deployment": "f2b24b3c-8d18-4a7b-a34b-2bc6a6b7d054",
     "deploymentFinalStatus": "CRASHED",
@@ -138,8 +138,17 @@
     "databaseVerified": true
   },
   "email": {
-    "status": "QUEUED_NOT_SENT",
-    "approvedRecipientVerified": true
+    "status": "APPROVED_WAITING_FOR_ACCESS",
+    "approvedRecipientVerified": true,
+    "runnerCommit": "a76e098ffe3450ab220dc2f3f180f286a66ba1a8",
+    "preflightWaitSeconds": 1800,
+    "providerSendBeforeHttp200": false,
+    "waitingDeployment": "06d22cad-a7e7-47ef-83a7-37173fd15466",
+    "waitingDeploymentStatus": "SUCCESS",
+    "currentBlockedIp": "54.177.170.222",
+    "waitStartedAt": "2026-11-04T07:39:00Z",
+    "waitExpiresAt": "2026-11-04T08:09:00Z",
+    "messageSendsBeforeAuthorization": 0
   },
   "networking": {
     "ownerScreenshot": "Networking shows outbound IPv6, no static IP control visible. IPv6 remains off.",
@@ -161,5 +170,12 @@
     "productionMutations": 0,
     "messagesSent": 0,
     "paidUpgradeRequiredByThisReview": false
+  },
+  "brevoCidrReview": {
+    "ownerAdded": "152.55.177.0/24",
+    "checkDeployment": "534fdeb8-51f5-409e-b420-39860c2da042",
+    "actualNewBlockedIp": "52.9.85.82",
+    "httpStatus": 401,
+    "longTermSubnetSolutionVerified": false
   }
 }

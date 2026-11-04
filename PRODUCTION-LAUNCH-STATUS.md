@@ -1,3 +1,17 @@
+# Production launch status — 4 November 2026
+
+**NO-GO pending confirmation-email receipt, an accepted egress operating approach and exact production approval. Production remains on the legacy scheduler.**
+
+The latest authenticated hosted checkout passed: private RTK-149, one chicken Green Curry, GBP9 less GBP5 loyalty reward = GBP4, with 100 points reserved only in the private fixture. The owner received the real kitchen Pushover and real outbox SMS, then accepted 4 November at 18:35 through the deployed response link. The database confirms customer_accepted_time and a queued confirmation email to the approved address. No further SMS/Pushover is authorized.
+
+Brevo IP protection blocked the new worker. The owner authorized 152.55.177.0/24, but a subsequent deployment used 52.9.85.82 and was blocked. One subnet is therefore not a verified lasting solution. A staging-only bounded one-email process now waits for a successful read-only account check in its running container before claiming/sending the exact approved event. Backend regression count is 42. This does not change the production worker.
+
+The existing production deployment was inspected read-only: commit 105b0845f3f4d50542d7daf575b2cd5642837669, deployed 23 October, same Brevo HTTPS API, no special relay found. The historical authorized-IP export contains both Railway and Amazon entries. Hobby can be retained with an explicit post-deployment access/authorization procedure, but that operating choice must be accepted; Pro or disabling account-wide IP protection has not been approved.
+
+Private staging control remains MASTER_WOK revision 17, with fixture-prefix and server-secret restrictions. The temporary Edge is v22. The worker runs only the bounded approved rehearsal; the continuous worker is disabled. Production certificate remains DRAFT. See STAGING-FINAL-PROVIDER-REHEARSAL.json and the draft PRODUCTION-RELEASE-PACKAGE.json.
+
+## Previous checkpoints
+
 # Production launch status — 3 November 2026
 
 **NO-GO pending final hosted provider rehearsal and exact production approval. Legacy remains authoritative; production checkout and Supabase have not been changed.**

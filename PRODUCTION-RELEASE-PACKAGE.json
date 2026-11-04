@@ -1,0 +1,68 @@
+{
+  "status": "DRAFT_PENDING_FINAL_EMAIL_RECEIPT_AND_OWNER_PRODUCTION_APPROVAL",
+  "preparedDate": "2026-11-04",
+  "productionAuthorized": false,
+  "runtimeSourceSha256": "021fb4dee715caeb07114f7eb8454ac59a6d46867c833bc1581283827b3d087f",
+  "runtimeModel": "combined-kitchen-protected-v3",
+  "project": "ubyjrrsvbbqomitpaidb",
+  "schema": "public",
+  "sqlInDependencyOrder": [
+    {
+      "path": "sql/capacity-scheduler-source.sql",
+      "sha256": "eb5a095274600afe8e8c58f4ff1e1a09bed8fc8af301b12d3786d0f77b652efc"
+    },
+    {
+      "path": "sql/booking-receipts.sql",
+      "sha256": "022e0078cc7110314706880ea6f73638dca68e90858b65eb6b86decdb904379f"
+    },
+    {
+      "path": "sql/time-response-receipts.sql",
+      "sha256": "2fc2f045ea318e16ed6f121c4a439f3d5d9f798bff6bb354800a47a023731b53"
+    },
+    {
+      "path": "sql/service-plans.sql",
+      "sha256": "a48666ce4a5418a347b8bf9d25c68cb7017650b7e6b79bc74d699e7df5d53be8"
+    },
+    {
+      "path": "sql/notification-outbox.sql",
+      "sha256": "32cadbf7ba46a86280ad5a3bc059dc3e44313202070500b07088f76814993174"
+    },
+    {
+      "path": "sql/launch-control.sql",
+      "sha256": "c73f7615cc7143492e5033a3d36aa6acaf930f2b73832b43417e54fd46f8e8a0"
+    },
+    {
+      "path": "sql/booking-write-fence.sql",
+      "sha256": "b1d8859d6e34103077872843ba163bd6f6f09907410b9d9ec3c9c57c27b4cb12"
+    }
+  ],
+  "reviewPullRequests": [
+    "https://github.com/rungsthaikitchen/master-wok-shadow/pull/2",
+    "https://github.com/rungsthaikitchen/order-backend/pull/1",
+    "https://github.com/rungsthaikitchen/Rungs-Thai-Kitchen/pull/66"
+  ],
+  "approvalScope": [
+    "Add reviewed capacity source column, runtime tables, release control and writer fence; preserve existing business data.",
+    "Deploy compatibility website and backend in LEGACY; record exact compatible rollback deployments.",
+    "Deploy certified server runtime and dedicated notification worker with secrets configured securely; worker disabled until checks pass.",
+    "Before 16:30 UK time, read and seed existing commitments under the shared lock; no running-service cutover.",
+    "Activate the exact certified release only after all checks pass; controlled first bookings and notification reconciliation."
+  ],
+  "rollback": "deployment/README.md#rollback-preserves-data-and-duplicate-protection",
+  "rollbackConditions": [
+    "Drain under shared lock; verify gateway503 and resolve unknown booking outcomes.",
+    "Resolve pending Master Wok time proposals before reopening LEGACY unless both commitments remain protected.",
+    "Retain compatible website/backend, receipts, plans, ledgers and loyalty/notification fences; no destructive schema rollback."
+  ],
+  "knownLimits": [
+    "Brevo egress varies across Railway and Amazon networks; the owner-approved 152.55.177.0/24 did not cover a later deployment. Before launch, explicitly accept and document post-deployment account-access checks/authorization on Hobby or approve another egress/security approach. A successful one-email rehearsal alone does not resolve future egress changes.",
+    "Production certificate remains DRAFT until the exact release evidence is complete; no production activation is authorized by this package."
+  ],
+  "remaining": [
+    "Approved confirmation email acceptance and owner inbox receipt.",
+    "Owner accepts the ongoing egress operating approach; no paid upgrade or account-wide IP-security deactivation is approved.",
+    "Record final source commits, compatible deployment baselines and explicit owner production approval."
+  ],
+  "backendReviewCommit": "a76e098ffe3450ab220dc2f3f180f286a66ba1a8",
+  "websiteReviewCommit": "2ef374c26a338dec2cb09b1d7b686ada8e78d2a0"
+}
