@@ -2,9 +2,9 @@
   "date": "2026-11-04",
   "ownerApproved": true,
   "approvedPackageCommit": "f71c40920d1b2fd42e7bbd0b6a6e4a8f36af746e",
-  "status": "WORKER_READY_BACKEND_PROVIDER_IP_AUTHORIZATION_REQUIRED",
-  "productionMode": "LEGACY",
-  "productionRevision": 1,
+  "status": "LIVE_AWAITING_FIRST_HOSTED_PRODUCTION_ORDER",
+  "productionMode": "MASTER_WOK",
+  "productionRevision": 2,
   "ddlApplied": true,
   "ddlFiles": 7,
   "beforeAndAfterCounts": {
@@ -18,17 +18,16 @@
   "activeFutureOrdersPreflight": 0,
   "originalBackendDeployment": "126fc57f-cf9b-4254-9dbb-2d49670d0695",
   "backendSourceCommit": "a76e098ffe3450ab220dc2f3f180f286a66ba1a8",
-  "backendStartup": "Read-only Brevo access gate then Gunicorn; old live deployment retained until healthy.",
+  "backendStartup": "Read-only Brevo access gate passed before Gunicorn startup.",
   "next": [
-    "Owner authorizes exact production backend egress IP 152.55.176.230 without redeploying.",
-    "Verify healthy gateway replacement, then execute the already approved locked cutover only if the pre-service window and empty commitment set still hold.",
-    "Verify production availability and first controlled customer checkout."
+    "Owner places one controlled TEST order through the normal production checkout, using their own contact details.",
+    "Verify atomic booking receipt, service plan, outbox delivery and normal lifecycle before declaring production end-to-end sign-off complete."
   ],
   "backendMergeCommit": "401ef93b81ff55ed09c933adb8385f0113f32063",
   "certificateStatus": "CERTIFIED_FOR_PRODUCTION",
-  "backendDeployment": "d7ac8181-1a02-4580-b194-1ed7cc277d8d",
+  "backendDeployment": "5b510d17-199f-451c-baaa-1f505d897c82",
   "backendDeploymentStatus": "SUCCESS",
-  "backendBrevoPreflight": "AUTHORIZED; zero sends",
+  "backendBrevoPreflight": "AUTHORIZED at 2026-11-04T08:48:07Z; zero preflight sends",
   "backendHealthHttp": 200,
   "backendModeHttp": 200,
   "websiteMergeCommit": "f4048f4ae253dace9d2aa50a58291c5cecb917e7",
@@ -38,7 +37,7 @@
     "id": "5934ea07-cfb9-470f-a373-3f6b3066d62d",
     "version": 1,
     "bundleSha256": "dbc82ecc2196be6a4e9071948b3b41f3d9504ae13fa1e9aa638cc8f7db49f3fd",
-    "status": "AUTHENTICATED_MODE_HTTP200_LEGACY",
+    "status": "AUTHENTICATED_AVAILABILITY_HTTP200_MASTER_WOK",
     "ownStrongSecretAuthentication": true
   },
   "productionWorker": {
@@ -60,7 +59,7 @@
     "EuropeLondon": 238,
     "failures": 0
   },
-  "publicWebsiteProbe": "Cloudflare returns HTTP403 to the automation host; GitHub Pages check-run deployment succeeded. Direct backend mode is verified LEGACY.",
+  "publicWebsiteProbe": "Cloudflare HTTP403 to automation host; Pages deployment succeeded. Direct backend mode HTTP200 MASTER_WOK. Hosted production order still requires owner browser.",
   "secretsConfigured": true,
   "cutoverPreflight": {
     "commitmentsToSeed": 0,
@@ -71,13 +70,36 @@
     "revision": 1
   },
   "directNotificationProbe": "Auto-review rejected a direct claim probe. Not retried; replaced with read-only SQL confirming no outbox/delivery events. Normal approved worker deployment includes provider checks before processing.",
-  "pendingBackend": {
-    "deployment": "5b510d17-199f-451c-baaa-1f505d897c82",
-    "status": "DEPLOYING",
-    "brevoBlockedIp": "152.55.176.230",
-    "preflightWaitStartedAt": "2026-11-04T08:45:26Z",
-    "preflightWaitSeconds": 900,
-    "existingLiveDeployment": "d7ac8181-1a02-4580-b194-1ed7cc277d8d"
+  "wrongBookingSecretHttp": 401,
+  "activatedAt": "2026-11-04T08:51:36.024649Z",
+  "cutover": {
+    "globalWriterLock": true,
+    "preServiceWindowPassed": true,
+    "commitmentsToSeed": 0,
+    "seedAction": "No seed required: full reader-aligned commitment set empty under shared writer lock.",
+    "modeBefore": "LEGACY",
+    "revisionBefore": 1,
+    "modeAfter": "MASTER_WOK",
+    "revisionAfter": 2
   },
-  "wrongBookingSecretHttp": 401
+  "liveSmoke": {
+    "gatewayMode": "MASTER_WOK",
+    "gatewayHttp": 200,
+    "availabilityHttp": 200,
+    "basket": "1 chicken green curry",
+    "times": {
+      "2026-11-04T16:55:00Z": false,
+      "2026-11-04T18:30:00Z": true,
+      "2026-11-08T18:30:00Z": false
+    },
+    "hintBookingApprovalAllowed": false,
+    "expiredServiceState": "very_busy effective_until 2026-10-10 correctly treated as normal",
+    "afterCounts": {
+      "orders": 1480,
+      "items": 5835,
+      "masterWokOrders": 0,
+      "outbox": 0
+    },
+    "worker": "SUCCESS; normal idle polls"
+  }
 }
