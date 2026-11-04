@@ -1,5 +1,5 @@
 {
-  "status": "DRAFT_PENDING_FINAL_EMAIL_RECEIPT_AND_OWNER_PRODUCTION_APPROVAL",
+  "status": "READY_FOR_OWNER_PRODUCTION_APPROVAL",
   "preparedDate": "2026-11-04",
   "productionAuthorized": false,
   "runtimeSourceSha256": "021fb4dee715caeb07114f7eb8454ac59a6d46867c833bc1581283827b3d087f",
@@ -59,10 +59,39 @@
     "Production certificate remains DRAFT until the exact release evidence is complete; no production activation is authorized by this package."
   ],
   "remaining": [
-    "Owner confirms received confirmation email; Brevo accepted and ledger is sent.",
-    "Owner accepts the ongoing egress operating approach; no paid upgrade or account-wide IP-security deactivation is approved.",
-    "Record final source commits, compatible deployment baselines and explicit owner production approval."
+    "Owner explicitly approves the production rollout and Hobby egress procedure described in this package.",
+    "After approval, record compatible production deployment baselines, complete production preflight/certification, and activate only if every gate passes before 16:30 UK time."
   ],
   "backendReviewCommit": "a76e098ffe3450ab220dc2f3f180f286a66ba1a8",
-  "websiteReviewCommit": "2ef374c26a338dec2cb09b1d7b686ada8e78d2a0"
+  "websiteReviewCommit": "2ef374c26a338dec2cb09b1d7b686ada8e78d2a0",
+  "coreReviewedCommit": "6033e3d63fcbcef531ac758aaaf2e4d02ecee024",
+  "targets": {
+    "supabaseProject": "ubyjrrsvbbqomitpaidb",
+    "railwayProject": "7821ad5b-f5c2-4ab4-9206-c3d76eefd4c8",
+    "railwayEnvironment": "eb574083-839c-4959-b1b1-8b96c45ce86b",
+    "existingBackendService": "f2eb904f-fc4a-41d0-9073-53a1b42fafe9",
+    "newNotificationWorkerName": "master-wok-notification-worker",
+    "cloudflarePagesProject": "rungsthaikitchen",
+    "websiteProductionBranch": "main"
+  },
+  "stagingSignoff": {
+    "ownerConfirmedAllReceipts": true,
+    "kitchenAlert": "PASS",
+    "smsAndCustomerAcknowledgement": "PASS",
+    "confirmationEmail": "PASS",
+    "coreTestsUTC": 238,
+    "coreTestsEuropeLondon": 238,
+    "backendTests": 42,
+    "websiteTests": 27,
+    "stagingRestoredLegacy": true,
+    "temporaryWriterInert": true
+  },
+  "operatingApproachForApproval": {
+    "railwayPlan": "Hobby; no upgrade",
+    "brevoIpBlocking": "Retained; no account-wide deactivation",
+    "afterWorkerDeployment": "Run read-only provider access checks before enabling sends. If Brevo blocks a changed source IP, keep sends disabled and request owner authorization for that exact IP. Recheck in the same running deployment before enabling processing.",
+    "newSenderSecrets": "Reuse existing server-side provider settings securely; never expose values in browser/source control.",
+    "futureRestarts": "A changed egress IP can also require authorization after a restart; inspect provider rejection/attention states.",
+    "automaticNotificationRetry": "Accepted/uncertain provider outcomes must not be resent; preserve durable ledger and reconcile."
+  }
 }

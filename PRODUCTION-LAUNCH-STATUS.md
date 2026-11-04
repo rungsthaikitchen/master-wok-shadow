@@ -1,8 +1,8 @@
 # Production launch status — 4 November 2026
 
-**NO-GO pending confirmation-email receipt, an accepted egress operating approach and exact production approval. Production remains on the legacy scheduler.**
+**Staging sign-off complete. Ready to request the exact controlled production rollout approval, including the Hobby egress operating approach. Production remains on the legacy scheduler; no rollout is yet authorized.**
 
-The latest authenticated hosted checkout passed: private RTK-149, one chicken Green Curry, GBP9 less GBP5 loyalty reward = GBP4, with 100 points reserved only in the private fixture. The owner received the real kitchen Pushover and real outbox SMS, then accepted 4 November at 18:35 through the deployed response link. The database confirms customer_accepted_time, one acknowledgement receipt, and the approved confirmation email accepted by Brevo at 07:41 on 4 November. Inbox receipt still needs owner confirmation. No further SMS/Pushover/email is authorized after this successful send.
+The latest authenticated hosted checkout passed: private RTK-149, one chicken Green Curry, GBP9 less GBP5 loyalty reward = GBP4, with 100 points reserved only in the private fixture. The owner received the real kitchen Pushover and real outbox SMS, then accepted 4 November at 18:35 through the deployed response link. The database confirms customer_accepted_time, one acknowledgement receipt, and the approved confirmation email accepted by Brevo at 07:41 on 4 November. The owner confirmed inbox receipt; all three real channels and customer acknowledgement passed. No further SMS/Pushover/email is authorized after this successful send.
 
 Brevo IP protection blocked the new worker. The owner authorized 152.55.177.0/24, but a subsequent deployment used 52.9.85.82 and was blocked. One subnet is therefore not a verified lasting solution. The staging-only bounded email process waited in its running container for owner authorization of 54.177.170.222, then passed the read-only account check and sent the exact approved event once. Backend regression count is 42. This does not change the production worker.
 

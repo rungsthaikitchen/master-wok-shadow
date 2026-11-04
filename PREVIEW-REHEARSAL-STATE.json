@@ -1,6 +1,6 @@
 {
   "date": "2026-11-04",
-  "state": "FINAL_HOSTED_PROVIDERS_ACCEPTED_OWNER_EMAIL_RECEIPT_PENDING",
+  "state": "FINAL_HOSTED_REHEARSAL_PASSED_ALL_RECEIPTS_CONFIRMED",
   "productionReady": false,
   "productionWrites": 0,
   "project": "hvrqgufqjslvgiohgkvu",
@@ -42,8 +42,7 @@
     "renewedEdgeModeRequest": 31
   },
   "pending": [
-    "Owner confirmation-email receipt.",
-    "Accepted ongoing egress operating approach, exact production certification and approval."
+    "Exact production rollout approval including the Hobby egress operating procedure."
   ],
   "cleanup": [
     "Retain the private test order, receipt, plan and write fence for review; fixture deletion requires the existing scoped cleanup path."

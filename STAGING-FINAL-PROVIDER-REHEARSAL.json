@@ -1,6 +1,6 @@
 {
   "date": "2026-11-04",
-  "status": "ALL_PROVIDERS_ACCEPTED_OWNER_EMAIL_RECEIPT_PENDING",
+  "status": "HOSTED_REHEARSAL_PASSED_ALL_OWNER_RECEIPTS_CONFIRMED",
   "productionReady": false,
   "productionWrites": 0,
   "approvedMessages": {
@@ -35,8 +35,7 @@
     "quantity": 1
   },
   "pending": [
-    "Owner confirms confirmation email receipt.",
-    "Accept ongoing Hobby egress authorization procedure, complete certification and obtain exact production approval."
+    "Explicit approval for the exact production release, including the ongoing Hobby egress authorization procedure."
   ],
   "deploymentStatus": {
     "gateway": "SUCCESS",
@@ -156,7 +155,7 @@
     "outboxStatus": "sent",
     "deliveryStatus": "sent",
     "providerReceiptPresent": true,
-    "ownerReceipt": "PENDING"
+    "ownerReceipt": "CONFIRMED_BY_OWNER"
   },
   "networking": {
     "ownerScreenshot": "Networking shows outbound IPv6, no static IP control visible. IPv6 remains off.",
