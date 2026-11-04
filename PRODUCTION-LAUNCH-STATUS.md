@@ -1,3 +1,17 @@
+# Approved production rollout — 4 November 2026
+
+**IN PROGRESS; LEGACY remains authoritative. The owner approved the exact controlled rollout.**
+
+The seven reviewed SQL additions were applied atomically under the shared lock. All six runtime tables have RLS and deny API-role writes; eight write-fence triggers are installed. Existing counts remained 1,480 orders and 5,835 items, with zero Master Wok orders. The active-future-order preflight found zero commitments needing migration at that moment; it must be rechecked under the cutover lock.
+
+The compatibility backend is live (d7ac8181) with a successful read-only Brevo access check, Gunicorn health HTTP200 and LEGACY mode HTTP200. Backend PR #1 is merged. Website PR #66 is merged; Cloudflare Pages deployment d6ae8537 succeeded. These compatible deployments are the rollback baseline. The new production notification worker is deployed in disabled standby (ffab709b), with zero provider calls.
+
+The source-bound production certificate has been completed after owner receipt sign-off and approval; the runtime digest remains 021fb4dee715caeb07114f7eb8454ac59a6d46867c833bc1581283827b3d087f. The actual release tests still pass 238/238 in both UTC and Europe/London. Draft rejection tests now explicitly create a draft fixture, so promotion does not weaken the guard.
+
+The production booking Edge is deployed but currently returns configuration-guard HTTP503: its four custom server settings must be copied securely from prepared Railway variables into Supabase Edge Function Secrets. The connected Supabase tools cannot set secrets. No booking authority has been enabled. After setup, continue the already approved runtime/provider checks, recheck/seed commitments and activate before 16:30 only if every gate passes. See PRODUCTION-ROLLOUT-STATE.json for precise identifiers.
+
+## Previous checkpoints
+
 # Production launch status — 4 November 2026
 
 **Staging sign-off complete. Ready to request the exact controlled production rollout approval, including the Hobby egress operating approach. Production remains on the legacy scheduler; no rollout is yet authorized.**

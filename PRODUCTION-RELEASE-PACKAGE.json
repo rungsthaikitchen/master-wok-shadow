@@ -1,7 +1,7 @@
 {
-  "status": "READY_FOR_OWNER_PRODUCTION_APPROVAL",
+  "status": "APPROVED_ROLLOUT_IN_PROGRESS_LEGACY",
   "preparedDate": "2026-11-04",
-  "productionAuthorized": false,
+  "productionAuthorized": true,
   "runtimeSourceSha256": "021fb4dee715caeb07114f7eb8454ac59a6d46867c833bc1581283827b3d087f",
   "runtimeModel": "combined-kitchen-protected-v3",
   "project": "ubyjrrsvbbqomitpaidb",
@@ -59,8 +59,8 @@
     "Production certificate remains DRAFT until the exact release evidence is complete; no production activation is authorized by this package."
   ],
   "remaining": [
-    "Owner explicitly approves the production rollout and Hobby egress procedure described in this package.",
-    "After approval, record compatible production deployment baselines, complete production preflight/certification, and activate only if every gate passes before 16:30 UK time."
+    "Secure production Edge settings, final runtime/provider access and pre-service commitment checks.",
+    "Activate under the approved lock only if every gate passes; otherwise remain LEGACY."
   ],
   "backendReviewCommit": "a76e098ffe3450ab220dc2f3f180f286a66ba1a8",
   "websiteReviewCommit": "2ef374c26a338dec2cb09b1d7b686ada8e78d2a0",
@@ -93,5 +93,7 @@
     "newSenderSecrets": "Reuse existing server-side provider settings securely; never expose values in browser/source control.",
     "futureRestarts": "A changed egress IP can also require authorization after a restart; inspect provider rejection/attention states.",
     "automaticNotificationRetry": "Accepted/uncertain provider outcomes must not be resent; preserve durable ledger and reconcile."
-  }
+  },
+  "ownerApprovalDate": "2026-11-04",
+  "approvedImmutablePackageCommit": "f71c40920d1b2fd42e7bbd0b6a6e4a8f36af746e"
 }

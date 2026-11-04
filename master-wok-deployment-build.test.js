@@ -1,8 +1,12 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm');
 const {execFileSync}=require('node:child_process');
-test('actual release bundle serves no booking endpoint with the committed draft and never connects to PostgreSQL',async()=>{
- const source=execFileSync(process.execPath,['staging-tests/build-atomic-checkout-edge.cjs','--release'],{cwd:__dirname,encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:1024*1024});
+test('actual release bundle serves no booking endpoint with an explicit draft and never connects to PostgreSQL',async()=>{
+ const built=execFileSync(process.execPath,['staging-tests/build-atomic-checkout-edge.cjs','--release'],{cwd:__dirname,encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:1024*1024});
+ const published=require('./master-wok-release-candidate.json');
+ const marker='module.exports='+JSON.stringify(published)+';';
+ assert.ok(built.includes(marker));
+ const source=built.replace(marker,'module.exports='+JSON.stringify({...published,status:'DRAFT'})+';');
  let handler,connections=0;
  const env={SUPABASE_URL:'https://ubyjrrsvbbqomitpaidb.supabase.co',SUPABASE_DB_URL:'postgres://unused.invalid/db',
   MASTER_WOK_RELEASE_ID:'master-wok-launch-2026-11-03',MASTER_WOK_BOOKING_SECRET:'a'.repeat(64),

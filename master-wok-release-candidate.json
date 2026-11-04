@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "DRAFT",
+  "status": "CERTIFIED_FOR_PRODUCTION",
   "releaseId": "master-wok-launch-2026-11-03",
   "projectRef": "ubyjrrsvbbqomitpaidb",
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
@@ -8,14 +8,23 @@
   "modelVersion": "combined-kitchen-protected-v3",
   "sourceSha256": "021fb4dee715caeb07114f7eb8454ac59a6d46867c833bc1581283827b3d087f",
   "checks": {
-    "atomicConcurrency": "PENDING_RELEASE_REHEARSAL",
-    "physicalCoverage": "PENDING_RELEASE_REHEARSAL",
-    "lifecycle": "PENDING_RELEASE_REHEARSAL",
-    "writeFence": "PENDING_RELEASE_REHEARSAL",
-    "commercial": "PENDING_RELEASE_REHEARSAL",
-    "delivery": "PENDING_RELEASE_REHEARSAL",
-    "notifications": "PENDING_RELEASE_REHEARSAL",
-    "wholeService": "PENDING_RELEASE_REHEARSAL",
-    "rollback": "PENDING_RELEASE_REHEARSAL"
+    "atomicConcurrency": "PASS",
+    "physicalCoverage": "PASS",
+    "lifecycle": "PASS",
+    "writeFence": "PASS",
+    "commercial": "PASS",
+    "delivery": "PASS",
+    "notifications": "PASS",
+    "wholeService": "PASS",
+    "rollback": "PASS"
+  },
+  "evidence": {
+    "sourceAndWholeService": "STAGING-RELEASE-RUNTIME-RESULT.json",
+    "hostedOwnerReceipts": "STAGING-FINAL-PROVIDER-REHEARSAL.json",
+    "planSeeding": "STAGING-PRE-SERVICE-SEED-RESULT.json",
+    "realDelivery": "STAGING-REAL-DELIVERY-RUNTIME-RESULT.json",
+    "approvedScope": "PRODUCTION-RELEASE-PACKAGE.json",
+    "approvalDate": "2026-11-04",
+    "productionPreflight": "PRODUCTION-ROLLOUT-STATE.json"
   }
 }

@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-04",
+  "ownerApproved": true,
+  "approvedPackageCommit": "f71c40920d1b2fd42e7bbd0b6a6e4a8f36af746e",
+  "status": "COMPATIBILITY_DEPLOYED_LEGACY_EDGE_SECRETS_REQUIRED",
+  "productionMode": "LEGACY",
+  "productionRevision": 1,
+  "ddlApplied": true,
+  "ddlFiles": 7,
+  "beforeAndAfterCounts": {
+    "orders": 1480,
+    "items": 5835
+  },
+  "runtimeTablesRls": true,
+  "apiRolesRuntimeWrites": false,
+  "writeFenceTriggers": 8,
+  "masterWokOrders": 0,
+  "activeFutureOrdersPreflight": 0,
+  "originalBackendDeployment": "126fc57f-cf9b-4254-9dbb-2d49670d0695",
+  "backendSourceCommit": "a76e098ffe3450ab220dc2f3f180f286a66ba1a8",
+  "backendStartup": "Read-only Brevo access gate then Gunicorn; old live deployment retained until healthy.",
+  "next": [
+    "Owner copies four prepared production Railway variables securely to Supabase Edge Function Secrets.",
+    "Verify production runtime authentication, database mode/readers and worker provider access.",
+    "Recheck/seed commitments under the approved lock before 16:30 and activate only when every gate passes."
+  ],
+  "backendMergeCommit": "401ef93b81ff55ed09c933adb8385f0113f32063",
+  "certificateStatus": "CERTIFIED_FOR_PRODUCTION",
+  "backendDeployment": "d7ac8181-1a02-4580-b194-1ed7cc277d8d",
+  "backendDeploymentStatus": "SUCCESS",
+  "backendBrevoPreflight": "AUTHORIZED; zero sends",
+  "backendHealthHttp": 200,
+  "backendModeHttp": 200,
+  "websiteMergeCommit": "f4048f4ae253dace9d2aa50a58291c5cecb917e7",
+  "pagesDeployment": "d6ae8537-1a8f-4ff8-a834-228b7169f4a4",
+  "pagesDeploymentStatus": "SUCCESS",
+  "productionEdge": {
+    "id": "5934ea07-cfb9-470f-a373-3f6b3066d62d",
+    "version": 1,
+    "bundleSha256": "dbc82ecc2196be6a4e9071948b3b41f3d9504ae13fa1e9aa638cc8f7db49f3fd",
+    "status": "CONFIGURATION_GUARD_HTTP503",
+    "ownStrongSecretAuthentication": true
+  },
+  "productionWorker": {
+    "service": "c92f1458-4011-4872-9121-5c827c64b0c0",
+    "deployment": "ffab709b-3ec0-4396-90a3-c0e5a874de99",
+    "status": "SUCCESS",
+    "enabled": false,
+    "providerCalls": 0
+  },
+  "compatibleRollbackBaseline": {
+    "backend": "d7ac8181-1a02-4580-b194-1ed7cc277d8d",
+    "websitePages": "d6ae8537-1a8f-4ff8-a834-228b7169f4a4"
+  },
+  "coreReleaseTests": {
+    "UTC": 238,
+    "EuropeLondon": 238,
+    "failures": 0
+  },
+  "publicWebsiteProbe": "Cloudflare returns HTTP403 to the automation host; GitHub Pages check-run deployment succeeded. Direct backend mode is verified LEGACY."
+}

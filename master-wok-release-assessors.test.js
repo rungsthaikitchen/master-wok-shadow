@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const {createReleaseAssessors,validateCertificate,REQUIRED_CHECKS}=require('./master-wok-release-assessors');
 const {createDeploymentRuntime}=require('./master-wok-deployment');
 const {assessCombinedBooking}=require('./master-wok-combined-assessment');
-const draft=require('./master-wok-release-candidate.json');
+const draft={...require('./master-wok-release-candidate.json'),status:'DRAFT'};
 require('./master-wok-model-bundle');
 const binding={releaseId:'staging-release-1',sourceSha256:'a'.repeat(64),projectRef:'hvrqgufqjslvgiohgkvu',schema:'master_wok_rehearsal'};
 const certificate=()=>({schemaVersion:1,status:'CERTIFIED_FOR_STAGING',...binding,modelVersion:'combined-kitchen-protected-v3',checks:Object.fromEntries(REQUIRED_CHECKS.map(k=>[k,'PASS']))});
@@ -14,10 +14,10 @@ const context=()=>({serviceDate:'2026-11-04',acceptedOrders:[],rawRows:[],
  state:{now:'2026-11-04T16:00:00Z',availability:{blackouts:[],serviceState:{mode:'normal',capacity_throttle:0}}}});
 function assessors(c=certificate()){return createReleaseAssessors({...binding,certificate:c,model:globalThis.MasterWokModelV1,
  readOrders:async()=>[],readAvailability:async()=>({blackouts:[]}),planStore:{read:async()=>null}});}
-test('committed draft cannot initialize a production booking runtime',()=>{
+test('a draft certificate cannot initialize a production booking runtime even with the matching source',()=>{
  assert.equal(draft.status,'DRAFT');
  assert.throws(()=>createDeploymentRuntime({pool:{connect:async()=>{throw Error('must not connect');}},model:globalThis.MasterWokModelV1,
-  certificate:draft,releaseId:draft.releaseId,projectRef:draft.projectRef,sourceSha256:'a'.repeat(64),
+  certificate:draft,releaseId:draft.releaseId,projectRef:draft.projectRef,sourceSha256:draft.sourceSha256,
   secret:'b'.repeat(64),notificationSecret:'c'.repeat(64),deliveryPublicKey:'sb_publishable_fixture'}),/CERTIFICATION_REQUIRED/);
 });
 test('certificate binds exact source, project, schema, model and release; every check required',()=>{
