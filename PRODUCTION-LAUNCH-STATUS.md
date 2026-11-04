@@ -1,12 +1,12 @@
 # Production activated — 4 November 2026
 
-**LIVE at 08:51:36 GMT; MASTER_WOK revision 2. Awaiting the first hosted production order for final production end-to-end sign-off.**
+**LIVE at 08:51:36 GMT; MASTER_WOK revision 2. First hosted production booking and customer time acknowledgement verified.**
 
 The owner-approved release passed its locked pre-service cutover. The complete reader-aligned commitment set was empty under the shared writer lock, so no legacy service plan needed seeding. Existing counts remain 1,480 orders and 5,835 items. No production order or notification was fabricated during smoke checks.
 
 The production gateway deployment 5b510d17 is healthy and returns HTTP200 MASTER_WOK. Its read-only Brevo access check passed after owner authorization. The active dedicated worker f9ec0920 passed SMS/Brevo account checks and is polling normally. The certified production Edge returns HTTP200 basket-specific availability: 18:30 Wednesday is available, 16:55 before opening and Sunday are unavailable. Hints do not approve or reserve a booking. The expired very-busy setting is correctly ignored without changing the stored business control.
 
-Website PR #66, backend PR #1 and core PR #2 are merged. Cloudflare Pages deployment d6ae8537 succeeded. Cloudflare blocks the automation host with HTTP403, so the owner must perform the final hosted production checkout using their own contact details and a clear TEST name. Verify its receipt, plan, notifications and lifecycle before declaring production end-to-end sign-off complete.
+Website PR #66, backend PR #1 and core PR #2 are merged. Cloudflare Pages deployment d6ae8537 succeeded. Cloudflare blocks the automation host with HTTP403; the owner completed the actual hosted production checkout as RTK-1599. One immutable booking receipt and committed service plan were verified. The time suggestion from 18:30 to 18:35 was emailed once; the owner confirmed receipt and clicked acceptance. The order is customer_accepted_time with confirmed_time 18:35 and one acknowledgement receipt. Order-created email/Pushover and the acceptance confirmation are all recorded sent once with no errors. The test was then marked is_test=true through the certified lifecycle writer, preserving evidence while releasing its capacity and pending loyalty reservation without settling points. Final confirmation inbox receipt was not separately reported.
 
 Regression evidence: 238 core tests in each of UTC and Europe/London, 42 backend tests and 27 website tests; staging Pushover, SMS/customer acknowledgement and email receipts confirmed. The source-bound certificate is CERTIFIED_FOR_PRODUCTION with runtime digest 021fb4dee715caeb07114f7eb8454ac59a6d46867c833bc1581283827b3d087f.
 

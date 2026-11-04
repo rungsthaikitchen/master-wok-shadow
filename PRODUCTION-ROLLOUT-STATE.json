@@ -2,7 +2,7 @@
   "date": "2026-11-04",
   "ownerApproved": true,
   "approvedPackageCommit": "f71c40920d1b2fd42e7bbd0b6a6e4a8f36af746e",
-  "status": "LIVE_AWAITING_FIRST_HOSTED_PRODUCTION_ORDER",
+  "status": "LIVE_HOSTED_PRODUCTION_BOOKING_AND_ACKNOWLEDGEMENT_VERIFIED",
   "productionMode": "MASTER_WOK",
   "productionRevision": 2,
   "ddlApplied": true,
@@ -20,8 +20,7 @@
   "backendSourceCommit": "a76e098ffe3450ab220dc2f3f180f286a66ba1a8",
   "backendStartup": "Read-only Brevo access gate passed before Gunicorn startup.",
   "next": [
-    "Owner places one controlled TEST order through the normal production checkout, using their own contact details.",
-    "Verify atomic booking receipt, service plan, outbox delivery and normal lifecycle before declaring production end-to-end sign-off complete."
+    "Observe normal service; retain tested guarded rollback."
   ],
   "backendMergeCommit": "401ef93b81ff55ed09c933adb8385f0113f32063",
   "certificateStatus": "CERTIFIED_FOR_PRODUCTION",
@@ -101,5 +100,19 @@
       "outbox": 0
     },
     "worker": "SUCCESS; normal idle polls"
+  },
+  "firstHostedProductionOrder": {
+    "reference": "RTK-1599",
+    "orderId": "8f2f0739-83d6-4a0a-9be3-d441d208a686",
+    "bookingReceipts": 1,
+    "acknowledgementReceipts": 1,
+    "originalTime": "2026-11-04T18:30:00Z",
+    "confirmedTime": "2026-11-04T18:35:00Z",
+    "status": "customer_accepted_time",
+    "capacityPlanCommitted": true,
+    "notifications": "order_created email/pushover, time_suggested email, customer_accept confirmation: sent once, no errors",
+    "ownerConfirmed": "time suggestion email received and acceptance clicked",
+    "loyalty": "100 points reserved with GBP5 discount; GBP4 total; no balance settlement",
+    "cleanup": "set_test=true committed through certified lifecycle writer; no cleanup notification; preserve receipts and accepted time"
   }
 }
