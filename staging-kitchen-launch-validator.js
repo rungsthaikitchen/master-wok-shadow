@@ -10,7 +10,7 @@ function validateKitchenTimeline(orders,plan,rows){
   issues.push({code:'COORDINATED_PLAN_MISSING'});
  const wok=(plan&&plan.wok&&plan.wok.jobs)||[];
  const fry=(plan&&plan.fryer&&plan.fryer.jobs)||[];
- const all=[...wok.map(j=>({...j,resource:'wok'})),...fry.map(j=>({...j,resource:j.basket}))];
+ const all=[...wok.map(j=>({...j,resource:'wok'})),...fry.map(j=>({...j,resource:j.basket})),...(plan?.auxiliary?.jobs||[])];
  for(const job of all){
   if(!Number.isFinite(job.start)||!Number.isFinite(job.finish)||job.finish<=job.start||
     job.start<990||job.finish>1320)issues.push({code:'INVALID_INTERVAL',resource:job.resource});
@@ -81,6 +81,11 @@ function validateKitchenTimeline(orders,plan,rows){
   issues.push({code:'ORDER_LINES_REQUIRED_FOR_COVERAGE'});
  }
  for(const job of fry){
+  if(job.standalone){
+   if(!Number.isFinite(job.readyMinute)||job.finish>job.readyMinute)
+    issues.push({code:'STANDALONE_FRY_DEADLINE_UNVERIFIED'});
+   continue;
+  }
   for(const orderId of job.orderIds||[]){
    const candidates=wok.filter(w=>(w.orderIds||[]).includes(orderId)&&
      (job.itemIds||[]).includes(w.itemId));
@@ -92,3 +97,4 @@ function validateKitchenTimeline(orders,plan,rows){
   issues,bookingApprovalAllowed:false};
 }
 module.exports={validateKitchenTimeline};
+

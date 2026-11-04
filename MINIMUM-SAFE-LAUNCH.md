@@ -1,6 +1,19 @@
+> 3 November update: the release runtime is assembled and private whole-service, concurrent worker, pre-service seeding, real route/geocode and rollback rehearsals passed. Production remains blocked by the DRAFT certificate. Final authenticated hosted flow and approved SMS/email/kitchen Pushover receipts remain outstanding. Current evidence and limits: `STAGING-RELEASE-RUNTIME-RESULT.json` and `PRODUCTION-LAUNCH-STATUS.md`. Historical gaps below are not all still outstanding.
+
 # Master Wok — minimum safe launch integration contract
 
 Status: **staging review only**. This is an implementation checklist, not permission to enable bookings.
+
+**1 November update:** The joined runtime now covers atomic checkout/lifecycle,
+protected plans, durable drain, notifications, server delivery validation and
+basket-specific read-only availability through the time picker. 53 real private
+PostgreSQL scenario groups pass; a mobile browser reached deployed Railway and
+Supabase for availability and checkout. See PRODUCTION-LAUNCH-STATUS.md and
+STAGING-FULL-MENU-RESULT.json for current gates and precise evidence limits.
+The original checklist below remains the acceptance contract, not a claim that
+those components are absent. Production authority remains disabled; realistic whole-service rehearsal,
+real-provider/hosted Cloudflare tests, hosted write-fence certification and
+full rollback are still release gates. Legacy remains authoritative.
 
 ## Existing proven boundaries
 - `master-wok-transaction-writer.js` obtains a per-service-date PostgreSQL advisory transaction lock before reading commitments and assessing the candidate.
@@ -22,3 +35,4 @@ No new chef confirmations, kitchen tablets, dashboards, or RestaurantOS redesign
 
 ## Important safety rule
 Do not convert `PHYSICAL_FIT_PROTOTYPE`, `FRY_PLACED_PROTOTYPE`, or `PROTOTYPE_FIT_LEAD_AND_COLD_FRYER_ONLY` into `GREEN` merely to satisfy the booking-mode gate.
+

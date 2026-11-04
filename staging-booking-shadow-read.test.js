@@ -9,7 +9,7 @@ test('read-only bridge queries staging and includes candidate',async()=>{
  const connection={query:async(sql,args)=>{
   calls++;
   assert.match(sql,/select o.id/i);
-  assert.deepEqual(args,['2026-10-17']);
+  assert.deepEqual(args,['2026-10-17',false]);
   return {rows:[]};
  }};
  const model={classifyBasket:()=>({}),hasItem:()=>true};
@@ -30,3 +30,4 @@ test('invalid connection does not attempt any booking',async()=>{
  assert.equal(r.reason,'INVALID_READ_CONNECTION');
  assert.equal(r.bookingApprovalAllowed,false);
 });
+

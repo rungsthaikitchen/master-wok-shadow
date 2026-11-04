@@ -1,0 +1,188 @@
+{
+  "date": "2026-11-02",
+  "status": "PASS_FOR_VERIFIED_PATHS",
+  "productionReady": false,
+  "productionWrites": 0,
+  "scope": "ACTUAL_CLOUDFLARE_ADMIN_SUGGEST_AND_DEPLOYED_STAGING_SERVICE_CONTROL",
+  "manualAdmin": {
+    "orderRef": "RTK-119",
+    "proposedTime": "2026-11-04T18:10:00Z",
+    "userScreenshot": "image(20261102-072327).png",
+    "httpStatus": 200,
+    "oldAndNewCommitmentsBeforeAcknowledgement": 2
+  },
+  "customerAcknowledgement": {
+    "requestId": 41,
+    "httpStatus": 200,
+    "transport": "Deployed Railway customer response HTML route",
+    "finalState": {
+      "order_ref": "RTK-119",
+      "status": "customer_accepted_time",
+      "confirmed_time": "2026-11-04 18:10:00+00",
+      "token_consumed": true,
+      "time_commitments": 1,
+      "response_receipts": 2,
+      "notification_events": 5,
+      "deliveries": 0,
+      "service_mode": "normal",
+      "active_blackouts": 0
+    }
+  },
+  "serviceControl": {
+    "status": "PASS",
+    "scope": "DEPLOYED_PRIVATE_STAGING_SERVICE_CONTROL_READ_WRITE_AVAILABILITY",
+    "checks": [
+      "NORMAL_HINT_AVAILABLE",
+      "PAUSE_READ_MATCHES_BLOCKED_HINT",
+      "CREATED_RESTRICTION_LISTED_AND_HINT_BLOCKED",
+      "DEACTIVATED_RESTRICTION_REMOVED_AND_HINT_RESTORED",
+      "EXPIRED_BUSY_READ_RETURNS_EFFECTIVE_NORMAL_WITHOUT_REWRITING_STORED_MODE"
+    ],
+    "productionWrites": 0,
+    "realNotifications": 0,
+    "restored": "normal"
+  },
+  "deployments": {
+    "edgeVersion": 12,
+    "edgeSha256": "35d6ce0a27ffe2c53ec557c9c130f9e6afc4201b15811c92b63867c6c2c75c9f",
+    "railwayDeployment": "382b8049-ded8-495a-9bb2-9e8816b8fee7",
+    "railwayStatus": "SUCCESS",
+    "railwayCommit": "b01ec3ba724a50cecfee8ce7e5dedcfd81134bde",
+    "pagesCommit": "33742aa7d43d11106d55fef5667a0ca87c8283b3",
+    "pagesStatus": "SUCCESS",
+    "pagesDeployment": "80ce2b0c-d19f-4912-9d79-3a80646c695f"
+  },
+  "checks": {
+    "coreTests": 223,
+    "backendTests": 22,
+    "adminClientProxyTests": 25,
+    "actualWorkerdProxyChecks": 6,
+    "inlineAdminScriptsParsed": 3
+  },
+  "transportLogs": [
+    {
+      "timestamp": "2026-11-02T07:17:33.557685379Z",
+      "path": "/booking-mode",
+      "status": 200,
+      "durationMs": 1807
+    },
+    {
+      "timestamp": "2026-11-02T07:22:09.733362750Z",
+      "path": "/admin-service-control",
+      "status": 500,
+      "durationMs": 24
+    },
+    {
+      "timestamp": "2026-11-02T07:22:09.738053443Z",
+      "path": "/admin-service-control",
+      "status": 500,
+      "durationMs": 25
+    },
+    {
+      "timestamp": "2026-11-02T07:22:11.170978130Z",
+      "path": "/booking-mode",
+      "status": 200,
+      "durationMs": 1465
+    },
+    {
+      "timestamp": "2026-11-02T07:22:12.911913286Z",
+      "path": "/admin-order-action",
+      "status": 200,
+      "durationMs": 1558
+    },
+    {
+      "timestamp": "2026-11-02T07:22:55.709712541Z",
+      "path": "/booking-mode",
+      "status": 200,
+      "durationMs": 1317
+    },
+    {
+      "timestamp": "2026-11-02T07:23:00.164599987Z",
+      "path": "/admin-order-action",
+      "status": 200,
+      "durationMs": 4264
+    },
+    {
+      "timestamp": "2026-11-02T07:23:19.731898546Z",
+      "path": "/admin-service-control",
+      "status": 500,
+      "durationMs": 3
+    },
+    {
+      "timestamp": "2026-11-02T07:23:19.747091328Z",
+      "path": "/admin-service-control",
+      "status": 500,
+      "durationMs": 24
+    },
+    {
+      "timestamp": "2026-11-02T07:23:20.977192922Z",
+      "path": "/booking-mode",
+      "status": 200,
+      "durationMs": 1266
+    },
+    {
+      "timestamp": "2026-11-02T07:23:22.563131145Z",
+      "path": "/admin-order-action",
+      "status": 200,
+      "durationMs": 1398
+    },
+    {
+      "timestamp": "2026-11-02T07:36:59.298287975Z",
+      "path": "/booking-mode",
+      "status": 200,
+      "durationMs": 1921
+    },
+    {
+      "timestamp": "2026-11-02T07:36:59.303528135Z",
+      "path": "/booking-mode",
+      "status": 200,
+      "durationMs": 1927
+    },
+    {
+      "timestamp": "2026-11-02T07:37:00.885433579Z",
+      "path": "/admin-order-action",
+      "status": 200,
+      "durationMs": 1395
+    },
+    {
+      "timestamp": "2026-11-02T07:37:00.889621590Z",
+      "path": "/admin-order-action",
+      "status": 200,
+      "durationMs": 1388
+    },
+    {
+      "timestamp": "2026-11-02T07:43:51.826828100Z",
+      "path": "/orders/a1e71ddf-df67-447b-82e8-c5d2663e9623/time/accept",
+      "status": 200,
+      "durationMs": 4696
+    }
+  ],
+  "limits": [
+    "Service control pause/list/expiry/hint checks ran against the actual deployed private Edge runtime; actual Cloudflare service-control refresh remains the next manual observation.",
+    "No real provider notifications, delivery-provider calls or physical printer output in these checks.",
+    "Production startup/worker configuration, verified admin Access policy, remaining hosted paths and full release rollback remain gates."
+  ],
+  "manualPrintCheck": {
+    "status": "USER_CONFIRMED",
+    "orderRef": "RTK-119",
+    "date": "2026-11-04",
+    "time": "18:10",
+    "reportedAt": "2026-11-02T07:50:00Z",
+    "scope": "User confirmation of ticket date/time; no claim about untested print variants."
+  },
+  "manualRestrictionsDisplay": {
+    "result": "PASS",
+    "evidence": "David confirmed the refreshed preview no longer displays the active-restrictions loading error on 2 November 2026."
+  },
+  "rehearsalClosed": {
+    "databaseMode": "LEGACY",
+    "revision": 6,
+    "gatewayLegacyDeployment": "949fe256-706c-4ded-b08b-1ef190becebe",
+    "edgeVersion": 13,
+    "edgeVerifyJwt": true,
+    "edgeHandler": "HTTP410",
+    "retainedOrder": "RTK-119",
+    "confirmedTime": "2026-11-04T18:10:00Z",
+    "notificationDeliveries": 0
+  }
+}

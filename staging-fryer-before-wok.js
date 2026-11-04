@@ -1,55 +1,95 @@
 'use strict';
-// Staging-only prerequisite scheduler: reserve fryer cycles BEFORE a known wok start.
-// This is a conservative diagnostic, not a joint optimiser or booking approval.
+// Coordinates fryer prerequisites with an attributed wok plan. This remains a
+// staging plan: recipe coverage and launch approval are checked separately.
 const {diagnoseFryer}=require('./staging-fryer-diagnostic');
+const {fryerCapacity}=require('./master-wok-recipe-rules');
 const BASKETS=[{id:'large',capacity:3},{id:'small-1',capacity:2},{id:'small-2',capacity:2}];
-const FRY_MINUTES=5,MAX_EARLY_MINUTES=10,PRODUCTION_START=990;
-function planFryerBeforeWok(orders,rows,wokPlan){
- const inventory=diagnoseFryer(orders,rows);
- if(inventory.unmodelled.length)return {status:'UNVERIFIED',reason:'FRY_RECIPES_UNMODELLED',inventory,jobs:[],bookingApprovalAllowed:false};
- if(!wokPlan||wokPlan.status!=='FEASIBLE_PROTOTYPE')
-  return {status:'UNVERIFIED',reason:'WOK_PLAN_UNVERIFIED',inventory,jobs:[],bookingApprovalAllowed:false};
- const placements=new Map(orders.map(o=>[String(o.orderId),o.placedAt instanceof Date
-  ?o.placedAt.getHours()*60+o.placedAt.getMinutes():NaN]));
+const recipeKey=(ready,line)=>JSON.stringify([ready,line.item_id,line.modifiers,line.spice??null,line.item_note??null]);
+function planFryerBeforeWok(orders,rows,wokPlan,options={}){
+ const inventory=diagnoseFryer(orders,rows,options);
+ const fail=reason=>({status:'UNVERIFIED',reason,inventory,jobs:[],bookingApprovalAllowed:false});
+ if(inventory.unmodelled.length)return fail('FRY_RECIPES_UNMODELLED');
+ if(!wokPlan||wokPlan.status!=='FEASIBLE_PROTOTYPE')return fail('WOK_PLAN_UNVERIFIED');
+ const known=new Map(orders.map(o=>[String(o.orderId),o]));
  const portions=[];
  for(const dep of inventory.dependencies){
-  const matches=(wokPlan.jobs||[]).filter(w=>w.itemId===dep.itemId&&(w.orderIds||[]).includes(dep.orderId));
-  // We cannot safely map a portion to a particular wok batch if ambiguous.
-  if(matches.length!==1)return {status:'UNVERIFIED',reason:'FRY_WOK_BATCH_MAPPING_UNVERIFIED',inventory,jobs:[],bookingApprovalAllowed:false};
-  for(const [type,count] of Object.entries(dep.counts))
-   for(let i=0;i<count;i++)portions.push({orderId:dep.orderId,itemId:dep.itemId,type,deadline:matches[0].start});
- }
- const groups=new Map();
- for(const p of portions){
-  const key=JSON.stringify([p.type,p.deadline]);
-  if(!groups.has(key))groups.set(key,[]);
-  groups.get(key).push(p);
- }
- const occupied=new Map(BASKETS.map(b=>[b.id,[]])),jobs=[];
- for(const group of [...groups.values()].sort((a,b)=>a[0].deadline-b[0].deadline)){
-  const remaining=[...group];
-  while(remaining.length){
-   let chosen=null;
-   for(let start=group[0].deadline-FRY_MINUTES;start>=Math.max(PRODUCTION_START,group[0].deadline-FRY_MINUTES-MAX_EARLY_MINUTES);start--){
-    for(const basket of BASKETS){
-     if(occupied.get(basket.id).some(j=>start<j.finish&&start+FRY_MINUTES>j.start))continue;
-     const size=Math.min(basket.capacity,remaining.length);
-     if(!chosen||size>chosen.size)chosen={basket,start,size};
-    }
-    if(chosen&&chosen.size===Math.min(3,remaining.length))break;
-   }
-   if(!chosen)return {status:'UNVERIFIED',reason:'FRY_BEFORE_WOK_CAPACITY_UNVERIFIED',inventory,jobs:[],bookingApprovalAllowed:false};
-   const assigned=remaining.slice(0,chosen.size);
-   if(assigned.some(p=>!Number.isFinite(placements.get(String(p.orderId)))||chosen.start<placements.get(String(p.orderId))))
-    return {status:'UNVERIFIED',reason:'FRY_BEFORE_ORDER_PLACED',inventory,jobs:[],bookingApprovalAllowed:false};
-   remaining.splice(0,chosen.size);
-   const job={type:assigned[0].type,basket:chosen.basket.id,portions:assigned.length,
-    orderIds:[...new Set(assigned.map(p=>p.orderId))],itemIds:[...new Set(assigned.map(p=>p.itemId))],
-    start:chosen.start,finish:chosen.start+FRY_MINUTES,wokStart:assigned[0].deadline};
-   occupied.get(chosen.basket.id).push(job);jobs.push(job);
+  const order=known.get(dep.orderId);
+  const placed=order?.placedAt instanceof Date?order.placedAt.getHours()*60+order.placedAt.getMinutes():NaN;
+  const notBefore=Math.max(990,placed,options.notBeforeByOrder?.[dep.orderId]??0);
+  if(!Number.isFinite(notBefore))return fail('INVALID_PLACEMENT');
+  if(dep.standalone){
+   const line=(rows.find(r=>String(r.id)===dep.orderId)?.items||[])[dep.lineIndex];
+   for(const [type,count] of Object.entries(dep.counts))for(let i=0;i<count;i++)
+    portions.push({orderId:dep.orderId,itemId:dep.itemId,type,duration:dep.durationMinutes,
+     deadline:dep.readyMinute,notBefore,standalone:true,recipeKey:recipeKey(order.readyMinute,line)});
+   continue;
+  }
+  // Attribute each line's portions to the exact recipe and wok batch. Repeated
+  // item IDs with different proteins/spice must not borrow each other's frying.
+  const line=(rows.find(r=>String(r.id)===dep.orderId)?.items||[])[dep.lineIndex];
+  const matches=wokPlan.jobs.filter(w=>w.itemId===dep.itemId&&(w.orderIds||[]).includes(dep.orderId)&&
+    (!w.recipeKey||w.recipeKey===recipeKey(order.readyMinute,line)));
+  if(!matches.length)return fail('FRY_WOK_BATCH_MAPPING_UNVERIFIED');
+  if(matches.length===1&&!matches[0].portionAllocations){
+   for(const [type,count] of Object.entries(dep.counts))for(let i=0;i<count;i++)
+    portions.push({orderId:dep.orderId,itemId:dep.itemId,type,duration:5,
+     deadline:matches[0].start,notBefore,wokStart:matches[0].start});
+   continue;
+  }
+  const attributed=matches.map(w=>({w,qty:(w.portionAllocations||[])
+   .filter(a=>String(a.orderId)===dep.orderId).reduce((n,a)=>n+a.qty,0)}));
+  // More than one identical source line is aggregated below, using its share
+  // of each batch. Fractions cannot be represented safely and fail closed.
+  const totalLineQty=(rows.find(r=>String(r.id)===dep.orderId)?.items||[])
+   .filter(l=>recipeKey(order.readyMinute,l)===recipeKey(order.readyMinute,line))
+   .reduce((n,l)=>n+l.qty,0);
+  if(attributed.reduce((n,a)=>n+a.qty,0)!==totalLineQty)return fail('FRY_WOK_BATCH_MAPPING_UNVERIFIED');
+  for(const {w,qty} of attributed)for(const [type,count] of Object.entries(dep.counts)){
+   const allocated=count*qty/totalLineQty;
+   if(!Number.isInteger(allocated))return fail('FRY_WOK_BATCH_MAPPING_UNVERIFIED');
+   for(let i=0;i<allocated;i++)portions.push({orderId:dep.orderId,itemId:dep.itemId,type,duration:5,
+    deadline:w.start,notBefore,wokStart:w.start,recipeKey:w.recipeKey});
   }
  }
- return {status:'PREREQUISITES_PLACED_PROTOTYPE',reason:'NOT_JOINTLY_OPTIMISED',
-  jobs:jobs.sort((a,b)=>a.start-b.start),inventory,bookingApprovalAllowed:false};
+ if(portions.length>150)return fail('FRY_SEARCH_SIZE_LIMIT');
+ const buckets=new Map();
+ for(const p of portions){
+  const key=JSON.stringify([p.type,p.duration,p.deadline,p.standalone?p.recipeKey:null]);
+  if(!buckets.has(key))buckets.set(key,[]);
+  buckets.get(key).push(p);
+ }
+ const groups=[...buckets.values()].sort((a,b)=>a[0].deadline-b[0].deadline)
+  .map(g=>g.sort((a,b)=>b.notBefore-a.notBefore));
+ const jobs=[];let nodes=0,exhausted=false;
+ function search(groupIndex,remaining){
+  if(++nodes>(options.maxNodes??20000)){exhausted=true;return false;}
+  if(groupIndex===groups.length)return true;
+  if(!remaining.length)return search(groupIndex+1,groups[groupIndex+1]||[]);
+  const first=remaining[0];
+  for(let start=first.deadline-first.duration;start>=Math.max(990,first.deadline-first.duration-10,first.notBefore);start--){
+   const finish=start+first.duration;
+   if((options.kitchenBlackouts||options.blackouts||[]).some(b=>start<b.finish&&finish>b.start))continue;
+   const blocked=options.fryerBlackouts||[];
+   for(const basket of BASKETS){
+    if(jobs.some(j=>j.basket===basket.id&&start<j.finish&&finish>j.start)||
+      blocked.some(b=>(!b.basket||b.basket===basket.id)&&start<b.finish&&finish>b.start))continue;
+    for(let size=Math.min(fryerCapacity(first.type,basket.id),remaining.length);size>=1;size--){
+     const assigned=remaining.slice(0,size);
+     const job={type:first.type,basket:basket.id,portions:size,start,finish,
+      orderIds:[...new Set(assigned.map(p=>p.orderId))],
+      itemIds:[...new Set(assigned.map(p=>p.itemId))],
+      allocations:assigned.map(p=>({...p,qty:1})),
+      ...(first.standalone?{standalone:true,readyMinute:first.deadline}:{wokStart:first.deadline})};
+     jobs.push(job);
+     if(search(groupIndex,remaining.slice(size)))return true;
+     jobs.pop();if(exhausted)return false;
+    }
+   }
+  }
+  return false;
+ }
+ if(!search(0,groups[0]||[]))return fail(exhausted?'FRY_SEARCH_LIMIT':'FRY_BEFORE_WOK_CAPACITY_UNVERIFIED');
+ return {status:'PREREQUISITES_PLACED_PROTOTYPE',reason:'ATTRIBUTED_FRYER_TIMELINE',
+  jobs:jobs.sort((a,b)=>a.start-b.start),inventory,nodes,bookingApprovalAllowed:false};
 }
 module.exports={planFryerBeforeWok};

@@ -19,7 +19,8 @@ async function readStagingOrders(connection, serviceDate, {includeTestOrders=fal
                at time zone 'Europe/London')::integer
            ) as local_ready_minute,
            coalesce(jsonb_agg(jsonb_build_object(
-             'item_id', i.item_id, 'qty', i.qty, 'modifiers', i.modifiers
+             'item_id', i.item_id, 'qty', i.qty, 'modifiers', i.modifiers,
+             'spice', to_jsonb(i)->'spice', 'item_note', to_jsonb(i)->'item_note'
            )) filter (where i.id is not null), '[]'::jsonb) as items
       from public.orders o
       left join public.order_items i on i.order_id = o.id
@@ -38,3 +39,4 @@ async function readStagingOrders(connection, serviceDate, {includeTestOrders=fal
   return result.rows;
 }
 module.exports={readStagingOrders};
+

@@ -2,7 +2,7 @@
 // Staging-only inventory of fryer dependencies; does not schedule or approve.
 const {OUT_OF_SCOPE}=require('./staging-out-of-scope-items');
 // These standalone items use fryer capacity but have no verified timing model.
-const UNMODELLED_FRIED=new Set(['chips','fried-tofu','fish-cakes','pork-dumplings','fried-prawns']);
+const UNMODELLED_FRIED=new Set(['chips','fried-tofu','fish-cakes','pork-dumplings','fried-prawns','veg-spring-rolls','chicken-spring-rolls']);
 const SPRING_ROLLS=new Set(['veg-spring-rolls','chicken-spring-rolls']);
 const FIXED = {
   'stir-crispy': {crispyChicken:1},
@@ -14,7 +14,7 @@ const MODS = {
   tofu:'tofu','extra-tofu':'tofu',
   'batter-chicken':'batteredChicken','extra-bchicken':'batteredChicken'
 };
-function diagnoseFryer(orders,rows) {
+function diagnoseFryer(orders,rows,{standaloneSpringRolls=false,confirmedStarterRecipes=false}={}) {
   const known=new Map(orders.map(o=>[String(o.orderId),o]));
   const dependencies=[],unmodelled=[];
   for(const row of rows) {
@@ -24,18 +24,26 @@ function diagnoseFryer(orders,rows) {
       unmodelled.push({orderId:String(row.id),reason:'MISSING_ITEMS'});
       continue;
     }
-    for(const line of row.items) {
+    for(const [lineIndex,line] of row.items.entries()) {
       if(!line || !Number.isInteger(line.qty) || line.qty<=0 ||
           !Array.isArray(line.modifiers)) {
         unmodelled.push({orderId:String(row.id),reason:'INVALID_LINE'});
         continue;
       }
-      if(UNMODELLED_FRIED.has(line.item_id)) {
+      const confirmed=confirmedStarterRecipes&&['fish-cakes','fried-prawns','pork-dumplings','chips','fried-tofu','thai-sausage'].includes(line.item_id);
+      if(UNMODELLED_FRIED.has(line.item_id) && !confirmed && !(standaloneSpringRolls && SPRING_ROLLS.has(line.item_id))) {
         unmodelled.push({orderId:String(row.id),itemId:line.item_id,reason:'FRY_RECIPE_UNMODELLED'});
         continue;
       }
+      const types={'fish-cakes':'fishCakeBatch','fried-prawns':'friedPrawnBatch','chips':'chips','fried-tofu':'tofu','thai-sausage':'thaiSausageBatch'};
+      if(confirmed&&types[line.item_id]){
+        const {fryerRecipe}=require('./master-wok-recipe-rules');const type=types[line.item_id];
+        dependencies.push({orderId:String(row.id),itemId:line.item_id,lineIndex,
+          readyMinute:order.readyMinute,standalone:true,durationMinutes:fryerRecipe(type).minutes,counts:{[type]:line.qty}});
+        continue;
+      }
       if(SPRING_ROLLS.has(line.item_id)){
-        dependencies.push({orderId:String(row.id),itemId:line.item_id,
+        dependencies.push({orderId:String(row.id),itemId:line.item_id,lineIndex,
           readyMinute:order.readyMinute,standalone:true,
           durationMinutes:7,counts:{springRollBatch:line.qty}});
         continue;
@@ -53,7 +61,7 @@ function diagnoseFryer(orders,rows) {
         if(type) counts[type]=(counts[type]||0)+line.qty;
       }
       if(Object.keys(counts).length)
-        dependencies.push({orderId:String(row.id),itemId:line.item_id,
+        dependencies.push({orderId:String(row.id),itemId:line.item_id,lineIndex,
           readyMinute:order.readyMinute,counts});
     }
   }
@@ -63,3 +71,4 @@ function diagnoseFryer(orders,rows) {
     dependencies,unmodelled,bookingApprovalAllowed:false};
 }
 module.exports={diagnoseFryer};
+

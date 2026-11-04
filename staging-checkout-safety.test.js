@@ -9,7 +9,7 @@ function harness(){
   return {query:async(sql)=>{
    log.push(name+':'+sql.split(' ')[0]);
    if(sql==='BEGIN')return;
-   if(sql.includes('pg_advisory_xact_lock')){
+   if(sql.includes('pg_advisory_xact_lock') && sql.includes('47822')){
     const previous=tail;
     tail=new Promise(resolve=>{release=resolve;});
     await previous;
@@ -58,3 +58,4 @@ test('shadow-only assessment cannot authorize persistence',async()=>{
  assert.equal(result.committed,false);
  assert.equal(writes,0);
 });
+
