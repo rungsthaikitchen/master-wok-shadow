@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "status": "DRAFT",
+  "releaseId": "master-wok-delivery-2026-11-04",
+  "projectRef": "ubyjrrsvbbqomitpaidb",
+  "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
+  "schema": "public",
+  "modelVersion": "combined-kitchen-protected-v3",
+  "sourceSha256": "dbf1e7bea82cd7851de68f3aec4cf48adc7df7be158291cc1f23f1f19c1c12e9",
+  "checks": {
+    "atomicConcurrency": "PENDING",
+    "physicalCoverage": "PENDING",
+    "lifecycle": "PENDING",
+    "writeFence": "PENDING",
+    "commercial": "PENDING",
+    "delivery": "PENDING",
+    "notifications": "PENDING",
+    "wholeService": "PENDING",
+    "rollback": "PENDING",
+    "driverReservations": "PENDING",
+    "combinedTrips": "PENDING",
+    "deliveryCheckout": "PENDING",
+    "deliveryRollback": "PENDING"
+  },
+  "evidence": {
+    "note": "New delivery runtime; prior kitchen launch approval does not certify these changes."
+  },
+  "deliveryScheduling": 1
+}
