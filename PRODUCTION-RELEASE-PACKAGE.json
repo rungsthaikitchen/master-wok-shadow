@@ -59,7 +59,7 @@
     "Production certificate remains DRAFT until the exact release evidence is complete; no production activation is authorized by this package."
   ],
   "remaining": [
-    "Approved confirmation email acceptance and owner inbox receipt.",
+    "Owner confirms received confirmation email; Brevo accepted and ledger is sent.",
     "Owner accepts the ongoing egress operating approach; no paid upgrade or account-wide IP-security deactivation is approved.",
     "Record final source commits, compatible deployment baselines and explicit owner production approval."
   ],

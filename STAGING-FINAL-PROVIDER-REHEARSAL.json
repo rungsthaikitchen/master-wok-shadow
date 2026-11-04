@@ -1,6 +1,6 @@
 {
   "date": "2026-11-04",
-  "status": "ONE_EMAIL_PROCESS_WAITING_FOR_OWNER_BREVO_IP_AUTHORIZATION",
+  "status": "ALL_PROVIDERS_ACCEPTED_OWNER_EMAIL_RECEIPT_PENDING",
   "productionReady": false,
   "productionWrites": 0,
   "approvedMessages": {
@@ -8,19 +8,20 @@
     "email": 1,
     "kitchenPushover": 1
   },
-  "realProviderCalls": 3,
+  "realProviderCalls": 4,
   "providerVariablesPresent": true,
   "continuousWorkerEnabled": false,
   "oneShotRestartPolicy": "NEVER",
   "stagingControl": {
-    "mode": "MASTER_WOK",
-    "revision": 17,
-    "releaseId": "master-wok-launch-2026-11-03"
+    "mode": "LEGACY",
+    "revision": 18,
+    "releaseId": "private-browser-26efcf42871d88c3"
   },
   "edge": {
-    "version": 22,
-    "bundleSha256": "d6b2aadc57aff4ac007dcdb000a188965a97f90b41cbaa089d8f1f1a1fb38831",
-    "ownStrongAuthentication": true
+    "version": 23,
+    "bundleSha256": "f77a48860d6fbea3c4299b040ce1654ea37bb16b051b700b6b132a329e151991",
+    "verifyJwt": true,
+    "handler": "HTTP410 inert"
   },
   "gatewayDeployment": "d9bc3603-68d1-4855-a1f4-6ea4fefec3d9",
   "workerStandbyDeployment": "d0d1b730-07d5-4026-828c-31f5087b9ef4",
@@ -34,9 +35,8 @@
     "quantity": 1
   },
   "pending": [
-    "Authorize the exact blocked source IP reported by the waiting one-email process; no redeploy between account access and the bounded send.",
-    "Owner inbox receipt and closure of private rehearsal.",
-    "Agree ongoing egress authorization handling for Hobby; certify exact release and obtain explicit production approval."
+    "Owner confirms confirmation email receipt.",
+    "Accept ongoing Hobby egress authorization procedure, complete certification and obtain exact production approval."
   ],
   "deploymentStatus": {
     "gateway": "SUCCESS",
@@ -64,7 +64,9 @@
     "pointsReserved": 100,
     "preferredTime": "2026-11-04T18:30:00Z",
     "proposedTime": "2026-11-04T18:35:00Z",
-    "savedNameWasTestLabel": false
+    "savedNameWasTestLabel": false,
+    "isTest": true,
+    "responseReceipts": 1
   },
   "events": {
     "orderCreated": "826e5b31-1ece-4356-a90e-23ca5c9d9494",
@@ -81,7 +83,7 @@
     "outboxStatus": "sent",
     "ownerReceipt": "CONFIRMED"
   },
-  "oneShotRehearsalEnabled": true,
+  "oneShotRehearsalEnabled": false,
   "sms": {
     "deployment": "f2b24b3c-8d18-4a7b-a34b-2bc6a6b7d054",
     "deploymentFinalStatus": "CRASHED",
@@ -138,7 +140,7 @@
     "databaseVerified": true
   },
   "email": {
-    "status": "APPROVED_WAITING_FOR_ACCESS",
+    "status": "PASS_PROVIDER_ACCEPTED",
     "approvedRecipientVerified": true,
     "runnerCommit": "a76e098ffe3450ab220dc2f3f180f286a66ba1a8",
     "preflightWaitSeconds": 1800,
@@ -148,7 +150,13 @@
     "currentBlockedIp": "54.177.170.222",
     "waitStartedAt": "2026-11-04T07:39:00Z",
     "waitExpiresAt": "2026-11-04T08:09:00Z",
-    "messageSendsBeforeAuthorization": 0
+    "messageSendsBeforeAuthorization": 0,
+    "sentAt": "2026-11-04T07:41:40Z",
+    "realProviderCalls": 1,
+    "outboxStatus": "sent",
+    "deliveryStatus": "sent",
+    "providerReceiptPresent": true,
+    "ownerReceipt": "PENDING"
   },
   "networking": {
     "ownerScreenshot": "Networking shows outbound IPv6, no static IP control visible. IPv6 remains off.",
@@ -177,5 +185,13 @@
     "actualNewBlockedIp": "52.9.85.82",
     "httpStatus": 401,
     "longTermSubnetSolutionVerified": false
+  },
+  "closureDeployments": {
+    "worker": "148b267d-d096-48b0-ae1a-f3b5d80ae60e",
+    "gateway": "c3c3ad40-41d2-4edd-8a66-b73ad871f5f1",
+    "status": "SUCCESS",
+    "gatewayModeHttp": 200,
+    "gatewayMode": "LEGACY",
+    "workerEnabled": false
   }
 }
