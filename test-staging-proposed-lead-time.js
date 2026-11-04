@@ -1,0 +1,15 @@
+'use strict';
+const assert=require('node:assert/strict');
+const {assess}=require('./staging-proposed-lead-time');
+const jobs=[{start:1037,finish:1045},{start:1039,finish:1045},{start:1040,finish:1045}];
+const short=assess({placedMinute:1035,readyMinute:1045,jobs});
+assert.equal(short.projectedCookingMinutes,8);
+assert.equal(short.requiredMinutes,18);
+assert.equal(short.shortfallMinutes,8);
+assert.equal(short.status,'BELOW_PROPOSED_LEAD_TIME');
+assert.equal(short.bookingApprovalAllowed,false);
+const fit=assess({placedMinute:1025,readyMinute:1045,jobs});
+assert.equal(fit.status,'MEETS_PROPOSED_LEAD_TIME');
+assert.equal(fit.bookingApprovalAllowed,false);
+assert.equal(assess({placedMinute:1035,readyMinute:1045,jobs:[]}).status,'UNVERIFIED');
+console.log('PASS: proposed lead-time rule remains offline and non-authoritative');

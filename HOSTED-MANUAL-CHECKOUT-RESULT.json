@@ -1,0 +1,151 @@
+{
+  "date": "2026-11-01",
+  "status": "PASS",
+  "scope": "ACTUAL_AUTHENTICATED_CLOUDFLARE_PREVIEW_COLLECTION_CHECKOUT_AND_STAGING_DRAIN_RESTORE",
+  "productionReady": false,
+  "productionWrites": 0,
+  "order": {
+    "id": "a1e71ddf-df67-447b-82e8-c5d2663e9623",
+    "order_ref": "RTK-119",
+    "total": "9",
+    "preferred_time": "2026-11-04 18:00:00+00",
+    "capacity_scheduler": "MASTER_WOK",
+    "items": 1,
+    "matching_receipts": 1,
+    "queued_events": 1,
+    "deliveries": 0,
+    "revision": 1,
+    "model_version": "combined-kitchen-protected-v3",
+    "plan_digest": "38a22ba1ab955fa468ce5363559fc6b7"
+  },
+  "items": [
+    {
+      "item_id": "green-curry",
+      "name": "Green Curry🌶️🌶️",
+      "qty": 1,
+      "unit_price": "9",
+      "modifiers": [
+        {
+          "id": "chicken",
+          "name": "Chicken",
+          "delta": 1
+        }
+      ],
+      "spice": 2
+    }
+  ],
+  "savedPlan": {
+    "service_date": "2026-11-04",
+    "revision": 1,
+    "model_version": "combined-kitchen-protected-v3",
+    "wok_jobs": [
+      {
+        "group": "fast",
+        "start": 1075,
+        "finish": 1080,
+        "itemId": "green-curry",
+        "latest": 1075,
+        "duration": 5,
+        "earliest": 1065,
+        "orderIds": [
+          "a1e71ddf-df67-447b-82e8-c5d2663e9623@2026-11-04T18:00:00.000Z"
+        ],
+        "portions": 1,
+        "recipeKey": "[1080,\"green-curry\",[{\"id\":\"chicken\",\"name\":\"Chicken\",\"delta\":1}],2,null]",
+        "readyMinute": 1080,
+        "holdingMinutes": 0,
+        "holdingSatisfied": true,
+        "placementSatisfied": true,
+        "portionAllocations": [
+          {
+            "qty": 1,
+            "orderId": "a1e71ddf-df67-447b-82e8-c5d2663e9623@2026-11-04T18:00:00.000Z"
+          }
+        ],
+        "holdingLimitMinutes": 10
+      }
+    ],
+    "fryer_jobs": 0,
+    "auxiliary_jobs": 0
+  },
+  "transport": {
+    "preview": "https://review-master-wok-checkout-i.rungsthaikitchen.pages.dev",
+    "pagesCommit": "8c12663badc4fd2785fec742fa1270f48f9ec8a1",
+    "railwayCodeCommit": "bbcd726d1d1bebc99dd8d86a75e7376497b1a3ab",
+    "edgeBookingVersion": 8,
+    "railwayRequests": [
+      {
+        "timestamp": "2026-11-01T19:31:00.894153865Z",
+        "path": "/booking-mode",
+        "status": 200,
+        "durationMs": 1915
+      },
+      {
+        "timestamp": "2026-11-01T19:33:03.175432323Z",
+        "path": "/booking-mode",
+        "status": 200,
+        "durationMs": 1493
+      },
+      {
+        "timestamp": "2026-11-01T19:33:06.558216860Z",
+        "path": "/booking-availability",
+        "status": 200,
+        "durationMs": 3188
+      },
+      {
+        "timestamp": "2026-11-01T19:33:56.430440232Z",
+        "path": "/booking-mode",
+        "status": 200,
+        "durationMs": 1303
+      },
+      {
+        "timestamp": "2026-11-01T19:34:01.937652559Z",
+        "path": "/book-order",
+        "status": 200,
+        "durationMs": 5297
+      },
+      {
+        "timestamp": "2026-11-01T19:35:25.331125367Z",
+        "path": "/booking-mode",
+        "status": 503,
+        "durationMs": 1500
+      }
+    ],
+    "checkoutHttp": 200
+  },
+  "isolation": {
+    "schema": "master_wok_rehearsal",
+    "testIdentity": "browser-26efcf42871d88c3@example.invalid",
+    "productionSelectOnlyCheck": {
+      "fixture_customers": 0,
+      "fixture_orders": 0
+    },
+    "notificationDeliveryRows": 0,
+    "providersDisabled": true
+  },
+  "restore": {
+    "drainedModeHttp": 503,
+    "restoredMode": "LEGACY",
+    "restoredModeHttp": 200,
+    "deployment": {
+      "id": "c30f0278-3e45-46c8-8810-42a34ff7a3fc",
+      "status": "SUCCESS",
+      "createdAt": "2026-11-01T19:35:47.543Z",
+      "url": null
+    },
+    "durableControlRevision": 3,
+    "orderReceiptAndPlanUnchanged": true,
+    "planDigestBefore": "38a22ba1ab955fa468ce5363559fc6b7",
+    "planDigestAfter": "38a22ba1ab955fa468ce5363559fc6b7",
+    "disabledEdgeVersion": 9,
+    "disabledHandlerStatus": 410,
+    "verifyJwt": true,
+    "fixtureRetainedForReview": true
+  },
+  "limitations": [
+    "One real hosted collection checkout, not the full release rehearsal.",
+    "No real customer notifications, delivery-provider calls or printer output tested.",
+    "Hosted admin/lifecycle/customer-response paths and full website/privilege rollback remain uncertified.",
+    "Independent authoritative transaction/lifecycle/fence/concurrency coverage is documented in the 53-case private staging suite; those results are not production permission."
+  ]
+}

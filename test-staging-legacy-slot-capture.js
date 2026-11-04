@@ -1,0 +1,14 @@
+'use strict';
+const assert=require('node:assert/strict');
+const {captureLegacySlotDecisions}=require('./staging-legacy-slot-capture');
+const input={serviceDate:'2026-10-30',basketLines:[{itemId:'pad-thai',qty:2,mods:[{id:'chicken',name:'Not retained'}]}],slots:[{time:'17:00',legacyAllowed:true,window:'NORMAL'},{time:'21:05',legacyAllowed:false,window:'OVERRUN'}]};
+const captured=captureLegacySlotDecisions(input);
+assert.deepEqual(captured.lines,[{itemId:'pad-thai',qty:2,mods:[{id:'chicken'}]}]);
+assert.equal(captured.decisions.length,2);
+assert.equal(captured.bookingApprovalAllowed,false);
+assert.equal(captured.comparisonVerified,false);
+assert.equal(captured.masterWokStatus,'NOT_ASSESSED');
+assert.throws(()=>captureLegacySlotDecisions({...input,slots:[{time:'17:00',legacyAllowed:'yes',window:'NORMAL'}]}),/INVALID_SLOT/);
+assert.throws(()=>captureLegacySlotDecisions({...input,basketLines:[{itemId:'pad-thai',qty:0,mods:[]}]}),/INVALID_BASKET/);
+assert.throws(()=>captureLegacySlotDecisions({...input,slots:Array.from({length:301},()=>input.slots[0])}),/CAPTURE_LIMIT/);
+console.log('PASS: legacy slot capture validates inputs and cannot approve bookings');

@@ -1,0 +1,196 @@
+{
+  "date": "2026-11-04",
+  "status": "HOSTED_REHEARSAL_PASSED_ALL_OWNER_RECEIPTS_CONFIRMED",
+  "productionReady": false,
+  "productionWrites": 0,
+  "approvedMessages": {
+    "sms": 1,
+    "email": 1,
+    "kitchenPushover": 1
+  },
+  "realProviderCalls": 4,
+  "providerVariablesPresent": true,
+  "continuousWorkerEnabled": false,
+  "oneShotRestartPolicy": "NEVER",
+  "stagingControl": {
+    "mode": "LEGACY",
+    "revision": 18,
+    "releaseId": "private-browser-26efcf42871d88c3"
+  },
+  "edge": {
+    "version": 23,
+    "bundleSha256": "f77a48860d6fbea3c4299b040ce1654ea37bb16b051b700b6b132a329e151991",
+    "verifyJwt": true,
+    "handler": "HTTP410 inert"
+  },
+  "gatewayDeployment": "d9bc3603-68d1-4855-a1f4-6ea4fefec3d9",
+  "workerStandbyDeployment": "d0d1b730-07d5-4026-828c-31f5087b9ef4",
+  "fixturePrefix": "release-nov3-candidate-live-",
+  "fixtureEmail": "release-nov3-live@example.invalid",
+  "manualCheckout": {
+    "date": "2026-11-04",
+    "time": "18:30",
+    "type": "collection",
+    "item": "green-curry/chicken",
+    "quantity": 1
+  },
+  "pending": [
+    "Explicit approval for the exact production release, including the ongoing Hobby egress authorization procedure."
+  ],
+  "deploymentStatus": {
+    "gateway": "SUCCESS",
+    "workerStandby": "SUCCESS"
+  },
+  "availabilityReadOnly": "2026-11-04T18:30Z available; bookingApprovalAllowed=false",
+  "loyaltyFixture": {
+    "status": "STAGING_BALANCE_ALIGNED_BEFORE_RETRY",
+    "reason": "Existing hosted checkout reads the production read-only loyalty endpoint; isolated writer initially had no corresponding fixture balance.",
+    "readOnlyBalanceSnapshot": 105,
+    "privateFixtureBalance": 105,
+    "expectedSubtotal": 9,
+    "expectedLoyaltyDiscount": 5,
+    "expectedTotal": 4,
+    "failedAttemptOrders": 0,
+    "realProviderCalls": 0,
+    "productionLoyaltyWrites": 0,
+    "scope": "Inserted missing private account only; no existing balance overwritten. No claim of separate staged loyalty lookup."
+  },
+  "order": {
+    "id": "851bd321-5459-4683-9490-72313d1914fc",
+    "reference": "RTK-149",
+    "total": 4,
+    "loyaltyDiscount": 5,
+    "pointsReserved": 100,
+    "preferredTime": "2026-11-04T18:30:00Z",
+    "proposedTime": "2026-11-04T18:35:00Z",
+    "savedNameWasTestLabel": false,
+    "isTest": true,
+    "responseReceipts": 1
+  },
+  "events": {
+    "orderCreated": "826e5b31-1ece-4356-a90e-23ca5c9d9494",
+    "timeSuggested": "d2f307e9-3de6-4beb-b54b-3b4d3b94f2f1",
+    "renewedTimeSuggested": "7debeacd-f54d-4d6b-8360-7433ce3d839c",
+    "timeConfirmed": "07322cb9-2ab2-42ac-bb9a-ed72cff904b2"
+  },
+  "pushDeployment": "3bdb3adb-c306-422e-ae22-f50c6521d219",
+  "emailPhasePrepared": "Private fixture current preference/email changed after immutable SMS snapshot queued; production untouched.",
+  "pushover": {
+    "status": "PROVIDER_ACCEPTED",
+    "realProviderCalls": 1,
+    "fixtureSuppressedCustomerCopies": 1,
+    "outboxStatus": "sent",
+    "ownerReceipt": "CONFIRMED"
+  },
+  "oneShotRehearsalEnabled": false,
+  "sms": {
+    "deployment": "f2b24b3c-8d18-4a7b-a34b-2bc6a6b7d054",
+    "deploymentFinalStatus": "CRASHED",
+    "outboxStatus": "pending",
+    "deliveryChannelAfterRejectedSms": "email",
+    "deliveryStatus": "failed",
+    "realDeliveryConfirmed": false,
+    "emailFallbackBlockedByBudget": true,
+    "automaticRetry": false,
+    "workerProof": {
+      "realProviderCalls": 1,
+      "resultStatus": "pending",
+      "outcome": "FAIL_OR_UNCERTAIN"
+    },
+    "renewedEvent": "7debeacd-f54d-4d6b-8360-7433ce3d839c",
+    "renewedDeployment": "ee07826d-6511-40dc-8a0f-4f959db6040a",
+    "renewedStatus": "PASS_PROVIDER_ACCEPTED",
+    "renewedProviderCalls": 1,
+    "ownerReceipt": "CONFIRMED_BY_OWNER"
+  },
+  "diagnosticCommit": "43d2971303f9215215631d0602447619c74e9682",
+  "diagnostic": {
+    "deployment": "e19d695a-ec03-4497-afbb-c53ff7308ee7",
+    "status": "SUCCESS",
+    "messageSends": 0,
+    "twilioSidFormatValid": true,
+    "twilioAuthTokenFormatValid": false,
+    "twilioSenderE164": true,
+    "brevoAccountReadHttp": 401
+  },
+  "credentialRecheck": {
+    "deployment": "d8e4290a-77ec-4a12-b630-8da1ecee6840",
+    "twilioAccountReadHttp": 200,
+    "twilioAccountStatus": "active",
+    "senderOwned": true,
+    "senderSmsCapable": true,
+    "brevoAccountReadHttp": 401,
+    "messageSends": 0
+  },
+  "brevoAuthorization": {
+    "ownerConfirmed": true,
+    "authorizedIp": "152.55.177.235",
+    "currentBlockedIp": "152.55.177.81",
+    "diagnosticDeployment": "6713ff96-8e07-4f79-b53e-2d5a7f2e1408",
+    "brevoAccountReadHttp": 401,
+    "brevoIpRestriction": true,
+    "brevoKeyNotFound": false,
+    "messageSends": 0,
+    "resolution": "Stable outbound IP assignment and allowlist before final email certification."
+  },
+  "customerAcknowledgement": {
+    "status": "customer_accepted_time",
+    "confirmedTime": "2026-11-04T18:35:00Z",
+    "databaseVerified": true
+  },
+  "email": {
+    "status": "PASS_PROVIDER_ACCEPTED",
+    "approvedRecipientVerified": true,
+    "runnerCommit": "a76e098ffe3450ab220dc2f3f180f286a66ba1a8",
+    "preflightWaitSeconds": 1800,
+    "providerSendBeforeHttp200": false,
+    "waitingDeployment": "06d22cad-a7e7-47ef-83a7-37173fd15466",
+    "waitingDeploymentStatus": "SUCCESS",
+    "currentBlockedIp": "54.177.170.222",
+    "waitStartedAt": "2026-11-04T07:39:00Z",
+    "waitExpiresAt": "2026-11-04T08:09:00Z",
+    "messageSendsBeforeAuthorization": 0,
+    "sentAt": "2026-11-04T07:41:40Z",
+    "realProviderCalls": 1,
+    "outboxStatus": "sent",
+    "deliveryStatus": "sent",
+    "providerReceiptPresent": true,
+    "ownerReceipt": "CONFIRMED_BY_OWNER"
+  },
+  "networking": {
+    "ownerScreenshot": "Networking shows outbound IPv6, no static IP control visible. IPv6 remains off.",
+    "plan": "Hobby; confirmed by owner"
+  },
+  "existingMailerReview": {
+    "date": "2026-11-04",
+    "scope": "READ_ONLY_PRODUCTION_CONFIGURATION_AND_LOGS",
+    "productionDeployment": "126fc57f-cf9b-4254-9dbb-2d49670d0695",
+    "productionCommit": "105b0845f3f4d50542d7daf575b2cd5642837669",
+    "deployedAt": "2026-10-23T21:25:17.469Z",
+    "provider": "Brevo HTTPS /v3/smtp/email",
+    "region": "us-west2",
+    "specialRelayFound": false,
+    "staticOutboundConfigurationExposed": false,
+    "recentSuccessfulBrevoDeliveryProvenByAvailableLogs": false,
+    "brevoAuthorizedListAccessibleThroughConnectedTools": false,
+    "hypothesis": "Existing production source IP or subnet may already be recognized; requires Brevo authorized-IP list verification.",
+    "productionMutations": 0,
+    "messagesSent": 0,
+    "paidUpgradeRequiredByThisReview": false
+  },
+  "brevoCidrReview": {
+    "ownerAdded": "152.55.177.0/24",
+    "checkDeployment": "534fdeb8-51f5-409e-b420-39860c2da042",
+    "actualNewBlockedIp": "52.9.85.82",
+    "httpStatus": 401,
+    "longTermSubnetSolutionVerified": false
+  },
+  "closureDeployments": {
+    "worker": "148b267d-d096-48b0-ae1a-f3b5d80ae60e",
+    "gateway": "c3c3ad40-41d2-4edd-8a66-b73ad871f5f1",
+    "status": "SUCCESS",
+    "gatewayModeHttp": 200,
+    "gatewayMode": "LEGACY",
+    "workerEnabled": false
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-04",
+  "state": "FINAL_HOSTED_REHEARSAL_PASSED_ALL_RECEIPTS_CONFIRMED",
+  "productionReady": false,
+  "productionWrites": 0,
+  "project": "hvrqgufqjslvgiohgkvu",
+  "schema": "master_wok_rehearsal",
+  "run": "26efcf42871d88c3",
+  "releaseId": "private-browser-26efcf42871d88c3",
+  "expiresAt": "2026-11-02T09:17:25.352Z",
+  "fixtureEmail": "browser-26efcf42871d88c3@example.invalid",
+  "fixturePrefix": "browser-26efcf42871d88c3-",
+  "preview": "https://review-master-wok-checkout-i.rungsthaikitchen.pages.dev",
+  "coreModelVersion": "combined-kitchen-protected-v3",
+  "edge": {
+    "name": "master-wok-booking",
+    "version": 23,
+    "bundleSha256": "f77a48860d6fbea3c4299b040ce1654ea37bb16b051b700b6b132a329e151991",
+    "verifyJwt": true,
+    "authentication": "Temporary handler replaced with HTTP410 and JWT enforcement restored."
+  },
+  "railway": {
+    "project": "7821ad5b-f5c2-4ab4-9206-c3d76eefd4c8",
+    "environment": "c1b8fad6-dbfc-4188-b4b5-a5dbfbf53279",
+    "service": "fd320f7b-3e1d-4b07-970c-74b75fdc82d3",
+    "deployment": "c3c3ad40-41d2-4edd-8a66-b73ad871f5f1",
+    "status": "SUCCESS",
+    "mode": "LEGACY",
+    "startCommand": "python -m gunicorn -c gunicorn.conf.py server:app",
+    "commit": "c06ada38d31e428448bd36a6c6b5e1b6698eb42a"
+  },
+  "verified": {
+    "directStagingGatewayMode": "MASTER_WOK",
+    "edgeModeRequest": 28,
+    "availabilityRequest": 29,
+    "availabilityHttp": 200,
+    "availabilityTrue": "2026-11-04T18:00:00.000Z",
+    "foreignIdentityRequest": 30,
+    "foreignIdentityHttp": 400,
+    "ordersBeforeUserTest": 0,
+    "writeFence": "Installed only in private staging schema; mode RLS enabled.",
+    "renewedEdgeModeRequest": 31
+  },
+  "pending": [
+    "Exact production rollout approval including the Hobby egress operating procedure."
+  ],
+  "cleanup": [
+    "Retain the private test order, receipt, plan and write fence for review; fixture deletion requires the existing scoped cleanup path."
+  ],
+  "completed": [
+    "Authenticated hosted preview collection checkout RTK-119 verified in private database.",
+    "One item, matching receipt, saved kitchen plan, pending outbox event and zero notification deliveries.",
+    "Staging drain returned HTTP503; deployed LEGACY restore returned HTTP200.",
+    "Test order, receipt and plan preserved unchanged; production fixture customer/order counts zero.",
+    "Actual Cloudflare admin Suggest to 18:10 verified, acknowledged via deployed Railway link, sole capacity commitment retained.",
+    "David confirmed RTK-119 ticket shows 4 November at 18:10.",
+    "David confirmed the refreshed preview restriction list no longer shows the loading error.",
+    "Private launch control restored to LEGACY revision 6; temporary writer disabled with JWT enforcement. RTK-119 retained at 18:10; zero deliveries.",
+    "Dedicated staging gateway Gunicorn deployment f13e5c9e succeeded, retaining LEGACY; local WSGI concurrency/shutdown and 22 backend regression tests passed."
+  ],
+  "evidence": "STAGING-SERVICE-CONTROL-RESULT.json",
+  "currentOrder": {
+    "reference": "RTK-119",
+    "status": "customer_accepted_time",
+    "confirmedTime": "2026-11-04T18:10:00Z",
+    "responseReceipts": 2,
+    "queuedNotifications": 5,
+    "notificationDeliveries": 0
+  },
+  "renewedAt": "2026-11-02T07:17:25Z",
+  "worker": {
+    "reviewCommit": "6a4be76f126d9875b02fb551bc25f5844ff9d3e6",
+    "deployed": true,
+    "enabled": false,
+    "backendTests": 42,
+    "realProcessShutdown": "PASS",
+    "realProviderCalls": 1,
+    "nextManualRequirement": "Owner confirmation email receipt; accept Hobby egress authorization procedure before production approval.",
+    "service": "9bfcff98-728e-4260-b452-9626c509ccac",
+    "deployment": "148b267d-d096-48b0-ae1a-f3b5d80ae60e"
+  },
+  "smsProbe": {
+    "result": "HANDSET_RECEIPT_CONFIRMED",
+    "evidence": "STAGING-SMS-PROBE-RESULT.json",
+    "cleanup": "Restored LEGACY/Gunicorn, disabled probe, cleared temporary values; SUCCESS."
+  },
+  "currentControlRevision": 18,
+  "latestEvidence": "STAGING-FINAL-PROVIDER-REHEARSAL.json"
+}

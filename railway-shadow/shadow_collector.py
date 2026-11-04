@@ -254,6 +254,28 @@ def run_replay(service_date, rows):
         raise ShadowError('INVALID_REPLAY_RESULT')
     return result
 
+def run_physical_fit(service_date, rows):
+    """Opt-in diagnostic only. Never affects stored legacy replay or source health."""
+    if os.environ.get('MASTER_WOK_PHYSICAL_FIT_SHADOW_ENABLED') != 'true':
+        return None
+    try:
+        bridge = Path(__file__).with_name('physical-fit-bridge.js')
+        process = subprocess.run(
+            ['node', str(bridge)],
+            input=canonical({'serviceDate': service_date, 'rows': rows}),
+            text=True, capture_output=True, timeout=15,
+            env={**os.environ, 'TZ': 'Europe/London'}, check=True)
+        result = json.loads(process.stdout)
+        if result.get('bookingApprovalAllowed') is not False:
+            raise ShadowError('UNSAFE_PHYSICAL_FIT_RESULT')
+        return {'status': result.get('status', 'UNVERIFIED'),
+                'reason': result.get('reason', 'UNKNOWN'),
+                'batches': result.get('productionBatches'),
+                'fryerCycles': result.get('fryerCycles')}
+    except Exception:
+        return {'status': 'UNVERIFIED', 'reason': 'PHYSICAL_FIT_BRIDGE_FAILED'}
+
+
 class MonitorStore:
     def __init__(self, filename, identity, build_hash='test-build',
                  legacy_identity=None, legacy_build=None):
@@ -411,6 +433,10 @@ class Collector:
                 replay = {'observations': [], 'verified': False}
                 reason = 'REPLAY_UNAVAILABLE'
             self.store.record(day, second, replay, reason)
+            physical_fit = run_physical_fit(day, replay_rows(day, second))
+            if physical_fit is not None:
+                print(canonical({'event': 'PHYSICAL_FIT_SHADOW', 'serviceDate': day,
+                                 **physical_fit, 'bookingApprovalAllowed': False}), flush=True)
             return {'state': 'OBSERVED', 'orders': len(second), 'prediction': 'UNVERIFIED', 'reason': reason}
         except Exception as error:
             code = str(error) if isinstance(error, ShadowError) else 'COLLECTOR_ERROR'

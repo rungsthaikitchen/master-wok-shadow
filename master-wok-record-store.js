@@ -21,6 +21,9 @@ async function createRecordStore(directory) {
   if (!path.isAbsolute(directory)) throw Error('ABSOLUTE_DEDICATED_DIRECTORY_REQUIRED');
   await fs.mkdir(directory, { recursive:true, mode:0o700 });
   async function syncDirectory() {
+    // Windows does not support fsync on directory handles. The record file
+    // itself is fsynced above; preserve directory fsync on other platforms.
+    if (process.platform === 'win32') return;
     const handle = await fs.open(directory, 'r');
     try { await handle.sync(); } finally { await handle.close(); }
   }
