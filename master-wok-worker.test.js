@@ -21,3 +21,4 @@ test('persistence failure retries; ack failure stays unacknowledged for lease ex
  const success=createShadowWorker({enabled:true,queue,observer:{observe:()=>({observed:true})}});
  assert.equal((await success.runOnce()).state,'QUEUE_OR_WORKER_ERROR');assert.equal(acks,1);
 });
+

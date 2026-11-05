@@ -1,0 +1,71 @@
+{
+  "date": "2026-11-01",
+  "status": "PASS_FOR_TESTED_API_PATHS",
+  "productionReady": false,
+  "productionWrites": 0,
+  "scope": "PRIVATE_REHEARSAL_ADMIN_RUNTIME_AND_DEPLOYED_RAILWAY_CUSTOMER_RESPONSE",
+  "orderRef": "RTK-119",
+  "orderId": "a1e71ddf-df67-447b-82e8-c5d2663e9623",
+  "fixtureRun": "26efcf42871d88c3",
+  "expiresAt": "2026-11-01T22:05:16.039515+00:00",
+  "edge": {
+    "version": 10,
+    "sha256": "934d39e8da8f5ec5f28dfc0f23c851317f2487885b5bc86827e26e3cf334ac13",
+    "runtime": "createBookingRuntime; existing lifecycle and mutation assessment modules; fixed private schema/fixture boundary"
+  },
+  "railway": {
+    "deployment": "5e7e6734-ae54-4f70-9691-1acdae75e24d",
+    "status": "SUCCESS",
+    "mode": "MASTER_WOK"
+  },
+  "pages": {
+    "commit": "6311cf2076e3954c40c964751060206803b8ccbd",
+    "deployment": "9791ee37-59e0-4571-9c13-3f1ed6ce921f",
+    "status": "SUCCESS"
+  },
+  "checks": {
+    "fixtureListRequest": 32,
+    "fixtureListHttp": 200,
+    "foreignOrderMutationRequest": 33,
+    "foreignOrderMutationHttp": 403,
+    "suggestTimeRequest": 34,
+    "suggestTimeHttp": 200,
+    "originalTime": "2026-11-04T18:00:00Z",
+    "proposedTime": "2026-11-04T18:05:00Z",
+    "commitmentsWhileProposed": 2,
+    "customerAcceptanceThroughRailwayRequest": 35,
+    "customerAcceptanceHttp": 200,
+    "customerLinkReplayRequest": 36,
+    "customerLinkReplayHttp": 200,
+    "finalState": {
+      "status": "customer_accepted_time",
+      "confirmed_time": "2026-11-04 18:05:00+00",
+      "receipts": 1,
+      "queued_events": 3,
+      "deliveries": 0,
+      "time_commitments": 1
+    }
+  },
+  "localChecks": {
+    "coreTests": 219,
+    "adminClientProxyTests": 23,
+    "actualWorkerdProxies": [
+      "booking-mode",
+      "booking",
+      "booking-availability",
+      "admin order-action",
+      "admin service-control"
+    ],
+    "adminInlineScriptsParsed": 3
+  },
+  "pending": [
+    "Manual actual Cloudflare Preview admin screen and Suggest action.",
+    "Real provider delivery/notification, printing and whole-service certification.",
+    "Full deployed website/privilege rollback, production startup and verified existing admin Access policy."
+  ],
+  "limits": [
+    "Admin suggestion/list tested directly through the deployed private Edge runtime; actual Cloudflare admin POST is pending the manual UI check.",
+    "Customer acknowledgement/replay used the deployed Railway HTML route and real PostgreSQL transactions.",
+    "No real notifications were sent; queued events remain pending. No production authority was enabled."
+  ]
+}

@@ -62,3 +62,4 @@ test('strict date parser rejects malformed and impossible dates', () => {
   assert.equal(validServiceDate('2024-02-29'),true);
   assert.equal(validServiceDate('2026-13-01'),false);
 });
+

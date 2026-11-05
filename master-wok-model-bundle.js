@@ -1289,3 +1289,4 @@ global.MasterWokModelV1 = Object.freeze({
   calculateProductionWindow
 });
 })(typeof window !== 'undefined' ? window : globalThis);
+

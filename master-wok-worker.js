@@ -28,3 +28,4 @@ function createShadowWorker({queue,observer,enabled=false}={}) {
   return Object.freeze({runOnce});
 }
 module.exports={createShadowWorker};
+

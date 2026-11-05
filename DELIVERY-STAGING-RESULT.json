@@ -1,0 +1,44 @@
+{
+  "status": "PASS",
+  "scope": "ISOLATED_STAGING_POSTGRES_DRIVER_AND_KITCHEN",
+  "schema": "master_wok_delivery_20a212751c68557c",
+  "date": "2026-11-05",
+  "results": [
+    "same-key replay",
+    "split and recombine re-assess both resources",
+    "recommendation, manual preview, atomic confirmation, stale revision, subsequent driver capacity",
+    "concurrent driver conflict: exactly one booking",
+    "delivery proposal, acknowledgement replay and test release",
+    "drain blocks new delivery bookings"
+  ],
+  "counts": {
+    "orders": "3",
+    "receipts": "3",
+    "provider_deliveries": "0"
+  },
+  "planRevision": "6",
+  "realRouteCalls": 0,
+  "providerSends": 0,
+  "productionWrites": 0,
+  "modeAfter": "LEGACY",
+  "limitations": [
+    "Deterministic route-duration fixtures; no hosted browser or real route/provider certification."
+  ],
+  "closure": {
+    "functionVersion": 5,
+    "jwtRequired": true,
+    "handler": "inert HTTP410",
+    "allNewIsolatedFixturesMarkedTest": true,
+    "sharedRehearsalModeChanged": false
+  },
+  "localTests": {
+    "UTC": 260,
+    "EuropeLondon": 260,
+    "failures": 0
+  },
+  "browserValidation": {
+    "status": "BLOCKED",
+    "reason": "Chromium absent; Playwright browser download returned an invalid archive. Real browser script prepared, not passed."
+  },
+  "websiteRegressionTests": 27
+}
