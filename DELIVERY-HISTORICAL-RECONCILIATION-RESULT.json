@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "scope": "DISPOSABLE_POSTGRESQL_FIXTURES_WITH_PRODUCTION_WRITE_FENCE_SQL",
+  "historicalCutoff": "2026-11-04T00:00:00Z",
+  "observedProduction": {
+    "legacyProposalsWithTokens": 13,
+    "legacyUntimedOrders": 21
+  },
+  "verified": [
+    "unretired links block cutover",
+    "unexpected retirement count rolls back",
+    "future booking rolls back token retirement",
+    "only old proposal tokens change",
+    "old link refused by lifecycle",
+    "rollback guard clears for historical records"
+  ],
+  "productionWrites": 0
+}
