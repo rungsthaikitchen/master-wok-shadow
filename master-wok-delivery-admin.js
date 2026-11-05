@@ -2,6 +2,11 @@
 const {beginBookingTransaction}=require('./master-wok-transaction-writer');
 const {normalizeStagingOrders}=require('./staging-order-snapshot');
 const {localDate,relativePlacement}=require('./master-wok-clock');
+const {POLICY}=require('./master-wok-driver-plan');
+function compareRecommendations(a,b){
+ return Number(a.foodAgeMinutes>=POLICY.preferredFoodAge)-Number(b.foodAgeMinutes>=POLICY.preferredFoodAge)
+  || b.savedMinutes-a.savedMinutes || a.foodAgeMinutes-b.foodAgeMinutes;
+}
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 // Shares the checkout writer lock and plan revision. Recommendations never write;
 // explicit confirmations re-read every commitment and assess kitchen + driver.
@@ -45,10 +50,16 @@ function createDeliveryAdmin({pool,model,readOrders,readAvailability,planStore,d
       if(r.status!=='VALIDATED_PROTECTED_PLAN')continue;
       const proposed=r.plan.delivery.trips.find(t=>t.stops.length===2&&t.stops.some(s=>s.id===focusId));
       const savedMinutes=(trip.finish-trip.start)+(other.finish-other.start)-(proposed.finish-proposed.start);
-      if(savedMinutes>0)candidates.push({orderIds:proposed.stops.map(s=>s.sourceId),trip:proposed,savedMinutes});
+      if(savedMinutes<=0)continue;
+      const jobs=[...r.plan.wok.jobs,...r.plan.fryer.jobs,...(r.plan.auxiliary?.jobs||[])];
+      const foodAgeMinutes=Math.max(...proposed.stops.map(stop=>{
+       const finishes=jobs.filter(job=>job.orderIds.includes(stop.id)).map(job=>job.finish);
+       return stop.arrival-(finishes.length?Math.max(...finishes):proposed.start);
+      }));
+      candidates.push({orderIds:proposed.stops.map(s=>s.sourceId),trip:proposed,savedMinutes,foodAgeMinutes});
      }
-     return candidates.sort((a,b)=>b.savedMinutes-a.savedMinutes)[0]||null;
-    }))).filter(Boolean).sort((a,b)=>b.savedMinutes-a.savedMinutes):[];
+     return candidates.sort(compareRecommendations)[0]||null;
+    }))).filter(Boolean).sort(compareRecommendations):[];
     return {success:true,committed:false,notification_managed:true,revision,serviceDate,trip,recommendations:options,candidates:raw.filter(r=>r.order_type==='delivery'&&r.status!=='proposed'&&r.source_order_id!==input.orderId).map(r=>({orderId:r.source_order_id,reference:r.order_ref,time:r.confirmed_time}))};
    }
    if(!Number.isSafeInteger(input.expectedRevision)||input.expectedRevision!==revision)return await rollback(fail('DELIVERY_PLAN_CHANGED_REFRESH'));

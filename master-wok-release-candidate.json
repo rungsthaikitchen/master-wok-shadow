@@ -6,7 +6,7 @@
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
   "schema": "public",
   "modelVersion": "combined-kitchen-protected-v3",
-  "sourceSha256": "dbf1e7bea82cd7851de68f3aec4cf48adc7df7be158291cc1f23f1f19c1c12e9",
+  "sourceSha256": "3ff3ee4bea51d9ad06023ce7cc1e09aa81fdca589f846d2d9f0c0a23325d56e6",
   "checks": {
     "atomicConcurrency": "PENDING",
     "physicalCoverage": "PENDING",

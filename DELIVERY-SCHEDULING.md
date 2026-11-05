@@ -61,13 +61,13 @@ rehearsal uses deterministic route durations; the real lookup is separate eviden
 2. Run the full hosted checkout/Admin flow using real route estimates and private
    staging data. Confirm free/paid delivery, route outage handling and timezone
    boundaries through the deployed runtime, not only individual adapters.
-3. Extend route recommendation ranking to prefer food-ready-to-door under 15
-   minutes; the current hard limit is 20. Test combinations whose best kitchen
-   placement differs from the driver's first feasible trip.
-4. Certify rollback with live delivery commitments. The kitchen-only legacy
-   scheduler cannot interpret these driver reservations: draining works, but a
-   route back to legacy must not reopen bookings over outstanding driver trips.
-   Do not treat the existing kitchen-only rollback rehearsal as delivery sign-off.
+3. Recommendations now prefer routes under 15 minutes from food ready to door.
+   Test combinations whose best kitchen placement differs from the driver's first
+   feasible trip.
+4. Rehearse `sql/delivery-rollback-guard.sql` against outstanding commitments.
+   Run it in the same transaction as the revision-checked mode update. It
+   requires DRAINING and blocks on outstanding trips or delivery orders.
+   The guard passed a staging PostgreSQL check with temporary fixtures. A full routing rollback rehearsal remains pending.
 5. Rehearse pre-service migration of existing kitchen-only delivery commitments,
    or require an empty future delivery commitment set under the writer lock.
 6. Certify the exact new source and obtain explicit approval before changing the
