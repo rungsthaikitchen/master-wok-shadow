@@ -55,21 +55,21 @@ rehearsal uses deterministic route durations; the real lookup is separate eviden
 
 ## Remaining release gates
 
-1. Run real browser tests (prepared in the website branch). Chromium is absent in
-   this environment and its download returned an invalid archive. Neither the new
-   Admin interaction nor changed checkout events have browser sign-off.
+1. Chromium Admin and mobile checkout tests passed with intercepted services.
+   Hosted checkout and Admin verification is still required.
 2. Run the full hosted checkout/Admin flow using real route estimates and private
    staging data. Confirm free/paid delivery, route outage handling and timezone
    boundaries through the deployed runtime, not only individual adapters.
 3. Recommendations now prefer routes under 15 minutes from food ready to door.
    Test combinations whose best kitchen placement differs from the driver's first
    feasible trip.
-4. Rehearse `sql/delivery-rollback-guard.sql` against outstanding commitments.
-   Run it in the same transaction as the revision-checked mode update. It
-   requires DRAINING and blocks on outstanding trips or delivery orders.
-   The guard passed a staging PostgreSQL check with temporary fixtures. A full routing rollback rehearsal remains pending.
-5. Rehearse pre-service migration of existing kitchen-only delivery commitments,
-   or require an empty future delivery commitment set under the writer lock.
+4. The rollback guard passed staging PostgreSQL checks. An additional disposable
+   PostgreSQL rehearsal verified a revision-checked switch in the same transaction
+   as the guard. Outstanding trips blocked the switch and preserved mode and revision.
+   The full hosted routing rollback remains pending.
+5. The cutover guard passed disposable PostgreSQL checks with a fixed London clock.
+   A future booking and the 16:30 boundary blocked cutover. Test-only fixtures
+   allowed the switch under the writer lock. Existing live commitments require migration.
 6. Certify the exact new source and obtain explicit approval before changing the
    production checkout or production Supabase. All new delivery checks remain
    PENDING in the DRAFT certificate. No merge/deployment is authorized by old
