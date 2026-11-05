@@ -1,0 +1,22 @@
+{
+  "status": "PASS_DATABASE_REHEARSAL",
+  "targetRelease": "master-wok-launch-2026-11-03",
+  "productionEdge": {
+    "version": 5,
+    "bundleSha256": "dbc82ecc2196be6a4e9071948b3b41f3d9504ae13fa1e9aa638cc8f7db49f3fd",
+    "verified": "Active function metadata matches previous kitchen-only release package"
+  },
+  "compatibleWebsiteCommit": "f4048f4ae253dace9d2aa50a58291c5cecb917e7",
+  "verification": [
+    "Drain delivery revision 3 under writer lock",
+    "Outstanding trip aborts restoration and preserves DRAINING revision 4",
+    "When trips clear, restore prior release in MASTER_WOK mode at revision 5"
+  ],
+  "schedulerRegressionTests": 260,
+  "websiteRegressionTests": 27,
+  "productionWrites": 0,
+  "remaining": [
+    "Hosted rollback rehearsal restoring prior Master Wok runtime and compatible website",
+    "Production release certification"
+  ]
+}
