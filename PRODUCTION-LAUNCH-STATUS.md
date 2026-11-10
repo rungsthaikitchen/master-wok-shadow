@@ -1,3 +1,33 @@
+# Four-ring relaunch status — 10 November 2026
+
+**NO-GO for production reactivation. Production remains on Legacy following the
+6 November large-basket incident. The production activation record below is
+historical and does not approve this replacement.**
+
+Private staging Edge v53 is bound to source digest
+`f9f95cb967193a606b9765fe7ad442122ccd04e39de14fe71e85c85e4b0ef915`.
+The actual £50 and £100 delivery baskets passed Cloudflare preview checkout,
+Admin acceptance and door-arrival trip display. RTK-186 customer acceptance/replay
+and RTK-187 confirmed 19:30 are verified with one booking receipt each.
+Four-ring staging supports two large woks, two small woks, five pans, four rings,
+one main portion per vessel, and the agreed maximum 20-minute finished-food age.
+
+306 core tests and 36 website tests pass. Occupied-service full-day availability
+returned 49 hints in 10.77 seconds, preserving unavailable times around the first
+trip. This does not certify every larger-basket latency case.
+
+The tested physical model now has a prepared production bootstrap, guarded by a
+DRAFT certificate with all checks PENDING. Full source-bound certification and a
+specific controlled cutover approval are still required. Do not relabel the old
+single-wok DRAFT certificate or inherit its PASS flags for the new runtime.
+Notification provider/rollback evidence must be reconciled against the final
+artifact; no new real provider send is authorized by this status note.
+
+Current detailed evidence and limits: `FOUR-RING-RELEASE-CHECKLIST.md`,
+`BASKET-REVIEW-STAGING.md`, and `STAGING-FOUR-RING-BROWSER-DELIVERY-RESULT.json`.
+
+## Historical launch record
+
 # Production activated — 4 November 2026
 
 **LIVE at 08:51:36 GMT; MASTER_WOK revision 2. First hosted production booking and customer time acknowledgement verified.**

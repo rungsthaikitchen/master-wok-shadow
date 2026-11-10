@@ -39,6 +39,11 @@ async function reserveWithMasterWok({ connection, serviceDate, key, candidate, r
     return { status: 'GREEN', committed: true, reason: 'RESERVED', ...(response?{response}:{}) };
   } catch (error) {
     try { await connection.query('ROLLBACK'); } catch (_) {}
+    // Server diagnostics contain only enum-shaped codes, never SQL, baskets,
+    // customer details, request keys or arbitrary exception text.
+    const diagnostic=/^[A-Z][A-Z_]{2,79}$/.test(error?.message||'')?error.message:'INTERNAL_ERROR';
+    const sqlState=/^[0-9A-Z]{5}$/.test(error?.code||'')?error.code:null;
+    console.error(JSON.stringify({event:'MASTER_WOK_TRANSACTION_FAILED',diagnostic,sqlState}));
     const publicReasons=new Set(['CHECKOUT_PRICE_CHANGED','CUSTOMER_CANNOT_SET_TEST_OR_ASAP',
       'INVALID_CUSTOMER_DETAILS','INVALID_BASKET','INVALID_BASKET_LINE','MODIFIER_NOT_ALLOWED',
       'INVALID_MODIFIER','SPICE_NOT_ALLOWED','DISCOUNT_NOT_AVAILABLE','DISCOUNT_WRONG_SERVICE_DAY',

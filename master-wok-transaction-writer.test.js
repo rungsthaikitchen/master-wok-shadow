@@ -42,3 +42,17 @@ test('failed persistence rolls back',async()=>{
  assert.equal(result.committed,false);assert.equal(log.at(-1),'ROLLBACK');
 });
 
+test('transaction diagnostics retain internal enum codes without leaking exception text',async t=>{
+ const diagnostics=[];
+ t.mock.method(console,'error',message=>diagnostics.push(JSON.parse(message)));
+ for(const message of ['PRIVATE_FIXTURE_REQUIRED','customer@example.invalid secret SQL']){
+  const result=await reserveWithMasterWok({connection:connection([]),serviceDate:'2026-11-01',
+   key:'private-key',candidate:{email:'private@example.invalid'},readCommitted:async()=>({acceptedOrders:[]}),
+   assess:async()=>({status:'GREEN'}),persist:async()=>{throw Error(message);}});
+  assert.equal(result.reason,'TRANSACTION_FAILED');
+ }
+ assert.deepEqual(diagnostics,[
+  {event:'MASTER_WOK_TRANSACTION_FAILED',diagnostic:'PRIVATE_FIXTURE_REQUIRED',sqlState:null},
+  {event:'MASTER_WOK_TRANSACTION_FAILED',diagnostic:'INTERNAL_ERROR',sqlState:null}]);
+});
+

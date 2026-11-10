@@ -1,4 +1,13 @@
-# Kitchen recipe facts — 1 November 2026
+# Kitchen recipe facts — updated 8 November 2026
+
+Latest confirmed conservative hob capacity: **one main portion per small wok,
+one per large wok, and one per curry pan**. Four shared rings; two large woks,
+two small woks and five curry pans. Noodles and fried rice retain their large-wok
+eligibility but are also limited to one portion per cook. The observed two-portion
+Dave Style S&P Chips cook is not guaranteed model capacity. Cold-preparation
+batch sizes and the separately confirmed two-eggs-per-wok rule are unchanged.
+The four-ring implementation remains staging-only; earlier single-wok model
+results below do not certify this updated configuration.
 
 Source: David's kitchen timings/capacities supplied in this development session.
 Batch quantities map to menu servings; they are not counts of individual cakes or
@@ -8,7 +17,7 @@ prawns within a serving. No production booking authority is implied by these fac
 | --- | --- | ---: | ---: | ---: | --- |
 | Fish cakes | Deep fry | 3 | 3 batches | 6 batches | |
 | Fried prawns | Deep fry | 2 | 3 batches | 6 batches | |
-| Pork dumplings | Microwave | 5 | | | 1 batch per run |
+| Pork dumplings | Microwave | 4 / 6 / 8 | | | 1 / 2 / 3 portions per run |
 | Thai sausage | Deep fry (confirmed) | 3 | 5 batches | 10 batches | |
 | Spare ribs | Microwave | 5 | | | 1 batch per run |
 | Fried eggs | Shallow fry, small wok | 2 | | | 2 eggs per wok |

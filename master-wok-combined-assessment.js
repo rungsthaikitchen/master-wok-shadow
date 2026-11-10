@@ -64,6 +64,10 @@ function verifyCombinedCapacity({acceptedOrders,proposedOrder,rawRows,serviceDat
    orders.some(o=>!rows.some(r=>String(r.id)===String(o.orderId))))return fail('INCOMPLETE_SNAPSHOT');
   const id=String(proposedOrder.orderId),warmup=5,buffer=10+extraLead;
   const protectedResult=planWithProtectedWork({orders,rows,serviceDate,now,previousPlan:state.previousPlan,
+   ...(typeof options.validateCompletePlan==='function'?{validateCompletePlan:options.validateCompletePlan}:{}),
+   ...(options.earliestFinishByOrder?{earliestFinishByOrder:options.earliestFinishByOrder}:{}),
+   maxSearchNodes:options.maxSearchNodes,maxCompleteChecks:options.maxCompleteChecks,
+   ...(options.sharedRings===true?{sharedRings:true,stagingSharedRings:options.stagingSharedRings===true}:{}),
    newOrderId:id,blackouts,
    standaloneSpringRolls:true,
    fryerWarmupMinutes:5,
@@ -71,12 +75,15 @@ function verifyCombinedCapacity({acceptedOrders,proposedOrder,rawRows,serviceDat
    notBeforeByOrder:{[id]:Math.max(990,Math.ceil(minute+Math.max(warmup,buffer)))}});
   if(protectedResult.status!=='VALIDATED_PROTECTED_PLAN')return fail(protectedResult.reason);
   const plan=protectedResult.plan,unstartedPlan=protectedResult.futurePlan,unstartedRows=protectedResult.remainingRows;
-  const validation=validateKitchenTimeline(orders,unstartedPlan,unstartedRows);
+  const validation=validateKitchenTimeline(orders,unstartedPlan,unstartedRows,options.sharedRings===true?{
+   auxiliaryRows:rows,fixedWok:protectedResult.protectedJobs.wok,
+   fixedAuxiliary:protectedResult.protectedJobs.auxiliary,fixedFryer:protectedResult.protectedJobs.fryer,blackouts}:{});
   if(validation.status!=='VALIDATED_STAGING_TIMELINE')return fail('TIMELINE_VALIDATION_FAILED',{issues:validation.issues});
   // Validate actual durations, deadlines and exact per-order fryer coverage,
   // independently of the allocator's success status.
   for(const job of unstartedPlan.wok.jobs){
    if(DURATIONS[job.group]?.[job.portions]!==job.finish-job.start||
+     ![10,20].includes(job.holdingLimitMinutes)||job.holdingLimitMinutes>(unstartedPlan.holdingLimitMinutes===20?20:10)||
      job.finish>job.readyMinute||job.readyMinute-job.finish>job.holdingLimitMinutes)
     return fail('INVALID_WOK_JOB');
   }
@@ -93,7 +100,8 @@ function verifyCombinedCapacity({acceptedOrders,proposedOrder,rawRows,serviceDat
      !Array.isArray(job.allocations)||job.allocations.length!==job.portions)
     return fail('INVALID_FRYER_JOB');
    for(const a of job.allocations){
-    if(job.start<a.notBefore||job.finish>a.deadline||a.deadline-job.finish>10||
+    const hold=job.standalone&&unstartedPlan.holdingLimitMinutes===20?20:10;
+    if(job.start<a.notBefore||job.finish>a.deadline||a.deadline-job.finish>hold||
       a.type!==job.type||a.qty!==1)return fail('INVALID_FRYER_ALLOCATION');
     const k=key(a.orderId,a.itemId,a.type);actual.set(k,(actual.get(k)||0)+1);
    }

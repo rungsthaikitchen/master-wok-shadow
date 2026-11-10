@@ -10,7 +10,7 @@ const {createServicePlanStore}=require('./master-wok-service-plan-store');
 const {localDate,relativePlacement}=require('./master-wok-clock');
 const {londonPlacement}=require('./staging-booking-integration');
 function createBasketAvailability({pool,model,readAvailability,assessBooking,assertWriteAllowed,
- quoteDelivery,readOrders=readCapacityCommitments,planStore=createServicePlanStore()}={}){
+ includeDiagnostics=false,quoteDelivery,readOrders=readCapacityCommitments,planStore=createServicePlanStore()}={}){
  if(!pool||!model||[readAvailability,assessBooking,assertWriteAllowed].some(f=>typeof f!=='function'))throw Error('INVALID_AVAILABILITY_CONFIGURATION');
  return async input=>{
   let connection;
@@ -36,15 +36,16 @@ function createBasketAvailability({pool,model,readAvailability,assessBooking,ass
     if(local.getSeconds()!==0||local.getMinutes()%5!==0)throw Error('INVALID_HINT_TIME');
     const prepared=prepareStagingBasket({id:'availability-candidate',createdAt:now,serviceDate:date,
      readyMinute:local.getHours()*60+local.getMinutes(),items,model});
-    let fits=false;
+    let fits=false,reason=prepared.reason||'BASKET_NOT_PREPARED';
     if(prepared.status==='PREPARED'){
-     const result=await assessBooking({serviceDate:date,acceptedOrders:orders,rawRows:rows,
+     const result=await assessBooking({assessmentPurpose:includeDiagnostics?'BASKET_REVIEW':'AVAILABILITY_HINT',serviceDate:date,acceptedOrders:orders,rawRows:rows,
       state:{now,availability,previousPlan},proposedOrder:{...prepared.candidate,
        placedAt:relativePlacement(now,date),items:prepared.rawRow.items,rawRow:prepared.rawRow,
        validatedHeader:{preferred_time:time,order_type:input.orderType,...(delivery?{customer_lat:delivery.customerLatitude,customer_lng:delivery.customerLongitude}:{})}}});
+     reason=result?.reason||'ASSESSMENT_UNVERIFIED';
      fits=result?.status==='GREEN'&&result.bookingApprovalAllowed===true;
     }
-    hints.push({time,available:fits});
+    hints.push({time,available:fits,...(includeDiagnostics?{reason}:{})});
    }
    await connection.query('ROLLBACK');
    return {success:true,hints,bookingApprovalAllowed:false};

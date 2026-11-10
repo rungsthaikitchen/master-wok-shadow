@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "status": "DRAFT",
+  "releaseId": "master-wok-four-ring-2026-11-10",
+  "projectRef": "ubyjrrsvbbqomitpaidb",
+  "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
+  "schema": "public",
+  "modelVersion": "combined-kitchen-four-ring-staging-v1",
+  "sourceSha256": "73f69764108bcb777b3c1110d7a3644bbd1af7366a6afb0076449133f403026c",
+  "checks": {
+    "atomicConcurrency": "PENDING",
+    "physicalCoverage": "PENDING",
+    "lifecycle": "PENDING",
+    "writeFence": "PENDING",
+    "commercial": "PENDING",
+    "delivery": "PENDING",
+    "notifications": "PENDING",
+    "wholeService": "PENDING",
+    "rollback": "PENDING",
+    "driverReservations": "PENDING",
+    "combinedTrips": "PENDING",
+    "deliveryCheckout": "PENDING",
+    "deliveryRollback": "PENDING"
+  },
+  "deliveryScheduling": 1,
+  "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
+  "evidence": {
+    "note": "Prepared release only. Every check must be signed off against the final bound source; prior release approval is not authorization."
+  }
+}

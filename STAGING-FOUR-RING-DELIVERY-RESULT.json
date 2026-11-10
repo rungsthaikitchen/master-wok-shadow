@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "scope": "HOSTED_PRIVATE_FOUR_RING_ATOMIC_SERVICE_AND_DELIVERY",
+  "checks": [
+    "SAME_KEY_TWO_CONNECTIONS_ONE_ORDER_AND_PLAN",
+    "CHANGED_RETRY_REJECTED",
+    "DISTINCT_KEY_TWO_CONNECTIONS_REASSESS_LOCKED_FOUR_RING_CAPACITY",
+    "PLAN_SAVE_FAILURE_ROLLS_BACK_HEADER_ITEMS_RECEIPT_AND_EVENT",
+    "SEVEN_ORDER_SERVICE_WITH_ORIGINAL_50_AND_100_BASKETS",
+    "CUSTOMER_ACKNOWLEDGED_TIME_CHANGE_AND_STARTED_CANCELLATION",
+    "50_AND_100_DELIVERY_BASKETS_KEEP_DOOR_ARRIVAL_AND_DRIVER_TRIPS_WITH_COLLECTION"
+  ],
+  "raceStatuses": [
+    "UNVERIFIED",
+    "GREEN"
+  ],
+  "productionWrites": 0,
+  "realNotificationsSent": 0,
+  "productionReady": false,
+  "testedDeploymentVersion": 8,
+  "disabledDeploymentVersion": 9,
+  "testedBundleSha256": "ae4e76b29ba98021bb45e52a0bf1151b2f0ebd70c09ef22945d9d906dcd8057d",
+  "routeFixture": "Five minutes per leg; fixed server-side fixture, not live routing",
+  "cleanupVerified": {
+    "testOrders": 0,
+    "testReceipts": 0,
+    "testPlans": 0,
+    "totalStagingOrders": 60,
+    "totalStagingOutbox": 81
+  },
+  "limitations": [
+    "No live-route provider or browser checkout certification",
+    "No deployment rollback certification",
+    "Small/large wok portion capacity not confirmed",
+    "No production launch approval"
+  ]
+}

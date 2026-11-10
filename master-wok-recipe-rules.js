@@ -14,7 +14,7 @@ const AUXILIARY={
  // One serving per run is conservative when rice happens to be freshly cooked.
  'jasmine-rice':{resource:'microwave',appliance:'microwave',minutes:3,capacity:1},
  'sticky-rice':{resource:'microwave',appliance:'microwave',minutes:3,capacity:1},
- 'pork-dumplings':{resource:'microwave',appliance:'microwave',minutes:5,capacity:1},
+ 'pork-dumplings':{resource:'microwave',appliance:'microwave',minutes:4,capacity:3,batchMinutes:{1:4,2:6,3:8}},
  'spare-ribs':{resource:'microwave',appliance:'microwave',minutes:5,capacity:1},
  // Conservative single-serving finishing on the existing chef/wok timeline.
  'chicken-satay':{resource:'wok',appliance:'small-wok',minutes:1,capacity:1},

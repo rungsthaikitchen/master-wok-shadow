@@ -3,8 +3,9 @@
 // through MASTER_WOK_CERTIFICATION_TOKEN; never commit the emitted bundle.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),seen=new Map();
-const releaseBuild=['--release','--release-staging'].includes(process.argv[2]);
-const certificateFile=process.argv[2]==='--release-staging'?'master-wok-release-candidate.staging.json':'master-wok-release-candidate.json';
+const releaseBuild=['--release','--release-staging','--release-four-ring'].includes(process.argv[2]);
+const certificateFile=process.argv[2]==='--release-staging'?'master-wok-release-candidate.staging.json':
+ process.argv[2]==='--release-four-ring'?'master-wok-release-candidate.four-ring.production.json':'master-wok-release-candidate.json';
 let stagingConfiguration={};
 if(process.argv[2]==='--release-staging'&&process.env.MASTER_WOK_STAGING_CONFIG_FILE){
  stagingConfiguration=JSON.parse(fs.readFileSync(process.env.MASTER_WOK_STAGING_CONFIG_FILE,'utf8'));

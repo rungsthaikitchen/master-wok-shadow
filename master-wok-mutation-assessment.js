@@ -8,7 +8,8 @@ const {createServicePlanStore}=require('./master-wok-service-plan-store');
 function demands(order){
  return order.is_test||['cancelled','declined','rejected'].includes(order.status)?[]:commitmentTimes(order);
 }
-function createMutationAssessment({model,readAvailability,readOrders=readCapacityCommitments,planStore=createServicePlanStore(),deliveryCapacity}={}){
+function createMutationAssessment({model,readAvailability,readOrders=readCapacityCommitments,planStore=createServicePlanStore(),deliveryCapacity,stagingSharedRings=false}={}){
+ const kitchenOptions=stagingSharedRings===true?{sharedRings:true,stagingSharedRings:true}:{};
  return async function assessMutation({connection,before,after,dates,now}){
   const old=demands(before),next=demands(after);
   const plansByDate={};
@@ -22,6 +23,7 @@ function createMutationAssessment({model,readAvailability,readOrders=readCapacit
    const availability=await readAvailability(connection,serviceDate);
    if(!changed.length){
     const protectedResult=deliveryCapacity?await deliveryCapacity.replan({orders,rows,previousPlan,now,serviceDate,availability}):planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,
+     ...kitchenOptions,
      standaloneSpringRolls:true,confirmedStarterRecipes:true,fryerWarmupMinutes:5});
     if(protectedResult.status!=='VALIDATED_PROTECTED_PLAN')return protectedResult;
     plansByDate[serviceDate]=protectedResult.plan;
@@ -32,7 +34,7 @@ function createMutationAssessment({model,readAvailability,readOrders=readCapacit
    const row=changed[0],candidate=orders.find(o=>String(o.orderId)===String(row.id));
    const result=await (deliveryCapacity?deliveryCapacity.verify:assessCombinedBooking)({serviceDate,state:{now,availability,previousPlan},
     acceptedOrders:orders.filter(o=>o!==candidate),rawRows:rows.filter(r=>r!==row),
-    proposedOrder:{...candidate,items:row.items,rawRow:row,validatedHeader:{preferred_time:row.confirmed_time,order_type:row.order_type,customer_lat:row.customer_lat,customer_lng:row.customer_lng}}});
+    proposedOrder:{...candidate,items:row.items,rawRow:row,validatedHeader:{preferred_time:row.confirmed_time,order_type:row.order_type,customer_lat:row.customer_lat,customer_lng:row.customer_lng}}},kitchenOptions);
    if(!['VALIDATED_COMBINED_ASSESSMENT','VERIFIED_KITCHEN_CAPACITY'].includes(result.status))return result;
    plansByDate[serviceDate]=result.plan;
   }

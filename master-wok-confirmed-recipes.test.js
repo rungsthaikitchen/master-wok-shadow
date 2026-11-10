@@ -17,10 +17,10 @@ test('fish cakes, prawns and sausage use recipe-specific times and basket capaci
  }
  assert.equal(FRYER.crispyChicken.large,3);assert.equal(FRYER.crispyChicken.small,2);
 });
-test('dumplings and ribs share one microwave, one batch per five-minute cycle',()=>{
+test('dumplings batch in six minutes while ribs retain their five-minute run',()=>{
  const p=plan([line('pork-dumplings',2),line('spare-ribs')]);assert.equal(p.status,'COORDINATED_PROTOTYPE');
- const jobs=p.auxiliary.jobs;assert.equal(jobs.length,3);
- for(const j of jobs){assert.equal(j.resource,'microwave');assert.equal(j.portions,1);assert.equal(j.finish-j.start,5);}
+ const jobs=p.auxiliary.jobs;assert.equal(jobs.length,2);
+ for(const j of jobs){assert.equal(j.resource,'microwave');assert.equal(j.portions,j.itemId==='pork-dumplings'?2:1);assert.equal(j.finish-j.start,j.itemId==='pork-dumplings'?6:5);}
  for(let i=0;i<jobs.length;i++)for(let k=i+1;k<jobs.length;k++)assert.ok(jobs[i].finish<=jobs[k].start||jobs[k].finish<=jobs[i].start);
 });
 test('extra and standalone eggs share main-wok time, two minutes and at most two eggs',()=>{
@@ -142,4 +142,55 @@ test('preorders cannot spend cold-fryer warmup before production opens at 16:30'
  assert.equal(assessCombinedBooking(context(1020)).status,'UNVERIFIED');
  const next=assessCombinedBooking(context(1025));assert.equal(next.status,'VALIDATED_COMBINED_ASSESSMENT');
  assert.ok(next.plan.fryer.jobs.every(j=>j.start>=995));assert.equal(next.bookingApprovalAllowed,false);
+});
+
+test('dumpling runs use confirmed durations for one, two and three portions',()=>{
+ for(const [qty,minutes] of [[1,4],[2,6],[3,8]]){
+  const p=plan([line('pork-dumplings',qty)]);
+  assert.equal(p.status,'COORDINATED_PROTOTYPE');
+  const jobs=p.auxiliary.jobs;
+  assert.equal(jobs.length,1);
+  assert.equal(jobs[0].portions,qty);
+  assert.equal(jobs[0].finish-jobs[0].start,minutes);
+ }
+});
+
+test('started dumpling batches survive new bookings and cancellation without moving',()=>{
+ for(const qty of [2,3]){
+  const a=input([line('pork-dumplings',qty)]);
+  const options={serviceDate:'2026-11-04',confirmedStarterRecipes:true};
+  const first=planWithProtectedWork({...options,orders:[a.order],rows:[a.row],now:'2026-11-04T16:00:00Z'});
+  assert.equal(first.status,'VALIDATED_PROTECTED_PLAN');
+  const job=first.plan.auxiliary.jobs[0],minute=job.start+1;
+  const now=`2026-11-04T${String(Math.floor(minute/60)).padStart(2,'0')}:${String(minute%60).padStart(2,'0')}:00Z`;
+  const b=input([line('pork-dumplings')],'b',1200);
+  const next=planWithProtectedWork({...options,orders:[a.order,b.order],rows:[a.row,b.row],previousPlan:first.plan,now,newOrderId:'b'});
+  assert.equal(next.status,'VALIDATED_PROTECTED_PLAN');
+  assert.deepEqual(next.protectedJobs.auxiliary,[job]);
+  assert.deepEqual(next.plan.auxiliary.jobs.find(j=>j.orderIds.includes('a')),job);
+  const cancelled=planWithProtectedWork({...options,orders:[],rows:[],previousPlan:first.plan,now});
+  assert.equal(cancelled.status,'VALIDATED_PROTECTED_PLAN');
+  assert.deepEqual(cancelled.plan.auxiliary.jobs,[job]);
+  for(const duration of [4,5,7,9]){
+   const corrupt=structuredClone(first.plan);
+   corrupt.auxiliary.jobs[0].start=job.finish-duration;
+   assert.throws(()=>protectStartedWork(corrupt,minute),/INVALID_COMMITTED_PLAN/);
+  }
+ }
+});
+
+test('twenty-minute microwave fallback passes protected planning and combined assessment',()=>{
+ const a=input([line('pork-dumplings',9)]);
+ const options={orders:[a.order],rows:[a.row],serviceDate:'2026-11-04',now:'2026-11-04T16:00:00Z',confirmedStarterRecipes:true};
+ const first=planWithProtectedWork(options);
+ assert.equal(first.status,'VALIDATED_PROTECTED_PLAN');
+ assert.equal(first.plan.holdingLimitMinutes,20);
+ const replay=planWithProtectedWork({...options,previousPlan:first.plan});
+ assert.equal(replay.status,'VALIDATED_PROTECTED_PLAN');
+ const assessed=assessCombinedBooking({serviceDate:'2026-11-04',acceptedOrders:[],rawRows:[],
+  proposedOrder:{...a.order,rawRow:a.row,validatedHeader:{preferred_time:'2026-11-04T19:00:00Z'}},
+  state:{now:'2026-11-03T12:00:00Z',availability:{blackouts:[],serviceState:{mode:'normal',capacity_throttle:0}}}});
+ assert.equal(assessed.status,'VALIDATED_COMBINED_ASSESSMENT');
+ assert.equal(assessed.plan.holdingLimitMinutes,20);
+ assert.equal(assessed.bookingApprovalAllowed,false);
 });

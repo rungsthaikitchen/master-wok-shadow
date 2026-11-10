@@ -53,6 +53,16 @@ test('cooking must finish before loading and actual food readiness must satisfy 
  assert.throws(()=>validateFoodAge(plan),/FOOD_HOLDING/);plan.wok.jobs[0].finish=1080;assert.throws(()=>validateFoodAge(plan),/FOOD_HOLDING/);
  plan.wok.jobs[0].finish=1103;assert.equal(validateFoodAge(plan),true);
 });
+
+test('each finished dish must meet the delivery holding limit, even when the final dish is fresh',async()=>{
+ const d=await run([row('a')]);
+ const plan={wok:{jobs:[{orderIds:['a'],finish:1089},{orderIds:['a'],finish:1103}]},fryer:{jobs:[]},delivery:d.delivery};
+ assert.throws(()=>validateFoodAge(plan),/DELIVERY_FOOD_HOLDING_LIMIT/);
+ plan.wok.jobs[0].finish=1090;assert.equal(validateFoodAge(plan),true);
+ plan.auxiliary={jobs:[{itemId:'pork-dumplings',orderIds:['a'],finish:1089}]};
+ assert.throws(()=>validateFoodAge(plan),/DELIVERY_FOOD_HOLDING_LIMIT/);
+ plan.auxiliary.jobs[0].itemId='coconut-rice';assert.equal(validateFoodAge(plan),true);
+});
 test('no driver is reserved for collection orders',async()=>{
  const p=await run([{id:'a',order_type:'collection'}]);assert.deepEqual(p.delivery.trips,[]);
 });

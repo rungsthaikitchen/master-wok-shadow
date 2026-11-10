@@ -59,3 +59,78 @@ test('delivery certification cannot initialize without its full driver component
  for(const name of ['driverReservations','combinedTrips','deliveryCheckout','deliveryRollback'])c.checks[name]='PASS';
  assert.throws(()=>assessors(c),/CERTIFIED_DELIVERY_COMPONENT_REQUIRED/);
 });
+
+test('four-ring candidate stays private; certification binds the actual four-ring model',()=>{
+ const c={...certificate(),status:'CANDIDATE_FOR_STAGING',fixturePrefix:'release-four-ring-',
+  modelVersion:'combined-kitchen-four-ring-staging-v1',kitchenConfiguration:'FOUR_RING_ONE_PORTION_V1',
+  checks:Object.fromEntries(REQUIRED_CHECKS.map(k=>[k,'PENDING']))};
+ assert.equal(validateCertificate(c,binding),true);
+ for(const patch of [{kitchenConfiguration:undefined},{kitchenConfiguration:'UNKNOWN'},
+  {status:'CERTIFIED_FOR_STAGING'},{status:'CERTIFIED_FOR_PRODUCTION'}])
+  assert.throws(()=>validateCertificate({...c,...patch},binding),/CERTIFICATION_REQUIRED/);
+ const prod={...c,status:'CERTIFIED_FOR_PRODUCTION',projectRef:'ubyjrrsvbbqomitpaidb',schema:'public',fixturePrefix:undefined,
+  checks:Object.fromEntries(REQUIRED_CHECKS.map(k=>[k,'PASS']))};
+ const productionBinding={...binding,projectRef:prod.projectRef,schema:prod.schema};
+ assert.equal(validateCertificate(prod,productionBinding),true);
+ for(const patch of [{status:'DRAFT'},{status:'CANDIDATE_FOR_STAGING'},
+  {fixturePrefix:'release-fixture-'},{kitchenConfiguration:undefined},{sourceSha256:'b'.repeat(64)}])
+  assert.throws(()=>validateCertificate({...prod,...patch},productionBinding),/CERTIFICATION_REQUIRED/);
+ for(const key of REQUIRED_CHECKS)
+  assert.throws(()=>validateCertificate({...prod,checks:{...prod.checks,[key]:'PENDING'}},productionBinding),/CERTIFICATION_REQUIRED/);
+ const certified=createReleaseAssessors({...productionBinding,certificate:prod,model:globalThis.MasterWokModelV1});
+ const productionContext=context();productionContext.proposedOrder.rawRow.items[0].qty=4;
+ const productionResult=certified.assessBooking(productionContext);
+ assert.equal(productionResult.status,'GREEN');
+ assert.equal(productionResult.plan.modelVersion,prod.modelVersion);
+ assert.equal(productionResult.plan.wok.jobs.length,4);
+ assert.ok(productionResult.plan.wok.jobs.every(j=>j.portions===1));
+ const ctx=context();ctx.proposedOrder.rawRow.items[0].qty=4;
+ const r=assessors(c).assessBooking(ctx);
+ assert.equal(r.status,'GREEN');
+ assert.equal(r.plan.modelVersion,c.modelVersion);
+ assert.equal(r.plan.wok.jobs.length,4);
+ assert.ok(r.plan.wok.jobs.every(j=>j.portions===1));
+});
+
+test('four-ring staging release rejects a single-wok delivery component',()=>{
+ const c={...certificate(),status:'CANDIDATE_FOR_STAGING',fixturePrefix:'release-four-ring-',
+  modelVersion:'combined-kitchen-four-ring-staging-v1',kitchenConfiguration:'FOUR_RING_ONE_PORTION_V1',deliveryScheduling:1};
+ for(const name of ['driverReservations','combinedTrips','deliveryCheckout','deliveryRollback'])c.checks[name]='PENDING';
+ assert.throws(()=>createReleaseAssessors({...binding,certificate:c,model:globalThis.MasterWokModelV1,
+  deliveryCapacity:{verify:()=>{},replan:()=>{},kitchenModelVersion:'combined-kitchen-protected-v3'}}),/MODEL_MISMATCH/);
+});
+
+test('availability hints, checkout and basket review all retain the full search',async()=>{
+ const c={...certificate(),status:'CANDIDATE_FOR_STAGING',fixturePrefix:'release-four-ring-',
+  modelVersion:'combined-kitchen-four-ring-staging-v1',kitchenConfiguration:'FOUR_RING_ONE_PORTION_V1',deliveryScheduling:1};
+ for(const name of ['driverReservations','combinedTrips','deliveryCheckout','deliveryRollback'])c.checks[name]='PENDING';
+ const calls=[];
+ const a=createReleaseAssessors({...binding,certificate:c,model:globalThis.MasterWokModelV1,
+  deliveryCapacity:{kitchenModelVersion:c.modelVersion,replan:async()=>{},verify:async(ctx,options)=>{
+   calls.push(options);return {status:'UNVERIFIED'};
+  }}});
+ for(const purpose of ['AVAILABILITY_HINT','BASKET_REVIEW',undefined]){
+  const result=await a.assessBooking({...context(),assessmentPurpose:purpose});
+  assert.equal(result.bookingApprovalAllowed,false);
+ }
+ assert.deepEqual(calls,[{},{},{}]);
+});
+
+
+test('four-ring production draft cannot initialize a writer or connect to its database',()=>{
+ const c=require('./master-wok-release-candidate.four-ring.production.json');
+ assert.equal(c.status,'DRAFT');assert.ok(Object.values(c.checks).every(v=>v==='PENDING'));
+ assert.throws(()=>createDeploymentRuntime({pool:{connect:async()=>{throw Error('must not connect');}},
+  model:globalThis.MasterWokModelV1,certificate:c,releaseId:c.releaseId,sourceSha256:c.sourceSha256,
+  projectRef:c.projectRef,deliveryProjectRef:c.deliveryProjectRef,secret:'b'.repeat(64),
+  notificationSecret:'c'.repeat(64),deliveryPublicKey:'sb_publishable_fixture'}),/CERTIFICATION_REQUIRED/);
+});
+
+test('certified four-ring delivery bootstrap selects the same kitchen model without opening a connection',()=>{
+ const draft=require('./master-wok-release-candidate.four-ring.production.json');
+ const c={...draft,status:'CERTIFIED_FOR_PRODUCTION',checks:Object.fromEntries(Object.keys(draft.checks).map(k=>[k,'PASS']))};
+ assert.doesNotThrow(()=>createDeploymentRuntime({pool:{connect:async()=>{throw Error('must not connect');}},
+  model:globalThis.MasterWokModelV1,certificate:c,releaseId:c.releaseId,sourceSha256:c.sourceSha256,
+  projectRef:c.projectRef,deliveryProjectRef:c.deliveryProjectRef,secret:'b'.repeat(64),
+  notificationSecret:'c'.repeat(64),deliveryPublicKey:'sb_publishable_fixture'}));
+});

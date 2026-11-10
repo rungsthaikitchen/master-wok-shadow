@@ -46,13 +46,16 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
  const jobs=[];
  for(const g of groups.values()) {
    const portions=[...g.portions].sort((a,b)=>options.batchLatestFirst===true?b.placedAt-a.placedAt:a.placedAt-b.placedAt);
-   const max=MAX_BY_GROUP[g.group];
+   // Confirmed conservative capacity: one main portion per pan or wok.
+   // Cold-preparation batches do not occupy a hob vessel.
+   const max=options.sharedRings===true&&g.group!=='salad'?1:MAX_BY_GROUP[g.group];
    for(let i=0;i<portions.length;i+=max){
      const batch=portions.slice(i,i+max);
      const duration=DURATION_BY_GROUP[g.group][batch.length];
      const placement=Math.max(...batch.map(p=>Math.max(p.placedAt.getHours()*60+p.placedAt.getMinutes(),options.notBeforeByOrder?.[p.orderId]??0)));
-     const holdingLimitMinutes=CURRIES.has(g.itemId)?curryHoldMinutes:10;
-     const earliest=Math.max(990,placement,g.readyMinute-holdingLimitMinutes-duration);
+     const holdingLimitMinutes=options.holdingLimitMinutes===20?20:(CURRIES.has(g.itemId)?curryHoldMinutes:10);
+     const earliest=Math.max(990,placement,g.readyMinute-holdingLimitMinutes-duration,
+      ...batch.map(p=>(options.earliestFinishByOrder?.[p.orderId]??0)-duration));
      const latest=g.readyMinute-duration;
      jobs.push({itemId:g.itemId,recipeKey:g.key,group:g.group,readyMinute:g.readyMinute,
        portions:batch.length,orderIds:[...new Set(batch.map(p=>p.orderId))],
@@ -67,7 +70,10 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
  // single-wok scheduler untouched unless explicitly requested.
  if(options.sharedRings===true){
    const {allocateSharedRings}=require('./staging-shared-ring-allocator');
-   const allocation=allocateSharedRings(jobs);
+   const allocation=allocateSharedRings(jobs,{blackouts:options.blackouts,fixedWok:options.fixedWok,
+    equivalentVessels:options.equivalentVessels,
+    maxSearchNodes:options.maxSearchNodes,maxCompleteChecks:options.maxCompleteChecks,
+    validateComplete:options.validateComplete});
    if(allocation.status!=='PHYSICAL_FIT_PROTOTYPE')
      return {status:'UNVERIFIED',reason:allocation.reason,
        resourceAllocation:allocation,bookingApprovalAllowed:false};

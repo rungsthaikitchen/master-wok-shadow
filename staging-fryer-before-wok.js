@@ -21,6 +21,7 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
    const line=(rows.find(r=>String(r.id)===dep.orderId)?.items||[])[dep.lineIndex];
    for(const [type,count] of Object.entries(dep.counts))for(let i=0;i<count;i++)
     portions.push({orderId:dep.orderId,itemId:dep.itemId,type,duration:dep.durationMinutes,
+     earliestFinish:options.earliestFinishByOrder?.[dep.orderId]??0,
      deadline:dep.readyMinute,notBefore,standalone:true,recipeKey:recipeKey(order.readyMinute,line)});
    continue;
   }
@@ -66,7 +67,8 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
   if(groupIndex===groups.length)return true;
   if(!remaining.length)return search(groupIndex+1,groups[groupIndex+1]||[]);
   const first=remaining[0];
-  for(let start=first.deadline-first.duration;start>=Math.max(990,first.deadline-first.duration-10,first.notBefore);start--){
+  const hold=first.standalone&&options.holdingLimitMinutes===20?20:10;
+  for(let start=first.deadline-first.duration;start>=Math.max(990,first.deadline-first.duration-hold,first.notBefore);start--){
    const finish=start+first.duration;
    if((options.kitchenBlackouts||options.blackouts||[]).some(b=>start<b.finish&&finish>b.start))continue;
    const blocked=options.fryerBlackouts||[];
@@ -75,6 +77,7 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
       blocked.some(b=>(!b.basket||b.basket===basket.id)&&start<b.finish&&finish>b.start))continue;
     for(let size=Math.min(fryerCapacity(first.type,basket.id),remaining.length);size>=1;size--){
      const assigned=remaining.slice(0,size);
+     if(assigned.some(p=>finish<(p.earliestFinish??0)))continue;
      const job={type:first.type,basket:basket.id,portions:size,start,finish,
       orderIds:[...new Set(assigned.map(p=>p.orderId))],
       itemIds:[...new Set(assigned.map(p=>p.itemId))],

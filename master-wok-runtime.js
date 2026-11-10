@@ -11,6 +11,7 @@ const {createServicePlanStore}=require('./master-wok-service-plan-store');
 const {createBookingHttpHandler}=require('./master-wok-http');
 const {createNotificationDispatcher,createNotificationHttpHandler}=require('./master-wok-notification-dispatch');
 const {createCommercialValidator}=require('./master-wok-commercial-validator');
+const {createBasketReviewStore,createBasketReviewAdmin}=require('./master-wok-basket-review');
 const {createBasketAvailability}=require('./master-wok-availability');
 function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,schema='public',
  validateCommercialOrder,deliveryService,readAvailability,readOrders,assessBooking,assessMutation,notificationOrderKeyPrefix,readPreviewOrders,deliveryCapacity,quoteDelivery}={}){
@@ -30,7 +31,18 @@ function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,sc
  const serviceControl=createServiceControlWriter({...shared,schema});
  const availability=createBasketAvailability({pool,model,readAvailability,assessBooking,
   quoteDelivery,assertWriteAllowed:gate.assertWriteAllowed,...(readOrders?{readOrders}:{}),planStore:createServicePlanStore({schema})});
- const booking=createBookingHttpHandler({secret,checkout,lifecycle,serviceControl,availability,
+ // Review diagnostics use the same inputs in a rolled-back transaction. They
+ // remain available in LEGACY mode and cannot authorize or reserve a booking.
+ const reviewAvailability=createBasketAvailability({pool,model,readAvailability,assessBooking,
+  quoteDelivery,includeDiagnostics:true,assertWriteAllowed:async()=>{},
+  ...(readOrders?{readOrders}:{}),planStore:createServicePlanStore({schema})});
+ const saveReview=createBasketReviewStore({pool,schema,assessReview:review=>reviewAvailability({
+  times:[review.preferredTime],items:review.basket,orderType:review.orderType,address:review.deliveryAddress})});
+ const basketReview=async input=>{
+  try{return await saveReview(input);}
+  catch(error){return {success:false,statusCode:error.message==='INVALID_REVIEW_REQUEST'?400:503,reason:'BASKET_REVIEW_UNAVAILABLE'};}
+ };
+ const booking=createBookingHttpHandler({secret,checkout,lifecycle,serviceControl,availability,basketReview,basketReviewAdmin:createBasketReviewAdmin({pool,schema}),
   readPreviewOrders:readPreviewOrders?async()=>{
    if((await gate.read(pool)).mode!=='MASTER_WOK')throw Error('PREVIEW_READER_DISABLED');
    return readPreviewOrders();

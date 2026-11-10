@@ -1,0 +1,223 @@
+{
+  "status": "PREPARED_NOT_CERTIFIED",
+  "preparedDate": "2026-11-10",
+  "releaseId": "master-wok-four-ring-2026-11-10",
+  "runtimeSourceSha256": "73f69764108bcb777b3c1110d7a3644bbd1af7366a6afb0076449133f403026c",
+  "modelVersion": "combined-kitchen-four-ring-staging-v1",
+  "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
+  "stagingEdgeVersion": 54,
+  "productionAuthorized": false,
+  "productionCertificateStatus": "DRAFT",
+  "productionCertificateChecks": "ALL_PENDING",
+  "websitePreviewCommit": "9dbba88aae9153dc2a47ba6551cc2c7159ef33c4",
+  "backendStagingCommit": "2042d266bf7c81058428ff996205d2380f4694ec",
+  "regression": {
+    "coreUTC": 308,
+    "coreEuropeLondon": 308,
+    "website": 36,
+    "backend": 46
+  },
+  "files": [
+    {
+      "path": "checkout-catalog.json",
+      "sha256": "cffbcdb2f7f98489537cda9b3a859aebbae486465ece699103543c588f51caa0"
+    },
+    {
+      "path": "deployment/booking-edge.js",
+      "sha256": "fdeeed67bcd5a73acf8a94d8d4fb2ddab7c0cb510cf3f7eda4d9f242dddaa76a"
+    },
+    {
+      "path": "master-wok-atomic-checkout.js",
+      "sha256": "de85222752790c17d3fe11731264a76924e17137bfe2fc65031fbbb3f42fb0f5"
+    },
+    {
+      "path": "master-wok-auxiliary-work.js",
+      "sha256": "02d6b5b2667ee82160dfd0938ebc881a2ca6a5e904173fe709749f6fcbd37a07"
+    },
+    {
+      "path": "master-wok-availability-reader.js",
+      "sha256": "40b70e421aeed1b691121e9c79aaa1da9f07c26bc3f92ad9338be26bfeb46a47"
+    },
+    {
+      "path": "master-wok-availability.js",
+      "sha256": "335db8881ecc8c5e4af682dd2f46ff3b339ab3e29c020dd0877fd4d19a4e0b77"
+    },
+    {
+      "path": "master-wok-basket-review.js",
+      "sha256": "d5be0f05ce24626edfd09a0feb88240ea480b7218023195ae3df59fbba27d177"
+    },
+    {
+      "path": "master-wok-clock.js",
+      "sha256": "a2d7f581b55e1d452a62139170ba35994ee936fccd1ab3014370d40e67b934c3"
+    },
+    {
+      "path": "master-wok-combined-assessment.js",
+      "sha256": "625a74c6db6b5bd3b55d8c1da747dbbce0a053cb6350300ac91b9fb167bc8c30"
+    },
+    {
+      "path": "master-wok-commercial-validator.js",
+      "sha256": "b9fff3f5a506c9edceefddf41c8d5c26492500dd3256f4a135a9256655dc07a6"
+    },
+    {
+      "path": "master-wok-commercial.js",
+      "sha256": "ab3da99874f263d5cb99d6035d0b861ddd2f0763804d69db6f3eb191ff689426"
+    },
+    {
+      "path": "master-wok-commitment-reader.js",
+      "sha256": "975dd9b2b4b24fe19f77270219938ad7eac5111254170b82ad20f54d8d4b2bae"
+    },
+    {
+      "path": "master-wok-delivery-admin.js",
+      "sha256": "8c780af8ae4d1db9591336559bf5e1a4fb2c6c85878e6a771d4d2d84eea11adc"
+    },
+    {
+      "path": "master-wok-delivery-capacity.js",
+      "sha256": "4dcd98dd93548480a4214964678d5c7110486f50fa6884d1da09952596b68c38"
+    },
+    {
+      "path": "master-wok-delivery-quote.js",
+      "sha256": "806d4361b67944a9a150a9eca92411fa9a7178634d5b867f8343d3b7dae3e048"
+    },
+    {
+      "path": "master-wok-deployment.js",
+      "sha256": "286fe989b227f07269d492bbe35030e21a26b916591c1c6b0e767e75dafb9331"
+    },
+    {
+      "path": "master-wok-driver-plan.js",
+      "sha256": "5c037b977145e741ac82ec5841c866acf01cadacc17b5f5727b9689723832f9f"
+    },
+    {
+      "path": "master-wok-http.js",
+      "sha256": "eae670e695b7b8aa68e19d9b7212608ac1bea0fdc67ebb11a0d12bb32e246f05"
+    },
+    {
+      "path": "master-wok-launch-control.js",
+      "sha256": "62b2faad056a825d41f74b50e8408d156499773e701bbf15c3d1d3fa97260725"
+    },
+    {
+      "path": "master-wok-lifecycle.js",
+      "sha256": "04fed7e4e92e47ba620fc7f3ba243179a03fe8871042442f6fbc0eee9588b6fd"
+    },
+    {
+      "path": "master-wok-loyalty-settlement.js",
+      "sha256": "f75f6039c5a4f251f9500edb559a63f8b72b5954726622f835e9f6b760c78f04"
+    },
+    {
+      "path": "master-wok-model-bundle.js",
+      "sha256": "9f32a3d206d514407ef418518d185bac83808666c09b856c3005ebcd1ac2642f"
+    },
+    {
+      "path": "master-wok-mutation-assessment.js",
+      "sha256": "b2109b19df5ab6a63da56ee7d86d1ad1459a782958fb132058e7aeb256ff5700"
+    },
+    {
+      "path": "master-wok-notification-dispatch.js",
+      "sha256": "d329b44bf78947e222fdbf3857f7243573d3d077bed7cf913530f4ca846fd402"
+    },
+    {
+      "path": "master-wok-notification-events.js",
+      "sha256": "e55737cab0a6584fba0f16c9fb327604c588b48b058c5a5ad10ffccc378a3fbd"
+    },
+    {
+      "path": "master-wok-order-store.js",
+      "sha256": "10bf23d8badb2878b245bed212948ed91994007dc579a7f4d6e46d4ffddfc02e"
+    },
+    {
+      "path": "master-wok-protected-plan.js",
+      "sha256": "b507fa66dd70a9ba74efdff12df490f001487757b0b7fda0445fbf5b6e3c53df"
+    },
+    {
+      "path": "master-wok-recipe-rules.js",
+      "sha256": "b184f85bc5f941e2bca6770f957fe4dbf49dab3fbe5056e22bdc2b915b499e0a"
+    },
+    {
+      "path": "master-wok-release-assessors.js",
+      "sha256": "303f6f9fd9d8e780e4c5d9de5e4cb727ba6097e8e1ddffc1f60cb29142e26f0f"
+    },
+    {
+      "path": "master-wok-release-candidate.four-ring.production.json",
+      "sha256": "445c18a85617e020162baf47447037368999af73c91674aa5c9f0b6ab25aa403"
+    },
+    {
+      "path": "master-wok-release-candidate.staging.json",
+      "sha256": "5bb7b757ba18f17cd97239cb68d55b8e40b456ca611293896cf2ddaa47c8a736"
+    },
+    {
+      "path": "master-wok-route-duration.js",
+      "sha256": "8cfff9e3a619c7ba5e582515aa664ed21b2127a59524b8c69e06116dfe2481d7"
+    },
+    {
+      "path": "master-wok-runtime.js",
+      "sha256": "32d01e81f3805204b366a95b5f5d1192adc82d88cf0d2b2fdbaa55515429b39f"
+    },
+    {
+      "path": "master-wok-service-control.js",
+      "sha256": "d3573ba71e7fc69b3ad0d2bf9adbcc3e8ceeb3ce2419d3eea1cbfa7c84f65168"
+    },
+    {
+      "path": "master-wok-service-plan-store.js",
+      "sha256": "d2c6450b2aeb057a5ba9da19de062d70380c9c846f3c9dee6d6236ff1cbea5bb"
+    },
+    {
+      "path": "master-wok-transaction-writer.js",
+      "sha256": "7acfbd29adbb8589446f76bd7aa52cd026ad3edfd1bcd330cf0ff96d3a889287"
+    },
+    {
+      "path": "sql/booking-write-fence.sql",
+      "sha256": "b1d8859d6e34103077872843ba163bd6f6f09907410b9d9ec3c9c57c27b4cb12"
+    },
+    {
+      "path": "staging-booking-integration.js",
+      "sha256": "77e569c6be446d48decccebbf6fb9bb5283839b4f6a41d736a07323d1f4e9b0c"
+    },
+    {
+      "path": "staging-booking-mode.js",
+      "sha256": "1af2256e4b6956d6637d96b7a3242f782465753493cbd35e8354593e590f736b"
+    },
+    {
+      "path": "staging-canonical-basket.js",
+      "sha256": "734d6202e6789ed0f756928b096aa66332c9a21d5e85403e8c2a38e900d8e96c"
+    },
+    {
+      "path": "staging-coordinated-kitchen.js",
+      "sha256": "fb260f5a6a1b3e097147ead44114ca3f3d8d4ce8663881d0cd35a5243cbcaeea"
+    },
+    {
+      "path": "staging-cross-order-scheduler.js",
+      "sha256": "c4914634b43a1e05139deebf2a089a20b7226870b3273003d3c6b9b990f64f84"
+    },
+    {
+      "path": "staging-fryer-before-wok.js",
+      "sha256": "5a43770a956c1e0de9b4c61fc4486081749e0b69423c841150019705392ecd19"
+    },
+    {
+      "path": "staging-fryer-diagnostic.js",
+      "sha256": "26e2542253720315be3545c48cacb0cd8f670b908aecce5075b1da7490db9879"
+    },
+    {
+      "path": "staging-kitchen-launch-validator.js",
+      "sha256": "6875a0ee17eb472a8f6a2dffd869b6fa9cb145579bc64b8aa76600486249ca7a"
+    },
+    {
+      "path": "staging-order-reader.js",
+      "sha256": "1ecc57fda351fd3d1a9fdec363b69412c4b09f6a222fab32a4b4dd35951ff3b3"
+    },
+    {
+      "path": "staging-order-snapshot.js",
+      "sha256": "058f159f09789c9e798f9e142153befbfb0b3a3eecf3c42bcbbd3c8836bb329d"
+    },
+    {
+      "path": "staging-out-of-scope-items.js",
+      "sha256": "1bbb5ac1174388bf7f42259fe3232883b538a6bedc1741a41ef19e42e956eabb"
+    },
+    {
+      "path": "staging-shared-ring-allocator.js",
+      "sha256": "31f37f0aead36bc0c907d097318e860817aeef30fbb5b0c43910ab158818d211"
+    },
+    {
+      "path": "staging-tests/build-atomic-checkout-edge.cjs",
+      "sha256": "5fb206e6ab16d09069da9bd0e6d79b87eaa242ddc8cf2b74b4197c482c0d01f6"
+    }
+  ],
+  "priorCertificate": "master-wok-release-candidate.json is historical; its check statuses do not certify this release."
+}

@@ -4,7 +4,7 @@
 // the transaction still requires the operator's matching durable release approval.
 const {verifyCombinedCapacity}=require('./master-wok-combined-assessment');
 const {createMutationAssessment}=require('./master-wok-mutation-assessment');
-const {protectStartedWork}=require('./master-wok-protected-plan');
+const {protectStartedWork,RING_MODEL_VERSION}=require('./master-wok-protected-plan');
 const DELIVERY_CHECKS=['driverReservations','combinedTrips','deliveryCheckout','deliveryRollback'];
 const REQUIRED_CHECKS=['atomicConcurrency','physicalCoverage','lifecycle','writeFence',
  'commercial','delivery','notifications','wholeService','rollback'];
@@ -12,10 +12,13 @@ function validateCertificate(c,{releaseId,sourceSha256,projectRef,schema}={}){
  const staging=projectRef==='hvrqgufqjslvgiohgkvu'&&schema==='master_wok_rehearsal';
  const production=projectRef==='ubyjrrsvbbqomitpaidb'&&schema==='public';
  const candidate=staging&&c?.status==='CANDIDATE_FOR_STAGING';
+ const fourRing=c?.modelVersion===RING_MODEL_VERSION&&
+  c?.kitchenConfiguration==='FOUR_RING_ONE_PORTION_V1';
  if(!c||c.schemaVersion!==1||!(staging||production)||
   (!candidate&&c.status!==(staging?'CERTIFIED_FOR_STAGING':'CERTIFIED_FOR_PRODUCTION'))||
   !/^[A-Za-z0-9._-]{8,128}$/.test(releaseId||'')||c.releaseId!==releaseId||c.projectRef!==projectRef||
-  c.schema!==schema||c.modelVersion!=='combined-kitchen-protected-v3'||
+  c.schema!==schema||!(c.modelVersion==='combined-kitchen-protected-v3'||fourRing)||
+  (c.kitchenConfiguration!==undefined&&!fourRing)||
   !/^[a-f0-9]{64}$/.test(sourceSha256||'')||c.sourceSha256!==sourceSha256||
   REQUIRED_CHECKS.some(key=>candidate?!['PASS','PENDING'].includes(c.checks?.[key]):c.checks?.[key]!=='PASS')||
   (candidate&&!/^[A-Za-z0-9-]{8,100}-$/.test(c.fixturePrefix||''))||
@@ -27,16 +30,21 @@ function validateCertificate(c,{releaseId,sourceSha256,projectRef,schema}={}){
 function createReleaseAssessors({certificate,releaseId,sourceSha256,projectRef,schema,model,
  readOrders,readAvailability,planStore,deliveryCapacity}={}){
  validateCertificate(certificate,{releaseId,sourceSha256,projectRef,schema});
+ const stagingSharedRings=certificate.modelVersion===RING_MODEL_VERSION;
+ const kitchenOptions=stagingSharedRings?{sharedRings:true,stagingSharedRings:true}:{};
  if((certificate.deliveryScheduling===1)!==!!deliveryCapacity||deliveryCapacity&&
   (typeof deliveryCapacity.verify!=='function'||typeof deliveryCapacity.replan!=='function'))
   throw Error('CERTIFIED_DELIVERY_COMPONENT_REQUIRED');
- const mutation=createMutationAssessment({model,readOrders,readAvailability,planStore,deliveryCapacity});
+ if(stagingSharedRings&&deliveryCapacity&&deliveryCapacity.kitchenModelVersion!==RING_MODEL_VERSION)
+  throw Error('STAGING_KITCHEN_DELIVERY_MODEL_MISMATCH');
+ const mutation=createMutationAssessment({model,readOrders,readAvailability,planStore,deliveryCapacity,stagingSharedRings});
  const fail=()=>({status:'UNVERIFIED',reason:'RELEASE_ASSESSMENT_NOT_VERIFIED',bookingApprovalAllowed:false});
  return {
   assessBooking(context){
+   const searchOptions={};
    // Call the complete validator directly, not an injected prototype assessor.
-   if(deliveryCapacity)return deliveryCapacity.verify(context).then(finish);
-   return finish(verifyCombinedCapacity(context));
+   if(deliveryCapacity)return deliveryCapacity.verify(context,searchOptions).then(finish);
+   return finish(verifyCombinedCapacity(context,{...kitchenOptions,...searchOptions}));
    function finish(r){
    if(r.status!=='VERIFIED_KITCHEN_CAPACITY'||r.plan?.modelVersion!==certificate.modelVersion)return fail();
    try{protectStartedWork(r.plan,0);}catch(_){return fail();}

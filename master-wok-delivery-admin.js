@@ -2,7 +2,7 @@
 const {beginBookingTransaction}=require('./master-wok-transaction-writer');
 const {normalizeStagingOrders}=require('./staging-order-snapshot');
 const {localDate,relativePlacement}=require('./master-wok-clock');
-const {POLICY}=require('./master-wok-driver-plan');
+const {POLICY,foodAgeAtStop}=require('./master-wok-driver-plan');
 function compareRecommendations(a,b){
  return Number(a.foodAgeMinutes>=POLICY.preferredFoodAge)-Number(b.foodAgeMinutes>=POLICY.preferredFoodAge)
   || b.savedMinutes-a.savedMinutes || a.foodAgeMinutes-b.foodAgeMinutes;
@@ -51,11 +51,8 @@ function createDeliveryAdmin({pool,model,readOrders,readAvailability,planStore,d
       const proposed=r.plan.delivery.trips.find(t=>t.stops.length===2&&t.stops.some(s=>s.id===focusId));
       const savedMinutes=(trip.finish-trip.start)+(other.finish-other.start)-(proposed.finish-proposed.start);
       if(savedMinutes<=0)continue;
-      const jobs=[...r.plan.wok.jobs,...r.plan.fryer.jobs,...(r.plan.auxiliary?.jobs||[])];
-      const foodAgeMinutes=Math.max(...proposed.stops.map(stop=>{
-       const finishes=jobs.filter(job=>job.orderIds.includes(stop.id)).map(job=>job.finish);
-       return stop.arrival-(finishes.length?Math.max(...finishes):proposed.start);
-      }));
+      const foodAgeMinutes=Math.max(...proposed.stops.map(stop=>
+       foodAgeAtStop(r.plan,stop)??stop.arrival-proposed.start));
       candidates.push({orderIds:proposed.stops.map(s=>s.sourceId),trip:proposed,savedMinutes,foodAgeMinutes});
      }
      return candidates.sort(compareRecommendations)[0]||null;

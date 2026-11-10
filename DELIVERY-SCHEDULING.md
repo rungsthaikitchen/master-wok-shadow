@@ -84,3 +84,36 @@ Prepared browser tests: `node tests/delivery-admin-browser.cjs` and the existing
 The private staging runner is `staging-tests/delivery-scheduling-edge.js`; its
 strong temporary authentication, expiry, staging-project guard and isolated schema
 are mandatory. Never embed its temporary token in a committed artifact.
+
+## 6 November staging evidence and cutover status
+
+Runtime digest `3ff3ee4bea51d9ad06023ce7cc1e09aa81fdca589f846d2d9f0c0a23325d56e6`.
+The hosted checks ran in separate sessions.
+
+- Twelve mixed-service baskets booked, including delivery. Concurrent retries
+  of the same delivery request produced one order.
+- Pause and blackout each marked an otherwise available collection slot
+  unavailable after the runner supplied the required order type.
+- RTK-155 saved a 17:25 delivery proposal, RTK-156 stayed completed after a
+  repeated completion request, and RTK-157 was cancelled.
+- The opening-slot fixture booked at 17:00. A second basket received 409.
+  Availability showed 17:00 unavailable and 17:05 available.
+- One order-created event produced one simulated email, SMS and Pushover
+  attempt. Replay found no work. No live provider calls were made.
+- The rollback guard blocked on retained trips and unresolved delivery orders.
+  A database dry run allowed the switch after simulating finished trips and
+  resolving fixture proposals. The transaction was rolled back. This check
+  does not constitute a full routing rollback.
+
+Keep the delivery certificate DRAFT pending a complete mixed-service run
+(including the oversized basket assertion) and full routing rollback evidence.
+The production package for the earlier kitchen release is not approval for
+this delivery release. Before requesting cutover approval, pin the exact
+website and runtime deployments and their rollback targets. Apply the cutover
+guard under the shared writer lock before 16:30 Europe/London and stop if
+current or future commitments require migration.
+
+
+## 10 November four-ring relaunch
+
+The £50 incident basket and doubled £100 basket passed actual private Cloudflare checkout and Admin acceptance. Delivery promises represent door arrival. The £100 occupied-service lookup CPU failure was repaired through bounded search ordering, without changing holding or physical limits. See BASKET-REVIEW-STAGING.md and FOUR-RING-RELEASE-CHECKLIST.md for the exact source, evidence and remaining gates. The earlier activation record and single-wok draft certificate do not approve this four-ring release.

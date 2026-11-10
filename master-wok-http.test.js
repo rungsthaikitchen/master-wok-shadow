@@ -32,3 +32,15 @@ test('mode and lifecycle/service operations use server dependencies without clie
  for(const operation of ['admin_action','customer_response','service_control'])assert.equal((await send({operation,payload:{action:'example'}})).status,200);
  assert.deepEqual(calls.map(x=>x.name),['admin','customer','controls']);
 });
+test('review submission is independent from booking mode and protected by the server secret',async()=>{
+ let saved=0;
+ const {send,calls}=setup({basketReview:async()=>{saved++;return {success:true,reviewId:'review',bookingApprovalAllowed:false};}});
+ assert.equal((await send({operation:'basket_review',payload:{}},{'x-master-wok-secret':'wrong'})).status,401);
+ assert.equal(saved,0);
+ const response=await send({operation:'basket_review',payload:{requestKey:'stable-key'}});
+ assert.equal(response.status,200);
+ assert.equal((await response.json()).bookingApprovalAllowed,false);
+ assert.equal(saved,1);assert.equal(calls.length,0);
+ const disabled=setup();
+ assert.equal((await disabled.send({operation:'basket_review',payload:{}})).status,400);
+});

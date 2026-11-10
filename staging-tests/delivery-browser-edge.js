@@ -2,6 +2,7 @@
 // provider sends, production changes or shared rehearsal launch-mode changes.
 import pg from 'npm:pg@8.23.1';
 const {createBookingRuntime}=require('./master-wok-runtime');
+const {createMutationAssessment}=require('./master-wok-mutation-assessment');
 const {createReleaseAssessors,REQUIRED_CHECKS,DELIVERY_CHECKS}=require('./master-wok-release-assessors');
 const {createDeliveryCapacity}=require('./master-wok-delivery-capacity');
 const {createCommercialValidator}=require('./master-wok-commercial-validator');
@@ -51,11 +52,14 @@ Deno.serve(async req=>{
    publicKey:'sb_publishable_wnLIasgPkPRUH3UnCpTMZw_hW6PHz2O'};
   const quoteDelivery=require('./master-wok-delivery-quote').createDeliveryQuoter(deliveryService);
   const quoteLeg=require('./master-wok-route-duration').createRouteDurationQuoter(deliveryService);
-  const deliveryCapacity=createDeliveryCapacity({quoteLeg});
+  const deliveryCapacity=createDeliveryCapacity({quoteLeg,stagingSharedRings:true});
   const commercial=createCommercialValidator({quoteDelivery});
   const binding={releaseId,sourceSha256:'__RUNTIME_SOURCE_SHA256__',projectRef:'hvrqgufqjslvgiohgkvu',schema:sourceSchema};
-  const certificate={schemaVersion:1,status:'CANDIDATE_FOR_STAGING',deliveryScheduling:1,...binding,modelVersion:'combined-kitchen-protected-v3',fixturePrefix:'delivery-fixture-',checks:Object.fromEntries([...REQUIRED_CHECKS,...DELIVERY_CHECKS].map(k=>[k,'PENDING']))};
+  const certificate={schemaVersion:1,status:'CANDIDATE_FOR_STAGING',deliveryScheduling:1,...binding,
+   modelVersion:'combined-kitchen-four-ring-staging-v1',kitchenConfiguration:'FOUR_RING_ONE_PORTION_V1',
+   fixturePrefix:'delivery-fixture-',checks:Object.fromEntries([...REQUIRED_CHECKS,...DELIVERY_CHECKS].map(k=>[k,'PENDING']))};
   const assessors=createReleaseAssessors({...binding,certificate,model,readOrders,readAvailability,planStore,deliveryCapacity});
+  const diagnoseMutation=createMutationAssessment({model,readOrders,readAvailability,planStore,deliveryCapacity,stagingSharedRings:true});
   const runtime=createBookingRuntime({pool,model,secret:TOKEN,releaseId,schema:sourceSchema,readOrders,readAvailability,
    validateCommercialOrder:(c,input,state)=>{
     check(input.key?.startsWith('delivery-fixture-')&&input.customer?.email?.endsWith('@example.invalid'),'FIXTURE_ONLY');
@@ -66,7 +70,14 @@ Deno.serve(async req=>{
      FROM ${schema}.orders o JOIN ${schema}.customers c ON c.id=o.customer_id
      WHERE o.idempotency_key LIKE 'delivery-fixture-%' AND o.is_test=false ORDER BY o.created_at DESC LIMIT 20`);
     return {success:true,notification_managed:true,orders:rows.map(row=>row.item)};
-   },deliveryCapacity,quoteDelivery,...assessors});
+   },deliveryCapacity,quoteDelivery,...assessors,assessMutation:async context=>{
+    const result=await assessors.assessMutation(context);
+    if(result.status==='GREEN')return result;
+    // Authenticated private rehearsal only: preserve refusal while identifying
+    // the underlying enum reason. Never promote a failed assessment.
+    const diagnostic=await diagnoseMutation(context);
+    return {...result,reason:diagnostic.reason||result.reason};
+   }});
   return await runtime(req);
  }catch(error){return Response.json({error:'STAGING_RUNTIME_FAILED'},{status:503});}
  finally{await native.end();}

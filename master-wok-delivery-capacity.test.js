@@ -53,3 +53,50 @@ test('persisted IDs are remapped in kitchen jobs and the delivery reservation to
  const stop=p.delivery.trips[0].stops[0];assert.equal(stop.sourceId,'11111111-1111-4111-8111-111111111111');
  assert.ok(p.wok.jobs.every(j=>j.orderIds.includes(stop.id)));assert.equal(first.plan.delivery.trips[0].stops[0].id,'candidate:key');
 });
+
+test('staging four-ring delivery keeps door arrival and loading deadlines through replanning',async()=>{
+ const parallel=createDeliveryCapacity({stagingSharedRings:true,quoteLeg:async()=>({durationSeconds:300})});
+ const a=candidate();a.rawRow.items[0].qty=4;
+ const first=await parallel.verify(context(a));
+ assert.equal(first.status,'VERIFIED_KITCHEN_CAPACITY',first.reason);
+ assert.equal(first.plan.modelVersion,'combined-kitchen-four-ring-staging-v1');
+ assert.equal(first.plan.wok.jobs.length,4);
+ const trip=first.plan.delivery.trips[0];assert.equal(trip.stops[0].arrival,1110);
+ assert.ok(first.plan.wok.jobs.every(j=>j.finish<=trip.start));
+ const r=await parallel.replan({orders:[a],rows:[accepted(a)],previousPlan:first.plan,serviceDate,now,availability});
+ assert.equal(r.status,'VALIDATED_PROTECTED_PLAN',r.reason);
+ assert.equal(r.bookingApprovalAllowed,false);
+});
+
+test('delivery time proposal searches for a plan whose every dish meets door-arrival food age',async()=>{
+ const parallel=createDeliveryCapacity({stagingSharedRings:true,quoteLeg:async()=>({durationSeconds:420})});
+ const items=[['pork-dumplings'],['red-curry','chicken'],['stir-pepper','beef'],
+  ['chef-pad-thai','pork'],['fried-rice','chicken'],['jasmine-rice'],['coconut-rice'],['chips']]
+  .map(([item_id,protein])=>({item_id,qty:1,modifiers:protein?[{id:protein}]:[],spice:protein?1:0}));
+ function basket(id,time,qty=1,selection=items,type='delivery'){
+  const base=candidate(id,time,type),p=prepareStagingBasket({id,createdAt:now,serviceDate,readyMinute:time,model,
+   items:selection.map(i=>({...i,qty:i.qty*qty}))});
+  return {...base,...p.candidate,placedAt:relativePlacement(now,serviceDate),
+   rawRow:{...p.rawRow,source_order_id:id.startsWith('same-delivery')?'same-delivery':id}};
+ }
+ const old=basket('same-delivery@old',1110),first=await parallel.verify(context(old));
+ assert.equal(first.status,'VERIFIED_KITCHEN_CAPACITY',first.reason);
+ const big=basket('hundred',1170,2),collection=basket('collection',1140,1,
+  [{item_id:'pad-thai',qty:1,modifiers:[{id:'chicken'}],spice:0}],'collection');
+ const existing=[old],rows=[{...accepted(old),source_order_id:'same-delivery'}];let previous=first.plan;
+ for(const c of [big,collection]){
+  const ctx=context(c);ctx.acceptedOrders=[...existing];ctx.rawRows=[...rows];ctx.state.previousPlan=previous;
+  const bounded=await parallel.verify(ctx,{maxSearchNodes:1000,maxCompleteChecks:8});
+  assert.equal(bounded.status,'VERIFIED_KITCHEN_CAPACITY',bounded.reason);
+  assert.equal(require('./master-wok-driver-plan').validateFoodAge(bounded.plan),true);
+  const added=await parallel.verify(ctx);assert.equal(added.status,'VERIFIED_KITCHEN_CAPACITY',added.reason);
+  previous=added.plan;existing.push(c);rows.push(accepted(c));
+ }
+ const ctx=context(basket('same-delivery@new',1115));ctx.acceptedOrders=existing;
+ ctx.rawRows=rows;ctx.state.previousPlan=previous;
+ const result=await parallel.verify(ctx);
+ assert.equal(result.status,'VERIFIED_KITCHEN_CAPACITY',result.reason);
+ const {validateFoodAge}=require('./master-wok-driver-plan');assert.equal(validateFoodAge(result.plan),true);
+ assert.equal(result.plan.delivery.trips.length,3);
+ assert.ok(result.plan.wok.jobs.every(j=>j.portions===1));
+});

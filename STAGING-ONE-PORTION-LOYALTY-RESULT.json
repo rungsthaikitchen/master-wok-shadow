@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "scope": "HOSTED_PRIVATE_FOUR_RING_LOYALTY",
+  "checks": [
+    "TRUSTED_PRICING_RESERVES_ONE_REWARD_WITHOUT_SETTLING_AT_CHECKOUT",
+    "FAILED_COMPLETION_ROLLS_BACK_ORDER_AND_POINTS",
+    "CONCURRENT_COMPLETION_SETTLES_REDEMPTION_AND_EARNINGS_EXACTLY_ONCE",
+    "SECOND_COMPLETION_EARNS_POINTS_AND_CANCELLATION_EARNS_NONE"
+  ],
+  "raceStatuses": [],
+  "productionWrites": 0,
+  "realNotificationsSent": 0,
+  "productionReady": false,
+  "testedDeploymentVersion": 14,
+  "disabledDeploymentVersion": 15,
+  "bundleSha256": "34e525eaca9eac9374076ec41d28e32eefc3ea1e6575c8efa586dedbabcf5629",
+  "limitations": [
+    "Fixed synthetic staging customer and collection baskets",
+    "Does not certify customer browser or deployment rollback",
+    "No production launch approval"
+  ],
+  "cleanupVerified": {
+    "testOrders": 0,
+    "testReceipts": 0,
+    "testPlans": 0,
+    "testCustomers": 0,
+    "testAccounts": 0,
+    "baselinePoints": 177,
+    "baselineOrders": 60,
+    "baselineOutbox": 81
+  }
+}

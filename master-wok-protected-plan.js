@@ -2,25 +2,37 @@
 // Reuses the existing coordinated allocator, keeping all work that may already
 // have started immovable. No chef start confirmations are introduced.
 const {planCoordinatedKitchen}=require('./staging-coordinated-kitchen');
-const {validateKitchenTimeline}=require('./staging-kitchen-launch-validator');
+const {validateKitchenTimeline,validateRingOccupancy}=require('./staging-kitchen-launch-validator');
 const {OUT_OF_SCOPE}=require('./staging-out-of-scope-items');
 const {localDate,relativePlacement}=require('./master-wok-clock');
 const {validateAuxiliaryWork}=require('./master-wok-auxiliary-work');
-const {AUXILIARY}=require('./master-wok-recipe-rules');
+const {AUXILIARY,fryerRecipe,fryerCapacity}=require('./master-wok-recipe-rules');
 const MODEL_VERSION='combined-kitchen-protected-v3';
+const RING_MODEL_VERSION='combined-kitchen-four-ring-staging-v1';
 const recipeKey=(ready,line)=>JSON.stringify([ready,line.item_id,line.modifiers,line.spice??null,line.item_note??null]);
 const overlaps=(a,b,reset=0)=>a.start<b.finish+reset&&a.finish+reset>b.start;
 function protectStartedWork(previous,asOfMinute){
  if(!Number.isFinite(asOfMinute)||asOfMinute<0||asOfMinute>1440)throw Error('INVALID_PLAN_CLOCK');
  if(!previous)return {wok:[],fryer:[],auxiliary:[]};
- if(previous.schemaVersion!==1||![MODEL_VERSION,'combined-kitchen-protected-v2','combined-kitchen-protected-v1'].includes(previous.modelVersion)||!Array.isArray(previous.wok?.jobs)||!Array.isArray(previous.fryer?.jobs)||
+ const shared=previous.modelVersion===RING_MODEL_VERSION;
+ if((previous.resourceModel==='FOUR_SHARED_RINGS')!==shared)throw Error('INVALID_COMMITTED_PLAN');
+ if(previous.schemaVersion!==1||![RING_MODEL_VERSION,MODEL_VERSION,'combined-kitchen-protected-v2','combined-kitchen-protected-v1'].includes(previous.modelVersion)||!Array.isArray(previous.wok?.jobs)||!Array.isArray(previous.fryer?.jobs)||
   (previous.auxiliary&&!Array.isArray(previous.auxiliary.jobs)))
   throw Error('INVALID_COMMITTED_PLAN');
- const all=[...previous.wok.jobs.map(j=>({...j,resource:'wok'})),
+ if(shared){
+  if(validateRingOccupancy(previous.wok.jobs,previous.auxiliary?.jobs||[]).length)throw Error('COMMITTED_PLAN_RESOURCE_CLASH');
+  for(const j of previous.wok.jobs)if(j.finish-j.start!==({fast:{1:5,2:6,3:8,4:10},noodle:{1:8,2:10},salad:{1:10,2:10,3:15,4:15}})[j.group]?.[j.portions]||
+   j.finish>j.readyMinute||j.readyMinute-j.finish>20)throw Error('INVALID_COMMITTED_PLAN');
+  for(const j of previous.fryer.jobs)if(!fryerRecipe(j.type)||j.finish-j.start!==fryerRecipe(j.type).minutes||
+   !Number.isInteger(j.portions)||j.portions<1||j.portions>fryerCapacity(j.type,j.basket)||
+   !Array.isArray(j.allocations)||j.allocations.length!==j.portions||
+   j.allocations.some(a=>a.qty!==1||a.type!==j.type||!j.orderIds.includes(a.orderId)))throw Error('INVALID_COMMITTED_PLAN');
+ }
+ const all=[...previous.wok.jobs.map(j=>({...j,resource:shared?'hob:'+j.vessel:'wok'})),
   ...previous.fryer.jobs.map(j=>({...j,resource:j.basket})),...(previous.auxiliary?.jobs||[])];
  for(const j of previous.auxiliary?.jobs||[]){
   const rule=AUXILIARY[j.itemId];
-  if(!rule||j.resource!==rule.resource||j.appliance!==rule.appliance||j.finish-j.start!==rule.minutes||
+  if(!rule||j.resource!==rule.resource||j.appliance!==rule.appliance||j.finish-j.start!==(rule.batchMinutes?.[j.portions]??rule.minutes)||
    !Number.isInteger(j.portions)||j.portions<1||j.portions>rule.capacity||j.allocations?.length!==j.portions||
    j.allocations.some(a=>a.qty!==1||a.itemId!==j.itemId||a.sourceRecipeKey!==j.sourceRecipeKey||!j.orderIds.includes(a.orderId)))
    throw Error('INVALID_COMMITTED_PLAN');
@@ -28,7 +40,7 @@ function protectStartedWork(previous,asOfMinute){
  for(const job of all){
   if(!Number.isInteger(job.start)||!Number.isInteger(job.finish)||job.start<990||job.finish>1320||job.finish<=job.start||
    !Array.isArray(job.orderIds)||!job.orderIds.length||new Set(job.orderIds).size!==job.orderIds.length||
-   !['wok','large','small-1','small-2','microwave'].includes(job.resource))throw Error('INVALID_COMMITTED_PLAN');
+   !(shared&&job.resource.startsWith('hob:'))&&!['wok','large','small-1','small-2','microwave'].includes(job.resource))throw Error('INVALID_COMMITTED_PLAN');
  }
  for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++)
   if(all[i].resource===all[j].resource&&overlaps(all[i],all[j],all[i].resource==='wok'?1:0))
@@ -102,6 +114,9 @@ function serviceMinute(now,serviceDate){
 }
 function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...options}){
  const fail=(reason,extra={})=>({status:'UNVERIFIED',reason,bookingApprovalAllowed:false,...extra});
+ const shared=options.sharedRings===true;
+ if(shared&&options.stagingSharedRings!==true)return fail('SHARED_RING_PROTECTED_PLANS_NOT_CERTIFIED');
+ if(previousPlan&&((previousPlan.modelVersion===RING_MODEL_VERSION)!==shared))return fail('SCHEDULER_MODEL_CHANGE_REQUIRES_DRAIN');
  try{
   const asOfMinute=serviceMinute(now,serviceDate);
   if(!previousPlan&&asOfMinute>=990&&orders.some(o=>String(o.orderId)!==options.newOrderId))
@@ -110,7 +125,7 @@ function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...opti
   const remaining=subtractProtectedPortions(orders,rows,fixed);
   const notBeforeByOrder=Object.fromEntries(orders.map(o=>[String(o.orderId),
    Math.max(Math.ceil(asOfMinute),options.notBeforeByOrder?.[String(o.orderId)]??0)]));
-  const wokBlackouts=[...(options.blackouts||[]),...[...fixed.wok,...fixed.auxiliary.filter(j=>j.resource==='wok')].map(j=>({start:j.start-1,finish:j.finish+1}))];
+  const wokBlackouts=[...(options.blackouts||[]),...[...(shared?[]:fixed.wok),...fixed.auxiliary.filter(j=>j.resource==='wok')].map(j=>({start:j.start-1,finish:j.finish+1}))];
   const warmup=options.fryerWarmupMinutes??0;
   if(!Number.isInteger(warmup)||warmup<0||warmup>15)throw Error('INVALID_FRYER_WARMUP');
   const fryerBlackouts=[...(options.fryerBlackouts||[]),
@@ -118,21 +133,24 @@ function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...opti
    ...fixed.fryer.map(j=>({basket:j.basket,start:j.start,finish:j.finish}))];
   const future=planCoordinatedKitchen(remaining.orders,remaining.rows,{...options,
    blackouts:wokBlackouts,kitchenBlackouts:options.blackouts||[],fryerBlackouts,notBeforeByOrder,
-   auxiliaryRows:rows,fixedAuxiliary:fixed.auxiliary,fixedWok:fixed.wok});
+   auxiliaryRows:rows,fixedAuxiliary:fixed.auxiliary,fixedWok:fixed.wok,fixedFryer:fixed.fryer});
   if(future.status!=='COORDINATED_PROTOTYPE')return fail(future.fryer?.reason||future.wok?.reason||future.reason);
-  const validation=validateKitchenTimeline(remaining.orders,future,remaining.rows);
+  const validation=validateKitchenTimeline(remaining.orders,future,remaining.rows,shared?{
+   auxiliaryRows:rows,fixedWok:fixed.wok,fixedAuxiliary:fixed.auxiliary,fixedFryer:fixed.fryer,notBeforeByOrder,
+   blackouts:options.blackouts||[]}:{});
   if(validation.status!=='VALIDATED_STAGING_TIMELINE')return fail('REMAINING_PLAN_COVERAGE_INVALID',{issues:validation.issues});
-  if(options.confirmedStarterRecipes&&!validateAuxiliaryWork(orders,rows,future.auxiliary.jobs,{notBeforeByOrder,fixedAuxiliary:fixed.auxiliary,mainJobs:[...fixed.wok,...future.wok.jobs]}))
+  if(options.confirmedStarterRecipes&&!validateAuxiliaryWork(orders,rows,future.auxiliary.jobs,{holdingLimitMinutes:future.holdingLimitMinutes,notBeforeByOrder,fixedAuxiliary:fixed.auxiliary,mainJobs:[...fixed.wok,...future.wok.jobs]}))
    return fail('AUXILIARY_COVERAGE_INVALID');
   // Keep the original immutable job objects in the persisted full plan. Future
   // allocations are independently validated against exactly the unstarted lines.
-  const plan={...future,schemaVersion:1,modelVersion:MODEL_VERSION,
+  const plan={...future,schemaVersion:1,modelVersion:shared?RING_MODEL_VERSION:MODEL_VERSION,
    wok:{...future.wok,jobs:[...fixed.wok,...future.wok.jobs].sort((a,b)=>a.start-b.start)},
    fryer:{...future.fryer,jobs:[...fixed.fryer,...future.fryer.jobs].sort((a,b)=>a.start-b.start)},
    auxiliary:{...future.auxiliary,jobs:[...fixed.auxiliary,...future.auxiliary.jobs].sort((a,b)=>a.start-b.start)}};
+  if(shared)protectStartedWork(plan,asOfMinute); // Validate the recombined persisted resource map too.
   return {status:'VALIDATED_PROTECTED_PLAN',plan,futurePlan:future,
    remainingRows:remaining.rows,protectedJobs:fixed,bookingApprovalAllowed:false};
  }catch(error){return fail(['STARTED_WORK_CHANGED','COMMITTED_PLAN_RESOURCE_CLASH',
   'COMMITTED_FRY_DEPENDENCY_MISSING'].includes(error.message)?error.message:'INVALID_COMMITTED_PLAN');}
 }
-module.exports={protectStartedWork,subtractProtectedPortions,planWithProtectedWork,serviceMinute};
+module.exports={protectStartedWork,subtractProtectedPortions,planWithProtectedWork,serviceMinute,RING_MODEL_VERSION};

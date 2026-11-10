@@ -3,6 +3,7 @@
 // Minutes use the service day's London clock, matching the kitchen allocator.
 const {RESTAURANT}=require('./master-wok-delivery-quote');
 const {relativePlacement}=require('./master-wok-clock');
+const {AUXILIARY}=require('./master-wok-recipe-rules');
 const POLICY=Object.freeze({arrivalTolerance:10,loading:2,handover:2,maxFoodAge:20,preferredFoodAge:15});
 const overlap=(a,b)=>a.start<b.finish&&b.start<a.finish;
 const coordinate=p=>p&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)&&Math.abs(p.lat)<=90&&Math.abs(p.lng)<=180;
@@ -108,14 +109,23 @@ function createDriverPlanner({quoteLeg}={}){
   return {delivery,deadlines};
  };
 }
+function finishedFoodJobs(plan){
+ // Count finished dishes separately. Ingredient frying and rice preheating
+ // precede a final cooking step and are not themselves ready-to-deliver food.
+ return [...plan.wok.jobs,...plan.fryer.jobs.filter(j=>j.standalone),
+  ...(plan.auxiliary?.jobs||[]).filter(j=>!AUXILIARY[j.itemId]?.beforeMain)];
+}
+function foodAgeAtStop(plan,stop){
+ const food=finishedFoodJobs(plan).filter(j=>j.orderIds.includes(stop.id));
+ return food.length?Math.max(...food.map(j=>stop.arrival-j.finish)):null;
+}
 function validateFoodAge(plan){
  if(!plan.delivery)return true;validateDriverPlan(plan.delivery);
- const jobs=[...plan.wok.jobs,...plan.fryer.jobs,...(plan.auxiliary?.jobs||[])];
+ const jobs=finishedFoodJobs(plan);
  for(const t of plan.delivery.trips)for(const s of t.stops){
   const food=jobs.filter(j=>j.orderIds.includes(s.id));if(!food.length)continue;
-  const ready=Math.max(...food.map(j=>j.finish));
-  if(ready>t.start||s.arrival-ready>POLICY.maxFoodAge)throw Error('DELIVERY_FOOD_HOLDING_LIMIT');
+  if(food.some(j=>j.finish>t.start||s.arrival-j.finish>POLICY.maxFoodAge))throw Error('DELIVERY_FOOD_HOLDING_LIMIT');
  }
  return true;
 }
-module.exports={createDriverPlanner,validateDriverPlan,validateFoodAge,POLICY};
+module.exports={createDriverPlanner,validateDriverPlan,validateFoodAge,foodAgeAtStop,POLICY};

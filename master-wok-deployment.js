@@ -4,6 +4,7 @@ const {createReleaseAssessors}=require('./master-wok-release-assessors');
 const {readCapacityCommitments}=require('./master-wok-commitment-reader');
 const {readBookingAvailability}=require('./master-wok-availability-reader');
 const {createServicePlanStore}=require('./master-wok-service-plan-store');
+const {RING_MODEL_VERSION}=require('./master-wok-protected-plan');
 function createDeploymentRuntime({pool,model,certificate,sourceSha256,releaseId,projectRef,
  secret,notificationSecret,deliveryPublicKey,deliveryProjectRef=projectRef}={}){
  if(typeof secret!=='string'||secret.length<32||typeof notificationSecret!=='string'||
@@ -21,8 +22,13 @@ function createDeploymentRuntime({pool,model,certificate,sourceSha256,releaseId,
  const readAvailability=(c,d)=>readBookingAvailability(connection(c),d);
  const planStore=createServicePlanStore({schema});
  const deliveryService={supabaseUrl:'https://'+deliveryProjectRef+'.supabase.co',publicKey:deliveryPublicKey};
+ // Hardware selection is certificate-bound. Candidate certificates remain
+ // private staging only; certified deployment requires every release check.
+ // The historical model identifier is retained to avoid relabelling plans.
+ const stagingSharedRings=certificate.modelVersion===RING_MODEL_VERSION&&
+  certificate.kitchenConfiguration==='FOUR_RING_ONE_PORTION_V1';
  const deliveryCapacity=certificate.deliveryScheduling===1?
-  require('./master-wok-delivery-capacity').createDeliveryCapacity({quoteLeg:require('./master-wok-route-duration').createRouteDurationQuoter(deliveryService)}):undefined;
+  require('./master-wok-delivery-capacity').createDeliveryCapacity({stagingSharedRings,quoteLeg:require('./master-wok-route-duration').createRouteDurationQuoter(deliveryService)}):undefined;
  const quoteDelivery=require('./master-wok-delivery-quote').createDeliveryQuoter(deliveryService);
  const assessors=createReleaseAssessors({certificate,releaseId,sourceSha256,projectRef,schema,model,readOrders,readAvailability,planStore,deliveryCapacity});
  // Staging commercial tables and counter are private as well.
@@ -42,8 +48,10 @@ function createDeploymentRuntime({pool,model,certificate,sourceSha256,releaseId,
    return {success:true,notification_managed:true,orders:r.rows.map(row=>row.item)};
   }:undefined,
   validateCommercialOrder:(c,input,state)=>{
-   if(certificate.status==='CANDIDATE_FOR_STAGING'&&(!input.key?.startsWith(certificate.fixturePrefix)||
-    !input.customer?.email?.endsWith('@example.invalid')))throw Error('PRIVATE_FIXTURE_REQUIRED');
+   if(certificate.status==='CANDIDATE_FOR_STAGING'){
+    if(!input.key?.startsWith(certificate.fixturePrefix))throw Error('PRIVATE_FIXTURE_KEY_REQUIRED');
+    if(!input.customer?.email?.endsWith('@example.invalid'))throw Error('PRIVATE_FIXTURE_EMAIL_REQUIRED');
+   }
    return commercial(commercialConnection(c),input,state);
   },...assessors});
 }

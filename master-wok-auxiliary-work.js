@@ -4,7 +4,7 @@
 const {AUXILIARY}=require('./master-wok-recipe-rules');
 const recipeKey=(ready,line)=>JSON.stringify([ready,line.item_id,line.modifiers,line.spice??null,line.item_note??null]);
 const key=a=>JSON.stringify([String(a.orderId),a.itemId,a.sourceRecipeKey,a.deadline??null]);
-function demands(orders,rows,{notBeforeByOrder={},fixedAuxiliary=[],mainJobs=[]}={}){
+function demands(orders,rows,{notBeforeByOrder={},earliestFinishByOrder={},fixedAuxiliary=[],mainJobs=[]}={}){
  const assigned=new Map();
  const known=new Map(orders.map(o=>[String(o.orderId),o])),portions=[];
  for(const row of rows){
@@ -23,6 +23,7 @@ function demands(orders,rows,{notBeforeByOrder={},fixedAuxiliary=[],mainJobs=[]}
      deadline=starts[index];
     }
     portions.push({orderId:String(row.id),itemId:task,
+    ...(!AUXILIARY[task].beforeMain?{earliestFinish:earliestFinishByOrder[String(row.id)]??0}:{}),
     sourceItemId:line.item_id,sourceRecipeKey:recipeKey(order.readyMinute,line),readyMinute:order.readyMinute,
     notBefore:Math.max(990,order.placedAt.getHours()*60+order.placedAt.getMinutes(),notBeforeByOrder[String(row.id)]||0),qty:1,...(deadline!==undefined?{deadline}:{})});
    }
@@ -48,12 +49,13 @@ function planAuxiliaryWork(orders,rows,wokJobs,options={}){
    if(++nodes>20000)return false;if(index===groups.length)return true;
    if(!remaining.length)return search(index+1,groups[index+1]||[]);
    const first=remaining[0],deadline=first.deadline??first.readyMinute,rule=AUXILIARY[first.itemId],reset=rule.resource==='wok'?1:0;
-   for(let start=deadline-rule.minutes;start>=Math.max(990,first.notBefore,deadline-rule.minutes-10);start--){
-    const finish=start+rule.minutes;
-    if([...(options.kitchenBlackouts||options.blackouts||[])].some(b=>start<b.finish&&finish>b.start)||
-     [...occupied,...jobs].some(j=>j.resource===rule.resource&&start<j.finish+reset&&finish+reset>j.start))continue;
-    for(let size=Math.min(rule.capacity,remaining.length);size>=1;size--){
-     const assigned=remaining.slice(0,size);if(assigned.some(p=>start<p.notBefore))continue;
+   for(let size=Math.min(rule.capacity,remaining.length);size>=1;size--){
+    const minutes=rule.batchMinutes?.[size]??rule.minutes;
+    for(let start=deadline-minutes;start>=Math.max(990,first.notBefore,deadline-minutes-(options.holdingLimitMinutes===20?20:10));start--){
+     const finish=start+minutes;
+     if([...(options.kitchenBlackouts||options.blackouts||[])].some(b=>start<b.finish&&finish>b.start)||
+      [...occupied,...jobs].some(j=>j.resource===rule.resource&&start<j.finish+reset&&finish+reset>j.start))continue;
+     const assigned=remaining.slice(0,size);if(assigned.some(p=>start<p.notBefore||finish<(p.earliestFinish??0)))continue;
      jobs.push({resource:rule.resource,appliance:rule.appliance,itemId:first.itemId,sourceRecipeKey:first.sourceRecipeKey,
       start,finish,readyMinute:first.readyMinute,portions:size,orderIds:[...new Set(assigned.map(p=>p.orderId))],allocations:assigned});
      if(search(index,remaining.slice(size)))return true;jobs.pop();
@@ -71,8 +73,8 @@ function validateAuxiliaryWork(orders,rows,jobs,options={}){
   for(const p of demands(orders,rows,options)){expected.set(key(p),(expected.get(key(p))||0)+1);bounds.set(key(p),p);}
   for(const j of jobs){
    const rule=AUXILIARY[j.itemId];
-   if(!rule||j.resource!==rule.resource||j.finish-j.start!==rule.minutes||!Number.isInteger(j.portions)||j.portions<1||j.portions>rule.capacity||
-    j.allocations?.length!==j.portions||j.start<990||j.finish>1320||j.finish>Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))||Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))-j.finish>10)return false;
+   if(!rule||j.resource!==rule.resource||j.finish-j.start!==(rule.batchMinutes?.[j.portions]??rule.minutes)||!Number.isInteger(j.portions)||j.portions<1||j.portions>rule.capacity||
+    j.allocations?.length!==j.portions||j.start<990||j.finish>1320||j.finish>Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))||Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))-j.finish>(options.holdingLimitMinutes===20?20:10))return false;
    for(const p of j.allocations){const original=bounds.get(key(p));
     if(!original||p.qty!==1||p.itemId!==j.itemId||p.sourceRecipeKey!==j.sourceRecipeKey||j.readyMinute!==original.readyMinute||j.finish>(original.deadline??original.readyMinute)||j.start<original.notBefore||j.start<p.notBefore||!j.orderIds.includes(p.orderId))return false;
     actual.set(key(p),(actual.get(key(p))||0)+1);}

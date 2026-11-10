@@ -54,6 +54,13 @@ test('corrupt saved resource overlaps are rejected',()=>{
  const {plan}=initial();plan.wok.jobs.push({...plan.wok.jobs[0]});
  assert.throws(()=>protectStartedWork(plan,1100),/RESOURCE_CLASH/);
 });
+
+test('physical four-ring option cannot enter certified protected-plan path',()=>{
+ const a=fixture();
+ const r=planWithProtectedWork({orders:[a.order],rows:[a.row],now:'2026-11-04T16:00:00Z',serviceDate:'2026-11-04',sharedRings:true});
+ assert.equal(r.reason,'SHARED_RING_PROTECTED_PLANS_NOT_CERTIFIED');
+ assert.equal(r.bookingApprovalAllowed,false);
+});
 test('temporary candidate identity maps to the persisted order commitment identity',()=>{
  const {plan}=initial(),mapped=remapPlanOrder(plan,'a','uuid@time');
  assert.deepEqual(mapped.wok.jobs[0].orderIds,['uuid@time']);

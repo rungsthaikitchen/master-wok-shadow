@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "scope": "HOSTED_PRIVATE_FOUR_RING_ATOMIC_AND_SERVICE",
+  "checks": [
+    "SAME_KEY_TWO_CONNECTIONS_ONE_ORDER_AND_PLAN",
+    "CHANGED_RETRY_REJECTED",
+    "DISTINCT_KEY_TWO_CONNECTIONS_REASSESS_LOCKED_FOUR_RING_CAPACITY",
+    "PLAN_SAVE_FAILURE_ROLLS_BACK_HEADER_ITEMS_RECEIPT_AND_EVENT",
+    "SEVEN_ORDER_SERVICE_WITH_ORIGINAL_50_AND_100_BASKETS",
+    "CUSTOMER_ACKNOWLEDGED_TIME_CHANGE_AND_STARTED_CANCELLATION"
+  ],
+  "raceStatuses": [
+    "GREEN",
+    "UNVERIFIED"
+  ],
+  "productionWrites": 0,
+  "realNotificationsSent": 0,
+  "productionReady": false,
+  "testedDeploymentVersion": 6,
+  "disabledDeploymentVersion": 7,
+  "testedBundleSha256": "d9c537cd13e0d63d8941d7eb7a4926a5191f4a623072b88eb5e0c96c9215d77a",
+  "cleanupVerified": {
+    "testOrders": 0,
+    "testReceipts": 0,
+    "testPlans": 0,
+    "totalStagingOrders": 60,
+    "totalStagingOutbox": 81
+  },
+  "limitations": [
+    "Seven fixed synthetic collection orders with a controlled server clock",
+    "Does not certify delivery, completion/loyalty or customer browser checkout",
+    "Does not certify chef concurrency or all physical vessel batch capacities",
+    "No production launch approval or deployment rollback certification"
+  ]
+}

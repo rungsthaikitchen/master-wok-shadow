@@ -1,0 +1,24 @@
+{
+  "scope": "PRIVATE_STAGING_GATEWAY_ROLLBACK",
+  "date": "2026-11-09",
+  "projectRef": "hvrqgufqjslvgiohgkvu",
+  "environmentId": "c1b8fad6-dbfc-4188-b4b5-a5dbfbf53279",
+  "gatewayDeployment": "108ed875-290f-4c9f-9509-ed2372ce1569",
+  "deploymentStatus": "SUCCESS",
+  "gatewayMode": "LEGACY",
+  "gatewayModeHttpStatus": 200,
+  "writerMode": "DRAINING",
+  "writerRevision": 40,
+  "preservedReceiptCount": 2,
+  "preservedServiceDate": "2026-11-14",
+  "preservedPlanRevision": 6,
+  "preservedPlanMd5": "fee185d812666fdb2638f12c6b2d8a6c",
+  "preservedOrderReferences": ["RTK-184", "RTK-185"],
+  "preservedCollectionTimes": ["20:20", "21:00"],
+  "fullProductionRollbackCertified": false,
+  "limitations": [
+    "No new Legacy booking submitted: private Preview deliberately refuses Legacy fallback",
+    "No provider dispatch or delivery-specific rollback certified",
+    "Production was not modified"
+  ]
+}

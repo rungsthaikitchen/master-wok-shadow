@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-10",
+  "environment": "private staging only",
+  "releaseId": "master-wok-delivery-2026-11-04",
+  "edgeVersion": 53,
+  "sourceSha256": "f9f95cb967193a606b9765fe7ad442122ccd04e39de14fe71e85c85e4b0ef915",
+  "modeRevision": 41,
+  "orders": [
+    {
+      "orderRef": "RTK-186",
+      "id": "6ea21032-00a4-4abb-92e4-c6daf43492fd",
+      "total": 50,
+      "status": "customer_accepted_time",
+      "arrival": "2026-11-21T18:35:00Z",
+      "bookingReceipts": 1,
+      "customerAcceptanceReplay": "HTTP200"
+    },
+    {
+      "orderRef": "RTK-187",
+      "id": "9db930c4-d88d-4984-ac9b-7bccda5a6464",
+      "total": 100,
+      "status": "confirmed",
+      "arrival": "2026-11-21T19:30:00Z",
+      "foodReady": "19:21",
+      "departure": "19:23",
+      "back": "19:39",
+      "bookingReceipts": 1,
+      "browserCheckout": "PASS",
+      "browserAdminAccept": "PASS",
+      "browserAdminDeliveryTrip": "PASS"
+    }
+  ],
+  "plan": {
+    "serviceDate": "2026-11-21",
+    "revision": 6,
+    "model": "combined-kitchen-four-ring-staging-v1",
+    "digest": "fe98c31d035fee4f2983179a6cb6c2a1"
+  },
+  "productionChanged": false,
+  "certificateStatus": "CANDIDATE_FOR_STAGING",
+  "limitations": [
+    "Exact-release provider sends, complete delivery rollback and final operating review remain uncertified.",
+    "Recovered availability leaves a stale error message visible; checkout nevertheless uses refreshed validated hints.",
+    "Some large-basket fallback searches remain costly; do not infer all basket performance from this successful occupied-day test."
+  ]
+}

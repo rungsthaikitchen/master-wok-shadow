@@ -32,3 +32,16 @@ test('standalone spring rolls have unverified fryer workload',()=>{
  assert.equal(r.bookingApprovalAllowed,false);
 });
 
+test('standalone fry can use twenty-minute fallback without extending prerequisite holds',()=>{
+ const basket=[{id:'A',items:[{item_id:'veg-spring-rolls',qty:1,modifiers:[]}]}];
+ const options={standaloneSpringRolls:true,fryerBlackouts:[{start:1120,finish:1140}]};
+ assert.equal(planFryerBeforeWok(orders,basket,wok(1130),options).status,'UNVERIFIED');
+ const extended=planFryerBeforeWok(orders,basket,wok(1130),{...options,holdingLimitMinutes:20});
+ assert.equal(extended.status,'PREREQUISITES_PLACED_PROTOTYPE');
+ assert.equal(extended.jobs[0].finish,1120);
+ assert.equal(extended.jobs[0].readyMinute-extended.jobs[0].finish,20);
+ assert.equal(extended.bookingApprovalAllowed,false);
+ const prerequisite=planFryerBeforeWok(orders,rows(),wok(1140),{holdingLimitMinutes:20,fryerBlackouts:[{start:1120,finish:1140}]});
+ assert.equal(prerequisite.status,'UNVERIFIED');
+});
+
