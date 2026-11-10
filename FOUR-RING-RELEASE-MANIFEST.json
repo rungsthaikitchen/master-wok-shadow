@@ -2,18 +2,18 @@
   "status": "PREPARED_NOT_CERTIFIED",
   "preparedDate": "2026-11-10",
   "releaseId": "master-wok-four-ring-2026-11-10",
-  "runtimeSourceSha256": "a1230b05e03b5cdef91e923fb4c1c1feeef307eea1bc687cbebd012e5b9ace15",
+  "runtimeSourceSha256": "f4dd2190e9037c0f1e1cb66d24c97d0af3fcd9610a385ac89358d8cbb25ae8e2",
   "modelVersion": "combined-kitchen-four-ring-staging-v1",
   "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
-  "stagingEdgeVersion": 55,
+  "stagingEdgeVersion": 56,
   "productionAuthorized": false,
   "productionCertificateStatus": "DRAFT",
   "productionCertificateChecks": "ALL_PENDING",
   "websitePreviewCommit": "9dbba88aae9153dc2a47ba6551cc2c7159ef33c4",
   "backendStagingCommit": "2042d266bf7c81058428ff996205d2380f4694ec",
   "regression": {
-    "coreUTC": 309,
-    "coreEuropeLondon": 309,
+    "coreUTC": 310,
+    "coreEuropeLondon": 310,
     "website": 36,
     "backend": 46
   },
@@ -136,11 +136,11 @@
     },
     {
       "path": "master-wok-release-candidate.four-ring.production.json",
-      "sha256": "e1538895a7240a64e67af834f34777d3aba6e8ff078404862fdc3bca3b03eb5e"
+      "sha256": "014a870f7eb5b5ce1bd7795c8c7dd88ec95806981f04c1ab0ada3f66362b8825"
     },
     {
       "path": "master-wok-release-candidate.staging.json",
-      "sha256": "77c3aa9ec1638b412c1bc2b131037886d9d90915733f23cf90d8eb5f90d62f49"
+      "sha256": "5e6d8a0ff647ec2b3fe641e18c16fc8c06458dfc817f6a21929579d845647523"
     },
     {
       "path": "master-wok-route-duration.js",
@@ -212,7 +212,7 @@
     },
     {
       "path": "staging-shared-ring-allocator.js",
-      "sha256": "71d8a85c3d30e3f554313fe81d38156a534c10e80c6645ea520537c6c464cf44"
+      "sha256": "43920b86ecfc14a256b73fac6a28b5427d0ebd29c9e1c14b8c12771959c517ee"
     },
     {
       "path": "staging-tests/build-atomic-checkout-edge.cjs",

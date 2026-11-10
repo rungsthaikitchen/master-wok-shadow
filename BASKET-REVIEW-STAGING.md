@@ -948,3 +948,46 @@ confirmed MASTER_WOK ownership, one receipt each, saved plan revision2/model4rin
 and maximum main hold20. No real provider calls or production writes.
 Evidence: STAGING-FOUR-RING-LARGE-HOSTED-HINTS-RESULT.json and
 STAGING-FOUR-RING-LARGE-HOSTED-CHECKOUT-RESULT.json. Production stays DRAFT and Legacy.
+
+## 10 November: final actual browser enquiry and rollback guard handoff
+
+Cloudflare session expired; owner completed secure email/code sign-in. The real
+preview customer built 11 Pad Thai/Prawn (£110), synthetic name/contact, requested
+28 Nov 20:15 on the service already containing the two £150 baskets. Whole-day
+availability could not be checked; the existing failure escape path offered the
+phone number and basket review. Sending the basket succeeded without an order.
+Protected Admin displayed all 11 portions, protein, £110, requested time and the
+explicit unconfirmed status. Mark contacted and Close review succeeded. Read-only
+SQL confirms review79831cac-ef26-4115-8985-56d8a3deaf77 closed, zero customer orders,
+main control MASTER_WOK revision41 unchanged. Assessment remained UNVERIFIED, not
+a fabricated confirmed bottleneck. Screenshots saved under shared evidence.
+Evidence: STAGING-BASKET-ENQUIRY-BROWSER-RESULT.json.
+
+Prepared build-delivery-rollback-rehearsal.cjs and its generated SQL. They copy
+RTK-186/187, their receipts and plan into TEMP tables only. The exact rollback
+DO guard is reused with table targets changed to pg_temp; source SHA is recorded.
+Cases cover missing drain, outstanding driver trip, cancelled/test order with
+retained trip, future delivery order, unresolved past proposal, stale revision,
+and record-preserving completed-service restoration. All table changes are TEMP;
+script ends ROLLBACK. No permanent mode or order change is performed.
+
+Supabase execute_sql confirmation expired before this TEMP rehearsal ran. Do not
+mark the guard rehearsal PASS or retry through another writer. The generated
+staging-tests/rehearse-delivery-rollback.sql is ready for the owner-selected SQL
+Editor path. Production remains unchanged, and production certificate stays DRAFT.
+
+The occupied-date scan's overload was fixed with a necessary bound per promised
+time, in addition to the full-service workload bound. Distant accepted orders
+must not enlarge an 11-noodle basket's own holding window. Regression rejects
+that overload before search and still places six noodle portions. No capacity or
+holding policy is loosened. All310 tests pass in UTC2.65s and UK time. Stagingv56
+source f4dd2190e9037c0f1e1cb66d24c97d0af3fcd9610a385ac89358d8cbb25ae8e2.
+Actual preview recheck now shows the normal no-online-time call/review popup, not
+an availability error; saved basket/enquiry remains intact.
+
+Production SELECT-only preflight: LEGACY revision4, old launch release, no current
+or future orders. The13 unresolved Legacy proposals have tokens and service dates
+Feb–Oct2026; these match the earlier explicitly approved historical-link retirement
+scope. No new approval is inferred for production activation. No token, status,
+price or other production value was changed. Final retirement belongs inside the
+new guarded cutover transaction; the old SQL revision2 guard must not be reused.

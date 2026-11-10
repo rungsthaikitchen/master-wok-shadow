@@ -144,3 +144,18 @@ test('bounded hint search fails closed while full booking search can find a late
  for(const maxSearchNodes of [0,-1,100001,NaN])
   assert.equal(allocateSharedRings(jobs,{maxSearchNodes}).reason,'INVALID_SEARCH_BUDGET');
 });
+
+test('distant orders cannot hide an overloaded noodle promise, while six portions still fit',()=>{
+ const noodles=Array.from({length:11},()=>({itemId:'pad-thai',earliest:1187,latest:1207,
+  duration:8,readyMinute:1215,holdingLimitMinutes:20,portions:1}));
+ const earlier={itemId:'green-curry',earliest:1085,latest:1105,duration:5,
+  readyMinute:1110,holdingLimitMinutes:20,portions:1};
+ let checked=0;
+ const overloaded=allocateSharedRings([earlier,...noodles],{validateComplete:()=>{checked++;return true;}});
+ assert.equal(overloaded.reason,'FIXED_RING_WORKLOAD_EXCEEDS_WINDOW');
+ assert.equal(overloaded.bookingApprovalAllowed,false);
+ assert.equal(checked,0);
+ const feasible=allocateSharedRings([earlier,...noodles.slice(0,6)]);
+ assert.equal(feasible.status,'PHYSICAL_FIT_PROTOTYPE');
+ assert.ok(feasible.jobs.filter(j=>j.itemId==='pad-thai').every(j=>j.readyMinute-j.finish<=20));
+});

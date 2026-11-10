@@ -4,7 +4,7 @@ Status: PREPARED FOR REVIEW, NOT PRODUCTION APPROVAL.
 
 ## Exact components
 
-- Runtime source: `a1230b05e03b5cdef91e923fb4c1c1feeef307eea1bc687cbebd012e5b9ace15`.
+- Runtime source: `f4dd2190e9037c0f1e1cb66d24c97d0af3fcd9610a385ac89358d8cbb25ae8e2`.
 - Proposed production release: `master-wok-four-ring-2026-11-10`.
 - Proposed certificate: `master-wok-release-candidate.four-ring.production.json`,
   DRAFT, all checks PENDING. Build with
@@ -36,7 +36,7 @@ PRODUCTION-RELEASE-PACKAGE.json approval refers to the November 4 release only.
 | Lifecycle | Admin Accept, £50 Suggest18:35, customer acceptance and replay, refreshed Admin | No new real notification receipt claimed |
 | Delivery | Saved loading/departure/door/return times; read-only recommendation, explicit combine/split, stale-revision refusal | Most combined-trip evidence is hosted API rather than actual browser controls |
 | Availability | Occupied-day £100 lookup: 49 hints, 46 available, 10.77s; hints never approve | Four £150 pressure examples also completed hosted scans |
-| Regression | Full core suite in UTC and Europe/London; website 36 and backend 46 | Record current run results in BASKET-REVIEW-STAGING.md |
+| Regression | Full 310 core tests in UTC and Europe/London; website 36 and backend 46 | Record current run results in BASKET-REVIEW-STAGING.md |
 | Earlier rollback | Gateway drained/restored with receipts and plans preserved | New Legacy checkout and complete delivery rollback not certified |
 
 Detailed raw records: STAGING-FOUR-RING-BROWSER-DELIVERY-RESULT.json,
@@ -90,3 +90,22 @@ committed=false. Server plan revision 2 preserves both baskets, maximum main
 holding 20 minutes, and one portion per hot vessel; cold salad batching remains
 separate. No provider sends or production mutations. See the LARGE-HOSTED result
 files; these are actual server transactions, not an additional browser checkout.
+
+## Customer enquiry completed / remaining manual guard rehearsal
+
+Actual preview enquiry, receipt, exact Admin basket, contacted and closed states
+passed with zero orders created. Subsequent v56 normal unavailable-slot response
+also passed after adding a necessary per-promise workload bound: distant orders
+cannot enlarge a noodle basket's own holding window. Full 310-test suites pass
+in UTC and UK time. Production remains DRAFT and unchanged.
+
+Supabase confirmation expired before the TEMP-copy rollback guard rehearsal ran.
+Owner SQL Editor execution is required for staging-tests/rehearse-delivery-rollback.sql.
+It changes TEMP copies only and ends ROLLBACK; do not call this test passed yet.
+The existing hosted gateway rollback evidence is separate and remains qualified.
+
+Read-only production preflight: LEGACY revision4, no current/future orders. Thirteen
+historical Legacy proposals still have response tokens; all are before Nov4 and
+match the already-approved historical retirement scope. They are not new bookings.
+Retire them only inside the final guarded production cutover transaction, preserving
+all history/pricing/status fields. No production mutation occurred in this check.
