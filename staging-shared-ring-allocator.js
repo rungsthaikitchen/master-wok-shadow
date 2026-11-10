@@ -101,8 +101,8 @@ function allocateSharedRings(jobs,options={}){
  if(!search(0)){
   // Fryer/microwave dependencies can favour the original ordering. Retain it
   // as a second bounded search rather than losing previously feasible baskets.
-  if(exhausted&&options.originalJobOrder!==true)
-   return allocateSharedRings(jobs,{...options,originalJobOrder:true});
+  if(exhausted&&options.orderRetry!==true)
+   return allocateSharedRings(jobs,{...options,originalJobOrder:options.originalJobOrder!==true,orderRetry:true});
   return fail(exhausted?'SEARCH_LIMIT':'NO_PHYSICAL_TIMELINE');
  }
  return {status:'PHYSICAL_FIT_PROTOTYPE',reason:'FOUR_SHARED_RINGS',

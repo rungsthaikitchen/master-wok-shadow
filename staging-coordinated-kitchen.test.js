@@ -90,3 +90,18 @@ test('original £50, £100 and tripled £150 baskets fit with independently vali
  }
 });
 
+
+test('large mixed and starter/curry baskets fit the bounded suggestion search with the approved 20-minute maximum',()=>{
+ const examples=require('./staging-tests/large-basket-examples');
+ const {validateKitchenTimeline}=require('./staging-kitchen-launch-validator');
+ for(const name of ['mixed','startersAndCurries']){
+  const orders=[{orderId:'large',readyMinute:1215,placedAt:new Date(2026,10,28,8)}];
+  const rows=[{id:'large',items:examples[name]}];
+  const plan=planCoordinatedKitchen(orders,rows,{sharedRings:true,confirmedStarterRecipes:true,
+   standaloneSpringRolls:true,maxSearchNodes:1000,maxCompleteChecks:8});
+  assert.equal(plan.status,'COORDINATED_PROTOTYPE',name);
+  assert.equal(plan.holdingLimitMinutes,20);
+  assert.equal(validateKitchenTimeline(orders,plan,rows).status,'VALIDATED_STAGING_TIMELINE');
+  assert.equal(plan.bookingApprovalAllowed,false);
+ }
+});

@@ -920,3 +920,31 @@ provider sends were made. FOUR-RING-RELEASE-MANIFEST.json pins runtime files,
 separate DRAFT production certificate, preview/backend revisions and test counts.
 The remote historical docs/shadow-service changes are preserved in the source
 snapshot; no unrelated local working-tree changes are reset or committed locally.
+
+## 10 November: hosted £150 CPU blocker fixed and actual bookings verified
+
+The final hosted pressure check found v54 single-slot CPU failures for mixed and
+starter/curry £150 baskets despite local feasibility. Temporary caching and job
+pruning experiments did not resolve this and were removed before deployment.
+The focused fix limits effort on the soft 10-minute preference before attempting
+the approved 20-minute maximum. Fryer-dependent baskets try established job order
+first; the alternative bounded ordering remains available. Suggestions and basket
+review explanations use a separate bounded search and remain non-authoritative.
+An exhausted hint is unverified, not proof the basket is physically impossible.
+Locked checkout retains the full 20-minute maximum search and all validators.
+
+All 309 tests pass in UTC (10.5s) and Europe/London (8.9s). New dedicated regression
+independently validates both £150 baskets in the suggestion budget and checks
+20-minute holding. Main staging v55 source:
+a1230b05e03b5cdef91e923fb4c1c1feeef307eea1bc687cbebd012e5b9ace15.
+
+Actual hosted whole-day scans on an empty 28 November returned HTTP200 for all
+four examples: mixed 47/49 available in 9.79s; starter/curry49/49 in10.24s;
+stir-fry0/49 in10.45s; noodles0/49 in9.43s. No crash or booking approval.
+Then the two fitting baskets actually committed through the authenticated main
+atomic writer as RTK-188 (£150 mixed,18:30) and RTK-189 (£150 starter/curry,20:15).
+Each replay returned HTTP200/sameorder/committed=false/replayed=true. Read-only SQL
+confirmed MASTER_WOK ownership, one receipt each, saved plan revision2/model4ring,
+and maximum main hold20. No real provider calls or production writes.
+Evidence: STAGING-FOUR-RING-LARGE-HOSTED-HINTS-RESULT.json and
+STAGING-FOUR-RING-LARGE-HOSTED-CHECKOUT-RESULT.json. Production stays DRAFT and Legacy.

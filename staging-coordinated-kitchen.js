@@ -13,11 +13,16 @@ function planCoordinatedKitchen(orders,rows,options={}){
  let last=null;
  for(const curryHoldMinutes of [10,20]){
   const attemptOptions={...options,holdingLimitMinutes:curryHoldMinutes};
+  // Ten minutes is a preference, not an admission limit. Do not exhaust the
+  // hosting CPU budget before trying the approved 20-minute maximum.
+  const mainSearchBudget=curryHoldMinutes===10?
+   Math.min(options.maxSearchNodes??100000,100):options.maxSearchNodes;
   let fryer,auxiliary;
   const wok=scheduleCrossOrderPanang(orders,rows,{sharedRings:options.sharedRings===true,allowFryerDependent:true,curryHoldMinutes,holdingLimitMinutes:curryHoldMinutes,
    blackouts:options.blackouts,fixedWok:options.fixedWok,notBeforeByOrder:options.notBeforeByOrder,
    earliestFinishByOrder:options.earliestFinishByOrder,equivalentVessels:options.sharedRings===true,
-   maxSearchNodes:options.maxSearchNodes,maxCompleteChecks:options.maxCompleteChecks,
+   maxSearchNodes:mainSearchBudget,maxCompleteChecks:options.maxCompleteChecks,
+   originalJobOrder:inventory.dependencies.some(d=>!d.standalone),
    validateComplete:jobs=>{
     fryer=planFryerBeforeWok(orders,rows,{status:'FEASIBLE_PROTOTYPE',jobs},attemptOptions);
     auxiliary=options.confirmedStarterRecipes?planAuxiliaryWork(orders,options.auxiliaryRows||rows,jobs,attemptOptions):{status:'AUXILIARY_PLACED_PROTOTYPE',jobs:[]};

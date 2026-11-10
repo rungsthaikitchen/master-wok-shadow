@@ -100,7 +100,7 @@ test('four-ring staging release rejects a single-wok delivery component',()=>{
   deliveryCapacity:{verify:()=>{},replan:()=>{},kitchenModelVersion:'combined-kitchen-protected-v3'}}),/MODEL_MISMATCH/);
 });
 
-test('availability hints, checkout and basket review all retain the full search',async()=>{
+test('read-only hints and reviews are bounded while checkout retains the full search',async()=>{
  const c={...certificate(),status:'CANDIDATE_FOR_STAGING',fixturePrefix:'release-four-ring-',
   modelVersion:'combined-kitchen-four-ring-staging-v1',kitchenConfiguration:'FOUR_RING_ONE_PORTION_V1',deliveryScheduling:1};
  for(const name of ['driverReservations','combinedTrips','deliveryCheckout','deliveryRollback'])c.checks[name]='PENDING';
@@ -113,7 +113,7 @@ test('availability hints, checkout and basket review all retain the full search'
   const result=await a.assessBooking({...context(),assessmentPurpose:purpose});
   assert.equal(result.bookingApprovalAllowed,false);
  }
- assert.deepEqual(calls,[{},{},{}]);
+ assert.deepEqual(calls,[{maxSearchNodes:1000,maxCompleteChecks:8},{maxSearchNodes:1000,maxCompleteChecks:8},{}]);
 });
 
 

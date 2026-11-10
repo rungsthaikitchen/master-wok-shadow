@@ -2,18 +2,18 @@
   "status": "PREPARED_NOT_CERTIFIED",
   "preparedDate": "2026-11-10",
   "releaseId": "master-wok-four-ring-2026-11-10",
-  "runtimeSourceSha256": "73f69764108bcb777b3c1110d7a3644bbd1af7366a6afb0076449133f403026c",
+  "runtimeSourceSha256": "a1230b05e03b5cdef91e923fb4c1c1feeef307eea1bc687cbebd012e5b9ace15",
   "modelVersion": "combined-kitchen-four-ring-staging-v1",
   "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
-  "stagingEdgeVersion": 54,
+  "stagingEdgeVersion": 55,
   "productionAuthorized": false,
   "productionCertificateStatus": "DRAFT",
   "productionCertificateChecks": "ALL_PENDING",
   "websitePreviewCommit": "9dbba88aae9153dc2a47ba6551cc2c7159ef33c4",
   "backendStagingCommit": "2042d266bf7c81058428ff996205d2380f4694ec",
   "regression": {
-    "coreUTC": 308,
-    "coreEuropeLondon": 308,
+    "coreUTC": 309,
+    "coreEuropeLondon": 309,
     "website": 36,
     "backend": 46
   },
@@ -132,15 +132,15 @@
     },
     {
       "path": "master-wok-release-assessors.js",
-      "sha256": "303f6f9fd9d8e780e4c5d9de5e4cb727ba6097e8e1ddffc1f60cb29142e26f0f"
+      "sha256": "d9d07419f1d680a385ea1503225af7ec3dda10ac89a74b2f658f485b9fab30cc"
     },
     {
       "path": "master-wok-release-candidate.four-ring.production.json",
-      "sha256": "445c18a85617e020162baf47447037368999af73c91674aa5c9f0b6ab25aa403"
+      "sha256": "e1538895a7240a64e67af834f34777d3aba6e8ff078404862fdc3bca3b03eb5e"
     },
     {
       "path": "master-wok-release-candidate.staging.json",
-      "sha256": "5bb7b757ba18f17cd97239cb68d55b8e40b456ca611293896cf2ddaa47c8a736"
+      "sha256": "77c3aa9ec1638b412c1bc2b131037886d9d90915733f23cf90d8eb5f90d62f49"
     },
     {
       "path": "master-wok-route-duration.js",
@@ -180,11 +180,11 @@
     },
     {
       "path": "staging-coordinated-kitchen.js",
-      "sha256": "fb260f5a6a1b3e097147ead44114ca3f3d8d4ce8663881d0cd35a5243cbcaeea"
+      "sha256": "2b911e8fefe7ea964fc55603bb4453e98b260786d1fdcccbd07779a17688ea66"
     },
     {
       "path": "staging-cross-order-scheduler.js",
-      "sha256": "c4914634b43a1e05139deebf2a089a20b7226870b3273003d3c6b9b990f64f84"
+      "sha256": "b78355fda894c0edef2c569d347136639ee0e22918f82c51eb9ee187ad6846b7"
     },
     {
       "path": "staging-fryer-before-wok.js",
@@ -212,7 +212,7 @@
     },
     {
       "path": "staging-shared-ring-allocator.js",
-      "sha256": "31f37f0aead36bc0c907d097318e860817aeef30fbb5b0c43910ab158818d211"
+      "sha256": "71d8a85c3d30e3f554313fe81d38156a534c10e80c6645ea520537c6c464cf44"
     },
     {
       "path": "staging-tests/build-atomic-checkout-edge.cjs",

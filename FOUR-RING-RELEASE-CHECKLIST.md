@@ -4,7 +4,7 @@ Status: PREPARED FOR REVIEW, NOT PRODUCTION APPROVAL.
 
 ## Exact components
 
-- Runtime source: `73f69764108bcb777b3c1110d7a3644bbd1af7366a6afb0076449133f403026c`.
+- Runtime source: `a1230b05e03b5cdef91e923fb4c1c1feeef307eea1bc687cbebd012e5b9ace15`.
 - Proposed production release: `master-wok-four-ring-2026-11-10`.
 - Proposed certificate: `master-wok-release-candidate.four-ring.production.json`,
   DRAFT, all checks PENDING. Build with
@@ -35,7 +35,7 @@ PRODUCTION-RELEASE-PACKAGE.json approval refers to the November 4 release only.
 | Customer checkout | £50 RTK-186 and £100 RTK-187 actual preview delivery submissions, one booking receipt each | Synthetic contacts and public destination; no production bookings |
 | Lifecycle | Admin Accept, £50 Suggest18:35, customer acceptance and replay, refreshed Admin | No new real notification receipt claimed |
 | Delivery | Saved loading/departure/door/return times; read-only recommendation, explicit combine/split, stale-revision refusal | Most combined-trip evidence is hosted API rather than actual browser controls |
-| Availability | Occupied-day £100 lookup: 49 hints, 46 available, 10.77s; hints never approve | Broader large-basket hosted latency still needs review |
+| Availability | Occupied-day £100 lookup: 49 hints, 46 available, 10.77s; hints never approve | Four £150 pressure examples also completed hosted scans |
 | Regression | Full core suite in UTC and Europe/London; website 36 and backend 46 | Record current run results in BASKET-REVIEW-STAGING.md |
 | Earlier rollback | Gateway drained/restored with receipts and plans preserved | New Legacy checkout and complete delivery rollback not certified |
 
@@ -55,8 +55,11 @@ STAGING-ROLLBACK-GATEWAY-RESULT.json.
 3. Reconcile notification contracts/worker source against prior received provider
    evidence. Any new real SMS/email/Pushover test needs explicit bounded approval;
    do not dispatch the synthetic browser fixtures to external providers.
-4. Review hosted latency for the agreed £150 pressure examples. Passing a local
-   fallback search does not prove it fits the hosted CPU budget.
+4. Hosted £150 full-day scans now complete without CPU crashes; mixed and
+   starter/curry examples have available times, while stir-fry/noodle examples
+   remain unverified. Two £150 atomic collections and exact-key replays also
+   passed. Confirm the enquiry route remains the escape path for unverified
+   baskets; do not reinterpret a bounded search as proof of physical impossibility.
 5. Prepare the revision-checked pre-service cutover and exact rollback deployment
    targets from a fresh read. The cutover guard must run under the writer lock.
    Keep Legacy authoritative until the owner approves that concrete package.
@@ -69,3 +72,21 @@ finished-food holding is 10 minutes, maximum 20; no unknown basket can authorize
 booking. Microwave dumplings use 4/6/8 minutes for 1/2/3 portions, rice reheating
 rounds 2m30s to 3 minutes. Coconut rice finishes in a curry pan. No additional chef
 interaction or dashboard is introduced.
+
+## Hosted £150 repair evidence
+
+The preferred ten-minute holding attempt has a small search budget before trying
+the agreed twenty-minute maximum with the full booking budget. Fryer-dependent
+baskets first use the established dependency order; constrained-vessel ordering
+remains available as the bounded alternative. Read-only suggestions and review
+diagnostics have a separate finite budget; exhausted searches remain unverified.
+Checkout retains the full twenty-minute assessment under the booking lock.
+
+All four pressure examples returned 49 hosted hints in 9.4–10.5 seconds. Mixed
+had 47 available, starter/curry 49, stir-fry and noodle zero verified slots. The
+mixed basket committed as RTK-188 at 18:30 and starter/curry as RTK-189 at 20:15
+on 28 November, £150 each. Same-key retries returned the original orders with
+committed=false. Server plan revision 2 preserves both baskets, maximum main
+holding 20 minutes, and one portion per hot vessel; cold salad batching remains
+separate. No provider sends or production mutations. See the LARGE-HOSTED result
+files; these are actual server transactions, not an additional browser checkout.

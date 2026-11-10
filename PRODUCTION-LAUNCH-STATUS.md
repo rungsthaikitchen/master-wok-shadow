@@ -4,17 +4,20 @@
 6 November large-basket incident. The production activation record below is
 historical and does not approve this replacement.**
 
-Private staging Edge v53 is bound to source digest
-`f9f95cb967193a606b9765fe7ad442122ccd04e39de14fe71e85c85e4b0ef915`.
+Private staging Edge v55 is bound to source digest
+`a1230b05e03b5cdef91e923fb4c1c1feeef307eea1bc687cbebd012e5b9ace15`.
 The actual £50 and £100 delivery baskets passed Cloudflare preview checkout,
 Admin acceptance and door-arrival trip display. RTK-186 customer acceptance/replay
 and RTK-187 confirmed 19:30 are verified with one booking receipt each.
 Four-ring staging supports two large woks, two small woks, five pans, four rings,
 one main portion per vessel, and the agreed maximum 20-minute finished-food age.
 
-306 core tests and 36 website tests pass. Occupied-service full-day availability
+309 core tests in UTC/UK time and 36 website tests pass. Occupied-service full-day availability
 returned 49 hints in 10.77 seconds, preserving unavailable times around the first
-trip. This does not certify every larger-basket latency case.
+trip. All four agreed £150 examples now complete hosted whole-day lookups without a
+CPU crash. Mixed and starter/curry examples also committed as RTK-188/189, £150
+each, with exact-key replay and one booking receipt each. Stir-fry/noodle examples
+remain unverified and require the enquiry route.
 
 The tested physical model now has a prepared production bootstrap, guarded by a
 DRAFT certificate with all checks PENDING. Full source-bound certification and a

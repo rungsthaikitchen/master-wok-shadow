@@ -1,0 +1,46 @@
+{
+  "scope": "READ_ONLY_HOSTED_150_BASKET_WHOLE_DAY_HINTS",
+  "serviceDate": "2026-11-28",
+  "sourceSha256": "a1230b05e03b5cdef91e923fb4c1c1feeef307eea1bc687cbebd012e5b9ace15",
+  "edgeVersion": 55,
+  "results": [
+    {
+      "basket": "mixed",
+      "status": 200,
+      "seconds": 9.79,
+      "hints": 49,
+      "available": 47,
+      "at2015": true,
+      "bookingApprovalAllowed": false
+    },
+    {
+      "basket": "startersAndCurries",
+      "status": 200,
+      "seconds": 10.24,
+      "hints": 49,
+      "available": 49,
+      "at2015": true,
+      "bookingApprovalAllowed": false
+    },
+    {
+      "basket": "stirFries",
+      "status": 200,
+      "seconds": 10.45,
+      "hints": 49,
+      "available": 0,
+      "at2015": false,
+      "bookingApprovalAllowed": false
+    },
+    {
+      "basket": "noodles",
+      "status": 200,
+      "seconds": 9.43,
+      "hints": 49,
+      "available": 0,
+      "at2015": false,
+      "bookingApprovalAllowed": false
+    }
+  ],
+  "bookingsCreated": 0,
+  "providerSends": 0
+}

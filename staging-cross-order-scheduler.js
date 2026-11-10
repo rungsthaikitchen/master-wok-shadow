@@ -72,6 +72,7 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
    const {allocateSharedRings}=require('./staging-shared-ring-allocator');
    const allocation=allocateSharedRings(jobs,{blackouts:options.blackouts,fixedWok:options.fixedWok,
     equivalentVessels:options.equivalentVessels,
+    originalJobOrder:options.originalJobOrder,
     maxSearchNodes:options.maxSearchNodes,maxCompleteChecks:options.maxCompleteChecks,
     validateComplete:options.validateComplete});
    if(allocation.status!=='PHYSICAL_FIT_PROTOTYPE')
