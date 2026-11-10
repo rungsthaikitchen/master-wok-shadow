@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-10",
+  "scope": "NOTIFICATION_SOURCE_CONTINUITY_ONLY",
+  "productionWorkerDeployment": "f9ec0920-dd4c-41cd-b4f6-35f1517fcb5c",
+  "productionWorkerCommit": "401ef93b81ff55ed09c933adb8385f0113f32063",
+  "components": [
+    {
+      "path": "master_wok_notification_worker.py",
+      "priorCommit": "401ef93b81ff55ed09c933adb8385f0113f32063",
+      "blob": "a5ab218cb062fe918fcaaf0353545451a6552229",
+      "unchanged": true
+    },
+    {
+      "path": "notifications.py",
+      "priorCommit": "401ef93b81ff55ed09c933adb8385f0113f32063",
+      "blob": "e94e558b897dc5ab64b9d8c5c9bd7c7f14eebc75",
+      "unchanged": true
+    },
+    {
+      "path": "master-wok-notification-events.js",
+      "priorCommit": "6033e3d63fcbcef531ac758aaaf2e4d02ecee024",
+      "blob": "fcbbb5e6a2f2d8726c7eb4d786d1bf977f2a34c6",
+      "unchanged": true
+    },
+    {
+      "path": "master-wok-notification-dispatch.js",
+      "priorCommit": "6033e3d63fcbcef531ac758aaaf2e4d02ecee024",
+      "blob": "8c4b9aeb59d59fe47f7593751b5ddeeb46e7a603",
+      "unchanged": true
+    }
+  ],
+  "newProviderSends": 0,
+  "productionMutations": 0,
+  "currentProviderAccessChecked": false,
+  "notes": [
+    "Worker and templates match the deployed version used for previously owner-confirmed provider receipts.",
+    "Core notification event and dispatcher modules match the earlier reviewed production source.",
+    "This supports carrying forward unchanged component evidence; it is not a new live receipt or current provider-access check.",
+    "New four-ring production certificate remains DRAFT; no real provider send or reactivation is authorized."
+  ]
+}
