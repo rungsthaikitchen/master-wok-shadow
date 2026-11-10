@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-10",
+  "reportedBy": "owner via staging Supabase SQL Editor",
+  "status": "PASS",
+  "scope": "TEMP_COPY_DELIVERY_ROLLBACK_GUARD_AND_PRESERVATION",
+  "guardSourceSha256": "af115534443b779b0cd285e2212d4d4415b0a9223986d628387bd6965e8dc0f6",
+  "checks": [
+    {"case":1,"refusal":"DELIVERY_ROLLBACK_REQUIRES_DRAIN","recordsPreserved":true},
+    {"case":2,"refusal":"OUTSTANDING_DRIVER_TRIPS","recordsPreserved":true},
+    {"case":3,"refusal":"OUTSTANDING_DRIVER_TRIPS","recordsPreserved":true},
+    {"case":4,"refusal":"OUTSTANDING_DELIVERY_ORDERS","recordsPreserved":true},
+    {"case":5,"refusal":"OUTSTANDING_DELIVERY_ORDERS","recordsPreserved":true},
+    {"case":"stale_revision","refused":true},
+    {"case":"completed_service_restore","mode":"LEGACY","revision":43,"recordsPreserved":true}
+  ],
+  "liveControl":{"mode":"MASTER_WOK","revision":41},
+  "permanentMutations":0,
+  "limitations":["Successful LEGACY revision43 was in TEMP copies only, not the live staging control.","This verifies the database guard and order/plan/receipt preservation, not a new Legacy customer checkout or a Cloudflare/Railway deployment rollback.","Earlier hosted gateway restoration evidence is recorded separately in STAGING-ROLLBACK-GATEWAY-RESULT.json."]
+}

@@ -991,3 +991,41 @@ Feb–Oct2026; these match the earlier explicitly approved historical-link retir
 scope. No new approval is inferred for production activation. No token, status,
 price or other production value was changed. Final retirement belongs inside the
 new guarded cutover transaction; the old SQL revision2 guard must not be reused.
+
+## 10 November: owner completed rollback guard rehearsal — PASS
+
+Owner supplied the complete staging SQL result. All seven TEMP-copy cases passed:
+requires drain; retained future driver trip blocks; cancelled/test order cannot
+free a retained trip; outstanding future delivery blocks; unresolved past proposal
+blocks; stale revision cannot switch; completed-service snapshot restores LEGACY
+revision43 with orders/plans/receipts unchanged. Actual live control remains
+MASTER_WOK revision41, permanentMutations=0. Reported guard SHA
+af115534443b779b0cd285e2212d4d4415b0a9223986d628387bd6965e8dc0f6 matches local SQL.
+STAGING-DELIVERY-ROLLBACK-GUARD-RESULT.json records owner-run evidence and limits.
+This does not claim a new Legacy checkout or full deployment rollback. Production
+certificate remains DRAFT and production has not been changed.
+
+Rollback baseline review found production main advanced to e8f668b (Thai Sausage
+peanut allergen, hidden pork salad and date-specific collection restriction).
+Reconciled those changes into preview11732f8 without overwriting unrelated work.
+Corrected renderer recognition of singular peanut alias so the intended warning
+renders; added behavioural menu regression. All37 website tests pass;22 active
+inline scripts parse after ignoring HTML-commented scripts. Cloudflare reports
+preview deployment50cb1909-d6ed-47ec-9057-a4ede585ea3c successful.
+
+Existing production checkout client blob5eee51e is unchanged since f4048f4 and
+shares pending key rtk_master_wok_pending_checkout; Legacy refuses unresolved
+MasterWok attempts. Production backend ec1d576d remains SUCCESS at a76e098.
+Retargeted website PR68 to main for one coherent review (includes PR67 work).
+Prepared PRODUCTION-FOUR-RING-COMPATIBILITY-PREPARATION.json, explicitly requiring
+approval for a Legacy-only compatibility deployment. No production deployment,
+Supabase write, worker change or new provider message was performed. Activation
+remains separate; current production certificate stays DRAFT.
+
+Production main received a concurrent correction58dfff3 while the release was
+being reviewed: canonical peanuts spelling on sausage. Incorporated that parent
+into candidate1b917b7 and removed the now-unneeded alias change. This explicitly
+preserves all production changes/ancestry rather than overwriting a live edit.
+37 website tests pass. Compatibility preparation now pins candidate1b917b7,
+current production baseline58dfff3, backend candidate2042d26 and liveec1d576d.
+No production deployment has been approved or executed.

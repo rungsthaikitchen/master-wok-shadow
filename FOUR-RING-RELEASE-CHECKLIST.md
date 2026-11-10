@@ -11,7 +11,7 @@ Status: PREPARED FOR REVIEW, NOT PRODUCTION APPROVAL.
   `node staging-tests/build-atomic-checkout-edge.cjs --release-four-ring`.
 - Private staging certificate remains CANDIDATE_FOR_STAGING, fixture-only.
 - Website preview: branch `feature/basket-review-staging-2026-11-07`,
-  commit `9dbba88aae9153dc2a47ba6551cc2c7159ef33c4`, PR #68.
+  commit `1b917b73c54295caf2576e66be6d603cd275d4ed`, PR #68.
 - Railway staging gateway: deployment `424c28ce-0727-43db-9a3f-3d4f71c3335b`,
   backend commit `2042d266bf7c81058428ff996205d2380f4694ec`.
 
@@ -99,13 +99,30 @@ also passed after adding a necessary per-promise workload bound: distant orders
 cannot enlarge a noodle basket's own holding window. Full 310-test suites pass
 in UTC and UK time. Production remains DRAFT and unchanged.
 
-Supabase confirmation expired before the TEMP-copy rollback guard rehearsal ran.
-Owner SQL Editor execution is required for staging-tests/rehearse-delivery-rollback.sql.
-It changes TEMP copies only and ends ROLLBACK; do not call this test passed yet.
-The existing hosted gateway rollback evidence is separate and remains qualified.
+Owner SQL Editor execution completed the TEMP-copy rollback guard rehearsal.
+All seven cases PASS; the guard SHA matches the committed release SQL. Unsafe
+switches and stale revision were refused, and the completed-service TEMP switch
+preserved orders/plans/receipts. Live staging remained MASTER_WOK revision41;
+permanentMutations=0. Evidence: STAGING-DELIVERY-ROLLBACK-GUARD-RESULT.json.
+This is database guard/preservation evidence, not a new Legacy customer checkout
+or a Cloudflare/Railway deployment rollback. Existing hosted gateway restoration
+evidence remains separate and qualified.
 
 Read-only production preflight: LEGACY revision4, no current/future orders. Thirteen
 historical Legacy proposals still have response tokens; all are before Nov4 and
 match the already-approved historical retirement scope. They are not new bookings.
 Retire them only inside the final guarded production cutover transaction, preserving
 all history/pricing/status fields. No production mutation occurred in this check.
+
+## Compatibility deployment proposed, not authorized
+
+Next production step is the exact website/backend pair in
+PRODUCTION-FOUR-RING-COMPATIBILITY-PREPARATION.json, with Legacy authoritative,
+reviews disabled, Supabase and notification worker unchanged. This stages a tested
+compatible baseline before any separate engine activation. Approval is required
+before merging production-targeted PRs or applying Railway changes.
+
+Production main advanced again during review to58dfff3 (canonical peanuts spelling).
+Candidate now includes that parent and all current main changes. The temporary
+singular-peanut alias adjustment was removed as unnecessary; the behavioural
+warning test remains. Website candidate1b917b7 passes37 tests.
