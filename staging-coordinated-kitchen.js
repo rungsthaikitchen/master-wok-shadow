@@ -19,7 +19,7 @@ function planCoordinatedKitchen(orders,rows,options={}){
    Math.min(options.maxSearchNodes??100000,100):options.maxSearchNodes;
   let fryer,auxiliary;
   const wok=scheduleCrossOrderPanang(orders,rows,{sharedRings:options.sharedRings===true,allowFryerDependent:true,curryHoldMinutes,holdingLimitMinutes:curryHoldMinutes,
-   blackouts:options.blackouts,fixedWok:options.fixedWok,notBeforeByOrder:options.notBeforeByOrder,
+   holdExceptions:options.holdExceptions,blackouts:options.blackouts,fixedWok:options.fixedWok,notBeforeByOrder:options.notBeforeByOrder,
    earliestFinishByOrder:options.earliestFinishByOrder,equivalentVessels:options.sharedRings===true,
    maxSearchNodes:mainSearchBudget,maxCompleteChecks:options.maxCompleteChecks,
    originalJobOrder:inventory.dependencies.some(d=>!d.standalone),
@@ -44,7 +44,7 @@ function planCoordinatedKitchen(orders,rows,options={}){
   return {status:'COORDINATED_PROTOTYPE',reason:'STAGING_ONLY_NOT_BOOKING_APPROVAL',
    ...(options.sharedRings===true?{resourceModel:'FOUR_SHARED_RINGS',chefConcurrencyVerified:false}:{}),
    curryHoldPolicy:curryHoldMinutes===10?'PREFERRED_10_MINUTES':'EXCEPTION_20_MINUTES',
-   curryHoldMinutes,holdingLimitMinutes:curryHoldMinutes,wok,fryer,auxiliary,events:[
+   curryHoldMinutes,holdingLimitMinutes:curryHoldMinutes,holdExceptions:options.holdExceptions||{},wok,fryer,auxiliary,events:[
     ...wok.jobs.map(j=>({resource:options.sharedRings===true?'hob:'+j.vessel:'wok',start:j.start,finish:j.finish,itemId:j.itemId})),
     ...fryer.jobs.map(j=>({resource:j.basket,start:j.start,finish:j.finish,fryType:j.type})),
     ...auxiliary.jobs.map(j=>({resource:j.resource,start:j.start,finish:j.finish,itemId:j.itemId}))

@@ -4,12 +4,13 @@ const {verifyCombinedCapacity}=require('./master-wok-combined-assessment');
 const {planWithProtectedWork,RING_MODEL_VERSION}=require('./master-wok-protected-plan');
 const {localDate,relativePlacement}=require('./master-wok-clock');
 function createDeliveryCapacity({quoteLeg,stagingSharedRings=false}={}){
+ const {holdFor}=require('./master-wok-hold-policy');
  const kitchenOptions=stagingSharedRings===true?{sharedRings:true,stagingSharedRings:true}:{};
  const driver=createDriverPlanner({quoteLeg});
- const foodAgeConstraint=delivery=>stagingSharedRings?{
-  earliestFinishByOrder:Object.fromEntries(delivery.trips.flatMap(t=>t.stops.map(s=>[s.id,s.arrival-POLICY.maxFoodAge]))),
+ const foodAgeConstraint=(delivery,holdExceptions={})=>stagingSharedRings?{
+  earliestFinishByOrder:Object.fromEntries(delivery.trips.flatMap(t=>t.stops.map(s=>[s.id,s.arrival-holdFor({holdExceptions},[s.id],POLICY.maxFoodAge)]))),
   validateCompletePlan:plan=>{
-  try{validateFoodAge({...plan,delivery});return true;}catch(_){return false;}
+  try{validateFoodAge({...plan,delivery,holdExceptions});return true;}catch(_){return false;}
  }}:{};
  async function prepare({orders,rows,previousPlan,serviceDate,now,combine,splitTripId}){
   const d=await driver({rows,previousPlan,serviceDate,now,combine,splitTripId});
@@ -29,7 +30,7 @@ function createDeliveryCapacity({quoteLeg,stagingSharedRings=false}={}){
     const candidate=p.orders.find(o=>String(o.orderId)===id),candidateRow=p.rows.find(r=>String(r.id)===id);
     const result=verifyCombinedCapacity({...context,acceptedOrders:p.orders.filter(o=>o!==candidate),
      rawRows:p.rows.filter(r=>r!==candidateRow),proposedOrder:{...candidate,rawRow:candidateRow}},
-     {...kitchenOptions,...foodAgeConstraint(p.delivery),maxSearchNodes:searchOptions.maxSearchNodes,
+     {...kitchenOptions,...foodAgeConstraint(p.delivery,{...context.state.previousPlan?.holdExceptions,...(c.staffHoldException?{[id]:c.staffHoldException}:{})}),maxSearchNodes:searchOptions.maxSearchNodes,
       maxCompleteChecks:searchOptions.maxCompleteChecks});
     if(result.status!=='VERIFIED_KITCHEN_CAPACITY')return result;
     const plan={...result.plan,delivery:p.delivery};validateFoodAge(plan);
@@ -52,7 +53,7 @@ function createDeliveryCapacity({quoteLeg,stagingSharedRings=false}={}){
      }
     }
     const result=planWithProtectedWork({orders:p.orders,rows:p.rows,previousPlan,serviceDate,now,blackouts,
-     ...kitchenOptions,...foodAgeConstraint(p.delivery),
+     ...kitchenOptions,...foodAgeConstraint(p.delivery,previousPlan?.holdExceptions),
      standaloneSpringRolls:true,confirmedStarterRecipes:true,fryerWarmupMinutes:5});
     if(result.status!=='VALIDATED_PROTECTED_PLAN')return result;
     const plan={...result.plan,delivery:p.delivery};validateFoodAge(plan);

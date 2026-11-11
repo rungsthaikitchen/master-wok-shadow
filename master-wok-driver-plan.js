@@ -1,4 +1,5 @@
 'use strict';
+const {holdFor,validateExceptions}=require('./master-wok-hold-policy');
 // One driver. Trips are reservations, not evidence of a completed delivery.
 // Minutes use the service day's London clock, matching the kitchen allocator.
 const {RESTAURANT}=require('./master-wok-delivery-quote');
@@ -124,7 +125,7 @@ function validateFoodAge(plan){
  const jobs=finishedFoodJobs(plan);
  for(const t of plan.delivery.trips)for(const s of t.stops){
   const food=jobs.filter(j=>j.orderIds.includes(s.id));if(!food.length)continue;
-  if(food.some(j=>j.finish>t.start||s.arrival-j.finish>POLICY.maxFoodAge))throw Error('DELIVERY_FOOD_HOLDING_LIMIT');
+  if(food.some(j=>j.finish>t.start||s.arrival-j.finish>holdFor(plan,[s.id],POLICY.maxFoodAge)))throw Error('DELIVERY_FOOD_HOLDING_LIMIT');
  }
  return true;
 }

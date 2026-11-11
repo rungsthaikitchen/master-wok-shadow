@@ -1,4 +1,5 @@
 'use strict';
+const {holdFor,validateExceptions}=require('./master-wok-hold-policy');
 // Coordinates fryer prerequisites with an attributed wok plan. This remains a
 // staging plan: recipe coverage and launch approval are checked separately.
 const {diagnoseFryer}=require('./staging-fryer-diagnostic');
@@ -67,7 +68,7 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
   if(groupIndex===groups.length)return true;
   if(!remaining.length)return search(groupIndex+1,groups[groupIndex+1]||[]);
   const first=remaining[0];
-  const hold=first.standalone&&options.holdingLimitMinutes===20?20:10;
+  const hold=first.standalone?holdFor(options,[first.orderId],options.holdingLimitMinutes===20?20:10):10;
   for(let start=first.deadline-first.duration;start>=Math.max(990,first.deadline-first.duration-hold,first.notBefore);start--){
    const finish=start+first.duration;
    if((options.kitchenBlackouts||options.blackouts||[]).some(b=>start<b.finish&&finish>b.start))continue;

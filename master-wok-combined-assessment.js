@@ -1,4 +1,5 @@
 'use strict';
+const {holdFor,validateExceptions}=require('./master-wok-hold-policy');
 // Complete assessment pipeline for staging certification. A valid schedule is
 // evidence, not a production booking authorization. Remains false by design.
 const {planWithProtectedWork}=require('./master-wok-protected-plan');
@@ -63,12 +64,14 @@ function verifyCombinedCapacity({acceptedOrders,proposedOrder,rawRows,serviceDat
    new Set(rows.map(r=>String(r.id))).size!==rows.length||
    orders.some(o=>!rows.some(r=>String(r.id)===String(o.orderId))))return fail('INCOMPLETE_SNAPSHOT');
   const id=String(proposedOrder.orderId),warmup=5,buffer=10+extraLead;
+  const holdExceptions=validateExceptions({...state.previousPlan?.holdExceptions,
+   ...(proposedOrder.staffHoldException?{[id]:proposedOrder.staffHoldException}:{})});
   const protectedResult=planWithProtectedWork({orders,rows,serviceDate,now,previousPlan:state.previousPlan,
    ...(typeof options.validateCompletePlan==='function'?{validateCompletePlan:options.validateCompletePlan}:{}),
    ...(options.earliestFinishByOrder?{earliestFinishByOrder:options.earliestFinishByOrder}:{}),
    maxSearchNodes:options.maxSearchNodes,maxCompleteChecks:options.maxCompleteChecks,
    ...(options.sharedRings===true?{sharedRings:true,stagingSharedRings:options.stagingSharedRings===true}:{}),
-   newOrderId:id,blackouts,
+   newOrderId:id,blackouts,holdExceptions,
    standaloneSpringRolls:true,
    fryerWarmupMinutes:5,
    confirmedStarterRecipes:true,
@@ -83,7 +86,7 @@ function verifyCombinedCapacity({acceptedOrders,proposedOrder,rawRows,serviceDat
   // independently of the allocator's success status.
   for(const job of unstartedPlan.wok.jobs){
    if(DURATIONS[job.group]?.[job.portions]!==job.finish-job.start||
-     ![10,20].includes(job.holdingLimitMinutes)||job.holdingLimitMinutes>(unstartedPlan.holdingLimitMinutes===20?20:10)||
+     job.holdingLimitMinutes>holdFor(unstartedPlan,job.orderIds,unstartedPlan.holdingLimitMinutes===20?20:10)||
      job.finish>job.readyMinute||job.readyMinute-job.finish>job.holdingLimitMinutes)
     return fail('INVALID_WOK_JOB');
   }
@@ -100,7 +103,7 @@ function verifyCombinedCapacity({acceptedOrders,proposedOrder,rawRows,serviceDat
      !Array.isArray(job.allocations)||job.allocations.length!==job.portions)
     return fail('INVALID_FRYER_JOB');
    for(const a of job.allocations){
-    const hold=job.standalone&&unstartedPlan.holdingLimitMinutes===20?20:10;
+    const hold=job.standalone?holdFor(unstartedPlan,[a.orderId],unstartedPlan.holdingLimitMinutes===20?20:10):10;
     if(job.start<a.notBefore||job.finish>a.deadline||a.deadline-job.finish>hold||
       a.type!==job.type||a.qty!==1)return fail('INVALID_FRYER_ALLOCATION');
     const k=key(a.orderId,a.itemId,a.type);actual.set(k,(actual.get(k)||0)+1);

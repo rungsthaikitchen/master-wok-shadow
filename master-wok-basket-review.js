@@ -43,19 +43,21 @@ module.exports={normalizeReview,createBasketReviewStore};
 
 // Called only by the authenticated server-to-server Admin boundary. A review
 // status can never create an order or bypass a booking assessment.
-function createBasketReviewAdmin({pool,schema='public'}){
+function createBasketReviewAdmin({pool,schema='public',reviewApproval}){
  if(!pool||!['public','master_wok_rehearsal'].includes(schema))throw Error('INVALID_REVIEW_CONFIGURATION');
  const table='"'+schema+'".master_wok_basket_reviews';
  return async input=>{
+  if(input?.action==='approve_agreed_time')return reviewApproval?reviewApproval.approve(input):{success:false,statusCode:503,reason:'REVIEW_APPROVAL_DISABLED'};
   if(input?.action==='list'){
    const result=await pool.query('SELECT id,status,customer_name,customer_phone,order_type,preferred_time,delivery_address,basket,assessment,created_at,updated_at FROM '+table+
-    " WHERE status IN ('pending','contacted') ORDER BY created_at ASC,id ASC LIMIT 100");
+    " WHERE status IN ('pending','contacted','approved') ORDER BY created_at ASC,id ASC LIMIT 100");
    return {success:true,reviews:result.rows,bookingApprovalAllowed:false};
   }
   if(input?.action!=='set_status'||!['pending','contacted','resolved','closed'].includes(input.status)||
-   !['pending','contacted','resolved','closed'].includes(input.expectedStatus)||
+   !['pending','contacted','approved','resolved','closed'].includes(input.expectedStatus)||
    !/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(input.reviewId||''))
    return {success:false,statusCode:400,reason:'INVALID_REVIEW_ACTION'};
+  if(input.expectedStatus==='approved'&&input.status!=='closed')return {success:false,statusCode:400,reason:'APPROVED_REVIEW_REQUIRES_CHECKOUT_OR_CLOSE'};
   const result=await pool.query('UPDATE '+table+' SET status=$1,updated_at=clock_timestamp() WHERE id=$2 AND status=$3 RETURNING id,status',
    [input.status,input.reviewId,input.expectedStatus]);
   return result.rows.length===1?{success:true,review:result.rows[0],bookingApprovalAllowed:false}:

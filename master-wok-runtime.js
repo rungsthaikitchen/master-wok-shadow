@@ -11,14 +11,16 @@ const {createServicePlanStore}=require('./master-wok-service-plan-store');
 const {createBookingHttpHandler}=require('./master-wok-http');
 const {createNotificationDispatcher,createNotificationHttpHandler}=require('./master-wok-notification-dispatch');
 const {createCommercialValidator}=require('./master-wok-commercial-validator');
+const {createReviewApproval}=require('./master-wok-review-approval');
 const {createBasketReviewStore,createBasketReviewAdmin}=require('./master-wok-basket-review');
 const {createBasketAvailability}=require('./master-wok-availability');
 function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,schema='public',
- validateCommercialOrder,deliveryService,readAvailability,readOrders,assessBooking,assessMutation,notificationOrderKeyPrefix,readPreviewOrders,deliveryCapacity,quoteDelivery}={}){
+ validateCommercialOrder,deliveryService,readAvailability,readOrders,assessBooking,assessMutation,notificationOrderKeyPrefix,readPreviewOrders,deliveryCapacity,quoteDelivery,reviewApprovalsEnabled=false}={}){
  if(typeof assessMutation!=='function')throw Error('CERTIFIED_LIFECYCLE_ASSESSOR_REQUIRED');
  const gate=createLaunchControl({schema,releaseId});
+ const reviewApproval=reviewApprovalsEnabled?createReviewApproval({pool,schema,assertWriteAllowed:gate.assertWriteAllowed}):undefined;
  const shared={pool,mode:'MASTER_WOK',assertWriteAllowed:gate.assertWriteAllowed};
- const checkout=createAtomicCheckout({...shared,model,validateCommercialOrder:validateCommercialOrder||createCommercialValidator({deliveryService}),readAvailability,
+ const checkout=createAtomicCheckout({...shared,reviewApproval,model,validateCommercialOrder:validateCommercialOrder||createCommercialValidator({deliveryService}),readAvailability,
   assessBooking,...(readOrders?{readOrders}:{}),store:createOrderStore({schema}),planStore:createServicePlanStore({schema})});
  const lifecycle=createLifecycleWriter({...shared,schema,assessMutation});
  if(deliveryCapacity){
@@ -39,10 +41,10 @@ function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,sc
  const saveReview=createBasketReviewStore({pool,schema,assessReview:review=>reviewAvailability({
   times:[review.preferredTime],items:review.basket,orderType:review.orderType,address:review.deliveryAddress})});
  const basketReview=async input=>{
-  try{return await saveReview(input);}
+  try{return input?.action==='approval_lookup'?(reviewApproval?await reviewApproval.lookup(input.token):{success:false,statusCode:503,reason:'REVIEW_APPROVAL_DISABLED'}):await saveReview(input);}
   catch(error){return {success:false,statusCode:error.message==='INVALID_REVIEW_REQUEST'?400:503,reason:'BASKET_REVIEW_UNAVAILABLE'};}
  };
- const booking=createBookingHttpHandler({secret,checkout,lifecycle,serviceControl,availability,basketReview,basketReviewAdmin:createBasketReviewAdmin({pool,schema}),
+ const booking=createBookingHttpHandler({secret,checkout,lifecycle,serviceControl,availability,basketReview,basketReviewAdmin:createBasketReviewAdmin({pool,schema,reviewApproval}),
   readPreviewOrders:readPreviewOrders?async()=>{
    if((await gate.read(pool)).mode!=='MASTER_WOK')throw Error('PREVIEW_READER_DISABLED');
    return readPreviewOrders();

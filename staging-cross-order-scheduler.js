@@ -1,4 +1,5 @@
 'use strict';
+const {holdFor,validateExceptions}=require('./master-wok-hold-policy');
 // Read-only cross-order scheduler prototype. Strictly identical compatible dish lines,
 // same promised time and modifiers; fryer-dependent dishes remain UNVERIFIED.
 // No database writes and no booking approval.
@@ -53,7 +54,7 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
      const batch=portions.slice(i,i+max);
      const duration=DURATION_BY_GROUP[g.group][batch.length];
      const placement=Math.max(...batch.map(p=>Math.max(p.placedAt.getHours()*60+p.placedAt.getMinutes(),options.notBeforeByOrder?.[p.orderId]??0)));
-     const holdingLimitMinutes=options.holdingLimitMinutes===20?20:(CURRIES.has(g.itemId)?curryHoldMinutes:10);
+     const holdingLimitMinutes=holdFor(options,batch.map(p=>p.orderId),options.holdingLimitMinutes===20?20:(CURRIES.has(g.itemId)?curryHoldMinutes:10));
      const earliest=Math.max(990,placement,g.readyMinute-holdingLimitMinutes-duration,
       ...batch.map(p=>(options.earliestFinishByOrder?.[p.orderId]??0)-duration));
      const latest=g.readyMinute-duration;

@@ -10,7 +10,7 @@ const {createOrderStore}=require('./master-wok-order-store');
 const {createServicePlanStore,remapPlanOrder}=require('./master-wok-service-plan-store');
 const {localDate,relativePlacement}=require('./master-wok-clock');
 function createAtomicCheckout({pool,model,validateCommercialOrder,readAvailability,assessBooking,
- store=createOrderStore(),planStore=createServicePlanStore(),readOrders=readCapacityCommitments,mode='LEGACY',assertWriteAllowed=async()=>{}}={}){
+ store=createOrderStore(),planStore=createServicePlanStore(),readOrders=readCapacityCommitments,mode='LEGACY',assertWriteAllowed=async()=>{},reviewApproval}={}){
  if(!pool||typeof pool.connect!=='function'||!model||
   typeof validateCommercialOrder!=='function'||typeof readAvailability!=='function'||
   typeof assessBooking!=='function')throw Error('MISSING_TRUSTED_CHECKOUT_DEPENDENCY');
@@ -23,6 +23,11 @@ function createAtomicCheckout({pool,model,validateCommercialOrder,readAvailabili
     typeof request.preferredTime!=='string'||!/(Z|[+-]\d\d:\d\d)$/.test(request.preferredTime))
    return fail('INVALID_REQUEST');
   let serviceDate,connection;
+  const originalRequest=request;
+  if(request.reviewApprovalToken){
+   if(!reviewApproval)return fail('REVIEW_APPROVAL_DISABLED');
+   request={...request,reviewApprovalToken:await require('./master-wok-review-approval').hash(request.reviewApprovalToken)};
+  }
   try{serviceDate=localDate(request.preferredTime);connection=await pool.connect();}
   catch(_){return fail('CONNECTION_OR_TIME_INVALID');}
   try{
@@ -45,6 +50,7 @@ function createAtomicCheckout({pool,model,validateCommercialOrder,readAvailabili
     prepareCandidate:async(input,c,state)=>{
      // Commercial validation must derive prices, delivery, discounts and loyalty
      // from trusted server data. It must not simply echo a browser payload.
+     const staffHoldException=originalRequest.reviewApprovalToken?await reviewApproval.authorize(c,originalRequest):undefined;
      const commercial=await validateCommercialOrder(c,input,state);
      if(!commercial||!commercial.header||!Array.isArray(commercial.items))
       throw Error('COMMERCIAL_VALIDATION_FAILED');
@@ -57,7 +63,7 @@ function createAtomicCheckout({pool,model,validateCommercialOrder,readAvailabili
      if(prepared.status!=='PREPARED')throw Error(prepared.reason);
      return {...prepared.candidate,placedAt:relativePlacement(state.now,serviceDate),
       items:prepared.rawRow.items,rawRow:prepared.rawRow,validatedHeader:commercial.header,
-      validatedItems:commercial.items};
+      validatedItems:commercial.items,...(staffHoldException?{staffHoldException}:{})};
     },
     assess:async context=>{
      const result=await assessBooking({...context,serviceDate});
@@ -72,6 +78,7 @@ function createAtomicCheckout({pool,model,validateCommercialOrder,readAvailabili
      const savedId=String(response.orderId)+'@'+new Date(data.candidate.validatedHeader.preferred_time).toISOString();
      const plan=remapPlanOrder(data.assessment.plan,data.candidate.orderId,savedId);
      await planStore.save(c,serviceDate,plan);
+     if(data.candidate.staffHoldException)await reviewApproval.consume(c,data.candidate.staffHoldException,response.orderId);
      return response;
     }
    });

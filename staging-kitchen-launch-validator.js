@@ -1,4 +1,5 @@
 'use strict';
+const {holdFor,validateExceptions}=require('./master-wok-hold-policy');
 // Staging-only launch safety gate. Never grants booking approval.
 // Validates reported resource intervals and order-placement boundaries.
 const {OUT_OF_SCOPE}=require('./staging-out-of-scope-items');
@@ -40,13 +41,13 @@ function validateKitchenTimeline(orders,plan,rows,options={}){
    if(!eligible(j.itemId)?.includes(j.vessel))issues.push({code:'INVALID_VESSEL',itemId:j.itemId});
    if(!Number.isInteger(j.start)||!Number.isInteger(j.finish)||
     j.finish-j.start!==({fast:{1:5,2:6,3:8,4:10},noodle:{1:8,2:10},salad:{1:10,2:10,3:15,4:15}})[j.group]?.[j.portions]||
-    j.finish>j.readyMinute||j.readyMinute-j.finish>(plan.holdingLimitMinutes===20?20:10))
+    j.finish>j.readyMinute||j.readyMinute-j.finish>holdFor(plan,j.orderIds,plan.holdingLimitMinutes===20?20:10))
     issues.push({code:'INVALID_COOKING_JOB',itemId:j.itemId});
   }
   issues.push(...validateRingOccupancy([...wok,...(options.fixedWok||[])],
    [...(plan.auxiliary?.jobs||[]),...(options.fixedAuxiliary||[])]));
   if(!validateAuxiliaryWork(orders,options.auxiliaryRows||rows,plan.auxiliary?.jobs||[],{
-   ...options,holdingLimitMinutes:plan.holdingLimitMinutes,mainJobs:[...wok,...(options.fixedWok||[])]}))issues.push({code:'AUXILIARY_COVERAGE_INVALID'});
+   ...options,holdExceptions:plan.holdExceptions,holdingLimitMinutes:plan.holdingLimitMinutes,mainJobs:[...wok,...(options.fixedWok||[])]}))issues.push({code:'AUXILIARY_COVERAGE_INVALID'});
   const inventory=diagnoseFryer(orders,rows,{confirmedStarterRecipes:true,standaloneSpringRolls:true});
   const expected=new Map(),actual=new Map(),deadlineExpected=new Map(),deadlineActual=new Map();
   const key=(id,item,type,recipe)=>JSON.stringify([String(id),item,type,recipe]);
@@ -80,7 +81,7 @@ function validateKitchenTimeline(orders,plan,rows,options={}){
     issues.push({code:'INVALID_FRYER_JOB'});
    for(const a of j.allocations||[]){
     if(a.qty!==1||a.type!==j.type||!j.orderIds.includes(a.orderId)||
-     j.finish>a.deadline||a.deadline-j.finish>(j.standalone&&plan.holdingLimitMinutes===20?20:10))
+     j.finish>a.deadline||a.deadline-j.finish>(j.standalone?holdFor(plan,[a.orderId],plan.holdingLimitMinutes===20?20:10):10))
      issues.push({code:'INVALID_FRYER_ALLOCATION'});
     const k=key(a.orderId,a.itemId,a.type,a.recipeKey);actual.set(k,(actual.get(k)||0)+1);
     const dk=JSON.stringify([String(a.orderId),a.itemId,a.type,a.recipeKey,a.deadline]);
