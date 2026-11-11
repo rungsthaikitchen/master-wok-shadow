@@ -6,7 +6,7 @@
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
   "schema": "public",
   "modelVersion": "combined-kitchen-four-ring-staging-v1",
-  "sourceSha256": "f4dd2190e9037c0f1e1cb66d24c97d0af3fcd9610a385ac89358d8cbb25ae8e2",
+  "sourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
   "checks": {
     "atomicConcurrency": "PENDING",
     "physicalCoverage": "PENDING",
@@ -25,6 +25,6 @@
   "deliveryScheduling": 1,
   "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
   "evidence": {
-    "note": "Prepared release only. Every check must be signed off against the final bound source; prior release approval is not authorization."
+    "note": "DRAFT. New reviewed-basket holding exception needs final source-bound certification. Staging collection proof is in STAGING-REVIEW-AGREED-CHECKOUT-RESULT.json; production deployment and activation are not authorized."
   }
 }

@@ -126,3 +126,8 @@ Production main advanced again during review to58dfff3 (canonical peanuts spelli
 Candidate now includes that parent and all current main changes. The temporary
 singular-peanut alias adjustment was removed as unnecessary; the behavioural
 warning test remains. Website candidate1b917b7 passes37 tests.
+
+
+## 11 November: reviewed basket acceptance extension
+
+Owner approved explicit, customer-discussed per-request holding exceptions. Collection review -> scoped approval -> saved customer checkout -> one booked order -> normal Admin Accept passed as RTK-190. Link replacement, audit preservation, old-link refusal and customer acknowledgement passed as RTK-191. See STAGING-REVIEW-AGREED-CHECKOUT-RESULT.json and REVIEW-AGREED-TIME-STAGING.md. Current candidate is Edge v58/source 56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d. Production remains Legacy and approval gates are off. The production certificate remains DRAFT/PENDING; historical source-bound evidence is not silently upgraded. Delivery exception and competing distinct-key grant consumption still require hosted verification.
