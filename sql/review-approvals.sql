@@ -17,6 +17,7 @@ CREATE TABLE public.master_wok_review_approvals (
  expires_at timestamptz NOT NULL,
  order_id uuid REFERENCES public.orders(id),
  consumed_at timestamptz,
+ audit_history jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(audit_history)='array'),
  CHECK (expires_at>created_at),
  CHECK ((order_id IS NULL)=(consumed_at IS NULL))
 );

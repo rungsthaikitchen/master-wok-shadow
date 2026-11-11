@@ -7,7 +7,7 @@ const TOKEN=/^[a-f0-9]{64}$/;
 const hash=async value=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value))),b=>b.toString(16).padStart(2,'0')).join('');
 const randomToken=()=>Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');
 function validApproval(input){
- return UUID.test(input?.reviewId||'')&&['pending','contacted'].includes(input.expectedStatus)&&
+ return UUID.test(input?.reviewId||'')&&['pending','contacted','approved'].includes(input.expectedStatus)&&
   typeof input.agreedTime==='string'&&/(Z|[+-]\d\d:\d\d)$/.test(input.agreedTime)&&Number.isFinite(Date.parse(input.agreedTime))&&
   Number.isInteger(input.maxHoldMinutes)&&input.maxHoldMinutes>=20&&input.maxHoldMinutes<=330&&
   input.customerDiscussed===true&&typeof input.reason==='string'&&input.reason.trim().length>=5&&input.reason.length<=1000&&
@@ -26,9 +26,10 @@ function createReviewApproval({schema='public',pool,assertWriteAllowed}={}){
     await beginBookingTransaction(c);await assertWriteAllowed(c);
     const row=(await c.query('SELECT * FROM '+reviews+' WHERE id=$1 FOR UPDATE',[input.reviewId])).rows[0];
     if(!row||row.status!==input.expectedStatus)throw Error('REVIEW_CHANGED_REFRESH');
-    const saved=await c.query('INSERT INTO '+grants+' (review_id,token_hash,agreed_time,max_hold_minutes,reason,staff_actor,customer_discussed,expires_at) '+
-     "VALUES($1,$2,$3,$4,$5,$6,true,clock_timestamp()+interval '30 minutes') RETURNING id,expires_at",
+    const saved=await c.query('INSERT INTO '+grants+' AS current_grant (review_id,token_hash,agreed_time,max_hold_minutes,reason,staff_actor,customer_discussed,expires_at) '+
+     "VALUES($1,$2,$3,$4,$5,$6,true,clock_timestamp()+interval '30 minutes') ON CONFLICT(review_id) DO UPDATE SET token_hash=excluded.token_hash,agreed_time=excluded.agreed_time,max_hold_minutes=excluded.max_hold_minutes,reason=excluded.reason,staff_actor=excluded.staff_actor,customer_discussed=true,created_at=clock_timestamp(),expires_at=excluded.expires_at,audit_history=current_grant.audit_history||jsonb_build_array(to_jsonb(current_grant)-'audit_history') WHERE current_grant.order_id IS NULL RETURNING id,expires_at",
      [row.id,digest,new Date(input.agreedTime).toISOString(),input.maxHoldMinutes,input.reason.trim(),input.staffActor.trim()]);
+    if(saved.rows.length!==1)throw Error('REVIEW_CHANGED_REFRESH');
     await c.query("UPDATE "+reviews+" SET status='approved',updated_at=clock_timestamp() WHERE id=$1",[row.id]);
     await c.query('COMMIT');return {success:true,token,approvalId:saved.rows[0].id,expiresAt:saved.rows[0].expires_at,
      reservesCapacity:false,message:'Customer must complete checkout. Capacity and price will be checked again.'};
