@@ -20,11 +20,6 @@
   ],
   "remainingGates": [
     {
-      "gate": "review notice contrast correction preview verification",
-      "status": "PREVIEW_DEPLOYMENT_PENDING",
-      "websiteCommit": "b605e13ef74506eb91730e29eaa261db94b4ef48"
-    },
-    {
       "gate": "production schema/configuration and guarded cutover",
       "status": "NOT_APPROVED",
       "details": "Review tables absent; production still Legacy4; fresh pre-service check and exact source-bound approval required."
@@ -51,6 +46,14 @@
       "status": "PASS_INVALID_TOKEN_REJECTION_AND_FRAGMENT_CLEARING",
       "websiteCommit": "8c550c70686cf03e31217048480afd93e1f64f50",
       "limits": "Invalid token exercised on already-loaded page. Existing valid-token checkout evidence is separate. Screenshot identified notice contrast issue; correction pending preview verification."
+    },
+    {
+      "gate": "review notice contrast correction preview verification",
+      "status": "PASS",
+      "websiteCommit": "b605e13ef74506eb91730e29eaa261db94b4ef48",
+      "background": "rgb(255, 255, 255)",
+      "textColor": "rgb(34, 34, 34)",
+      "evidence": "STAGING-REVIEW-RETURN-BROWSER-RESULT.json"
     }
   ]
 }

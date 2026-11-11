@@ -9,7 +9,7 @@
   "productionAuthorized": false,
   "productionCertificateStatus": "DRAFT",
   "productionCertificateChecks": "ALL_PENDING",
-  "websitePreviewCommit": "8c550c70686cf03e31217048480afd93e1f64f50",
+  "websitePreviewCommit": "b605e13ef74506eb91730e29eaa261db94b4ef48",
   "backendStagingCommit": "bc6bb47aaf68c6c9734ebf15c5713d70f87ebcba",
   "regression": {
     "coreUTC": 315,
@@ -242,7 +242,7 @@
   "priorCertificate": "master-wok-release-candidate.json is historical; its check statuses do not certify this release.",
   "rollbackGuardSha256": "79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af",
   "rollbackGuardRehearsal": "PASS_TEN_CASES_TEMP_COPY",
-  "previewBrowser": "ACCESS_SESSION_EXPIRED",
+  "previewBrowser": "PASS_REVIEW_RETURN_AND_READABLE_NOTICE",
   "productionMode": "LEGACY",
   "productionRevision": 4,
   "productionFutureActiveOrders": 0,
