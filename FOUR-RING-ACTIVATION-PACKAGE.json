@@ -1,0 +1,58 @@
+{
+  "status": "READY_FOR_OWNER_REVIEW_NOT_AUTHORIZED",
+  "date": "2026-11-11",
+  "releaseId": "master-wok-four-ring-2026-11-10",
+  "sourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+  "certificate": "master-wok-release-candidate.four-ring.production.json",
+  "evidence": "FOUR-RING-CERTIFICATION-EVIDENCE.json",
+  "expectedControl": {
+    "mode": "LEGACY",
+    "revision": 4
+  },
+  "targets": {
+    "supabaseProject": "ubyjrrsvbbqomitpaidb",
+    "function": "master-wok-booking",
+    "websiteCommit": "d5b20f7eb29a76de68299ecad1a96a2272cc1586",
+    "websiteDeployment": "204d4883-5492-4573-b4fa-ecae79108114",
+    "backendCommit": "fee04f72163af9aff8b63143749c52fcfa3911e8",
+    "backendDeployment": "484502cd-d675-4952-af8e-f5032e952093"
+  },
+  "sequence": [
+    "Deploy the exact certified production bundle and matching MASTER_WOK_RELEASE_ID server configuration; durable control stays Legacy4. Preserve distinct booking/notification secrets and existing worker.",
+    "Configure production review staff Access domain, production Admin application AUD, explicit staff email allowlist and the same private review-admin secret on Cloudflare/backend; never reuse the Preview app audience for production Admin. Keep gates disabled until verified.",
+    "Check authenticated runtime mode returns Legacy; invalid authentication rejected; checkout in Legacy refuses without committing; installed tables/privileges remain correct. Verify actual source digest/configuration, no fixture authorization in production.",
+    "Immediately before cutover, run deployment/four-ring-cutover-2026-11-11.sql under the common lock. Refuse at/after16:30 UK, changed revision, live commitments, or changed historical-link scope. Retire only listed13 tokens; preserve order history. Expected result MASTER_WOK revision5.",
+    "Switch Railway gateway MASTER_WOK_BOOKING_MODE to MASTER_WOK and enable review/approval gates in runtime, backend and Cloudflare. Observe terminal deployment success and any Brevo changed-IP authorization. If deployment/configuration verification fails, keep ordering paused and restore compatible Legacy under the guard before reopening.",
+    "Verify live mode, actual-basket hints, signed Admin review access and controlled first customer checkout/lifecycle. Record resulting identities/receipts; real notification receipt needs an explicitly bounded test or a genuine customer order."
+  ],
+  "abortConditions": [
+    "Any unexpected source/configuration/table state",
+    "Any current/future commitments requiring migration",
+    "Pre-service window missed",
+    "Staff Access assertion/AUD/allowlist not verified",
+    "Runtime authentication or disabled-writer verification fails",
+    "Deployment or provider access fails"
+  ],
+  "rollback": {
+    "procedure": [
+      "Pause new orders while MASTER_WOK still handles existing lifecycle.",
+      "Resolve uncertain submissions by original keys; finalize/cancel existing Master Wok orders.",
+      "Wait retained driver trips and extended-hold work to elapse.",
+      "Use common writer lock, current revision and sql/delivery-rollback-guard.sql; switch to Legacy only if complete guard passes.",
+      "Restore compatible gateway routing and keep current compatible website/backend; preserve orders, receipts, plans, notification ledger and private tables."
+    ],
+    "guardSha256": "79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af",
+    "limitation": "No instant full Legacy restore while live commitments remain."
+  },
+  "approvalRequiredFor": [
+    "Production Edge replacement and server configuration",
+    "Production review gates and staff-access configuration",
+    "Exact guarded Legacy4 to MasterWok5 cutover and13 historical-token retirement"
+  ],
+  "notAuthorizedByThisFile": [
+    "Any production change before owner approval",
+    "No new chef/dashboard workflow",
+    "No destructive schema rollback or provider security weakening"
+  ],
+  "cutoverSha256": "093d26a2835ff27a8a7972c2c88eb9f1f0fac082ccdc159acbb7cf7ea5a260a2"
+}

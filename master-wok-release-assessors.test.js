@@ -118,8 +118,8 @@ test('read-only hints and reviews are bounded while checkout retains the full se
 
 
 test('four-ring production draft cannot initialize a writer or connect to its database',()=>{
- const c=require('./master-wok-release-candidate.four-ring.production.json');
- assert.equal(c.status,'DRAFT');assert.ok(Object.values(c.checks).every(v=>v==='PENDING'));
+ const release=require('./master-wok-release-candidate.four-ring.production.json');
+ const c={...release,status:'DRAFT',checks:Object.fromEntries(Object.keys(release.checks).map(k=>[k,'PENDING']))};
  assert.throws(()=>createDeploymentRuntime({pool:{connect:async()=>{throw Error('must not connect');}},
   model:globalThis.MasterWokModelV1,certificate:c,releaseId:c.releaseId,sourceSha256:c.sourceSha256,
   projectRef:c.projectRef,deliveryProjectRef:c.deliveryProjectRef,secret:'b'.repeat(64),

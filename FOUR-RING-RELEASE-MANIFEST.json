@@ -1,5 +1,5 @@
 {
-  "status": "PREPARED_NOT_CERTIFIED",
+  "status": "SOURCE_CERTIFIED_AWAITING_PRODUCTION_ACCEPTANCE",
   "preparedDate": "2026-11-11",
   "releaseId": "master-wok-four-ring-2026-11-10",
   "runtimeSourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
@@ -7,8 +7,8 @@
   "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
   "stagingEdgeVersion": 58,
   "productionAuthorized": false,
-  "productionCertificateStatus": "DRAFT",
-  "productionCertificateChecks": "ALL_PENDING",
+  "productionCertificateStatus": "CERTIFIED_FOR_PRODUCTION",
+  "productionCertificateChecks": "PASS_WITH_EXPLICIT_EVIDENCE_QUALIFICATIONS",
   "websitePreviewCommit": "b605e13ef74506eb91730e29eaa261db94b4ef48",
   "backendStagingCommit": "bc6bb47aaf68c6c9734ebf15c5713d70f87ebcba",
   "regression": {
@@ -140,7 +140,7 @@
     },
     {
       "path": "master-wok-release-candidate.four-ring.production.json",
-      "sha256": "77b6fe00d483b34afb1665aa8cda017ae15027358ea19da7c1d803c129b3fb8e"
+      "sha256": "ed74c04a5ad324fd44199a896b08486887e8f855196ef9213cfd57effce42ead"
     },
     {
       "path": "master-wok-release-candidate.staging.json",
@@ -246,6 +246,7 @@
   "productionMode": "LEGACY",
   "productionRevision": 4,
   "productionFutureActiveOrders": 0,
-  "productionReviewTablesInstalled": false,
-  "rollbackGuardEvidence": "STAGING-EXPANDED-ROLLBACK-GUARD-RESULT.json"
+  "productionReviewTablesInstalled": true,
+  "rollbackGuardEvidence": "STAGING-EXPANDED-ROLLBACK-GUARD-RESULT.json",
+  "activationPackage": "FOUR-RING-ACTIVATION-PACKAGE.json"
 }
