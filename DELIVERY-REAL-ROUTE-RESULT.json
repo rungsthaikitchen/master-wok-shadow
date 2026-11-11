@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "scope": "REAL_READ_ONLY_EXISTING_ROUTE_EDGE",
+  "publicLocation": "Morley Town Hall",
+  "outbound": {
+    "ok": true,
+    "routeMiles": 1.4509017338741748,
+    "distanceMeters": 2335,
+    "duration": "371s"
+  },
+  "return": {
+    "ok": true,
+    "routeMiles": 1.382550902728068,
+    "distanceMeters": 2225,
+    "duration": "381s"
+  },
+  "productionWrites": 0,
+  "providerSends": 0,
+  "durationParser": "PASS: 371s outward and 381s return"
+}

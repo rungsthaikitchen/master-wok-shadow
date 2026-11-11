@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "scope": "HOSTED_STAGING_RUNTIME_WITH_REAL_ROUTES",
+  "fixtureSchema": "master_wok_delivery_68cbb424b397e3ac",
+  "deliveryFeesGBP": [
+    2,
+    0
+  ],
+  "driverTrips": 2,
+  "successfulGeocodeCalls": 4,
+  "successfulRouteCalls": 4,
+  "rollbackBlockedWithTrips": true,
+  "modeAfter": "LEGACY",
+  "providerSends": 0,
+  "productionWrites": 0,
+  "closure": {
+    "function": "master-wok-delivery-hosted-rehearsal",
+    "version": 4,
+    "jwtRequired": true,
+    "handler": "inert HTTP410"
+  },
+  "remaining": "Browser through hosted checkout and Admin, including gateway routing rollback"
+}

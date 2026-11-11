@@ -1,0 +1,74 @@
+{
+  "mode": {
+    "mode": "MASTER_WOK",
+    "revision": 41
+  },
+  "plans": [
+    {
+      "date": "2026-12-02",
+      "revision": 3,
+      "doorFoodAgeMax": 54,
+      "exceptionLimits": [
+        60
+      ],
+      "ordinaryMaxHold": 0
+    },
+    {
+      "date": "2026-12-03",
+      "revision": 1,
+      "doorFoodAgeMax": null,
+      "exceptionLimits": [
+        50
+      ],
+      "ordinaryMaxHold": null
+    },
+    {
+      "date": "2026-12-04",
+      "revision": 1,
+      "doorFoodAgeMax": null,
+      "exceptionLimits": [
+        50
+      ],
+      "ordinaryMaxHold": null
+    }
+  ],
+  "orders": [
+    {
+      "id": "308bf891-b017-4fa9-b5a0-0aa8afb6d44f",
+      "qty": 11,
+      "ref": "RTK-192",
+      "total": 110,
+      "grants": 1,
+      "status": "confirmed",
+      "receipts": 1
+    },
+    {
+      "id": "1b538aa7-9cd9-4cfc-a4f3-8bf1b43f4d52",
+      "qty": 1,
+      "ref": "RTK-193",
+      "total": 9,
+      "grants": 0,
+      "status": "pending",
+      "receipts": 1
+    },
+    {
+      "id": "132e7196-437f-449b-8058-35d574d60706",
+      "qty": 11,
+      "ref": "RTK-194",
+      "total": 110,
+      "grants": 1,
+      "status": "pending",
+      "receipts": 1
+    },
+    {
+      "id": "2a1b2fad-658e-479e-ad69-10ff5465ce45",
+      "qty": 11,
+      "ref": "RTK-195",
+      "total": 110,
+      "grants": 1,
+      "status": "pending",
+      "receipts": 1
+    }
+  ],
+  "providerAttempts": 0
+}

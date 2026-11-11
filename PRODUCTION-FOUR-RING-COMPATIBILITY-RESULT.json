@@ -1,0 +1,37 @@
+{
+  "status": "PASS_COMPATIBILITY_DEPLOYMENT_ONLY",
+  "approvedByOwner": true,
+  "date": "2026-11-10",
+  "mode": "LEGACY",
+  "website": {
+    "commit": "a2ed2e497a1fa4dd055fd5f8f9f25fe663b1ccb7",
+    "deployment": "f6ecba02-dc9d-410b-ac7a-1da6ccb99462",
+    "status": "SUCCESS",
+    "priorSource": "58dfff3c47de1cdf8d46dfbf1b36d21df2a5f939"
+  },
+  "backend": {
+    "commit": "b556574e230edd6d268248975f05c8e60aec19f9",
+    "deployment": "bee8d14f-2841-478d-8cd0-70fde15fdbad",
+    "status": "SUCCESS",
+    "priorDeployment": "ec1d576d-e7d0-4c68-ab0e-1303ed03317c"
+  },
+  "checks": {
+    "liveBookingMode": "LEGACY",
+    "adminRead": "PASS_SERVICE_CONTROL_AND_ORDER_DATA",
+    "sausagePeanutWarning": "PRESERVED",
+    "hiddenPorkSalad": "PRESERVED",
+    "emailPreflight": "AUTHORIZED",
+    "messageSends": 0,
+    "notificationWorkerDeployment": "f9ec0920-dd4c-41cd-b4f6-35f1517fcb5c",
+    "notificationWorkerUnchanged": true
+  },
+  "productionDatabaseMutations": 0,
+  "productionEdgeChanged": false,
+  "basketEnquiriesEnabled": false,
+  "engineActivationApproved": false,
+  "limits": [
+    "No customer order submitted during this production deployment check.",
+    "Full Master Wok activation still requires source-bound certification and guarded cutover approval.",
+    "Recorded deployment baselines have not been exercised by a new production rollback."
+  ]
+}

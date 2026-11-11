@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-05",
+  "status": "PASS",
+  "scope": "HOSTED_PREVIEW_DELIVERY_CHECKOUT_ADMIN_TRIP_AND_GATEWAY_ROLLBACK",
+  "preview": "https://6eb640c7.rungsthaikitchen.pages.dev",
+  "websiteCommit": "249958c",
+  "stagingSchema": "master_wok_delivery_ad8602f9f87c7822",
+  "browser": {
+    "modeBefore": "MASTER_WOK",
+    "receipt": "RTK-001",
+    "serviceDate": "2026-11-06",
+    "deliveryFeeGBP": 2,
+    "totalGBP": 7.5,
+    "foodReady": "18:21",
+    "depart": "18:23",
+    "arrival": "18:30",
+    "return": "18:39",
+    "modeAfter": "LEGACY"
+  },
+  "stagingGateway": {
+    "activeDeployment": "f4543496-3c19-4902-868f-125dee2be42a",
+    "rollbackDeployment": "2b1856d7-f9c3-402c-b4c8-51b0301c691f"
+  },
+  "cleanup": {
+    "testOrders": 1,
+    "receipts": 1,
+    "providerDeliveries": 0,
+    "databaseMode": "LEGACY",
+    "databaseRevision": 3,
+    "edgeVersion": 25,
+    "edgeJwtRequired": true,
+    "edgeHandler": "inert HTTP410"
+  },
+  "limitations": [
+    "Single delivery in the hosted browser. Combination and split were tested separately in isolated staging and intercepted browser tests.",
+    "Fixture released through the staging Admin API. Database drain and rollback guard executed in one transaction.",
+    "No production writes."
+  ]
+}

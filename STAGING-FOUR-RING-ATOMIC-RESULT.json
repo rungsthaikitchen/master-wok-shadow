@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "scope": "HOSTED_PRIVATE_FOUR_RING_ATOMIC_CHECKOUT",
+  "checks": [
+    "SAME_KEY_TWO_CONNECTIONS_ONE_ORDER_AND_PLAN",
+    "CHANGED_RETRY_REJECTED",
+    "DISTINCT_KEY_TWO_CONNECTIONS_REASSESS_LOCKED_FOUR_RING_CAPACITY",
+    "PLAN_SAVE_FAILURE_ROLLS_BACK_HEADER_ITEMS_RECEIPT_AND_EVENT"
+  ],
+  "raceStatuses": [
+    "UNVERIFIED",
+    "GREEN"
+  ],
+  "productionWrites": 0,
+  "realNotificationsSent": 0,
+  "productionReady": false,
+  "testedDeploymentVersion": 3,
+  "disabledDeploymentVersion": 4,
+  "testedBundleSha256": "10acc8a954e6a2065c3b95ded317c32fb8009be837deede3ec26d03c3c045ff8",
+  "cleanupVerified": {
+    "testOrders": 0,
+    "testReceipts": 0,
+    "testPlans": 0,
+    "totalStagingOrders": 60,
+    "totalStagingOutbox": 81
+  },
+  "limitations": [
+    "Fixed synthetic collection baskets only",
+    "Does not certify whole-service, delivery or customer checkout flows",
+    "Does not change production launch approval"
+  ]
+}

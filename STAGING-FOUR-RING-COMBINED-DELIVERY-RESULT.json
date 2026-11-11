@@ -1,0 +1,55 @@
+{
+  "scope": "ISOLATED_FOUR_RING_COMBINED_DELIVERY_ADMIN",
+  "date": "2026-11-10",
+  "schema": "master_wok_delivery_c95e08436a4744c6",
+  "checks": {
+    "recommendation": true,
+    "nonCommittingPreview": true,
+    "staffConfirmation": true,
+    "staleRevisionRejected": true,
+    "laterBookingPreservesCombination": true,
+    "splitRestoresSeparateTrips": true,
+    "worstFoodAgeReporting": true
+  },
+  "savedMinutes": 14,
+  "foodAgeMinutes": 15,
+  "finalPlanRevision": 6,
+  "auditDecisions": [
+    {
+      "at": "2026-11-09T08:24:14.152Z",
+      "action": "combine_deliveries",
+      "source": "admin",
+      "orderIds": [
+        "62049f48-41f7-419f-80a3-ce401cff53b6",
+        "2265ec3d-bdd1-4cf7-8c84-a204f4898510"
+      ],
+      "priorRevision": 2
+    },
+    {
+      "at": "2026-11-09T08:26:18.588Z",
+      "action": "split_delivery_trip",
+      "source": "admin",
+      "orderIds": [
+        "62049f48-41f7-419f-80a3-ce401cff53b6"
+      ],
+      "priorRevision": 4
+    },
+    {
+      "at": "2026-11-10T06:02:15.557Z",
+      "action": "combine_deliveries",
+      "source": "admin",
+      "orderIds": [
+        "62049f48-41f7-419f-80a3-ce401cff53b6",
+        "2265ec3d-bdd1-4cf7-8c84-a204f4898510"
+      ],
+      "priorRevision": 5
+    }
+  ],
+  "coreTests": 304,
+  "mainRuntimeVersion": 50,
+  "mainRuntimeSourceSha256": "7a39b0c10314897ef539587dc9ef3e92d0537bdd634e55c5dad15997c75f2532",
+  "probeDisabledVersion": 25,
+  "productionMutations": 0,
+  "browserAdminVerified": false,
+  "productionReleaseCertified": false
+}

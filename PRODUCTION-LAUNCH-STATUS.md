@@ -1,3 +1,48 @@
+# Current relaunch status — 11 November 2026
+
+Production remains LEGACY revision4. No production schema, runtime, checkout or notification change was made during these checks. Current private candidate: Edge58, source56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d.
+
+New staged review-delivery and concurrency checks pass (25 HTTP checks plus database reconciliation). The current-source whole-service replay also passes (27 checks, thirteen actual bookings including the opening test, thirteen receipts). Ordinary work remains within the usual holding limits; exceptions are explicit per reviewed order. Zero real notification attempts.
+
+Remaining gates: expanded TEMP-copy rollback preservation rehearsal; refreshed preview sign-in for the final same-page return check; final source/evidence reconciliation and production schema/configuration approval. The SQL tool's confirmation expired for the expanded rehearsal. The prepared staging script uses TEMP copies only and ends ROLLBACK. Do not claim full certification or activate production from component results.
+
+See FOUR-RING-RELEASE-CHECKLIST.md and FOUR-RING-RELEASE-MANIFEST.json for exact evidence and current artifacts. Rollback now additionally fences extended-hold work and unfinalized Master Wok orders. Pause first while Master Wok lifecycle is still enabled, finish commitments, then DRAINING for the final guarded switch.
+
+## Historical progress (retained for context)
+
+# Four-ring relaunch status — 10 November 2026
+
+**NO-GO for production reactivation. Production remains on Legacy following the
+6 November large-basket incident. The production activation record below is
+historical and does not approve this replacement.**
+
+Private staging Edge v56 is bound to source digest
+`f4dd2190e9037c0f1e1cb66d24c97d0af3fcd9610a385ac89358d8cbb25ae8e2`.
+The actual £50 and £100 delivery baskets passed Cloudflare preview checkout,
+Admin acceptance and door-arrival trip display. RTK-186 customer acceptance/replay
+and RTK-187 confirmed 19:30 are verified with one booking receipt each.
+Four-ring staging supports two large woks, two small woks, five pans, four rings,
+one main portion per vessel, and the agreed maximum 20-minute finished-food age.
+
+310 core tests in UTC/UK time and 36 website tests pass. Occupied-service full-day availability
+returned 49 hints in 10.77 seconds, preserving unavailable times around the first
+trip. All four agreed £150 examples now complete hosted whole-day lookups without a
+CPU crash. Mixed and starter/curry examples also committed as RTK-188/189, £150
+each, with exact-key replay and one booking receipt each. Stir-fry/noodle examples
+remain unverified and require the enquiry route.
+
+The tested physical model now has a prepared production bootstrap, guarded by a
+DRAFT certificate with all checks PENDING. Full source-bound certification and a
+specific controlled cutover approval are still required. Do not relabel the old
+single-wok DRAFT certificate or inherit its PASS flags for the new runtime.
+Notification provider/rollback evidence must be reconciled against the final
+artifact; no new real provider send is authorized by this status note.
+
+Current detailed evidence and limits: `FOUR-RING-RELEASE-CHECKLIST.md`,
+`BASKET-REVIEW-STAGING.md`, and `STAGING-FOUR-RING-BROWSER-DELIVERY-RESULT.json`.
+
+## Historical launch record
+
 # Production activated — 4 November 2026
 
 **LIVE at 08:51:36 GMT; MASTER_WOK revision 2. First hosted production booking and customer time acknowledgement verified.**
@@ -247,3 +292,6 @@ the isolated SMS provider/handset check, not full deployed outbox worker validat
 Backend tests: 29. See STAGING-SMS-PROBE-RESULT.json. Full runtime composition,
 whole-service/delivery and worker rehearsal, access boundaries and full rollback
 remain release gates; no production cutover approval is requested.
+
+
+11 November owner result: expanded guard rehearsal PASS, all ten cases, exact guard digest79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af. Unsafe delivery/hold/lifecycle switches and stale revision refused; safe TEMP restore preserved records. Live staging remained MASTER_WOK41, permanentMutations0. The earlier pending SQL rehearsal note is superseded by STAGING-EXPANDED-ROLLBACK-GUARD-RESULT.json. Final preview sign-in/browser return check and separately approved production rollout remain.

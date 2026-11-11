@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-11",
+  "status": "PASS_DISABLED_PRODUCTION_INSTALLATION",
+  "approval": {
+    "packageCommit": "832436bff05c13d9a006416a4e5f66529277b590",
+    "scope": "Disabled production installation only"
+  },
+  "production": {
+    "mode": "LEGACY",
+    "revision": 4,
+    "reviewsEnabled": false,
+    "approvalsEnabled": false
+  },
+  "database": {
+    "status": "PASS",
+    "tables": [
+      "master_wok_basket_reviews",
+      "master_wok_review_approvals"
+    ],
+    "rlsEnabled": true,
+    "deniedRoles": [
+      "anon",
+      "authenticated",
+      "service_role"
+    ],
+    "reviews": 0,
+    "approvals": 0,
+    "ordersModified": 0,
+    "launchControlModified": false
+  },
+  "website": {
+    "status": "SUCCESS",
+    "mergeCommit": "d5b20f7eb29a76de68299ecad1a96a2272cc1586",
+    "cloudflareDeployment": "204d4883-5492-4573-b4fa-ecae79108114",
+    "reviewCapabilities": {
+      "enabled": false,
+      "approvalsEnabled": false
+    },
+    "bookingMode": "LEGACY",
+    "browser": {
+      "status": "PASS_SMOKE_NO_SUBMISSION",
+      "basket": "1 chicken green curry, £9",
+      "collectionDate": "2026-11-13",
+      "selectedTime": "18:00",
+      "availableTimeRange": "17:00–21:00 at five-minute intervals",
+      "screenshot": "staging-tests/evidence/production-disabled-install-checkout.png"
+    }
+  },
+  "backend": {
+    "status": "SUCCESS",
+    "mergeCommit": "fee04f72163af9aff8b63143749c52fcfa3911e8",
+    "deployment": "484502cd-d675-4952-af8e-f5032e952093",
+    "reason": "Brevo read-only startup access check authorized; terminal Railway SUCCESS observed",
+    "blockedIp": "54.67.22.28",
+    "messageSends": 0,
+    "previousDeployment": "bee8d14f-2841-478d-8cd0-70fde15fdbad",
+    "liveHealthHTTP": 200,
+    "reviewFlagNamesAbsent": true,
+    "brevoAccess": "AUTHORIZED",
+    "authorizationObservedAt": "2026-11-11T08:14:16Z",
+    "successObservedAt": "2026-11-11T08:14:32Z"
+  },
+  "notificationWorker": {
+    "deployment": "f9ec0920-dd4c-41cd-b4f6-35f1517fcb5c",
+    "status": "SUCCESS_UNCHANGED"
+  },
+  "remaining": [
+    "Reconcile production runtime certificate and prepare guarded pre-service cutover; activation and review enablement remain unauthorized"
+  ]
+}

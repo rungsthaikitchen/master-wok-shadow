@@ -1,0 +1,77 @@
+{
+  "scope": "PRIVATE_HOSTED_ATOMIC_150_CHECKOUT_AND_REPLAY",
+  "sourceSha256": "a1230b05e03b5cdef91e923fb4c1c1feeef307eea1bc687cbebd012e5b9ace15",
+  "edgeVersion": 55,
+  "results": [
+    {
+      "basket": "mixed",
+      "status": 200,
+      "seconds": 6.45,
+      "body": {
+        "orderId": "3899276e-bd90-4c3a-8e06-89df9a94501c",
+        "serviceDate": "2026-11-28",
+        "status": "pending",
+        "orderRef": "RTK-188",
+        "customerId": "bb53a6c2-d4c3-4135-8460-87ddb5af7d9d",
+        "totals": {
+          "subtotal": 150,
+          "discount": 0,
+          "discount_amount": 0,
+          "delivery_fee": 0,
+          "total": 150,
+          "loyalty_discount": 0,
+          "loyalty_points_redeem_pending": 0,
+          "loyalty_points_earned_pending": 150,
+          "loyalty_reward_applied": false,
+          "loyalty_expected_balance": 150
+        },
+        "notification_status": "queued",
+        "success": true,
+        "committed": true,
+        "replayed": false
+      },
+      "replay": {
+        "status": 200,
+        "orderId": "3899276e-bd90-4c3a-8e06-89df9a94501c",
+        "committed": false,
+        "replayed": true
+      }
+    },
+    {
+      "basket": "startersAndCurries",
+      "status": 200,
+      "seconds": 6.66,
+      "body": {
+        "orderId": "a622d552-9c84-49ae-9243-85815fe51268",
+        "serviceDate": "2026-11-28",
+        "status": "pending",
+        "orderRef": "RTK-189",
+        "customerId": "2f6e486c-351f-44dd-9181-1714dbbfea90",
+        "totals": {
+          "subtotal": 150,
+          "discount": 0,
+          "discount_amount": 0,
+          "delivery_fee": 0,
+          "total": 150,
+          "loyalty_discount": 0,
+          "loyalty_points_redeem_pending": 0,
+          "loyalty_points_earned_pending": 150,
+          "loyalty_reward_applied": false,
+          "loyalty_expected_balance": 150
+        },
+        "notification_status": "queued",
+        "success": true,
+        "committed": true,
+        "replayed": false
+      },
+      "replay": {
+        "status": 200,
+        "orderId": "a622d552-9c84-49ae-9243-85815fe51268",
+        "committed": false,
+        "replayed": true
+      }
+    }
+  ],
+  "realProviderSends": 0,
+  "productionMutations": 0
+}

@@ -1,0 +1,252 @@
+{
+  "status": "SOURCE_CERTIFIED_AWAITING_PRODUCTION_ACCEPTANCE",
+  "preparedDate": "2026-11-11",
+  "releaseId": "master-wok-four-ring-2026-11-10",
+  "runtimeSourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+  "modelVersion": "combined-kitchen-four-ring-staging-v1",
+  "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
+  "stagingEdgeVersion": 58,
+  "productionAuthorized": false,
+  "productionCertificateStatus": "CERTIFIED_FOR_PRODUCTION",
+  "productionCertificateChecks": "PASS_WITH_EXPLICIT_EVIDENCE_QUALIFICATIONS",
+  "websitePreviewCommit": "b605e13ef74506eb91730e29eaa261db94b4ef48",
+  "backendStagingCommit": "bc6bb47aaf68c6c9734ebf15c5713d70f87ebcba",
+  "regression": {
+    "coreUTC": 315,
+    "coreEuropeLondon": 315,
+    "website": 39,
+    "backendFocused": 39
+  },
+  "files": [
+    {
+      "path": "checkout-catalog.json",
+      "sha256": "cffbcdb2f7f98489537cda9b3a859aebbae486465ece699103543c588f51caa0"
+    },
+    {
+      "path": "deployment/booking-edge.js",
+      "sha256": "cd5188245ae2fe9405ff782061634751d1c2a7fd954771e264f18cadc19d56f6"
+    },
+    {
+      "path": "master-wok-atomic-checkout.js",
+      "sha256": "49726bb09ed25a805a27ea453d5ccec85b24ad8c3ff31188e39a8134c8190cf9"
+    },
+    {
+      "path": "master-wok-auxiliary-work.js",
+      "sha256": "ad4d60de4b91900d0c55028aa9b21c200a9dffaba7cee416111bb6e3d80439ee"
+    },
+    {
+      "path": "master-wok-availability-reader.js",
+      "sha256": "40b70e421aeed1b691121e9c79aaa1da9f07c26bc3f92ad9338be26bfeb46a47"
+    },
+    {
+      "path": "master-wok-availability.js",
+      "sha256": "335db8881ecc8c5e4af682dd2f46ff3b339ab3e29c020dd0877fd4d19a4e0b77"
+    },
+    {
+      "path": "master-wok-basket-review.js",
+      "sha256": "961637cbe19557195726ef65f9215b963b301216404240fb73ea40d13bc58371"
+    },
+    {
+      "path": "master-wok-clock.js",
+      "sha256": "a2d7f581b55e1d452a62139170ba35994ee936fccd1ab3014370d40e67b934c3"
+    },
+    {
+      "path": "master-wok-combined-assessment.js",
+      "sha256": "7052e976e1c8fbab3e1b78341abcb2d1e10458f3636ca22651fb37e15f8f346d"
+    },
+    {
+      "path": "master-wok-commercial-validator.js",
+      "sha256": "b9fff3f5a506c9edceefddf41c8d5c26492500dd3256f4a135a9256655dc07a6"
+    },
+    {
+      "path": "master-wok-commercial.js",
+      "sha256": "ab3da99874f263d5cb99d6035d0b861ddd2f0763804d69db6f3eb191ff689426"
+    },
+    {
+      "path": "master-wok-commitment-reader.js",
+      "sha256": "975dd9b2b4b24fe19f77270219938ad7eac5111254170b82ad20f54d8d4b2bae"
+    },
+    {
+      "path": "master-wok-delivery-admin.js",
+      "sha256": "8c780af8ae4d1db9591336559bf5e1a4fb2c6c85878e6a771d4d2d84eea11adc"
+    },
+    {
+      "path": "master-wok-delivery-capacity.js",
+      "sha256": "6fb1a540de78fc3dc2c1d4f8427ef3ee69ab5d603209dbdc3539da00bf207a03"
+    },
+    {
+      "path": "master-wok-delivery-quote.js",
+      "sha256": "806d4361b67944a9a150a9eca92411fa9a7178634d5b867f8343d3b7dae3e048"
+    },
+    {
+      "path": "master-wok-deployment.js",
+      "sha256": "7c8a6bedc2df059629064efb1786f4bcfa87d4546f66860c06204afb3e1c3a5f"
+    },
+    {
+      "path": "master-wok-driver-plan.js",
+      "sha256": "81b3231b6be0244d055ad78bb9b519bc646958bb05da2708618fa32105b61579"
+    },
+    {
+      "path": "master-wok-hold-policy.js",
+      "sha256": "3e6fbc395d23c2aacbc1892f29d3514566f7aa61c76b151385da0734c5a624f8"
+    },
+    {
+      "path": "master-wok-http.js",
+      "sha256": "eae670e695b7b8aa68e19d9b7212608ac1bea0fdc67ebb11a0d12bb32e246f05"
+    },
+    {
+      "path": "master-wok-launch-control.js",
+      "sha256": "62b2faad056a825d41f74b50e8408d156499773e701bbf15c3d1d3fa97260725"
+    },
+    {
+      "path": "master-wok-lifecycle.js",
+      "sha256": "04fed7e4e92e47ba620fc7f3ba243179a03fe8871042442f6fbc0eee9588b6fd"
+    },
+    {
+      "path": "master-wok-loyalty-settlement.js",
+      "sha256": "f75f6039c5a4f251f9500edb559a63f8b72b5954726622f835e9f6b760c78f04"
+    },
+    {
+      "path": "master-wok-model-bundle.js",
+      "sha256": "9f32a3d206d514407ef418518d185bac83808666c09b856c3005ebcd1ac2642f"
+    },
+    {
+      "path": "master-wok-mutation-assessment.js",
+      "sha256": "b2109b19df5ab6a63da56ee7d86d1ad1459a782958fb132058e7aeb256ff5700"
+    },
+    {
+      "path": "master-wok-notification-dispatch.js",
+      "sha256": "d329b44bf78947e222fdbf3857f7243573d3d077bed7cf913530f4ca846fd402"
+    },
+    {
+      "path": "master-wok-notification-events.js",
+      "sha256": "e55737cab0a6584fba0f16c9fb327604c588b48b058c5a5ad10ffccc378a3fbd"
+    },
+    {
+      "path": "master-wok-order-store.js",
+      "sha256": "10bf23d8badb2878b245bed212948ed91994007dc579a7f4d6e46d4ffddfc02e"
+    },
+    {
+      "path": "master-wok-protected-plan.js",
+      "sha256": "671882ae88a43b1062043a02acc693ad154c0896b5370da5cb1250a39cc9ce1f"
+    },
+    {
+      "path": "master-wok-recipe-rules.js",
+      "sha256": "b184f85bc5f941e2bca6770f957fe4dbf49dab3fbe5056e22bdc2b915b499e0a"
+    },
+    {
+      "path": "master-wok-release-assessors.js",
+      "sha256": "d9d07419f1d680a385ea1503225af7ec3dda10ac89a74b2f658f485b9fab30cc"
+    },
+    {
+      "path": "master-wok-release-candidate.four-ring.production.json",
+      "sha256": "ed74c04a5ad324fd44199a896b08486887e8f855196ef9213cfd57effce42ead"
+    },
+    {
+      "path": "master-wok-release-candidate.staging.json",
+      "sha256": "169d1bd5cee139ffe8580a0f86bef6766bd305d04f43d697b2a66c8dde6f9365"
+    },
+    {
+      "path": "master-wok-review-approval.js",
+      "sha256": "82b13c5ca8f6814799c9c0fda5683e5708fbd1e7e1594a44735ade870fd133ab"
+    },
+    {
+      "path": "master-wok-route-duration.js",
+      "sha256": "8cfff9e3a619c7ba5e582515aa664ed21b2127a59524b8c69e06116dfe2481d7"
+    },
+    {
+      "path": "master-wok-runtime.js",
+      "sha256": "6b26a2eed00f0705367c056799f7b2e820a871070dcce4cf1cd951cb36d033cf"
+    },
+    {
+      "path": "master-wok-service-control.js",
+      "sha256": "d3573ba71e7fc69b3ad0d2bf9adbcc3e8ceeb3ce2419d3eea1cbfa7c84f65168"
+    },
+    {
+      "path": "master-wok-service-plan-store.js",
+      "sha256": "9e0fa54f4543302a21500ec674b237aebd86e1782aab2fea804e8141eedfac60"
+    },
+    {
+      "path": "master-wok-transaction-writer.js",
+      "sha256": "145abf4f56cf1c60b5bda191238d7a1ffb96222ccff8f71c5c66922236e01f01"
+    },
+    {
+      "path": "sql/basket-reviews.sql",
+      "sha256": "f812d689f49ed8ce2d9ab31a3574efdb45b262b736d23ff42bde2e11f5c2a8a3"
+    },
+    {
+      "path": "sql/booking-write-fence.sql",
+      "sha256": "b1d8859d6e34103077872843ba163bd6f6f09907410b9d9ec3c9c57c27b4cb12"
+    },
+    {
+      "path": "sql/delivery-rollback-guard.sql",
+      "sha256": "79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af"
+    },
+    {
+      "path": "sql/review-approvals.sql",
+      "sha256": "9c1fa8e6680660c49c8afb0791abdde7fe80ea022672b1c5cac59040d24a7e34"
+    },
+    {
+      "path": "staging-booking-integration.js",
+      "sha256": "77e569c6be446d48decccebbf6fb9bb5283839b4f6a41d736a07323d1f4e9b0c"
+    },
+    {
+      "path": "staging-booking-mode.js",
+      "sha256": "1af2256e4b6956d6637d96b7a3242f782465753493cbd35e8354593e590f736b"
+    },
+    {
+      "path": "staging-canonical-basket.js",
+      "sha256": "734d6202e6789ed0f756928b096aa66332c9a21d5e85403e8c2a38e900d8e96c"
+    },
+    {
+      "path": "staging-coordinated-kitchen.js",
+      "sha256": "5a59579101cbd3a750c392e90e6ad932994831182e81aa0e489767e3637c8f00"
+    },
+    {
+      "path": "staging-cross-order-scheduler.js",
+      "sha256": "26ad955b67cb6071a4b0dd835ea94b1b5445b29bfc409416b94a31ebaba33bc8"
+    },
+    {
+      "path": "staging-fryer-before-wok.js",
+      "sha256": "7f24af42bf9935d390509f3c24ec2a834d5a850a7739a6980c789c52ef368fff"
+    },
+    {
+      "path": "staging-fryer-diagnostic.js",
+      "sha256": "26e2542253720315be3545c48cacb0cd8f670b908aecce5075b1da7490db9879"
+    },
+    {
+      "path": "staging-kitchen-launch-validator.js",
+      "sha256": "0f12b3b38bc42d1fd1cca64008d94affe1482f3f680d57b86a1cb34d5a5de376"
+    },
+    {
+      "path": "staging-order-reader.js",
+      "sha256": "1ecc57fda351fd3d1a9fdec363b69412c4b09f6a222fab32a4b4dd35951ff3b3"
+    },
+    {
+      "path": "staging-order-snapshot.js",
+      "sha256": "058f159f09789c9e798f9e142153befbfb0b3a3eecf3c42bcbbd3c8836bb329d"
+    },
+    {
+      "path": "staging-out-of-scope-items.js",
+      "sha256": "1bbb5ac1174388bf7f42259fe3232883b538a6bedc1741a41ef19e42e956eabb"
+    },
+    {
+      "path": "staging-shared-ring-allocator.js",
+      "sha256": "43920b86ecfc14a256b73fac6a28b5427d0ebd29c9e1c14b8c12771959c517ee"
+    },
+    {
+      "path": "staging-tests/build-atomic-checkout-edge.cjs",
+      "sha256": "a81b7d446e6ffc97427768ea7b3826f5b65e2115faad21b8e1284abe888341db"
+    }
+  ],
+  "priorCertificate": "master-wok-release-candidate.json is historical; its check statuses do not certify this release.",
+  "rollbackGuardSha256": "79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af",
+  "rollbackGuardRehearsal": "PASS_TEN_CASES_TEMP_COPY",
+  "previewBrowser": "PASS_REVIEW_RETURN_AND_READABLE_NOTICE",
+  "productionMode": "LEGACY",
+  "productionRevision": 4,
+  "productionFutureActiveOrders": 0,
+  "productionReviewTablesInstalled": true,
+  "rollbackGuardEvidence": "STAGING-EXPANDED-ROLLBACK-GUARD-RESULT.json",
+  "activationPackage": "FOUR-RING-ACTIVATION-PACKAGE.json"
+}

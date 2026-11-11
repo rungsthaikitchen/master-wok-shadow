@@ -1,0 +1,65 @@
+{
+  "status": "PREPARED_AWAITING_OWNER_APPROVAL",
+  "date": "2026-11-11",
+  "scope": "INSTALL_REVIEW_COMPONENTS_WITH_LEGACY_AUTHORITATIVE",
+  "productionAuthorized": false,
+  "supabaseProject": "ubyjrrsvbbqomitpaidb",
+  "expectedControl": {
+    "mode": "LEGACY",
+    "revision": 4
+  },
+  "freshRead": {
+    "futureActiveOrders": 0,
+    "reviewTablesAbsent": true
+  },
+  "website": {
+    "repository": "rungsthaikitchen/Rungs-Thai-Kitchen",
+    "pullRequest": 69,
+    "commit": "b605e13ef74506eb91730e29eaa261db94b4ef48",
+    "target": "main",
+    "keepReviewsDisabled": true
+  },
+  "backend": {
+    "repository": "rungsthaikitchen/order-backend",
+    "pullRequest": 3,
+    "commit": "bc6bb47aaf68c6c9734ebf15c5713d70f87ebcba",
+    "target": "review/master-wok-booking-gateway-2026-11-01",
+    "keepReviewsDisabled": true
+  },
+  "databaseFiles": [
+    {
+      "path": "sql/basket-reviews.sql",
+      "sha256": "f812d689f49ed8ce2d9ab31a3574efdb45b262b736d23ff42bde2e11f5c2a8a3"
+    },
+    {
+      "path": "sql/review-approvals.sql",
+      "sha256": "9c1fa8e6680660c49c8afb0791abdde7fe80ea022672b1c5cac59040d24a7e34"
+    }
+  ],
+  "databaseExecution": "One transaction; verify Legacy revision4 under common kitchen writer advisory lock, tables absent, apply files in listed order, verify RLS and denied browser/service-role grants, commit only if all checks pass. No order or launch-control changes.",
+  "disabledSettings": [
+    "MASTER_WOK_BASKET_REVIEWS",
+    "MASTER_WOK_REVIEW_APPROVALS"
+  ],
+  "verification": [
+    "Website and backend deployment success and exact merge source recorded",
+    "Production mode remains Legacy4",
+    "Review capabilities disabled; normal checkout and Admin unchanged",
+    "New private tables RLS enabled, no public/anon/authenticated/service_role access"
+  ],
+  "rollback": {
+    "websiteCommit": "a2ed2e497a1fa4dd055fd5f8f9f25fe663b1ccb7",
+    "websiteDeployment": "f6ecba02-dc9d-410b-ac7a-1da6ccb99462",
+    "backendCommit": "b556574e230edd6d268248975f05c8e60aec19f9",
+    "backendDeployment": "bee8d14f-2841-478d-8cd0-70fde15fdbad",
+    "policy": "Restore compatible previous deployments, retain additive private tables; no data deletion."
+  },
+  "excluded": [
+    "Master Wok activation",
+    "new runtime deployment or certificate approval",
+    "review feature enablement",
+    "historical link retirement",
+    "notification worker deployment or real sends"
+  ],
+  "nextPhase": "Reconcile production certificate and guarded pre-service activation against installed production state; separate explicit approval."
+}

@@ -43,3 +43,4 @@ async function main() {
   }
 }
 main().catch(()=>{console.error('MASTER_WOK_OFFLINE_COMMAND_FAILED');process.exitCode=1;});
+

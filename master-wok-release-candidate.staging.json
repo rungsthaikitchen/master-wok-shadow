@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "status": "CANDIDATE_FOR_STAGING",
+  "releaseId": "master-wok-delivery-2026-11-04",
+  "projectRef": "hvrqgufqjslvgiohgkvu",
+  "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
+  "schema": "master_wok_rehearsal",
+  "modelVersion": "combined-kitchen-four-ring-staging-v1",
+  "sourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+  "checks": {
+    "atomicConcurrency": "PENDING",
+    "physicalCoverage": "PENDING",
+    "lifecycle": "PENDING",
+    "writeFence": "PENDING",
+    "commercial": "PENDING",
+    "delivery": "PENDING",
+    "notifications": "PENDING",
+    "wholeService": "PENDING",
+    "rollback": "PENDING",
+    "driverReservations": "PENDING",
+    "combinedTrips": "PENDING",
+    "deliveryCheckout": "PENDING",
+    "deliveryRollback": "PENDING"
+  },
+  "fixturePrefix": "release-nov6-delivery-",
+  "deliveryScheduling": 1,
+  "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1"
+}

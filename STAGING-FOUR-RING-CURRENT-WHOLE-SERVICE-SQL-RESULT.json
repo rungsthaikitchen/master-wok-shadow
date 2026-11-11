@@ -1,0 +1,12 @@
+{
+  "items": 37,
+  "orders": 13,
+  "receipts": 13,
+  "serviceMode": "normal",
+  "launchControl": {
+    "mode": "MASTER_WOK",
+    "revision": 41
+  },
+  "providerAttempts": 0,
+  "activeRehearsalBlackouts": 0
+}

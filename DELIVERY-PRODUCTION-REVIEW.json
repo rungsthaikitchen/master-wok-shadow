@@ -1,0 +1,42 @@
+{
+  "status": "REVIEW_REQUIRED",
+  "releaseId": "master-wok-delivery-2026-11-04",
+  "schedulerReviewedCommit": "bf4fe827d9c85e010618f73be482b4b8db339910",
+  "websiteReviewedCommit": "249958cf39edb452786067168dcf19cec445bb82",
+  "localRuntimeDigest": "3ff3ee4bea51d9ad06023ce7cc1e09aa81fdca589f846d2d9f0c0a23325d56e6",
+  "localSchedulerTestsPassed": 260,
+  "preflight": {
+    "observedLondonTime": "2026-11-05T10:44:43.305914",
+    "currentMode": "MASTER_WOK",
+    "currentRelease": "master-wok-launch-2026-11-03",
+    "currentRevision": 2,
+    "eligibleHistoricalLinks": 13,
+    "projectedCommitmentBlockersAfterRetirement": 0
+  },
+  "guardedCutover": {
+    "window": "Before 16:30 Europe/London on approved service day",
+    "transaction": [
+      "Acquire existing booking writer lock and verify release/revision",
+      "Retire exactly the 13 scoped historical legacy links",
+      "Recheck cutover commitments under lock",
+      "Switch release approval and advance revision atomically"
+    ],
+    "onFailure": "Roll back the whole transaction"
+  },
+  "rollback": {
+    "targetRelease": "master-wok-launch-2026-11-03",
+    "requirement": "Rehearse restoring the prior Master Wok runtime and compatible website together, with delivery trip and commitment guards. Staging LEGACY return is separate evidence."
+  },
+  "evidence": [
+    "DELIVERY-HOSTED-BROWSER-RESULT.json",
+    "DELIVERY-HOSTED-REAL-ROUTE-RESULT.json",
+    "DELIVERY-HISTORICAL-RECONCILIATION-RESULT.json",
+    "DELIVERY-STAGING-RESULT.json"
+  ],
+  "open": [
+    "Bind exact repository source and deployment bundle to completed release checks",
+    "Rehearse restoration to prior production Master Wok release",
+    "Obtain explicit production approval for exact builds and historical link retirement"
+  ],
+  "productionWrites": 0
+}

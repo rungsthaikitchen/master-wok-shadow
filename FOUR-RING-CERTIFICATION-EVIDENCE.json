@@ -1,0 +1,208 @@
+{
+  "date": "2026-11-11",
+  "runtimeSourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+  "scope": "SOURCE_BOUND_REVIEW_FOR_CONTROLLED_PRE_SERVICE_LAUNCH",
+  "productionActivationAuthorized": false,
+  "checks": {
+    "atomicConcurrency": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-REVIEW-DELIVERY-CONCURRENCY-RESULT.json",
+          "sha256": "d124cebeefea46a8e741e141c976db2a2692b36a59271ccca2c2dce8e90cac9e"
+        },
+        {
+          "path": "STAGING-REVIEW-DELIVERY-CONCURRENCY-SQL-RESULT.json",
+          "sha256": "103293fdbc1c159513dbfcf8d76fc22f58745911cecf365b216f176981c58d65"
+        }
+      ],
+      "qualification": "Current-source hosted evidence supplemented by recorded browser/component evidence; individual file versions retain their original scope."
+    },
+    "physicalCoverage": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-FOUR-RING-CURRENT-WHOLE-SERVICE-PHYSICAL-RESULT.json",
+          "sha256": "645c9efaba279d42a26fae5790a79b7d20301b92729ff9fcea0cacfbef6c7f85"
+        },
+        {
+          "path": "STAGING-FOUR-RING-LARGE-HOSTED-CHECKOUT-RESULT.json",
+          "sha256": "5675958cffb8c9ba90840e22b1ba4bc3697ac00f2d8afc87b86f39837031448f"
+        }
+      ],
+      "qualification": "Current-source hosted evidence supplemented by recorded browser/component evidence; individual file versions retain their original scope."
+    },
+    "lifecycle": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-FOUR-RING-CURRENT-WHOLE-SERVICE-RESULT.json",
+          "sha256": "67db68a0154b17a0191894ec5e965669442f5dbdae3dec36ebb03232e8cdcc69"
+        },
+        {
+          "path": "STAGING-REVIEW-AGREED-CHECKOUT-RESULT.json",
+          "sha256": "6656eaef3387d0c671feaf7c14bc301505f16ed8a93bef58c5465340d708aa8f"
+        }
+      ],
+      "qualification": "Current-source hosted evidence supplemented by recorded browser/component evidence; individual file versions retain their original scope."
+    },
+    "writeFence": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-WRITE-FENCE-RESULT.json",
+          "sha256": "e1ef45db8fde1b809b945097b41673fc71c2a364f6328cd3fd166dbe6f645b59"
+        },
+        {
+          "path": "sql/booking-write-fence.sql",
+          "sha256": "b1d8859d6e34103077872843ba163bd6f6f09907410b9d9ec3c9c57c27b4cb12"
+        }
+      ],
+      "qualification": "Fence SQL is unchanged from the hosted role/lock rehearsal; current whole-service checkout uses the same transaction boundary."
+    },
+    "commercial": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-REVIEW-DELIVERY-CONCURRENCY-RESULT.json",
+          "sha256": "d124cebeefea46a8e741e141c976db2a2692b36a59271ccca2c2dce8e90cac9e"
+        },
+        {
+          "path": "STAGING-ONE-PORTION-LOYALTY-RESULT.json",
+          "sha256": "a47f97fc50c335c3f5ef6a9f1cbfada4aa0c6341dfa48a8d137de271da663a5e"
+        }
+      ],
+      "qualification": "Current-source hosted evidence supplemented by recorded browser/component evidence; individual file versions retain their original scope."
+    },
+    "delivery": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-REVIEW-DELIVERY-CONCURRENCY-RESULT.json",
+          "sha256": "d124cebeefea46a8e741e141c976db2a2692b36a59271ccca2c2dce8e90cac9e"
+        },
+        {
+          "path": "STAGING-FOUR-RING-CURRENT-WHOLE-SERVICE-RESULT.json",
+          "sha256": "67db68a0154b17a0191894ec5e965669442f5dbdae3dec36ebb03232e8cdcc69"
+        }
+      ],
+      "qualification": "Current-source hosted evidence supplemented by recorded browser/component evidence; individual file versions retain their original scope."
+    },
+    "notifications": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "FOUR-RING-NOTIFICATION-CONTINUITY.json",
+          "sha256": "0f3a5a2de415cf2cc40ea303145abb3dc2bba8606177ac2810aafc51038e7f5f"
+        },
+        {
+          "path": "STAGING-NOTIFICATION-WORKER-RESULT.json",
+          "sha256": "1c58bf112113a07ac5d4b4f0f09f15931d5422ce89c8e2e2dd1da2dfa0eb2663"
+        }
+      ],
+      "qualification": "Unchanged worker/event/dispatcher source and prior owner-confirmed real receipts; no new real sends. Backend Brevo access authorized on 11 November. Worker remains unchanged."
+    },
+    "wholeService": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-FOUR-RING-CURRENT-WHOLE-SERVICE-RESULT.json",
+          "sha256": "67db68a0154b17a0191894ec5e965669442f5dbdae3dec36ebb03232e8cdcc69"
+        },
+        {
+          "path": "STAGING-FOUR-RING-CURRENT-WHOLE-SERVICE-SQL-RESULT.json",
+          "sha256": "0c90b388c162348da6b389fd6fc8a8743b721554a9f6ffade05cb50db2deeac6"
+        }
+      ],
+      "qualification": "Current-source hosted evidence supplemented by recorded browser/component evidence; individual file versions retain their original scope."
+    },
+    "rollback": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-EXPANDED-ROLLBACK-GUARD-RESULT.json",
+          "sha256": "c97128c3e7725e2f6d5fed3fd909e41cf529608014db3db8e42994c2139a1794"
+        },
+        {
+          "path": "STAGING-ROLLBACK-GATEWAY-RESULT.json",
+          "sha256": "0dfdc1024c18dff1e73704aa9e7d6fd3e0af2ea28785521d49918de4c5576308"
+        },
+        {
+          "path": "STAGING-WRITE-FENCE-RESULT.json",
+          "sha256": "e1ef45db8fde1b809b945097b41673fc71c2a364f6328cd3fd166dbe6f645b59"
+        }
+      ],
+      "qualification": "Controlled post-service restoration only. Expanded exact-source TEMP-copy refusal/preservation, earlier real gateway Legacy routing restoration, hosted database role restoration, and current compatible production Legacy checkout smoke form the evidence. No new Legacy order was submitted and no production rollback was performed."
+    },
+    "driverReservations": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-REVIEW-DELIVERY-CONCURRENCY-RESULT.json",
+          "sha256": "d124cebeefea46a8e741e141c976db2a2692b36a59271ccca2c2dce8e90cac9e"
+        },
+        {
+          "path": "STAGING-FOUR-RING-REAL-DELIVERY-RESULT.json",
+          "sha256": "ef8f468cd633da815165af2754a43cbf62a7ab1450594fb67544e6c4dd48abea"
+        }
+      ],
+      "qualification": "Current-source hosted evidence supplemented by recorded browser/component evidence; individual file versions retain their original scope."
+    },
+    "combinedTrips": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-FOUR-RING-COMBINED-DELIVERY-RESULT.json",
+          "sha256": "158786cb71a20a52d351266dfa292f5411edf5dee1e8d0d5df7ae69a6dc92da4"
+        },
+        {
+          "path": "master-wok-delivery-admin.test.js",
+          "sha256": "fd5c1796c0031ac07957c1304aae3516dfa47091b20026ef3a6a3c4c37f7a6d6"
+        }
+      ],
+      "qualification": "Hosted four-ring API combine/split and revision evidence is from v50; current local delivery-admin regressions cover the component. Not a new v58 browser combine test."
+    },
+    "deliveryCheckout": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-FOUR-RING-BROWSER-DELIVERY-RESULT.json",
+          "sha256": "c835c66bf69a03e984e14d33d7e62c54a29986dded00d3602c83f672543e4357"
+        },
+        {
+          "path": "STAGING-REVIEW-DELIVERY-CONCURRENCY-RESULT.json",
+          "sha256": "d124cebeefea46a8e741e141c976db2a2692b36a59271ccca2c2dce8e90cac9e"
+        }
+      ],
+      "qualification": "Current-source hosted evidence supplemented by recorded browser/component evidence; individual file versions retain their original scope."
+    },
+    "deliveryRollback": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-EXPANDED-ROLLBACK-GUARD-RESULT.json",
+          "sha256": "c97128c3e7725e2f6d5fed3fd909e41cf529608014db3db8e42994c2139a1794"
+        },
+        {
+          "path": "sql/delivery-rollback-guard.sql",
+          "sha256": "79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af"
+        }
+      ],
+      "qualification": "Exact-source ten-case TEMP-copy guard rehearsal; delivery/holding/lifecycle commitments block restoration. Not an instant mid-service fallback."
+    }
+  },
+  "operatingLimits": [
+    "No running-service cutover; guard requires pre-16:30 Europe/London and no current/future commitments.",
+    "Pause new orders in MASTER_WOK, finalize existing orders and retained work, then guarded DRAINING/Legacy restoration.",
+    "Normal holding preferred10/max20; larger per-order exception only after recorded staff/customer discussion and acknowledgement.",
+    "Bounded unavailable search is unverified; customer enquiry/call route remains available.",
+    "No new chef interactions."
+  ],
+  "remainingProductionAcceptance": [
+    "Deploy exact certified bundle with matching server-only release configuration while durable mode remains LEGACY.",
+    "Verify signed production Admin Access audience/allowlist and shared private review secret before enabling reviews.",
+    "Read back production runtime configuration; verify mode/authentication and disabled-writer refusal before switching.",
+    "Re-run locked cutover preflight and retire only the thirteen approved historical links.",
+    "Verify production mode, availability, Admin and controlled checkout/lifecycle after explicitly approved activation."
+  ]
+}

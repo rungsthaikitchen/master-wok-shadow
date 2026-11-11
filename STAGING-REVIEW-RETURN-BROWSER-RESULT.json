@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-11",
+  "scope": "OPEN_PAGE_REVIEW_HASH_RETURN",
+  "websiteCommit": "8c550c70686cf03e31217048480afd93e1f64f50",
+  "checks": {
+    "existingPageHandledHash": true,
+    "invalidApprovalRejected": true,
+    "fragmentCleared": true
+  },
+  "visibleMessage": "This agreed-time link is invalid or expired. Please contact the restaurant.",
+  "screenshot": "staging-tests/evidence/review-link-open-page-validation.png",
+  "finding": "Readability issue corrected and visually verified in deployed preview.",
+  "productionMutations": 0,
+  "contrastCorrection": {
+    "status": "PASS_BROWSER",
+    "websiteCommit": "b605e13ef74506eb91730e29eaa261db94b4ef48",
+    "background": "#ffffff",
+    "textColor": "#222222",
+    "screenshot": "staging-tests/evidence/review-link-readable-validation.png"
+  }
+}

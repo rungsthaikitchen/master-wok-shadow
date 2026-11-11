@@ -1,0 +1,68 @@
+{
+  "status": "PASS_HTTP_AND_DATABASE_RECONCILIATION",
+  "scope": "DEPLOYED_STAGING_REVIEWED_CHECKOUT",
+  "edgeVersion": 58,
+  "sourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+  "prefix": "release-nov6-delivery-review-20261111-9624974e-",
+  "productionMutations": 0,
+  "providerDispatchCalls": 0,
+  "checks": [
+    "STAGING_MASTER_WOK_MODE",
+    "delivery_REVIEW_SAVED",
+    "delivery_SCOPED_APPROVAL_CREATED",
+    "DELIVERY_NO_ACK_REFUSED",
+    "DELIVERY_CHANGED_TIME_REFUSED",
+    "DELIVERY_CHANGED_BASKET_REFUSED",
+    "DELIVERY_CHANGED_ADDRESS_REFUSED",
+    "DELIVERY_EXCEPTION_BOOKED",
+    "DELIVERY_SAME_KEY_REPLAY_ONE_ORDER",
+    "CONSUMED_TOKEN_NEW_KEY_REFUSED",
+    "DELIVERY_NORMAL_ADMIN_ACCEPT",
+    "ORDINARY_ORDER_AFTER_DELIVERY_EXCEPTION_BOOKED",
+    "distinct-race_REVIEW_SAVED",
+    "distinct-race_SCOPED_APPROVAL_CREATED",
+    "DISTINCT_KEYS_COMPETING_FOR_ONE_GRANT_ONE_COMMIT_ONE_REFUSAL",
+    "same-race_REVIEW_SAVED",
+    "same-race_SCOPED_APPROVAL_CREATED",
+    "SAME_KEY_CONCURRENT_RETRY_ONE_COMMIT_ONE_REPLAY",
+    "renew-revoke_REVIEW_SAVED",
+    "renew-revoke_SCOPED_APPROVAL_CREATED",
+    "REPLACEMENT_APPROVAL_CREATED",
+    "REPLACED_CAPABILITY_REJECTED",
+    "UNUSED_RENEWAL_REVIEW_CLOSED",
+    "CLOSED_REVIEW_CAPABILITY_REJECTED",
+    "STAGING_MODE_UNCHANGED"
+  ],
+  "bookings": [
+    {
+      "case": "delivery",
+      "orderId": "308bf891-b017-4fa9-b5a0-0aa8afb6d44f",
+      "orderRef": "RTK-192",
+      "reviewId": "413e1970-6468-43da-b76e-5528e1fd5dc0"
+    },
+    {
+      "case": "ordinary",
+      "orderId": "1b538aa7-9cd9-4cfc-a4f3-8bf1b43f4d52",
+      "orderRef": "RTK-193"
+    },
+    {
+      "case": "distinct-race",
+      "orderId": "132e7196-437f-449b-8058-35d574d60706",
+      "orderRef": "RTK-194",
+      "reviewId": "59a5d331-dd7b-4137-895a-d022ece76449"
+    },
+    {
+      "case": "same-race",
+      "orderId": "2a1b2fad-658e-479e-ad69-10ff5465ce45",
+      "orderRef": "RTK-195",
+      "reviewId": "fbaf3911-2207-44ee-b880-5c2aaec78eae"
+    }
+  ],
+  "distinctRaceHttp": [
+    409,
+    200
+  ],
+  "sqlEvidence": "STAGING-REVIEW-DELIVERY-CONCURRENCY-SQL-RESULT.json",
+  "rollbackExtension": "PREPARED_AWAITING_SQL_EDITOR_EXECUTION",
+  "browserReturnCheck": "BLOCKED_PREVIEW_ACCESS_SESSION_EXPIRED"
+}

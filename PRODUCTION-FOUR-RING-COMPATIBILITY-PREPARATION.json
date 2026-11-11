@@ -1,0 +1,47 @@
+{
+  "status": "PREPARED_FOR_APPROVAL_NOT_EXECUTED",
+  "productionAuthorized": false,
+  "stage": "COMPATIBILITY_ONLY_KEEP_LEGACY",
+  "website": {
+    "pullRequest": 68,
+    "targetBranch": "main",
+    "commit": "1b917b73c54295caf2576e66be6d603cd275d4ed",
+    "tests": 37,
+    "currentMain": "58dfff3c47de1cdf8d46dfbf1b36d21df2a5f939",
+    "preservesCurrentMainChanges": true
+  },
+  "backend": {
+    "pullRequest": 2,
+    "commit": "2042d266bf7c81058428ff996205d2380f4694ec",
+    "productionService": "f2eb904f-fc4a-41d0-9073-53a1b42fafe9",
+    "productionEnvironment": "eb574083-839c-4959-b1b1-8b96c45ce86b",
+    "requiredMode": "LEGACY"
+  },
+  "rollbackBaseline": {
+    "websiteSource": "58dfff3c47de1cdf8d46dfbf1b36d21df2a5f939",
+    "checkoutClientBlob": "5eee51e226c10d9acbe049e2884b521d3d456d74",
+    "pendingKeyPreserved": "rtk_master_wok_pending_checkout",
+    "legacyRefusesUnresolvedMasterWokAttempt": true,
+    "backendDeployment": "ec1d576d-e7d0-4c68-ab0e-1303ed03317c",
+    "backendCommit": "a76e098ffe3450ab220dc2f3f180f286a66ba1a8"
+  },
+  "approvalScope": [
+    "Deploy the tested compatibility website and backend with Legacy authoritative.",
+    "Leave production Supabase, production Edge runtime, launch control and notification worker unchanged.",
+    "Keep basket review disabled until its database and production Access settings have separately been approved/configured.",
+    "Preserve existing secrets, production provider settings and current production menu/service changes."
+  ],
+  "verificationAfterApproval": [
+    "Confirm Cloudflare and Railway deployments succeed.",
+    "Confirm production mode remains LEGACY and the booking writer is not activated.",
+    "Verify customer menu/allergens and existing Admin read paths.",
+    "Record the new exact compatible deployment IDs as rollback baselines before considering activation.",
+    "Run the existing read-only startup/provider-access checks; keep the working Legacy deployment if the candidate is unhealthy."
+  ],
+  "separateActivationRequired": true,
+  "activationLimits": [
+    "The TEMP-copy guard rehearsal passed, but the new release has not performed a full new Legacy customer checkout or production deployment rollback.",
+    "Draining stops new authoritative writes; safe return to Legacy is blocked while driver commitments or unresolved delivery time proposals remain.",
+    "Final source-bound certification, production binding/schema checks, guarded historical token retirement and pre-service cutover approval remain separate."
+  ]
+}

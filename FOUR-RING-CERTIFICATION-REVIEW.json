@@ -1,0 +1,60 @@
+{
+  "status": "SOURCE_REVIEW_COMPLETE_PRODUCTION_ACCEPTANCE_PENDING",
+  "date": "2026-11-11",
+  "runtimeSourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+  "productionAuthorized": false,
+  "productionMode": "LEGACY",
+  "productionRevision": 4,
+  "evidenceReady": [
+    "actual reviewed collection checkout and normal Admin Accept",
+    "actual reviewed delivery with door-age exception and ordinary following order",
+    "distinct-key one-grant race: one commit, one refusal, one receipt",
+    "same-key concurrent retry: one commit, one replay, one receipt",
+    "25 current-source HTTP review checks plus database reconciliation",
+    "27 current-source whole-service checks, 13 orders, 37 item rows, 13 receipts",
+    "independent four-ring occupancy and vessel reset checks",
+    "315 local core regressions in UTC/Europe-London",
+    "39 website tests and 39 focused gateway tests",
+    "unchanged notification components with prior owner-confirmed real receipts; no new dispatches",
+    "ten-case exact-source expanded TEMP rollback guard and preservation: owner PASS, zero permanent mutations"
+  ],
+  "remainingGates": [
+    {
+      "gate": "Production runtime/configuration verification and guarded activation",
+      "status": "AWAITING_EXPLICIT_OWNER_APPROVAL",
+      "package": "FOUR-RING-ACTIVATION-PACKAGE.json"
+    }
+  ],
+  "rollbackProcedure": [
+    "Pause new orders while Master Wok remains authoritative for existing lifecycle actions.",
+    "Finalize or cancel Master Wok orders and allow retained driver/holding-exception work to elapse.",
+    "Enter DRAINING under the common writer lock and run the complete revision-checked guard.",
+    "Restore compatible Legacy controls/deployments without deleting receipts, orders, plans or notification ownership."
+  ],
+  "completedGates": [
+    {
+      "gate": "expanded rollback guard preservation",
+      "status": "PASS_OWNER_SQL_EDITOR",
+      "script": "staging-tests/rehearse-delivery-rollback.sql",
+      "guardSourceSha256": "79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af",
+      "mutationScope": "TEMP copies only; final ROLLBACK",
+      "expectedChecks": 10,
+      "resultFile": "STAGING-EXPANDED-ROLLBACK-GUARD-RESULT.json"
+    },
+    {
+      "gate": "same-page return-link browser confirmation",
+      "status": "PASS_INVALID_TOKEN_REJECTION_AND_FRAGMENT_CLEARING",
+      "websiteCommit": "8c550c70686cf03e31217048480afd93e1f64f50",
+      "limits": "Invalid token exercised on already-loaded page. Existing valid-token checkout evidence is separate. Screenshot identified notice contrast issue; correction pending preview verification."
+    },
+    {
+      "gate": "review notice contrast correction preview verification",
+      "status": "PASS",
+      "websiteCommit": "b605e13ef74506eb91730e29eaa261db94b4ef48",
+      "background": "rgb(255, 255, 255)",
+      "textColor": "rgb(34, 34, 34)",
+      "evidence": "STAGING-REVIEW-RETURN-BROWSER-RESULT.json"
+    }
+  ],
+  "certificate": "CERTIFIED_FOR_PRODUCTION"
+}

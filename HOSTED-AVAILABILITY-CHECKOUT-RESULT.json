@@ -1,0 +1,101 @@
+{
+  "status": "PASS",
+  "scope": "MOBILE_BROWSER_LOCAL_PAGES_FUNCTIONS_TO_DEPLOYED_RAILWAY_AND_PRIVATE_STAGING_DATABASE",
+  "mode": "MASTER_WOK",
+  "newWriterRequests": 1,
+  "supabaseWrites": 0,
+  "legacyNotificationRequests": 0,
+  "pageErrors": [],
+  "receipt": {
+    "committed": true,
+    "customerId": "2febdf37-b012-4197-8d68-dc0c701508f2",
+    "notification_status": "queued",
+    "orderId": "50278540-4686-4a69-b459-933b8d5f998d",
+    "orderRef": "RTK-035",
+    "replayed": false,
+    "serviceDate": "2026-11-04",
+    "status": "pending",
+    "success": true,
+    "totals": {
+      "delivery_fee": 0,
+      "discount": 0,
+      "discount_amount": 0,
+      "loyalty_discount": 0,
+      "loyalty_expected_balance": 9,
+      "loyalty_points_earned_pending": 9,
+      "loyalty_points_redeem_pending": 0,
+      "loyalty_reward_applied": false,
+      "subtotal": 9,
+      "total": 9
+    }
+  },
+  "productionReady": false,
+  "productionWrites": 0,
+  "backendCommit": "bbcd726d1d1bebc99dd8d86a75e7376497b1a3ab",
+  "railwayDeployment": "345005a5-be98-422a-9ea8-d61dd0085ca5",
+  "edgeDeploymentVersion": 5,
+  "edgeDeploymentHash": "127950f83479e3d1a97f50ea85105b69bce49e1e942908b67325d9edd91a5e57",
+  "edgeDisabledVersion": 6,
+  "httpProof": [
+    {
+      "path": "/booking-mode",
+      "status": 200,
+      "timestamp": "2026-11-01T13:45:02.812662746Z"
+    },
+    {
+      "path": "/booking-mode",
+      "status": 200,
+      "timestamp": "2026-11-01T13:45:02.818917729Z"
+    },
+    {
+      "path": "/booking-availability",
+      "status": 200,
+      "timestamp": "2026-11-01T13:45:06.035101457Z"
+    },
+    {
+      "path": "/booking-availability",
+      "status": 200,
+      "timestamp": "2026-11-01T13:45:07.247203434Z"
+    },
+    {
+      "path": "/booking-mode",
+      "status": 200,
+      "timestamp": "2026-11-01T13:45:09.128768856Z"
+    },
+    {
+      "path": "/book-order",
+      "status": 200,
+      "timestamp": "2026-11-01T13:45:14.331566228Z"
+    }
+  ],
+  "databaseProof": {
+    "id": "50278540-4686-4a69-b459-933b8d5f998d",
+    "order_ref": "RTK-035",
+    "total": "9",
+    "capacity_scheduler": "MASTER_WOK",
+    "items": 1,
+    "receipts": 1,
+    "notifications": 1
+  },
+  "cleanupCounts": {
+    "orders": 0,
+    "items": 0,
+    "receipts": 0,
+    "time_responses": 0,
+    "plans": 0,
+    "notifications": 0,
+    "deliveries": 0,
+    "customers": 0,
+    "loyalty_accounts": 0,
+    "launch_controls": 0
+  },
+  "limits": [
+    "Pages proxy code ran locally against actual deployed Railway and Supabase",
+    "Cloudflare-hosted preview remains behind Access login",
+    "Read providers stubbed and collection basket only",
+    "Notification queued; no real messages, payment or printing",
+    "Private fixture-only authority; not production booking certification"
+  ],
+  "legacyRestoreDeployment": "5eb177be-772f-4fb6-aff3-5f0528eeef10",
+  "legacyRestoreDeploymentStatus": "SUCCESS"
+}

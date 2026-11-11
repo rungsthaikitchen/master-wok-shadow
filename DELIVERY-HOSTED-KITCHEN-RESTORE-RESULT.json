@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "scope": "HOSTED_KITCHEN_RESTORE_WITH_LOCAL_COMPATIBLE_WEBSITE_ADAPTERS",
+  "fixtureSchema": "master_wok_restore_82129760ab4423fa",
+  "targetRelease": "master-wok-launch-2026-11-03",
+  "restoredRevision": 5,
+  "mode": "MASTER_WOK",
+  "matchingProductionRuntimeModules": 39,
+  "websiteCommit": "f4048f4ae253dace9d2aa50a58291c5cecb917e7",
+  "exactWebsiteAdapters": [
+    "api/booking-mode",
+    "api/booking-availability",
+    "api/booking",
+    "admin-api/order-action"
+  ],
+  "checks": [
+    "Guarded database restoration",
+    "Availability",
+    "Collection checkout RTK-001",
+    "Admin order listing",
+    "Fixture released through Admin adapter"
+  ],
+  "closure": {
+    "edgeVersion": 2,
+    "jwtRequired": true,
+    "handler": "inert HTTP410"
+  },
+  "productionWrites": 0,
+  "limitations": [
+    "Website adapters executed locally through an isolated gateway bridge against the hosted staging Edge.",
+    "No Cloudflare Pages or Railway deployment rollback performed in this rehearsal."
+  ]
+}

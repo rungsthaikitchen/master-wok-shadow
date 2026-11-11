@@ -1,0 +1,62 @@
+{
+  "status": "PASS",
+  "scope": "SEPARATED_HOSTED_ONE_PORTION_REHEARSALS",
+  "testedDeploymentVersion": 12,
+  "disabledDeploymentVersion": 13,
+  "bundleSha256": "1696e005d88a0647352a54525ed73f9c9dea17b800c583a56ebc066615b04a9c",
+  "phases": {
+    "atomic": {
+      "status": "PASS",
+      "scope": "HOSTED_PRIVATE_FOUR_RING_ATOMIC",
+      "checks": [
+        "SAME_KEY_TWO_CONNECTIONS_ONE_ORDER_AND_PLAN",
+        "CHANGED_RETRY_REJECTED",
+        "DISTINCT_KEY_TWO_CONNECTIONS_REASSESS_LOCKED_FOUR_RING_CAPACITY",
+        "PLAN_SAVE_FAILURE_ROLLS_BACK_HEADER_ITEMS_RECEIPT_AND_EVENT"
+      ],
+      "raceStatuses": [
+        "GREEN",
+        "UNVERIFIED"
+      ],
+      "productionWrites": 0,
+      "realNotificationsSent": 0,
+      "productionReady": false
+    },
+    "service": {
+      "status": "PASS",
+      "scope": "HOSTED_PRIVATE_FOUR_RING_SERVICE",
+      "checks": [
+        "SEVEN_ORDER_SERVICE_WITH_ORIGINAL_50_AND_100_BASKETS",
+        "CUSTOMER_ACKNOWLEDGED_TIME_CHANGE_AND_STARTED_CANCELLATION"
+      ],
+      "raceStatuses": [],
+      "productionWrites": 0,
+      "realNotificationsSent": 0,
+      "productionReady": false
+    },
+    "delivery": {
+      "status": "PASS",
+      "scope": "HOSTED_PRIVATE_FOUR_RING_DELIVERY",
+      "checks": [
+        "50_AND_100_DELIVERY_BASKETS_KEEP_DOOR_ARRIVAL_AND_DRIVER_TRIPS_WITH_COLLECTION"
+      ],
+      "raceStatuses": [],
+      "productionWrites": 0,
+      "realNotificationsSent": 0,
+      "productionReady": false
+    }
+  },
+  "productionReady": false,
+  "limitations": [
+    "Fixed server-side five-minute delivery legs, not live route verification",
+    "Does not certify browser checkout/Admin or deployment rollback",
+    "No production launch approval"
+  ],
+  "cleanupVerified": {
+    "testOrders": 0,
+    "testReceipts": 0,
+    "testPlans": 0,
+    "totalStagingOrders": 60,
+    "totalStagingOutbox": 81
+  }
+}

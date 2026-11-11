@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-11",
+  "status": "APPROVED_ROLLOUT_IN_PROGRESS_LEGACY",
+  "approvedPackageCommit": "3660cb03beae4be99a92e1dda4af1aa9205d0722",
+  "ownerApproval": "Explicit yes approved in conversation",
+  "control": {
+    "mode": "LEGACY",
+    "revision": 4
+  },
+  "runtime": {
+    "project": "ubyjrrsvbbqomitpaidb",
+    "function": "master-wok-booking",
+    "version": 7,
+    "status": "ACTIVE",
+    "sourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+    "readbackExact": true,
+    "invalidAuthHTTP": 401,
+    "modeHTTP": 200,
+    "mode": "LEGACY",
+    "disabledCheckoutHTTP": 503,
+    "disabledCheckoutCommitted": false,
+    "probeOrders": 0,
+    "probeReceipts": 0
+  },
+  "configuration": {
+    "supabaseReleaseIdSavedByOwner": "master-wok-four-ring-2026-11-10",
+    "runtimeReviewApprovalsSavedByOwner": "enabled",
+    "cloudflareAccessDomainSavedByOwner": "https://rungsthaikitchen.cloudflareaccess.com",
+    "productionAdminAudSavedByOwner": "d29d9159669da2346f9a5aacb672bd24cb83ea4b2b8a6959e5f841a0488d501c",
+    "staffEmailAllowlistSavedByOwner": "dwightman@sky.com",
+    "newProductionReviewSecretSetRailway": true,
+    "matchingCloudflareSecretSavedByOwner": true,
+    "secretValuesExcluded": true
+  },
+  "backend": {
+    "deployment": "75a0a3b3-3667-4c59-9362-c855ba1cb0a6",
+    "status": "BUILDING",
+    "bookingModeUnchanged": "LEGACY",
+    "reviewGates": "enabled pending deployment"
+  },
+  "remaining": [
+    "Observe backend terminal SUCCESS and Brevo access",
+    "Enable Cloudflare basket-review flag and deploy; verify signed staff access",
+    "Fresh locked pre-service cutover and final gateway switch"
+  ],
+  "cutoverExecuted": false,
+  "historicalTokensRetired": false
+}

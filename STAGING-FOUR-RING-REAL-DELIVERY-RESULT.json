@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-09",
+  "scope": "ISOLATED_FOUR_RING_REAL_ROUTE_DELIVERY",
+  "projectRef": "hvrqgufqjslvgiohgkvu",
+  "schema": "master_wok_delivery_c95e08436a4744c6",
+  "hostedProbeVersion": 21,
+  "disabledProbeVersion": 22,
+  "mainRuntimeVersion": 49,
+  "mainRuntimeSourceSha256": "d835202363fbacebe45f4553697489a18ce5f8207a26d6a50d8674c5170b33c7",
+  "checks": {
+    "delivery50": "PASS",
+    "delivery100": "PASS",
+    "collectionPreservesDriverTrips": "PASS",
+    "checkoutReplay": "PASS",
+    "doorArrivalTargets": "PASS",
+    "cookingBeforeLoading": "PASS",
+    "perDishMaxAge20": "PASS",
+    "onePortionHotVessels": "PASS",
+    "changedPriceRefused": "PASS",
+    "outsideThreeMileRadiusEvenWhenFree": "PASS",
+    "deliveryTimeProposal": "PASS",
+    "customerAcknowledgement": "PASS",
+    "acknowledgementReplay": "PASS"
+  },
+  "savedPlanRevision": 5,
+  "delivery": {
+    "trips": [
+      {
+        "id": "trip:fc080b95-7738-4b74-9c03-dc3f36626b6d@2026-11-21T18:35:00.000Z",
+        "legs": [
+          7,
+          7
+        ],
+        "start": 1106,
+        "stops": [
+          {
+            "id": "fc080b95-7738-4b74-9c03-dc3f36626b6d@2026-11-21T18:35:00.000Z",
+            "target": 1115,
+            "arrival": 1115,
+            "sourceId": "fc080b95-7738-4b74-9c03-dc3f36626b6d",
+            "destination": {
+              "lat": 53.7457392,
+              "lng": -1.6020136
+            }
+          }
+        ],
+        "finish": 1124,
+        "departure": 1108
+      },
+      {
+        "id": "trip:4b050f83-cf17-472b-8bcb-1bbe6d246a86@2026-11-21T19:30:00.000Z",
+        "legs": [
+          7,
+          7
+        ],
+        "start": 1161,
+        "stops": [
+          {
+            "id": "4b050f83-cf17-472b-8bcb-1bbe6d246a86@2026-11-21T19:30:00.000Z",
+            "target": 1170,
+            "arrival": 1170,
+            "sourceId": "4b050f83-cf17-472b-8bcb-1bbe6d246a86",
+            "destination": {
+              "lat": 53.7457392,
+              "lng": -1.6020136
+            }
+          }
+        ],
+        "finish": 1179,
+        "departure": 1163
+      }
+    ],
+    "version": 1
+  },
+  "notificationsSent": 0,
+  "productionMutations": 0,
+  "mainWriterMode": "DRAINING",
+  "mainWriterRevision": 40,
+  "fullProductionReleaseCertified": false,
+  "remaining": [
+    "Combined-trip Admin/driver flow for this exact four-ring release",
+    "Full browser delivery checkout/Admin replay on final candidate",
+    "Provider dispatch and delivery rollback certification",
+    "Final operating review and explicit production approval"
+  ]
+}

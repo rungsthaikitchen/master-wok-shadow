@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-10",
+  "scope": "ACTUAL_CLOUDFLARE_PREVIEW_CUSTOMER_ENQUIRY_AND_ADMIN",
+  "runtimeSourceSha256": "a1230b05e03b5cdef91e923fb4c1c1feeef307eea1bc687cbebd012e5b9ace15",
+  "basket": "11 x Pad Thai / Prawn, GBP110",
+  "preferredTime": "2026-11-28T20:15:00Z",
+  "reviewId": "79831cac-ef26-4115-8985-56d8a3deaf77",
+  "checks": {
+    "availabilityFailureOffersCallAndReview": "PASS",
+    "basketPreserved": "PASS",
+    "customerReceivesUnconfirmedEnquiryReceipt": "PASS",
+    "protectedAdminShowsExactBasketAndTotal": "PASS",
+    "adminMarkContacted": "PASS",
+    "adminCloseReview": "PASS",
+    "zeroOrdersForSyntheticEnquiryCustomer": "PASS"
+  },
+  "finalReviewStatus": "closed",
+  "assessment": "UNVERIFIED; no confirmed bottleneck claimed",
+  "productionMutations": 0,
+  "providerSends": 0,
+  "stagingControl": {
+    "mode": "MASTER_WOK",
+    "revision": 41
+  },
+  "limitations": [
+    "Whole-day availability on the already occupied date could not be checked; the error escape path, rather than a successful unavailable-slot response, was exercised.",
+    "This is a saved request, not approval of this basket or a reserved time."
+  ],
+  "normalUnavailableSlotRecheck": {
+    "edgeVersion": 56,
+    "sourceSha256": "f4dd2190e9037c0f1e1cb66d24c97d0af3fcd9610a385ac89358d8cbb25ae8e2",
+    "status": "PASS",
+    "message": "We could not find an online collection time; call us; basket saved"
+  },
+  "screenshots": [
+    "staging-tests/evidence/basket-enquiry-admin.png",
+    "staging-tests/evidence/basket-enquiry-no-slots.png"
+  ]
+}

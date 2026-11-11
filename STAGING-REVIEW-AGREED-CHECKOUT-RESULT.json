@@ -1,0 +1,80 @@
+{
+  "status": "PASS_STAGING_COLLECTION_FLOW",
+  "date": "2026-11-11",
+  "scope": "BASKET_REVIEW_AGREED_TIME_CHECKOUT_AND_REPLACEMENT",
+  "productionChanges": 0,
+  "productionMode": "LEGACY",
+  "basket": {
+    "description": "11 x Pad Thai / Prawn",
+    "total": 110,
+    "ordinaryHoldingLimit": 20,
+    "explicitSyntheticAllowance": 50,
+    "actualMaximumHold": 45
+  },
+  "firstCheckout": {
+    "edgeVersion": 57,
+    "sourceSha256": "42937fbe290b808dddeaa61868d3b7d164b1c3b8ee0716d2fa744d99059eaf1f",
+    "reviewId": "cfa21abd-a28f-4be2-9e01-b09d58dba978",
+    "approvalId": "af57c772-dbdf-4b72-afe4-3f0f7e0c6c68",
+    "orderId": "c42f2c46-a816-40ec-9785-f560227fbe71",
+    "orderRef": "RTK-190",
+    "agreedTime": "2026-11-27T20:15:00Z",
+    "receiptCount": 1,
+    "reviewStatus": "resolved",
+    "normalAdminAccept": "confirmed"
+  },
+  "replacementCheckout": {
+    "edgeVersion": 58,
+    "sourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+    "reviewId": "44727846-1750-45e5-a67f-f697cbf2b8c0",
+    "orderId": "1485a5be-b7a3-498d-884c-c96f8e435d06",
+    "orderRef": "RTK-191",
+    "agreedTime": "2026-11-26T20:15:00Z",
+    "receiptCount": 1,
+    "reviewStatus": "resolved",
+    "priorApprovalAuditEntries": 1,
+    "oldLinkRejected": true,
+    "acknowledgementRequired": true,
+    "agreedTimeAutomaticallySelected": true
+  },
+  "checks": {
+    "savedBasketRestored": true,
+    "signedStaffActorBound": true,
+    "exceptionInPersistedPlan": true,
+    "grantConsumedInBookingTransaction": true,
+    "consumedLinkRejected": true,
+    "replacedLinkRejected": true,
+    "ordinarySubsequentOrderLimitPreserved": "LOCAL_INTEGRATION_PASS",
+    "closuresRemainAuthoritative": "LOCAL_INTEGRATION_PASS",
+    "duplicateGrantConsumptionRollsBack": "LOCAL_INTEGRATION_PASS"
+  },
+  "providerEvidence": {
+    "RTK190OutboxEvents": 2,
+    "attempts": 0,
+    "sentAt": null,
+    "realSends": 0
+  },
+  "stagingGateway": {
+    "deployment": "88b782b1-a728-4b73-b201-23657198711b",
+    "commit": "bc6bb47aaf68c6c9734ebf15c5713d70f87ebcba",
+    "status": "SUCCESS"
+  },
+  "website": {
+    "commit": "684a7ddab600295fd1ba2451d69b1b2675ebdac3",
+    "deployment": "6cef72b7-b164-4668-aea3-44ba353fd933",
+    "status": "SUCCESS"
+  },
+  "tests": {
+    "coreUTC": 315,
+    "coreEuropeLondon": 315,
+    "website": 39,
+    "gatewayFocused": 39,
+    "activeInlineScriptsParsed": 22
+  },
+  "limits": [
+    "Synthetic collection rehearsals only; the 50-minute allowance is a stress-test choice, not a new default.",
+    "New holding-exception delivery checkout and competing distinct-key grant consumption still need hosted verification.",
+    "Current production certificate remains DRAFT/PENDING.",
+    "Same-page hash-return polish was added after the hosted checkout and needs browser confirmation."
+  ]
+}
