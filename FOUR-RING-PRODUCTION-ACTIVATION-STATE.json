@@ -1,11 +1,12 @@
 {
   "date": "2026-11-11",
-  "status": "APPROVED_ROLLOUT_IN_PROGRESS_LEGACY",
+  "status": "ACTIVE_PRODUCTION_ACCEPTANCE_ORDER_PENDING",
   "approvedPackageCommit": "3660cb03beae4be99a92e1dda4af1aa9205d0722",
   "ownerApproval": "Explicit yes approved in conversation",
   "control": {
-    "mode": "LEGACY",
-    "revision": 4
+    "mode": "MASTER_WOK",
+    "revision": 8,
+    "releaseId": "master-wok-four-ring-2026-11-10"
   },
   "runtime": {
     "project": "ubyjrrsvbbqomitpaidb",
@@ -33,16 +34,74 @@
     "secretValuesExcluded": true
   },
   "backend": {
-    "deployment": "75a0a3b3-3667-4c59-9362-c855ba1cb0a6",
-    "status": "BUILDING",
-    "bookingModeUnchanged": "LEGACY",
-    "reviewGates": "enabled pending deployment"
+    "deployment": "8c2b10cf-7cca-47bd-a462-46ccb55b6761",
+    "status": "SUCCESS",
+    "bookingMode": "MASTER_WOK",
+    "brevoAccess": "AUTHORIZED",
+    "messageSendsDuringPreflight": 0
   },
   "remaining": [
-    "Observe backend terminal SUCCESS and Brevo access",
-    "Enable Cloudflare basket-review flag and deploy; verify signed staff access",
-    "Fresh locked pre-service cutover and final gateway switch"
+    "Controlled first production checkout, Admin acceptance and real notification receipt verification; not yet exercised for this release"
   ],
-  "cutoverExecuted": false,
-  "historicalTokensRetired": false
+  "cutoverExecuted": true,
+  "historicalTokensRetired": true,
+  "cloudflare": {
+    "deployment": "e4346cae-236c-41f9-a0d5-b87ae9918d14",
+    "status": "SUCCESS",
+    "reviewCapabilities": {
+      "enabled": true,
+      "approvalsEnabled": true
+    },
+    "signedAdminReviewList": "PASS_NO_ACTIVE_REVIEWS",
+    "publicMode": "MASTER_WOK"
+  },
+  "rolloutHistory": [
+    {
+      "control": "MASTER_WOK",
+      "revision": 5,
+      "retiredHistoricalTokens": 13
+    },
+    {
+      "control": "LEGACY",
+      "revision": 7,
+      "reason": "Brevo delayed gateway startup; complete rollback guard passed with no commitments",
+      "ordersOrReceiptsDeleted": 0
+    },
+    {
+      "control": "MASTER_WOK",
+      "revision": 8,
+      "reason": "Same approved release resumed after gateway SUCCESS and fresh zero-commitment pre-service guard"
+    }
+  ],
+  "productionAvailability": {
+    "original50": {
+      "date": "2026-11-13",
+      "times": [
+        "18:00",
+        "20:15"
+      ],
+      "available": [
+        true,
+        true
+      ]
+    },
+    "double100": {
+      "date": "2026-11-13",
+      "times": [
+        "18:00",
+        "20:15"
+      ],
+      "available": [
+        true,
+        true
+      ]
+    },
+    "bookingApprovalAllowed": false,
+    "ordersCreated": 0
+  },
+  "notificationWorker": {
+    "deployment": "f9ec0920-dd4c-41cd-b4f6-35f1517fcb5c",
+    "status": "SUCCESS_UNCHANGED"
+  },
+  "proof": "staging-tests/evidence/production-master-wok-active-revision8.png"
 }
