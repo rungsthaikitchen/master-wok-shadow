@@ -28,6 +28,31 @@ BEGIN
     RAISE EXCEPTION 'OUTSTANDING_DRIVER_TRIPS';
   END IF;
 
+  -- Legacy does not model a manually extended cooking/holding window.
+  -- Retained started work still matters after cancellation or test tagging.
+  -- Do not restore Legacy until every such job/promise has elapsed.
+  IF EXISTS (
+    SELECT 1
+    FROM pg_temp.master_wok_service_plans AS service
+    CROSS JOIN LATERAL jsonb_array_elements(
+      coalesce(service.plan #> '{wok,jobs}', '[]'::jsonb) ||
+      coalesce(service.plan #> '{fryer,jobs}', '[]'::jsonb) ||
+      coalesce(service.plan #> '{auxiliary,jobs}', '[]'::jsonb)
+    ) AS job
+    WHERE EXISTS (
+      SELECT 1 FROM jsonb_each(coalesce(service.plan->'holdExceptions', '{}'::jsonb)) AS exception
+      WHERE job->'orderIds' ? exception.key
+    ) AND (
+      job->>'finish' IS NULL OR
+      ((service.service_date::timestamp + greatest(
+        coalesce((job->>'readyMinute')::integer, (job->>'finish')::integer),
+        (job->>'finish')::integer
+      ) * interval '1 minute') AT TIME ZONE 'Europe/London') > checked_at
+    )
+  ) THEN
+    RAISE EXCEPTION 'OUTSTANDING_HOLD_EXCEPTION_WORK';
+  END IF;
+
   -- Also block on deliveries without a driver plan and unresolved proposals.
   IF EXISTS (
     SELECT 1 FROM pg_temp.orders
@@ -53,6 +78,16 @@ BEGIN
       )
   ) THEN
     RAISE EXCEPTION 'OUTSTANDING_DELIVERY_ORDERS';
+  END IF;
+  -- The compatible Legacy routes cannot finalize Master Wok-owned orders.
+  -- Keep the authoritative lifecycle available until all such orders finish.
+  -- Pause new orders in Admin first; DRAINING is only the final switch fence.
+  IF EXISTS (
+    SELECT 1 FROM pg_temp.orders
+    WHERE capacity_scheduler = 'MASTER_WOK' AND is_test IS NOT TRUE
+      AND coalesce(lower(status), '') NOT IN ('completed', 'cancelled', 'declined', 'rejected')
+  ) THEN
+    RAISE EXCEPTION 'OUTSTANDING_MASTER_WOK_ORDERS';
   END IF;
 END;
 $guard$;$guard_source$;
@@ -81,8 +116,39 @@ BEGIN
   IF before_data<>after_data THEN RAISE EXCEPTION 'REFUSAL_CHANGED_RECORDS'; END IF;
   checks:=checks||jsonb_build_array(jsonb_build_object('case',step,'refusal',issue,'recordsPreserved',true));
  END LOOP;
+ -- Exercise the exact persisted collection exception produced by the new
+ -- hosted distinct-key grant race. The test copies it; live rows stay intact.
+ INSERT INTO pg_temp.orders SELECT * FROM master_wok_rehearsal.orders WHERE id='132e7196-437f-449b-8058-35d574d60706';
+ IF NOT FOUND THEN RAISE EXCEPTION 'HOLD_EXCEPTION_ORDER_REQUIRED'; END IF;
+ INSERT INTO pg_temp.booking_receipts SELECT * FROM master_wok_rehearsal.master_wok_booking_receipts WHERE order_id='132e7196-437f-449b-8058-35d574d60706';
+ IF NOT FOUND THEN RAISE EXCEPTION 'HOLD_EXCEPTION_RECEIPT_REQUIRED'; END IF;
+ INSERT INTO pg_temp.master_wok_service_plans SELECT * FROM master_wok_rehearsal.master_wok_service_plans WHERE service_date='2026-12-03';
+ IF NOT FOUND THEN RAISE EXCEPTION 'HOLD_EXCEPTION_FIXTURE_REQUIRED'; END IF;
+ UPDATE pg_temp.master_wok_service_plans SET service_date=(clock_timestamp() AT TIME ZONE 'Europe/London')::date+1 WHERE service_date='2026-12-03';
+ UPDATE pg_temp.orders SET order_type='collection',status='confirmed',is_test=false,preferred_time=clock_timestamp()-interval '1 day',confirmed_time=clock_timestamp()-interval '1 day',proposed_time=NULL;
+ FOR step IN 6..7 LOOP
+  IF step=7 THEN UPDATE pg_temp.orders SET status='cancelled',is_test=true; END IF;
+  SELECT md5(jsonb_build_object('orders',(SELECT jsonb_agg(to_jsonb(o) ORDER BY id) FROM pg_temp.orders o),'plans',(SELECT jsonb_agg(to_jsonb(p) ORDER BY service_date) FROM pg_temp.master_wok_service_plans p),'receipts',(SELECT jsonb_agg(to_jsonb(r) ORDER BY key) FROM pg_temp.booking_receipts r))::text) INTO before_data;
+  issue:=NULL;
+  BEGIN EXECUTE guard_sql; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS issue=MESSAGE_TEXT; END;
+  IF issue IS DISTINCT FROM 'OUTSTANDING_HOLD_EXCEPTION_WORK' THEN RAISE EXCEPTION 'EXTENDED_HOLD_ROLLBACK_NOT_REFUSED %',issue; END IF;
+  SELECT md5(jsonb_build_object('orders',(SELECT jsonb_agg(to_jsonb(o) ORDER BY id) FROM pg_temp.orders o),'plans',(SELECT jsonb_agg(to_jsonb(p) ORDER BY service_date) FROM pg_temp.master_wok_service_plans p),'receipts',(SELECT jsonb_agg(to_jsonb(r) ORDER BY key) FROM pg_temp.booking_receipts r))::text) INTO after_data;
+  IF before_data<>after_data THEN RAISE EXCEPTION 'HOLD_REFUSAL_CHANGED_RECORDS'; END IF;
+  checks:=checks||jsonb_build_array(jsonb_build_object('case',step,'refusal',issue,'recordsPreserved',true));
+ END LOOP;
+ UPDATE pg_temp.master_wok_service_plans SET service_date=service_date-100;
+ -- Even after every cooking window has elapsed, pending Master Wok
+ -- orders must be finalized using their own lifecycle before Legacy restore.
+ UPDATE pg_temp.orders SET status='pending',is_test=false,preferred_time=clock_timestamp()-interval '1 day',confirmed_time=clock_timestamp()-interval '1 day',proposed_time=NULL;
+ SELECT md5(jsonb_build_object('orders',(SELECT jsonb_agg(to_jsonb(o) ORDER BY id) FROM pg_temp.orders o),'plans',(SELECT jsonb_agg(to_jsonb(p) ORDER BY service_date) FROM pg_temp.master_wok_service_plans p),'receipts',(SELECT jsonb_agg(to_jsonb(r) ORDER BY key) FROM pg_temp.booking_receipts r))::text) INTO before_data;
+ issue:=NULL;
+ BEGIN EXECUTE guard_sql; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS issue=MESSAGE_TEXT; END;
+ IF issue IS DISTINCT FROM 'OUTSTANDING_MASTER_WOK_ORDERS' THEN RAISE EXCEPTION 'PENDING_MASTER_WOK_LIFECYCLE_NOT_PROTECTED %',issue; END IF;
+ SELECT md5(jsonb_build_object('orders',(SELECT jsonb_agg(to_jsonb(o) ORDER BY id) FROM pg_temp.orders o),'plans',(SELECT jsonb_agg(to_jsonb(p) ORDER BY service_date) FROM pg_temp.master_wok_service_plans p),'receipts',(SELECT jsonb_agg(to_jsonb(r) ORDER BY key) FROM pg_temp.booking_receipts r))::text) INTO after_data;
+ IF before_data<>after_data THEN RAISE EXCEPTION 'LIFECYCLE_REFUSAL_CHANGED_RECORDS'; END IF;
+ checks:=checks||jsonb_build_array(jsonb_build_object('case','pending_master_wok_lifecycle','refusal',issue,'recordsPreserved',true));
  -- A completed-service snapshot. No live commitment is changed to create it.
- UPDATE pg_temp.orders SET status='customer_accepted_time',preferred_time=clock_timestamp()-interval '1 day',confirmed_time=clock_timestamp()-interval '1 day',proposed_time=NULL;
+ UPDATE pg_temp.orders SET status='completed',preferred_time=clock_timestamp()-interval '1 day',confirmed_time=clock_timestamp()-interval '1 day',proposed_time=NULL;
  UPDATE pg_temp.master_wok_launch_control SET mode='LEGACY',revision=revision+1 WHERE id=1 AND mode='DRAINING' AND revision=41;
  GET DIAGNOSTICS affected=ROW_COUNT;
  IF affected<>0 THEN RAISE EXCEPTION 'STALE_REVISION_SWITCHED_MODE'; END IF;
@@ -95,7 +161,7 @@ BEGIN
  SELECT md5(jsonb_build_object('orders',(SELECT jsonb_agg(to_jsonb(o) ORDER BY id) FROM pg_temp.orders o),'plans',(SELECT jsonb_agg(to_jsonb(p) ORDER BY service_date) FROM pg_temp.master_wok_service_plans p),'receipts',(SELECT jsonb_agg(to_jsonb(r) ORDER BY key) FROM pg_temp.booking_receipts r))::text) INTO after_data;
  IF before_data<>after_data THEN RAISE EXCEPTION 'SUCCESSFUL_SWITCH_CHANGED_RECORDS'; END IF;
  checks:=checks||jsonb_build_array(jsonb_build_object('case','completed_service_restore','mode','LEGACY','revision',43,'recordsPreserved',true));
- INSERT INTO pg_temp.rollback_proof VALUES(jsonb_build_object('status','PASS','scope','TEMP_COPY_DELIVERY_ROLLBACK_GUARD_AND_PRESERVATION','guardSourceSha256','af115534443b779b0cd285e2212d4d4415b0a9223986d628387bd6965e8dc0f6','checks',checks,'permanentMutations',0,'liveControl',(SELECT jsonb_build_object('mode',mode,'revision',revision) FROM master_wok_rehearsal.master_wok_launch_control WHERE id=1)));
+ INSERT INTO pg_temp.rollback_proof VALUES(jsonb_build_object('status','PASS','scope','TEMP_COPY_DELIVERY_AND_HOLD_EXCEPTION_ROLLBACK_GUARD_AND_PRESERVATION','guardSourceSha256','79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af','checks',checks,'permanentMutations',0,'liveControl',(SELECT jsonb_build_object('mode',mode,'revision',revision) FROM master_wok_rehearsal.master_wok_launch_control WHERE id=1)));
 END;
 $rehearsal$;
 SELECT result FROM pg_temp.rollback_proof;

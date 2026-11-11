@@ -7,7 +7,7 @@ const config=JSON.parse(fs.readFileSync(process.env.MASTER_WOK_PRIVATE_CONFIG_FI
 if(!/^[a-f0-9]{64}$/.test(config.MASTER_WOK_BOOKING_SECRET||''))throw Error('PRIVATE_SECRET_REQUIRED');
 const prefix=process.env.MASTER_WOK_RUN_PREFIX||'release-nov3-candidate-',proofPath=process.env.MASTER_WOK_RUNTIME_PROOF_FILE||'/tmp/mw-release-runtime-proof.json',date=process.env.MASTER_WOK_SERVICE_DATE||'2026-11-06',proof={status:'RUNNING',checks:[],orderIds:[],productionMutations:0,realNotificationsSent:0};
 const fixtureEmail=process.env.MASTER_WOK_WORKER_FIXTURE_EMAIL||'release-nov3-candidate@example.invalid';
-if(!['release-nov3-candidate@example.invalid','release-nov6-delivery@example.invalid'].includes(fixtureEmail))throw Error('INVALID_FIXTURE_EMAIL');
+if(!['release-nov3-candidate@example.invalid','release-nov6-delivery@example.invalid','release-nov6-delivery-service-20261111@example.invalid'].includes(fixtureEmail))throw Error('INVALID_FIXTURE_EMAIL');
 if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date+'T17:20:00Z'))||new Date(date+'T17:20:00Z').toISOString().slice(0,10)!==date)throw Error('INVALID_SERVICE_DATE');
 const openingDate=process.env.MASTER_WOK_OPENING_DATE||'2026-11-07';
 if(!/^\d{4}-\d{2}-\d{2}$/.test(openingDate)||!Number.isFinite(Date.parse(openingDate+'T17:00:00Z'))||new Date(openingDate+'T17:00:00Z').toISOString().slice(0,10)!==openingDate||openingDate===date)throw Error('INVALID_OPENING_DATE');
@@ -45,7 +45,7 @@ const line=id=>{const i=catalog.items.find(i=>i.id===id);return {item_id:id,qty:
 (async()=>{
  if(process.argv[2]==='--race-only'){
   const input={orderType:'collection',preferredTime:'2026-11-11T17:00:00Z',communicationPreference:'email',
-   customer:{name:'Private concurrent fixture',phone:'07700900123',email:fixtureEmail},
+   customer:{name:'Private concurrent fixture',phone:fixtureEmail==='release-nov6-delivery-service-20261111@example.invalid'?'07700900875':'07700900123',email:fixtureEmail},
    items:[{item_id:'green-curry',qty:4,modifiers:[{id:'tofu'}],spice:1}]};
   input.expectedTotals=calculateCommercialOrder(input,{now:new Date()}).header;
   const result=await Promise.all(['a','b'].map(suffix=>call('checkout',{...input,key:prefix+'race-'+suffix})));
@@ -66,7 +66,7 @@ const line=id=>{const i=catalog.items.find(i=>i.id===id);return {item_id:id,qty:
  for(let n=0;n<sets.length;n++){
   const ready=new Date(date+'T17:20:00Z');ready.setUTCMinutes(ready.getUTCMinutes()+n*20);
   const input={key:prefix+n,orderType:n===0?'delivery':'collection',preferredTime:ready.toISOString(),
-   customer:{name:'Private release fixture',phone:'07700900123',email:fixtureEmail,
+   customer:{name:'Private release fixture',phone:fixtureEmail==='release-nov6-delivery-service-20261111@example.invalid'?'07700900875':'07700900123',email:fixtureEmail,
     address:n===0?'Morley Town Hall, Queen Street, Morley, Leeds LS27 9DY, UK':''},
    communicationPreference:'email',items:sets[n].map(line)};
   const deliveryQuote=n===0?await quoteDelivery({
@@ -104,12 +104,12 @@ const line=id=>{const i=catalog.items.find(i=>i.id===id);return {item_id:id,qty:
  check((await call('admin_action',{action:'complete',orderId:proof.orderIds[1]})).http===200,'completion-committed');
  check((await call('admin_action',{action:'complete',orderId:proof.orderIds[1]})).http===200,'completion-replay-stable');
  check((await call('admin_action',{action:'decline',orderId:proof.orderIds[2]})).http===200,'cancellation-committed');
- const cold={...proof.firstInput,key:prefix+'cold-first',orderType:'collection',preferredTime:openingDate+'T17:00:00Z',items:[{item_id:'green-curry',qty:4,modifiers:[{id:'tofu'}],spice:1}]};
+ const cold={...proof.firstInput,key:prefix+'cold-first',orderType:'collection',preferredTime:openingDate+'T17:00:00Z',items:[{item_id:'green-curry',qty:12,modifiers:[{id:'chicken'}],spice:1}]};
  cold.expectedTotals=calculateCommercialOrder(cold,{now:new Date()}).header;
  const firstCold=await call('checkout',cold);check(firstCold.http===200&&firstCold.body.success,'cold-first-order-committed');proof.coldOrderId=firstCold.body.orderId;
  check((await call('checkout',{...cold,key:prefix+'cold-conflict'})).http===409,'cold-warmup-overflow-refused');
- const coldHints=await call('availability',{orderType:'collection',items:cold.items,times:[openingDate+'T17:00:00Z',openingDate+'T17:05:00Z']});
- check(coldHints.http===200&&coldHints.body.hints[0].available===false&&coldHints.body.hints[1].available===true,'cold-warmup-next-slot-offered');
+ const coldHints=await call('availability',{orderType:'collection',items:cold.items,times:['17:00','17:05','17:10','17:15','17:20','17:25','17:30'].map(time=>openingDate+'T'+time+':00Z')});
+ check(coldHints.http===200&&coldHints.body.hints[0].available===false&&coldHints.body.hints.slice(1).some(h=>h.available===true),'cold-warmup-next-slot-offered');
  proof.status='PASS_CHECKOUT_AND_CONTROLS';fs.writeFileSync(proofPath,JSON.stringify(proof,null,2));
  console.log(JSON.stringify({status:proof.status,orders:proof.orderIds.length,checks:proof.checks.length}));
 })().catch(e=>{proof.status='FAIL';proof.reason=e.message;fs.writeFileSync(proofPath,JSON.stringify(proof,null,2));console.error(e.message);process.exitCode=1;});

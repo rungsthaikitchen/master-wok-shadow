@@ -1,3 +1,15 @@
+# Current relaunch status — 11 November 2026
+
+Production remains LEGACY revision4. No production schema, runtime, checkout or notification change was made during these checks. Current private candidate: Edge58, source56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d.
+
+New staged review-delivery and concurrency checks pass (25 HTTP checks plus database reconciliation). The current-source whole-service replay also passes (27 checks, thirteen actual bookings including the opening test, thirteen receipts). Ordinary work remains within the usual holding limits; exceptions are explicit per reviewed order. Zero real notification attempts.
+
+Remaining gates: expanded TEMP-copy rollback preservation rehearsal; refreshed preview sign-in for the final same-page return check; final source/evidence reconciliation and production schema/configuration approval. The SQL tool's confirmation expired for the expanded rehearsal. The prepared staging script uses TEMP copies only and ends ROLLBACK. Do not claim full certification or activate production from component results.
+
+See FOUR-RING-RELEASE-CHECKLIST.md and FOUR-RING-RELEASE-MANIFEST.json for exact evidence and current artifacts. Rollback now additionally fences extended-hold work and unfinalized Master Wok orders. Pause first while Master Wok lifecycle is still enabled, finish commitments, then DRAINING for the final guarded switch.
+
+## Historical progress (retained for context)
+
 # Four-ring relaunch status — 10 November 2026
 
 **NO-GO for production reactivation. Production remains on Legacy following the

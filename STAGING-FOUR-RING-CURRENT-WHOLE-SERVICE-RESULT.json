@@ -1,0 +1,116 @@
+{
+  "status": "PASS_HTTP_AND_DATABASE_RECONCILIATION",
+  "checks": [
+    "joined-basket-0",
+    "concurrent-same-key-one-commit",
+    "joined-basket-1",
+    "joined-basket-2",
+    "joined-basket-3",
+    "joined-basket-4",
+    "joined-basket-5",
+    "joined-basket-6",
+    "joined-basket-7",
+    "joined-basket-8",
+    "joined-basket-9",
+    "joined-basket-10",
+    "joined-basket-11",
+    "pause-set",
+    "pause-blocks-hints",
+    "normal-restored",
+    "blackout-created",
+    "blackout-blocks-hints",
+    "blackout-deactivated",
+    "physical-overflow-refused",
+    "time-proposal-committed",
+    "completion-committed",
+    "completion-replay-stable",
+    "cancellation-committed",
+    "cold-first-order-committed",
+    "cold-warmup-overflow-refused",
+    "cold-warmup-next-slot-offered"
+  ],
+  "orderIds": [
+    "d5b48cee-0ae9-458e-85b7-cc4463d762ef",
+    "c27db420-dc09-4e05-ac2e-09bf43dd70ff",
+    "acea5d37-bcef-410d-84d3-79bde91d3bff",
+    "c9130214-fcc9-40b2-a5c5-88f072c1c07a",
+    "51a1dc60-9862-47a8-8e4a-9fed72187d09",
+    "3c2e8a2a-7558-4a26-bc02-860b44dfd746",
+    "54f6bf64-c01c-4662-97e2-7c51fdf6bca0",
+    "9eacb717-79b5-429d-b51f-d5d8440335c6",
+    "f39275c7-3eba-455b-bf64-0ecd4daa3294",
+    "079af7d7-d911-4674-a983-840ec6db6952",
+    "9505056b-0d0b-476d-b3d2-f1c31627b590",
+    "9ac3d647-34a5-4347-a59d-1893606bee46"
+  ],
+  "productionMutations": 0,
+  "realNotificationsSent": 0,
+  "firstInput": {
+    "key": "release-nov6-delivery-service-20261111-0",
+    "orderType": "delivery",
+    "preferredTime": "2026-12-09T17:20:00.000Z",
+    "customer": {
+      "name": "Private release fixture",
+      "phone": "07700900875",
+      "email": "release-nov6-delivery-service-20261111@example.invalid",
+      "address": "Morley Town Hall, Queen Street, Morley, Leeds LS27 9DY, UK"
+    },
+    "communicationPreference": "email",
+    "items": [
+      {
+        "item_id": "green-curry",
+        "qty": 1,
+        "modifiers": [
+          {
+            "id": "chicken"
+          }
+        ],
+        "spice": 2
+      },
+      {
+        "item_id": "jasmine-rice",
+        "qty": 1,
+        "modifiers": [],
+        "spice": 0
+      },
+      {
+        "item_id": "fish-cakes",
+        "qty": 1,
+        "modifiers": [],
+        "spice": 1
+      }
+    ],
+    "expectedTotals": {
+      "subtotal": 17,
+      "total": 19,
+      "discount": 0,
+      "discount_code": null,
+      "discount_amount": 0,
+      "discount_label": null,
+      "delivery_fee": 2,
+      "delivery_straight_line_miles": 1.0435314459883527,
+      "delivery_route_miles": 1.4509017338741748,
+      "delivery_distance_source": "route",
+      "loyalty_discount": 0,
+      "loyalty_points_redeem_pending": 0,
+      "loyalty_points_earned_pending": 17,
+      "loyalty_reward_applied": false,
+      "loyalty_expected_balance": 17,
+      "order_type": "delivery",
+      "preferred_time": "2026-12-09T17:20:00.000Z",
+      "asap_requested": false,
+      "payment_preference": "on_arrival",
+      "communication_preference": "email",
+      "notes": null
+    }
+  },
+  "blackoutId": "97f90ca0-a343-44a6-8f52-afdb71fe4bed",
+  "coldOrderId": "e2bca01f-4cf9-41eb-9d16-b8728f799ba0",
+  "edgeVersion": 58,
+  "runtimeSourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+  "sqlEvidence": "STAGING-FOUR-RING-CURRENT-WHOLE-SERVICE-SQL-RESULT.json",
+  "physicalEvidence": "STAGING-FOUR-RING-CURRENT-WHOLE-SERVICE-PHYSICAL-RESULT.json",
+  "serviceDate": "2026-12-09",
+  "openingDate": "2026-12-10",
+  "providerAttempts": 0
+}

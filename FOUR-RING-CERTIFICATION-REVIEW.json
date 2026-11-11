@@ -1,0 +1,46 @@
+{
+  "status": "DRAFT_NOT_CERTIFIED",
+  "date": "2026-11-11",
+  "runtimeSourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+  "productionAuthorized": false,
+  "productionMode": "LEGACY",
+  "productionRevision": 4,
+  "evidenceReady": [
+    "actual reviewed collection checkout and normal Admin Accept",
+    "actual reviewed delivery with door-age exception and ordinary following order",
+    "distinct-key one-grant race: one commit, one refusal, one receipt",
+    "same-key concurrent retry: one commit, one replay, one receipt",
+    "25 current-source HTTP review checks plus database reconciliation",
+    "27 current-source whole-service checks, 13 orders, 37 item rows, 13 receipts",
+    "independent four-ring occupancy and vessel reset checks",
+    "315 local core regressions in UTC/Europe-London",
+    "39 website tests and 39 focused gateway tests",
+    "unchanged notification components with prior owner-confirmed real receipts; no new dispatches"
+  ],
+  "remainingGates": [
+    {
+      "gate": "expanded rollback guard preservation",
+      "status": "AWAITING_STAGING_SQL_EDITOR",
+      "script": "staging-tests/rehearse-delivery-rollback.sql",
+      "guardSourceSha256": "79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af",
+      "mutationScope": "TEMP copies only; final ROLLBACK",
+      "reason": "SQL connector confirmation expired",
+      "expectedChecks": 10
+    },
+    {
+      "gate": "same-page return-link browser confirmation",
+      "status": "PREVIEW_SIGN_IN_EXPIRED"
+    },
+    {
+      "gate": "production schema/configuration and guarded cutover",
+      "status": "NOT_APPROVED",
+      "details": "Review tables absent; production still Legacy4; fresh pre-service check and exact source-bound approval required."
+    }
+  ],
+  "rollbackProcedure": [
+    "Pause new orders while Master Wok remains authoritative for existing lifecycle actions.",
+    "Finalize or cancel Master Wok orders and allow retained driver/holding-exception work to elapse.",
+    "Enter DRAINING under the common writer lock and run the complete revision-checked guard.",
+    "Restore compatible Legacy controls/deployments without deleting receipts, orders, plans or notification ownership."
+  ]
+}
