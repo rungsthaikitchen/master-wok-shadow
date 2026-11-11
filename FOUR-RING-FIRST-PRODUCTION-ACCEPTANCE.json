@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-11",
+  "status": "PASS_FIRST_PRODUCTION_CHECKOUT_AND_ADMIN_ACCEPTANCE",
+  "scope": "OWNER_SUBMITTED_ORDER_READ_ONLY_RECONCILIATION",
+  "reference": "RTK-1619",
+  "subtotal": 38,
+  "loyaltyDiscount": 5,
+  "total": 33,
+  "orderType": "collection",
+  "fulfilment": "2026-11-11T18:00:00Z",
+  "orderStatus": "confirmed",
+  "capacityScheduler": "MASTER_WOK",
+  "isTest": false,
+  "bookingReceiptCount": 1,
+  "servicePlan": {
+    "serviceDate": "2026-11-11",
+    "revision": 2,
+    "model": "combined-kitchen-four-ring-staging-v1",
+    "containsOrder": true
+  },
+  "notifications": [
+    {
+      "event": "order_created",
+      "channel": "sms",
+      "status": "sent",
+      "attempts": 1
+    },
+    {
+      "event": "order_created",
+      "channel": "pushover",
+      "status": "sent",
+      "attempts": 1
+    },
+    {
+      "event": "time_confirmed",
+      "channel": "sms",
+      "status": "sent",
+      "attempts": 1
+    }
+  ],
+  "ownerConfirmedExpectedReceipts": true,
+  "productionMutationsByThisCheck": 0,
+  "limits": [
+    "This order is still a confirmed live capacity commitment; no cancellation/test marking performed.",
+    "Earlier £50/£100 production checks were read-only availability, not submitted orders.",
+    "Reviewed-basket exception flow has staging E2E proof and live signed Admin access; no production exception order claimed."
+  ]
+}
