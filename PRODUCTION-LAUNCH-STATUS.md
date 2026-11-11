@@ -292,3 +292,6 @@ the isolated SMS provider/handset check, not full deployed outbox worker validat
 Backend tests: 29. See STAGING-SMS-PROBE-RESULT.json. Full runtime composition,
 whole-service/delivery and worker rehearsal, access boundaries and full rollback
 remain release gates; no production cutover approval is requested.
+
+
+11 November owner result: expanded guard rehearsal PASS, all ten cases, exact guard digest79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af. Unsafe delivery/hold/lifecycle switches and stale revision refused; safe TEMP restore preserved records. Live staging remained MASTER_WOK41, permanentMutations0. The earlier pending SQL rehearsal note is superseded by STAGING-EXPANDED-ROLLBACK-GUARD-RESULT.json. Final preview sign-in/browser return check and separately approved production rollout remain.

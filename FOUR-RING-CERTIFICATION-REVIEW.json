@@ -15,18 +15,10 @@
     "independent four-ring occupancy and vessel reset checks",
     "315 local core regressions in UTC/Europe-London",
     "39 website tests and 39 focused gateway tests",
-    "unchanged notification components with prior owner-confirmed real receipts; no new dispatches"
+    "unchanged notification components with prior owner-confirmed real receipts; no new dispatches",
+    "ten-case exact-source expanded TEMP rollback guard and preservation: owner PASS, zero permanent mutations"
   ],
   "remainingGates": [
-    {
-      "gate": "expanded rollback guard preservation",
-      "status": "AWAITING_STAGING_SQL_EDITOR",
-      "script": "staging-tests/rehearse-delivery-rollback.sql",
-      "guardSourceSha256": "79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af",
-      "mutationScope": "TEMP copies only; final ROLLBACK",
-      "reason": "SQL connector confirmation expired",
-      "expectedChecks": 10
-    },
     {
       "gate": "same-page return-link browser confirmation",
       "status": "PREVIEW_SIGN_IN_EXPIRED"
@@ -42,5 +34,16 @@
     "Finalize or cancel Master Wok orders and allow retained driver/holding-exception work to elapse.",
     "Enter DRAINING under the common writer lock and run the complete revision-checked guard.",
     "Restore compatible Legacy controls/deployments without deleting receipts, orders, plans or notification ownership."
+  ],
+  "completedGates": [
+    {
+      "gate": "expanded rollback guard preservation",
+      "status": "PASS_OWNER_SQL_EDITOR",
+      "script": "staging-tests/rehearse-delivery-rollback.sql",
+      "guardSourceSha256": "79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af",
+      "mutationScope": "TEMP copies only; final ROLLBACK",
+      "expectedChecks": 10,
+      "resultFile": "STAGING-EXPANDED-ROLLBACK-GUARD-RESULT.json"
+    }
   ]
 }

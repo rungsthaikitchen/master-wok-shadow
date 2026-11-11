@@ -1,0 +1,67 @@
+{
+  "scope": "TEMP_COPY_DELIVERY_AND_HOLD_EXCEPTION_ROLLBACK_GUARD_AND_PRESERVATION",
+  "checks": [
+    {
+      "case": 1,
+      "refusal": "DELIVERY_ROLLBACK_REQUIRES_DRAIN",
+      "recordsPreserved": true
+    },
+    {
+      "case": 2,
+      "refusal": "OUTSTANDING_DRIVER_TRIPS",
+      "recordsPreserved": true
+    },
+    {
+      "case": 3,
+      "refusal": "OUTSTANDING_DRIVER_TRIPS",
+      "recordsPreserved": true
+    },
+    {
+      "case": 4,
+      "refusal": "OUTSTANDING_DELIVERY_ORDERS",
+      "recordsPreserved": true
+    },
+    {
+      "case": 5,
+      "refusal": "OUTSTANDING_DELIVERY_ORDERS",
+      "recordsPreserved": true
+    },
+    {
+      "case": 6,
+      "refusal": "OUTSTANDING_HOLD_EXCEPTION_WORK",
+      "recordsPreserved": true
+    },
+    {
+      "case": 7,
+      "refusal": "OUTSTANDING_HOLD_EXCEPTION_WORK",
+      "recordsPreserved": true
+    },
+    {
+      "case": "pending_master_wok_lifecycle",
+      "refusal": "OUTSTANDING_MASTER_WOK_ORDERS",
+      "recordsPreserved": true
+    },
+    {
+      "case": "stale_revision",
+      "refused": true
+    },
+    {
+      "case": "completed_service_restore",
+      "mode": "LEGACY",
+      "revision": 43,
+      "recordsPreserved": true
+    }
+  ],
+  "status": "PASS",
+  "liveControl": {
+    "mode": "MASTER_WOK",
+    "revision": 41
+  },
+  "guardSourceSha256": "79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af",
+  "permanentMutations": 0,
+  "evidenceSource": "Owner SQL Editor output",
+  "limits": [
+    "LEGACY43 was a TEMP-copy simulation; live staging stayed MASTER_WOK41.",
+    "This is guard and preservation evidence, not a new production deployment rollback or customer Legacy checkout."
+  ]
+}

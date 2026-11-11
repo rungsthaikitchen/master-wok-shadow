@@ -143,3 +143,6 @@ Owner approved explicit, customer-discussed per-request holding exceptions. Coll
 - Preview browser reauthentication is required for the final same-page return-link check. Production currently remains Legacy4, with zero future active or unfinished Master Wok orders. Review tables/configuration are not installed in production. Production schema/config/runtime rollout still needs explicit approval after certification; it is not covered by the earlier compatibility deployment approval.
 
 Evidence: STAGING-REVIEW-DELIVERY-CONCURRENCY-RESULT.json, its SQL result, STAGING-FOUR-RING-CURRENT-WHOLE-SERVICE-RESULT.json and its SQL/physical results. Historical evidence below is not silently attributed to a new source digest. The production certificate stays DRAFT/PENDING until final reconciliation.
+
+
+11 November owner result: expanded guard rehearsal PASS, all ten cases, exact guard digest79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af. Unsafe delivery/hold/lifecycle switches and stale revision refused; safe TEMP restore preserved records. Live staging remained MASTER_WOK41, permanentMutations0. The earlier pending SQL rehearsal note is superseded by STAGING-EXPANDED-ROLLBACK-GUARD-RESULT.json. Final preview sign-in/browser return check and separately approved production rollout remain.

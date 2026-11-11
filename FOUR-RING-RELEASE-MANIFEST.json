@@ -241,10 +241,11 @@
   ],
   "priorCertificate": "master-wok-release-candidate.json is historical; its check statuses do not certify this release.",
   "rollbackGuardSha256": "79ae0a3d62defb89e23d759c75777b9852754a4fad9c66d56752cfb336a592af",
-  "rollbackGuardRehearsal": "PENDING_EXPANDED_TEMP_COPY_TEST",
+  "rollbackGuardRehearsal": "PASS_TEN_CASES_TEMP_COPY",
   "previewBrowser": "ACCESS_SESSION_EXPIRED",
   "productionMode": "LEGACY",
   "productionRevision": 4,
   "productionFutureActiveOrders": 0,
-  "productionReviewTablesInstalled": false
+  "productionReviewTablesInstalled": false,
+  "rollbackGuardEvidence": "STAGING-EXPANDED-ROLLBACK-GUARD-RESULT.json"
 }
