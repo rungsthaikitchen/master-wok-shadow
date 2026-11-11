@@ -1,0 +1,26 @@
+{
+  "status": "OWNER_APPROVED_FOR_PRODUCTION_HOTFIX",
+  "incident": "Admin completion refuses unchanged delivery commitment after coordinate round-trip",
+  "previousRuntimeSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+  "candidateRuntimeSha256": "865bea4967643d94f4163b72321b3df545792b1adbfb9c27c441a78cb608bb03",
+  "implementationFiles": [
+    "master-wok-driver-plan.js"
+  ],
+  "regressionFiles": [
+    "master-wok-driver-plan.test.js"
+  ],
+  "validation": {
+    "unitTests": 317,
+    "failed": 0,
+    "productionSnapshotOfflineReplays": 2,
+    "allCompletionAssessmentsValidated": true,
+    "reservedDriverTripsUnchanged": true,
+    "realDestinationAndPromiseChangesStillRefused": true
+  },
+  "scope": "Coordinate identity comparison tolerates scaled floating-point precision only. No SQL/schema, checkout, equipment, hold-policy or notification change.",
+  "limitations": [
+    "No hosted staging completion run for this hotfix yet"
+  ],
+  "rollback": "Redeploy backed-up version 7 runtime with its original bound certificate. Preserve all live orders, receipts and service plans.",
+  "ownerApproval": "You may"
+}

@@ -9,6 +9,10 @@ const POLICY=Object.freeze({arrivalTolerance:10,loading:2,handover:2,maxFoodAge:
 const overlap=(a,b)=>a.start<b.finish&&b.start<a.finish;
 const coordinate=p=>p&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)&&Math.abs(p.lat)<=90&&Math.abs(p.lng)<=180;
 const key=p=>JSON.stringify([p.lat,p.lng]);
+// JSON/PostgreSQL round-trips can change the last few binary digits. Compare
+// coordinate identity within scaled machine precision, not route precision.
+const sameDestination=(a,b)=>['lat','lng'].every(axis=>
+ Math.abs(a[axis]-b[axis])<=8*Number.EPSILON*Math.max(1,Math.abs(a[axis]),Math.abs(b[axis])));
 const sameSource=(a,b)=>a.stops.length===1&&b.stops.length===1&&a.stops[0].sourceId===b.stops[0].sourceId;
 function validateDriverPlan(plan){
  if(!plan||plan.version!==1||!Array.isArray(plan.trips))throw Error('INVALID_DRIVER_PLAN');
@@ -77,7 +81,7 @@ function createDriverPlanner({quoteLeg}={}){
    // For a partially cancelled combined trip retain the full route conservatively.
    if(current.length||t.start<=asOf&&t.finish>asOf){
     for(const s of current){const d=byId.get(s.id);
-     if(d.target!==s.target||key(d.destination)!==key(s.destination))throw Error('DELIVERY_COMMITMENT_CHANGED');
+     if(d.target!==s.target||!sameDestination(d.destination,s.destination))throw Error('DELIVERY_COMMITMENT_CHANGED');
      assigned.add(s.id);
     }
     trips.push(structuredClone(t));

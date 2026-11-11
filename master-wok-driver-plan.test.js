@@ -5,6 +5,17 @@ const date='2026-11-04',now='2026-11-04T08:00:00Z';
 const row=(id,time=1110,lat=53.75)=>({id,source_order_id:id.split('@')[0],order_type:'delivery',local_ready_minute:time,customer_lat:lat,customer_lng:-1.58});
 function planner(){return createDriverPlanner({quoteLeg:async({origin,destination})=>({durationSeconds:origin.lat===53.744437?300:destination.lat===53.744437?420:120})});}
 const run=(rows,other={})=>planner()({rows,serviceDate:date,now,...other});
+test('persisted coordinate round-off preserves the exact reserved trip',async()=>{
+ const rows=[row('roundtrip')],first=await run(rows);
+ const reread=[{...rows[0],customer_lat:rows[0].customer_lat+2*Number.EPSILON*rows[0].customer_lat}];
+ const next=await run(reread,{previousPlan:{delivery:first.delivery}});
+ assert.deepEqual(next.delivery,first.delivery);
+});
+test('real destination or promise changes still refuse a retained trip',async()=>{
+ const rows=[row('moved')],first=await run(rows);
+ for(const changed of [{...rows[0],customer_lat:53.750000001},{...rows[0],customer_lng:-1.580000001},{...rows[0],local_ready_minute:1115}])
+  await assert.rejects(()=>run([changed],{previousPlan:{delivery:first.delivery}}),/DELIVERY_COMMITMENT_CHANGED/);
+});
 test('arrival means the door: reserve loading, distinct outbound, handover and return',async()=>{
  const p=await run([row('a')]),t=p.delivery.trips[0];
  assert.equal(t.start,1103);assert.equal(t.departure,1105);assert.equal(t.stops[0].arrival,1110);assert.equal(t.finish,1119);assert.equal(p.deadlines.get('a'),1103);
