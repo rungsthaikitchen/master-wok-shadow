@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "DRAFT",
+  "status": "CERTIFIED_FOR_PRODUCTION",
   "releaseId": "master-wok-four-ring-2026-11-10",
   "projectRef": "ubyjrrsvbbqomitpaidb",
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
@@ -41,7 +41,7 @@
   },
   "paymentsEvidence": {
     "manifest": "ADMIN-PAYMENTS-READINESS-2026-11-12.md",
-    "productionApproval": "PENDING_OWNER",
+    "productionApproval": "Owner: I approve! \u2014 approved production database migration and deployment, 2026-11-12",
     "tests": {
       "core": 337,
       "website": 43,

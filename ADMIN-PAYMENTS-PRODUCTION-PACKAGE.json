@@ -1,5 +1,5 @@
 {
-  "status": "AWAITING_EXPLICIT_PRODUCTION_APPROVAL",
+  "status": "OWNER_APPROVED_DEPLOYMENT_IN_PROGRESS",
   "date": "2026-11-12",
   "releaseId": "master-wok-four-ring-2026-11-10",
   "runtimeSha256": "045da2c60703163228e028397c131eac22a9ae463e3fedad078e0dc4ce19595b",
@@ -44,5 +44,15 @@
     "No split/partial payments, refunds or correction action in first release",
     "No real payment collection; records money already received",
     "Hosted browser dropped-response injection not performed; exact server retry/concurrency and transaction rollback tested"
-  ]
+  ],
+  "ownerApproval": "I approve!",
+  "progress": {
+    "migration": "APPLIED; RLS true; API role access false; zero payment/event rows",
+    "productionEdgeVersion": 9,
+    "runtimeDigestVerified": "045da2c60703163228e028397c131eac22a9ae463e3fedad078e0dc4ce19595b",
+    "backendPinnedCommit": "3f864aa830718b4fd0165b60c94c644915dc5fd7",
+    "backendBranchMergeCommit": "921cd0026f37fff905a6179251d683ddbd9e0c87",
+    "websiteMergeCommit": "27aa3666b0ddb353293feb62b114d6dea75a2694",
+    "activation": "Supabase and Cloudflare gates disabled; Railway route enabled in its pending deployment to avoid a second IP-changing backend deploy"
+  }
 }
