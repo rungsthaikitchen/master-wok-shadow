@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "DRAFT",
+  "status": "CERTIFIED_FOR_PRODUCTION",
   "releaseId": "master-wok-four-ring-2026-11-10",
   "projectRef": "ubyjrrsvbbqomitpaidb",
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
@@ -52,7 +52,7 @@
     "scope": "Full bill payment plus separately recorded tip; no completion or schedule changes"
   },
   "combinedPayment": {
-    "productionApproval": "PENDING_OWNER",
+    "productionApproval": "Owner: I approve! \u2014 combined production runtime and Admin flow, 2026-11-12",
     "coreTests": 342,
     "databaseScenarios": 22,
     "hostedPreview": "https://538fcc91.rungsthaikitchen.pages.dev/admin",
