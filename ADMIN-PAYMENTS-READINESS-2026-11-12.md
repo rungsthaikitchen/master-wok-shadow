@@ -38,3 +38,8 @@ Disable payment flags to return to existing Mark paid behavior. Preserve payment
 - Actual hosted Edge requests: save HTTP 200 committed, identical retry HTTP 200 replayed without commit, batch summary HTTP 200 one result, invalid batch HTTP 400. Fixtures cleaned.
 - Core 337 and website 43 tests rerun successfully after row summaries.
 - Remaining integration blocker: Cloudflare Preview MASTER_WOK_PAYMENTS flag must be enabled by the owner, and the new branch Preview URL supplied. Railway OAuth hides existing proxy secret values, so direct authenticated gateway calls cannot be synthesized from current credentials. No production flags were changed.
+
+## Full hosted browser acceptance — PASS
+Preview https://19c16d6e.rungsthaikitchen.pages.dev/admin reported enabled=true. In the signed staff session, synthetic PAYMENT-TEST saved £32 card + £3 cash tip through Cloudflare -> Railway -> deployed booking Edge -> PostgreSQL. Order row showed both methods, refresh/reopening read the persisted payment without offering a duplicate entry form. Database verification: paid=true, status=confirmed, loyalty_settled=false, payment rows=1, audit rows=1, staff actor recorded. Synthetic order/payment/audit fixtures removed; remaining test orders=0. The earlier disabled Preview retained the existing confirmation prompt; it was dismissed without writing.
+
+The prior Cloudflare integration blocker is resolved. Production remains unchanged. Remaining release work: exact source-bound production certificate, final deploy/rollback package and explicit production approval. No claim is made that a dropped response was injected into the hosted browser; server replay/concurrency and fault rollback are covered by the staging transaction tests.
