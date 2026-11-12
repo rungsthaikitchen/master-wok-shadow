@@ -3,12 +3,12 @@ const {phoneKey}=require('./master-wok-commercial-validator');
 // Called inside the order lifecycle transaction after the order row is locked.
 // New Master Wok checkouts reserve rewards; their balance changes exactly once,
 // on completion. Imported legacy orders retain their existing settlement path.
-async function settleMasterWokLoyalty(connection,order,{schema='public'}={}){
+async function settleMasterWokLoyalty(connection,order,{schema='public',allowLegacy=false}={}){
  if(!['public','master_wok_rehearsal'].includes(schema))throw Error('INVALID_LOYALTY_SCHEMA');
  if(order.status!=='completed'||order.is_test)return {handled:false};
  const q='"'+schema+'".';
  const receipt=(await connection.query(`SELECT order_id FROM ${q}master_wok_booking_receipts WHERE order_id=$1`,[order.id])).rows[0];
- if(!receipt)return {handled:false};
+ if(!receipt&&!allowLegacy)return {handled:false};
  if(order.loyalty_settled)return {handled:true,settled:true};
  const customer=(await connection.query(`SELECT phone,email FROM ${q}customers WHERE id=$1`,[order.customer_id])).rows[0];
  const phone=phoneKey(customer?.phone);
@@ -27,3 +27,4 @@ async function settleMasterWokLoyalty(connection,order,{schema='public'}={}){
  return {handled:true,settled:true,pointsBalance:balance};
 }
 module.exports={settleMasterWokLoyalty};
+

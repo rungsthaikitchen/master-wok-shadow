@@ -1,6 +1,7 @@
 // Isolated staging certification; never deploy to production. No notifications.
 import pg from 'npm:pg@8.23.1';
 const {createPaymentWriter}=require('./master-wok-payments');
+const {createPaymentCompletion}=require('./master-wok-payment-completion');
 const {beginBookingTransaction}=require('./master-wok-transaction-writer');
 const token='__TOKEN__',expires=__EXPIRES__;
 const pool=new pg.Pool({connectionString:Deno.env.get('SUPABASE_DB_URL'),max:4});
@@ -30,9 +31,28 @@ Deno.serve(async req=>{
   const completed=await writer(payload(ids[3],{tipAmount:'0.00',tipMethod:null}));assert(completed.success&&completed.status==='completed'&&completed.payment.previously_marked_paid,'completed_paid_order_can_add_details');
   assert((await writer(payload(ids[4]))).reason==='ORDER_NOT_PAYABLE','cancelled_order_refused');
   const audit=(await pool.query('SELECT (SELECT count(*) FROM master_wok_rehearsal.order_payments WHERE order_id=ANY($1::uuid[]))::int AS payments,(SELECT count(*) FROM master_wok_rehearsal.order_payment_events WHERE order_id=ANY($1::uuid[]))::int AS events',[ids])).rows[0];assert(audit.payments===3&&audit.events===3,'one_audit_event_per_capture');
+  const completion=createPaymentCompletion({schema,assessMutation:async()=>({status:'GREEN',bookingApprovalAllowed:true,plansByDate:{}})});
+  const combined=createPaymentWriter({pool,schema,assertWriteAllowed:gate,completeOrder:completion});
+  const setup=await pool.connect();try{await beginBookingTransaction(setup,{key:'combined-payment-fixtures'});await setup.query("UPDATE master_wok_rehearsal.orders SET status='confirmed' WHERE id=$1",[ids[2]]);await setup.query('COMMIT');}finally{setup.release();}
+  const cp=payload(ids[2],{action:'record_and_complete'}),done=await combined(cp);assert(done.success&&done.status==='completed','combined_payment_completes_in_same_transaction');
+  assert((await combined(cp)).replayed===true,'combined_retry_replays_once');
+  const after=(await pool.query('SELECT status,paid FROM master_wok_rehearsal.orders WHERE id=$1',[ids[2]])).rows[0];assert(after.status==='completed'&&after.paid,'combined_status_and_paid_persist');
+  const legacy=await combined({...payload(ids[3]),action:'record_and_complete'});assert(legacy.reason==='PAYMENT_ALREADY_RECORDED','existing_payment_not_duplicated_by_combined_action');
+  const failId=crypto.randomUUID();ids.push(failId);const fc=await pool.connect();try{await beginBookingTransaction(fc,{key:'combined-failure-fixture'});await fc.query("INSERT INTO master_wok_rehearsal.orders(id,status,total,subtotal,paid,is_test,idempotency_key,capacity_scheduler) VALUES($1,'confirmed',32,32,false,true,$2,'MASTER_WOK')",[failId,'payment-certification-'+failId]);await fc.query('COMMIT');}finally{fc.release();}
+  const refused=createPaymentWriter({pool,schema,assertWriteAllowed:gate,completeOrder:createPaymentCompletion({schema,assessMutation:async()=>({status:'UNVERIFIED'})})});
+  // Give the failure fixture a date so the certified-plan requirement is exercised.
+  const dc=await pool.connect();try{await beginBookingTransaction(dc,{key:'combined-failure-date'});await dc.query("UPDATE master_wok_rehearsal.orders SET preferred_time='2026-12-09T18:00:00Z' WHERE id=$1",[failId]);await dc.query('COMMIT');}finally{dc.release();}
+  assert((await refused(payload(failId,{action:'record_and_complete'}))).reason==='PAYMENT_COMPLETION_NOT_VERIFIED','completion_refusal_refuses_payment');
+  const failed=(await pool.query('SELECT status,paid,(SELECT count(*) FROM master_wok_rehearsal.order_payments WHERE order_id=$1)::int AS payments FROM master_wok_rehearsal.orders WHERE id=$1',[failId])).rows[0];assert(failed.status==='confirmed'&&!failed.paid&&failed.payments===0,'completion_refusal_rolls_back_status_and_payment');
+  const nc=await pool.connect();try{await beginBookingTransaction(nc,{key:'combined-late-failure-reset'});await nc.query('UPDATE master_wok_rehearsal.orders SET preferred_time=null WHERE id=$1',[failId]);await nc.query('COMMIT');}finally{nc.release();}
+  const lateFaultPool={connect:async()=>{const c=await pool.connect();return {query:(sql,args)=>{if(sql.startsWith('INSERT INTO')&&sql.includes('.order_payments('))throw Error('INJECTED_PAYMENT_INSERT_FAILURE');return c.query(sql,args);},release:()=>c.release()};}};
+  const late=createPaymentWriter({pool:lateFaultPool,schema,assertWriteAllowed:gate,completeOrder:completion});
+  assert((await late(payload(failId,{action:'record_and_complete'}))).reason==='PAYMENT_TRANSACTION_FAILED','payment_insert_failure_after_completion_refused');
+  const lateState=(await pool.query('SELECT status,paid FROM master_wok_rehearsal.orders WHERE id=$1',[failId])).rows[0];assert(lateState.status==='confirmed'&&!lateState.paid,'late_failure_rolls_completion_back');
   return Response.json({status:'PASS',checks,notifications:0,productionMutations:0});
  }catch(e){return Response.json({status:'FAIL',reason:e.message,checks},{status:500});}
  finally{
   const c=await pool.connect();try{await beginBookingTransaction(c,{key:'payment-fixture-cleanup'});await c.query('DELETE FROM master_wok_rehearsal.order_payment_events WHERE order_id=ANY($1::uuid[])',[ids]);await c.query('DELETE FROM master_wok_rehearsal.order_payments WHERE order_id=ANY($1::uuid[])',[ids]);await c.query("DELETE FROM master_wok_rehearsal.orders WHERE id=ANY($1::uuid[]) AND idempotency_key LIKE 'payment-certification-%'",[ids]);await c.query('COMMIT');}catch(_){await c.query('ROLLBACK');}finally{c.release();}
  }
 });
+

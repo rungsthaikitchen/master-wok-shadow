@@ -1,6 +1,7 @@
 'use strict';
 // Composition root shared by deployed transports. Certification is an explicit
 // server dependency: this module never turns a prototype GREEN into approval.
+const {createPaymentCompletion}=require('./master-wok-payment-completion');
 const {createPaymentWriter}=require('./master-wok-payments');
 const {createDeliveryAdmin}=require('./master-wok-delivery-admin');
 const {createAtomicCheckout}=require('./master-wok-atomic-checkout');
@@ -45,7 +46,7 @@ function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,sc
   try{return input?.action==='approval_lookup'?(reviewApproval?await reviewApproval.lookup(input.token):{success:false,statusCode:503,reason:'REVIEW_APPROVAL_DISABLED'}):await saveReview(input);}
   catch(error){return {success:false,statusCode:error.message==='INVALID_REVIEW_REQUEST'?400:503,reason:'BASKET_REVIEW_UNAVAILABLE'};}
  };
- const payments=paymentsEnabled?createPaymentWriter({...shared,schema}):undefined;
+ const payments=paymentsEnabled?createPaymentWriter({...shared,schema,completeOrder:createPaymentCompletion({schema,assessMutation})}):undefined;
  const booking=createBookingHttpHandler({secret,payments,checkout,lifecycle,serviceControl,availability,basketReview,basketReviewAdmin:createBasketReviewAdmin({pool,schema,reviewApproval}),
   readPreviewOrders:readPreviewOrders?async()=>{
    if((await gate.read(pool)).mode!=='MASTER_WOK')throw Error('PREVIEW_READER_DISABLED');
@@ -57,3 +58,4 @@ function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,sc
  return request=>notifications&&request.headers.has('x-master-wok-notification-secret')?notifications(request):booking(request);
 }
 module.exports={createBookingRuntime};
+
