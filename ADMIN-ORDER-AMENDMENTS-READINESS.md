@@ -1,0 +1,17 @@
+# Admin order amendments — 12 November 2026
+
+Status: implemented and deployed to private staging; production approval pending.
+
+Scope: active unpaid, non-test orders with unsettled loyalty. Collection/delivery switching at the existing booked customer time; verified delivery address and automatic or explicit delivery charge; add/remove discount codes; reviewed server totals; staff reason, timestamp, before/after audit and idempotent save. No item or time editing in this form. Existing Suggest remains the time-change path. No customer notifications are queued or sent by amendments.
+
+The saved food subtotal is retained, rather than repricing historical items against today's menu. Existing loyalty is retained/capped, never newly awarded; unused full-discount redemption is released and pending earnings recalculated. Discount usage counters change exactly once and reverse when a code is removed. Unchanged codes remain usable even if the campaign has since ended. Codes newly added must meet current campaign and service-day eligibility.
+
+Transactions acquire the same global kitchen writer/order/service-date locks as checkout/payment. Read/preview roll back. Save rechecks order version, prices, payment status, loyalty state and protected kitchen/driver plans before committing order, counters, plans and audit together. Started delivery trips cannot change type/address. Monetary edits do not replan cooking. Paid/completed/cancelled/proposed orders are refused. Failure after a possible commit retains the same request key for retry; a replay is checked before stale-version validation.
+
+Validation: 352 core tests; 64 website/client/access/receipt tests. Staging SQL scenarios verify rollback, counter release, concurrent edits, idempotency conflicts, real four-ring and driver replanning, audit/payment preservation and late failure. Scenario route durations are synthetic five-minute journeys. Hosted Cloudflare→Railway→Edge tests additionally use the real address lookup/route service: collection £22.50→delivery £24.50; waive £2 delivery plus AMEND10→£20.25; restore collection/remove code→£22.50. SQL verified three audit rows, no payment or notification creation. Preview fixture RTK-AMEND-PREVIEW and staging-only code AMEND10 are retained for owner review.
+
+New audit table is RLS-enabled with no anon/authenticated/service-role access. Existing booking fence remains unchanged. Staging Edge version 65 uses source eef0b50c4c04d164ad41212446741af25af5da4773a1e70025282e6c40e32925. Production certificate template is deliberately DRAFT_PENDING_PRODUCTION_APPROVAL; it cannot run until explicitly certified for this exact source.
+
+Release after owner approval: inspect current production revision/runtime for drift; apply sql/admin-order-amendments.sql to production, certify the exact source with this evidence, deploy the production booking Edge with existing release binding/secrets, then merge website PR76. No Railway configuration, booking-mode change or customer messages are needed. Verify read/preview on live Admin and use an explicitly designated fixture for any live write acceptance.
+
+Rollback: restore the previous production Edge source and revert the two additive frontend entry points (script and Amend button). Leave audit records/table intact. Original financial values remain in the audit history; already saved amendments must not be undone by overwriting headers. No production data/runtime changes were made during this implementation.
