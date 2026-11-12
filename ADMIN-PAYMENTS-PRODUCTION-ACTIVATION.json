@@ -1,0 +1,28 @@
+{
+  "status": "LIVE_ACTIVATION_VERIFIED_READ_ONLY",
+  "date": "2026-11-12",
+  "ownerProductionApproval": "I approve!",
+  "feature": "Admin full bill payment methods and separately recorded tips",
+  "runtimeSourceSha256": "045da2c60703163228e028397c131eac22a9ae463e3fedad078e0dc4ce19595b",
+  "productionEdgeVersion": 10,
+  "websiteMainCommit": "27aa3666b0ddb353293feb62b114d6dea75a2694",
+  "backendDeployment": "24db06a0-3d2e-4968-bd9c-135bf9e08b02",
+  "backendBuiltCommit": "921cd0026f37fff905a6179251d683ddbd9e0c87",
+  "backendBuiltTreeMatchesStaging": true,
+  "backendStatus": "SUCCESS",
+  "cloudflarePaymentFlag": "enabled verified through public capability endpoint",
+  "bookingPaymentRead": "HTTP 200 success, committed false, empty UUID probe",
+  "adminSignedRead": "Production Mark paid form loaded stored final total, bill/tip method selectors; closed without save",
+  "productionFinancialWritesDuringVerification": 0,
+  "firstGenuineProductionCapture": "PENDING_NORMAL_SERVICE",
+  "bookingControl": {
+    "mode": "MASTER_WOK",
+    "revision": 8
+  },
+  "incidentCorrection": "First backend deploy 330cbabc-e619-47ab-b07c-f4bb6e31d4bd reported SUCCESS but actually built old fee04 commit despite configured pin. Production read-only UI check caught 404 payment route. Redeployed after merge and verified actual deployment commit metadata and real Admin read.",
+  "rollback": "Disable payment flags and preserve all orders/payment/audit/plan/outbox/loyalty records; previous compatible code targets remain in ADMIN-PAYMENTS-PRODUCTION-PACKAGE.json",
+  "limitations": [
+    "Single full bill and optional tip only; no corrections, refunds or split/partial payments in initial release",
+    "Production save intentionally left to a genuine received payment; full write/retry/concurrency/rollback tested in staging"
+  ]
+}
