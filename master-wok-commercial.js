@@ -91,4 +91,4 @@ function calculateCommercialOrder(input,{now,discount=null,settledPoints=0,reser
   payment_preference:input.paymentPreference==='in_advance'?'in_advance':'on_arrival',
   communication_preference:input.communicationPreference==='email'?'email':'sms',notes:input.notes||null}};
 }
-module.exports={priceBasket,calculateCommercialOrder,catalog};
+module.exports={priceBasket,calculateCommercialOrder,discountCents,catalog};
