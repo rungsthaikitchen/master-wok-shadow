@@ -6,7 +6,7 @@ const {readBookingAvailability}=require('./master-wok-availability-reader');
 const {createServicePlanStore}=require('./master-wok-service-plan-store');
 const {RING_MODEL_VERSION}=require('./master-wok-protected-plan');
 function createDeploymentRuntime({pool,model,certificate,sourceSha256,releaseId,projectRef,
- secret,notificationSecret,deliveryPublicKey,deliveryProjectRef=projectRef,reviewApprovalsEnabled=false}={}){
+ secret,notificationSecret,deliveryPublicKey,deliveryProjectRef=projectRef,paymentsEnabled=false,reviewApprovalsEnabled=false}={}){
  if(typeof secret!=='string'||secret.length<32||typeof notificationSecret!=='string'||
   notificationSecret.length<32||secret===notificationSecret)throw Error('DISTINCT_SERVER_SECRETS_REQUIRED');
  const schema=projectRef==='hvrqgufqjslvgiohgkvu'?'master_wok_rehearsal':'public';
@@ -38,7 +38,7 @@ function createDeploymentRuntime({pool,model,certificate,sourceSha256,releaseId,
   .replaceAll('public.customers',schema+'.customers').replaceAll('public.loyalty_accounts',schema+'.loyalty_accounts')
   .replaceAll('public.discount_codes',schema+'.discount_codes')
   .replace('SELECT public.get_next_order_number() AS value',`WITH bump AS (UPDATE ${schema}.order_counters SET current_num=current_num+1 WHERE id=1 RETURNING current_num) SELECT json_build_object('assigned',current_num) AS value FROM bump`),args)};
- return createBookingRuntime({pool,model,reviewApprovalsEnabled,deliveryCapacity,quoteDelivery:deliveryCapacity?quoteDelivery:undefined,secret,notificationSecret,releaseId,schema,readOrders,readAvailability,
+ return createBookingRuntime({pool,model,paymentsEnabled,reviewApprovalsEnabled,deliveryCapacity,quoteDelivery:deliveryCapacity?quoteDelivery:undefined,secret,notificationSecret,releaseId,schema,readOrders,readAvailability,
   notificationOrderKeyPrefix:certificate.status==='CANDIDATE_FOR_STAGING'?certificate.fixturePrefix:undefined,
   readPreviewOrders:certificate.status==='CANDIDATE_FOR_STAGING'?async()=>{
    const r=await pool.query(`SELECT to_jsonb(o)||jsonb_build_object('customers',to_jsonb(c),
