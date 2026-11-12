@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "DRAFT_PENDING_PRODUCTION_APPROVAL",
+  "status": "CERTIFIED_FOR_PRODUCTION",
   "releaseId": "master-wok-four-ring-2026-11-10",
   "projectRef": "ubyjrrsvbbqomitpaidb",
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
@@ -66,7 +66,8 @@
       "website": 64,
       "postgresScenarios": 22
     },
-    "productionApproval": "PENDING",
-    "manifest": "ADMIN-ORDER-AMENDMENTS-READINESS.md"
+    "productionApproval": "Owner: Yes please Sensei! \u2014 production Admin, database and scheduler deployment approved, 12 November 2026",
+    "manifest": "ADMIN-ORDER-AMENDMENTS-READINESS.md",
+    "ownerAcceptance": "POLICE10 with collection\u2192delivery, \u00a33 delivery and \u00a32.25 discount; \u00a323.25 saved correctly in staging Admin"
   }
 }
