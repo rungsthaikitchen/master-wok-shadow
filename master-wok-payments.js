@@ -7,12 +7,16 @@ function createPaymentWriter({pool,schema='public',assertWriteAllowed}={}){
  const table=name=>'"'+schema+'".'+name;
  return async input=>{
   const fail=(reason,statusCode=409)=>({success:false,committed:false,reason,statusCode});
-  if(!input||!UUID.test(input.orderId||'')||!['read','record'].includes(input.action))return fail('INVALID_PAYMENT_REQUEST',400);
+  if(!input||!['read','record','list'].includes(input.action)||(input.action!=='list'&&!UUID.test(input.orderId||''))||(input.action==='list'&&(!Array.isArray(input.orderIds)||!input.orderIds.length||input.orderIds.length>60||input.orderIds.some(id=>!UUID.test(id)))))return fail('INVALID_PAYMENT_REQUEST',400);
   // Only the authenticated server transport supplies this signed staff identity.
   if(typeof input.staffActor!=='string'||!/^\S+@\S+\.\S+$/.test(input.staffActor)||input.staffActor.length>254)return fail('PAYMENT_STAFF_REQUIRED',403);
   let c;
   try{
    c=await pool.connect();await beginBookingTransaction(c,{key:'order:'+input.orderId});await assertWriteAllowed(c);
+   if(input.action==='list'){
+    const rows=(await c.query(`SELECT o.id AS order_id,o.paid,to_jsonb(p) AS payment FROM ${table('orders')} o LEFT JOIN ${table('order_payments')} p ON p.order_id=o.id WHERE o.id=ANY($1::uuid[])`,[input.orderIds])).rows;
+    await c.query('ROLLBACK');return {success:true,committed:false,payments:rows};
+   }
    const order=(await c.query(`SELECT id,total,status,paid,paid_at,payment_status,is_test FROM ${table('orders')} WHERE id=$1 FOR UPDATE`,[input.orderId])).rows[0];
    if(!order){await c.query('ROLLBACK');return fail('ORDER_NOT_FOUND',404);}
    const prior=(await c.query(`SELECT * FROM ${table('order_payments')} WHERE order_id=$1`,[input.orderId])).rows[0];
