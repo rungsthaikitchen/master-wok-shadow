@@ -1,0 +1,48 @@
+{
+  "status": "AWAITING_EXPLICIT_PRODUCTION_APPROVAL",
+  "date": "2026-11-12",
+  "releaseId": "master-wok-four-ring-2026-11-10",
+  "runtimeSha256": "045da2c60703163228e028397c131eac22a9ae463e3fedad078e0dc4ce19595b",
+  "productionProject": "ubyjrrsvbbqomitpaidb",
+  "stagingProject": "hvrqgufqjslvgiohgkvu",
+  "migration": "sql/admin-payments.sql",
+  "migrationSha256": "99ff4ecd3a8fbe0fc02f356c64bf90f252ba4184e667a02dfd4c42942afa4802",
+  "databaseChange": "Add order_payments and order_payment_events with RLS; no backfill, no order updates",
+  "websiteCommit": "96b7d18590ad7a1af7c3c85b62c8608c02c0d415",
+  "backendCommit": "3f864aa830718b4fd0165b60c94c644915dc5fd7",
+  "rollback": {
+    "edgeVersion": 8,
+    "runtimeSha256": "865bea4967643d94f4163b72321b3df545792b1adbfb9c27c441a78cb608bb03",
+    "websiteCommit": "283fd1ed5ace0b453d4e64782514aedfe398a77e",
+    "backendDeployment": "8c2b10cf-7cca-47bd-a462-46ccb55b6761",
+    "backendCommit": "fee04f72163af9aff8b63143749c52fcfa3911e8",
+    "preserve": [
+      "all orders",
+      "all payment and audit rows",
+      "service plans",
+      "booking receipts",
+      "notification outbox",
+      "loyalty history"
+    ],
+    "coreCommit": "09f7a655f6d1548583cf7295fc94eb0bbd51e54d"
+  },
+  "manualConfiguration": [
+    "Supabase production MASTER_WOK_PAYMENTS=enabled only after code deployment",
+    "Cloudflare Production MASTER_WOK_PAYMENTS=enabled then redeploy after backend health checks"
+  ],
+  "sequence": [
+    "Get explicit production DB/runtime/deployment approval",
+    "Apply additive migration in production and verify RLS/API privileges",
+    "Set production certificate certified with explicit owner approval and matching tested digest; deploy Edge with payment feature disabled",
+    "Deploy pinned backend payment source, flag disabled; observe SUCCESS and Brevo authorised without sending notices",
+    "Deploy website PR71 with Production payment flag disabled",
+    "Enable Supabase and Railway payment flags after health checks; enable Cloudflare Production flag and redeploy",
+    "Owner verifies first genuine payment; read-only verify audit count and unchanged completion",
+    "On payment issue disable flags, retain data and restore compatible backed-up runtimes as needed"
+  ],
+  "limitations": [
+    "No split/partial payments, refunds or correction action in first release",
+    "No real payment collection; records money already received",
+    "Hosted browser dropped-response injection not performed; exact server retry/concurrency and transaction rollback tested"
+  ]
+}
