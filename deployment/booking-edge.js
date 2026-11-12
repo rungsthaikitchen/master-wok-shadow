@@ -16,6 +16,7 @@ try{
  const pool=new pg.Pool({connectionString:Deno.env.get('SUPABASE_DB_URL'),max:3,connectionTimeoutMillis:10000});
  handler=createDeploymentRuntime({pool,model:globalThis.MasterWokModelV1,certificate,
   sourceSha256:'__RUNTIME_SOURCE_SHA256__',projectRef,
+  paymentsEnabled:getEnv('MASTER_WOK_PAYMENTS')==='enabled',
   reviewApprovalsEnabled:getEnv('MASTER_WOK_REVIEW_APPROVALS')==='enabled',
   releaseId:getEnv('MASTER_WOK_RELEASE_ID'),secret:getEnv('MASTER_WOK_BOOKING_SECRET'),
   deliveryProjectRef:getEnv('MASTER_WOK_DELIVERY_PROJECT_REF')||projectRef,

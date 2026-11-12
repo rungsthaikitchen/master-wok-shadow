@@ -1,6 +1,7 @@
 'use strict';
 // Composition root shared by deployed transports. Certification is an explicit
 // server dependency: this module never turns a prototype GREEN into approval.
+const {createPaymentWriter}=require('./master-wok-payments');
 const {createDeliveryAdmin}=require('./master-wok-delivery-admin');
 const {createAtomicCheckout}=require('./master-wok-atomic-checkout');
 const {createLifecycleWriter}=require('./master-wok-lifecycle');
@@ -15,7 +16,7 @@ const {createReviewApproval}=require('./master-wok-review-approval');
 const {createBasketReviewStore,createBasketReviewAdmin}=require('./master-wok-basket-review');
 const {createBasketAvailability}=require('./master-wok-availability');
 function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,schema='public',
- validateCommercialOrder,deliveryService,readAvailability,readOrders,assessBooking,assessMutation,notificationOrderKeyPrefix,readPreviewOrders,deliveryCapacity,quoteDelivery,reviewApprovalsEnabled=false}={}){
+ validateCommercialOrder,deliveryService,readAvailability,readOrders,assessBooking,assessMutation,notificationOrderKeyPrefix,readPreviewOrders,deliveryCapacity,quoteDelivery,reviewApprovalsEnabled=false,paymentsEnabled=false}={}){
  if(typeof assessMutation!=='function')throw Error('CERTIFIED_LIFECYCLE_ASSESSOR_REQUIRED');
  const gate=createLaunchControl({schema,releaseId});
  const reviewApproval=reviewApprovalsEnabled?createReviewApproval({pool,schema,assertWriteAllowed:gate.assertWriteAllowed}):undefined;
@@ -44,7 +45,8 @@ function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,sc
   try{return input?.action==='approval_lookup'?(reviewApproval?await reviewApproval.lookup(input.token):{success:false,statusCode:503,reason:'REVIEW_APPROVAL_DISABLED'}):await saveReview(input);}
   catch(error){return {success:false,statusCode:error.message==='INVALID_REVIEW_REQUEST'?400:503,reason:'BASKET_REVIEW_UNAVAILABLE'};}
  };
- const booking=createBookingHttpHandler({secret,checkout,lifecycle,serviceControl,availability,basketReview,basketReviewAdmin:createBasketReviewAdmin({pool,schema,reviewApproval}),
+ const payments=paymentsEnabled?createPaymentWriter({...shared,schema}):undefined;
+ const booking=createBookingHttpHandler({secret,payments,checkout,lifecycle,serviceControl,availability,basketReview,basketReviewAdmin:createBasketReviewAdmin({pool,schema,reviewApproval}),
   readPreviewOrders:readPreviewOrders?async()=>{
    if((await gate.read(pool)).mode!=='MASTER_WOK')throw Error('PREVIEW_READER_DISABLED');
    return readPreviewOrders();

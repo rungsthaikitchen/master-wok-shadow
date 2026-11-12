@@ -10,7 +10,7 @@ let stagingConfiguration={};
 if(process.argv[2]==='--release-staging'&&process.env.MASTER_WOK_STAGING_CONFIG_FILE){
  stagingConfiguration=JSON.parse(fs.readFileSync(process.env.MASTER_WOK_STAGING_CONFIG_FILE,'utf8'));
  const keys=['MASTER_WOK_RELEASE_ID','MASTER_WOK_BOOKING_SECRET','MASTER_WOK_NOTIFICATION_SECRET',
-  'MASTER_WOK_DELIVERY_PROJECT_REF','MASTER_WOK_DELIVERY_PUBLIC_KEY','MASTER_WOK_REVIEW_APPROVALS'];
+  'MASTER_WOK_DELIVERY_PROJECT_REF','MASTER_WOK_DELIVERY_PUBLIC_KEY','MASTER_WOK_REVIEW_APPROVALS','MASTER_WOK_PAYMENTS'];
  if(!stagingConfiguration||Array.isArray(stagingConfiguration)||Object.keys(stagingConfiguration).some(k=>!keys.includes(k)||typeof stagingConfiguration[k]!=='string'))
   throw Error('INVALID_PRIVATE_STAGING_CONFIGURATION');
 }
