@@ -13,7 +13,7 @@ const pool=new pg.Pool({connectionString:Deno.env.get('SUPABASE_DB_URL'),max:4})
 Deno.serve(async req=>{
  if(Deno.env.get('SUPABASE_URL')!=='https://hvrqgufqjslvgiohgkvu.supabase.co'||Date.now()>expires||req.headers.get('x-amendment-certification')!==token)return Response.json({error:'Unavailable'},{status:403});
  if(req.method!=='POST')return Response.json({error:'Method'},{status:405});
- const schema='master_wok_rehearsal',ids=Array.from({length:4},()=>crypto.randomUUID()),run=crypto.randomUUID().slice(0,8),code=('AMEND-'+run).toUpperCase(),date='2027-02-11',checks=[];
+ const schema='master_wok_rehearsal',ids=Array.from({length:4},()=>crypto.randomUUID()),run=crypto.randomUUID().slice(0,8),code=('AMEND-'+run).toUpperCase(),date='2027-02-11',checks=[],completedIds=[],customerId=crypto.randomUUID(),phone='07700900995';let createdCustomer=false;
  const assert=(ok,label)=>{if(!ok)throw Error(label);checks.push(label);};
  const quote={straightLineMiles:1,routeMiles:2,customerLatitude:53.74,customerLongitude:-1.57};
  const rewrite=c=>({query:(sql,args)=>c.query(sql.replaceAll('public.orders',schema+'.orders').replaceAll('public.order_items',schema+'.order_items').replaceAll('public.service_state',schema+'.service_state').replaceAll('public.booking_blackouts',schema+'.booking_blackouts'),args)});
@@ -65,10 +65,42 @@ Deno.serve(async req=>{
   const preserved=(await pool.query(`SELECT order_type,(SELECT revision FROM ${schema}.master_wok_service_plans WHERE service_date=$2) AS revision FROM ${schema}.orders WHERE id=$1`,[ids[1],date])).rows[0];
   assert(preserved.order_type==='delivery'&&preserved.revision===oldRevision,'late_failure_preserves_order_and_driver_plan');
   const counts=(await pool.query(`SELECT (SELECT count(*)::int FROM ${schema}.order_amendments WHERE order_id=ANY($1::uuid[])) audits,(SELECT count(*)::int FROM ${schema}.order_payments WHERE order_id=ANY($1::uuid[])) payments`,[ids])).rows[0];assert(counts.audits===5&&counts.payments===0,'audit_count_and_payment_preservation');
+  const historyWriter=createAmendmentWriter({...options,assessMutation:async()=>{throw Error('COMPLETED_MUST_NOT_REPLAN');},quoteDelivery:async()=>{throw Error('COMPLETED_MUST_NOT_GEOCODE');},planStore:{read:async()=>{throw Error('NO_PLAN_READ');},save:async()=>{throw Error('NO_PLAN_WRITE');}}});
+  const historyRead=id=>historyWriter({action:'amend_read',orderId:id,staffActor});
+  completedIds.push(crypto.randomUUID(),crypto.randomUUID(),crypto.randomUUID());
+  const cs=await pool.connect();try{await beginBookingTransaction(cs,{key:'completed-amendment-fixtures'});
+   if((await cs.query(`SELECT id FROM ${schema}.loyalty_accounts WHERE customer_phone=$1`,[phone])).rows.length)throw Error('COMPLETED_FIXTURE_PHONE_IN_USE');
+   await cs.query(`INSERT INTO ${schema}.customers(id,full_name,email,phone) VALUES($1,'Synthetic completed amendment','completed-amendment@example.invalid',$2)`,[customerId,phone]);createdCustomer=true;
+   await cs.query(`INSERT INTO ${schema}.loyalty_accounts(customer_phone,points_balance,lifetime_points) VALUES($1,72,572)`,[phone]);
+   for(const id of completedIds)await cs.query(`INSERT INTO ${schema}.orders(id,customer_id,status,total,subtotal,discount,discount_amount,loyalty_discount,delivery_fee,order_type,loyalty_points_earned_pending,loyalty_points_redeem_pending,loyalty_expected_balance,loyalty_settled,paid,payment_status,is_test,idempotency_key,capacity_scheduler,preferred_time) VALUES($1,$2,'completed',25.5,22.5,0,0,0,3,'delivery',22,0,72,true,true,'paid',false,$3,'MASTER_WOK',$4)`,[id,customerId,'amendment-certification-'+run+'-completed-'+id,date+'T20:00:00Z']);
+   for(const id of completedIds.slice(0,2))await cs.query(`INSERT INTO ${schema}.order_payments(order_id,capture_idempotency_key,bill_amount,bill_method,tip_amount,tip_method,recorded_by,previously_marked_paid) VALUES($1,$2,25.5,'card',2,'cash',$3,false)`,[id,crypto.randomUUID(),staffActor]);
+   await cs.query('COMMIT');}catch(e){await cs.query('ROLLBACK');throw e;}finally{cs.release();}
+  const paymentOriginal=JSON.stringify((await pool.query(`SELECT * FROM ${schema}.order_payments WHERE order_id=ANY($1::uuid[]) ORDER BY order_id`,[completedIds])).rows);
+  const planOriginal=JSON.stringify((await pool.query(`SELECT * FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows);
+  const cr=await historyRead(completedIds[0]),ci=input(completedIds[0],cr.version,delivery),cp=await historyWriter(ci);
+  assert(cp.success&&cp.paymentAfter.balance.overpayment==='2.25'&&cp.loyaltyAdjustment.after.pointsBalance===70,'completed_preview_shows_overpayment_and_loyalty');
+  assert(Number((await pool.query(`SELECT points_balance FROM ${schema}.loyalty_accounts WHERE customer_phone=$1`,[phone])).rows[0].points_balance)===72,'completed_preview_no_loyalty_write');
+  const csr=save(ci,cp),saved=await historyWriter(csr);assert(saved.success&&saved.committed,'completed_paid_discount_commit');
+  assert((await historyWriter(csr)).replayed,'completed_amendment_retry_once');
+  const cstate=(await pool.query(`SELECT status,paid,payment_status,loyalty_settled,total FROM ${schema}.orders WHERE id=$1`,[completedIds[0]])).rows[0];
+  assert(cstate.status==='completed'&&cstate.paid&&cstate.payment_status==='overpaid'&&cstate.loyalty_settled&&Number(cstate.total)===23.25,'completed_state_and_overpayment_persist');
+  const ca=(await pool.query(`SELECT points_balance,lifetime_points FROM ${schema}.loyalty_accounts WHERE customer_phone=$1`,[phone])).rows[0];assert(Number(ca.points_balance)===70&&Number(ca.lifetime_points)===570,'completed_settled_points_adjust_once');
+  const fr=await historyRead(completedIds[1]),fci=input(completedIds[1],fr.version,delivery),fcp=await historyWriter(fci);
+  assert(!(await createAmendmentWriter({...options,pool:failPool})(save(fci,fcp))).success,'completed_late_audit_failure_refused');
+  const rollback=(await pool.query(`SELECT total FROM ${schema}.orders WHERE id=$1`,[completedIds[1]])).rows[0];const rollbackPoints=(await pool.query(`SELECT points_balance FROM ${schema}.loyalty_accounts WHERE customer_phone=$1`,[phone])).rows[0];assert(Number(rollback.total)===25.5&&Number(rollbackPoints.points_balance)===70,'completed_audit_failure_rolls_back_points_and_totals');
+  const colRead=await historyRead(completedIds[0]),colInput=input(completedIds[0],colRead.version,{orderType:'collection',deliveryAddress:'',deliveryFee:'',discountCode:code}),colPreview=await historyWriter(colInput);assert((await historyWriter(save(colInput,colPreview))).success,'completed_delivery_to_collection');
+  const delRead=await historyRead(completedIds[0]),delInput=input(completedIds[0],delRead.version,{...delivery,deliveryAddress:'',deliveryFee:'6.00'}),delPreview=await historyWriter(delInput);assert(delPreview.paymentAfter.balance.underpayment==='0.75'&&(await historyWriter(save(delInput,delPreview))).success,'completed_collection_to_delivery_underpayment');
+  const under=(await pool.query(`SELECT paid,payment_status FROM ${schema}.orders WHERE id=$1`,[completedIds[0]])).rows[0];assert(!under.paid&&under.payment_status==='underpaid','completed_underpayment_not_marked_paid');
+  const unknownRead=await historyRead(completedIds[2]),unknownInput=input(completedIds[2],unknownRead.version,{...delivery,discountCode:'',deliveryFee:'0.00'}),unknownPreview=await historyWriter(unknownInput);assert(unknownPreview.paymentAfter.methodUnknown&&!unknownPreview.paymentAfter.recorded&&(await historyWriter(save(unknownInput,unknownPreview))).success,'completed_unknown_historical_payment_not_invented');
+  assert(JSON.stringify((await pool.query(`SELECT * FROM ${schema}.order_payments WHERE order_id=ANY($1::uuid[]) ORDER BY order_id`,[completedIds])).rows)===paymentOriginal,'completed_receipts_and_tips_unchanged');
+  assert(JSON.stringify((await pool.query(`SELECT * FROM ${schema}.master_wok_service_plans WHERE service_date=$1`,[date])).rows)===planOriginal,'completed_kitchen_and_driver_history_unchanged');
+  const auditCount=(await pool.query(`SELECT count(*)::int n FROM ${schema}.order_amendments WHERE order_id=$1`,[completedIds[0]])).rows[0];assert(auditCount.n===3,'completed_one_audit_per_amendment');
   result={status:'PASS',checks,productionMutations:0,notifications:0,routeSource:'synthetic five minute journeys',scheduler:'real four-ring and driver replanning'};
  }catch(e){result={status:'FAIL',reason:e.message,checks};}
  finally{const c=await pool.connect();try{await beginBookingTransaction(c,{key:'amendment-fixture-cleanup'});
-  await c.query(`DELETE FROM ${schema}.order_amendments WHERE order_id=ANY($1::uuid[])`,[ids]);await c.query(`DELETE FROM ${schema}.order_items WHERE order_id=ANY($1::uuid[])`,[ids]);await c.query(`DELETE FROM ${schema}.orders WHERE id=ANY($1::uuid[]) AND idempotency_key LIKE $2`,[ids,'amendment-certification-'+run+'-%']);await c.query(`DELETE FROM ${schema}.discount_codes WHERE code=$1`,[code]);
+  await c.query(`DELETE FROM ${schema}.order_payments WHERE order_id=ANY($1::uuid[])`,[completedIds]);
+  ids.push(...completedIds);
+  await c.query(`DELETE FROM ${schema}.order_amendments WHERE order_id=ANY($1::uuid[])`,[ids]);await c.query(`DELETE FROM ${schema}.order_items WHERE order_id=ANY($1::uuid[])`,[ids]);await c.query(`DELETE FROM ${schema}.orders WHERE id=ANY($1::uuid[]) AND idempotency_key LIKE $2`,[ids,'amendment-certification-'+run+'-%']);await c.query(`DELETE FROM ${schema}.discount_codes WHERE code=$1`,[code]);if(createdCustomer){await c.query(`DELETE FROM ${schema}.loyalty_accounts WHERE customer_phone=$1`,[phone]);await c.query(`DELETE FROM ${schema}.customers WHERE id=$1`,[customerId]);}
   // Only delete our plan, identified by its fixture stop; never another service.
   await c.query(`DELETE FROM ${schema}.master_wok_service_plans WHERE service_date=$1 AND plan::text LIKE $2`,[date,'%'+ids[1]+'%']);await c.query('COMMIT');}catch(_){await c.query('ROLLBACK');result.cleanup='FAILED';}finally{c.release();}}
  return Response.json(result,{status:result.status==='PASS'?200:500});
