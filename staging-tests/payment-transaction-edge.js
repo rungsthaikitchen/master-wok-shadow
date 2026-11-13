@@ -8,7 +8,7 @@ const pool=new pg.Pool({connectionString:Deno.env.get('SUPABASE_DB_URL'),max:4})
 Deno.serve(async req=>{
  if(Deno.env.get('SUPABASE_URL')!=='https://hvrqgufqjslvgiohgkvu.supabase.co'||Date.now()>expires||req.headers.get('x-payment-certification')!==token)return Response.json({error:'Unavailable'},{status:403});
  if(req.method!=='POST')return Response.json({error:'Method'}, {status:405});
- const schema='master_wok_rehearsal',ids=Array.from({length:5},()=>crypto.randomUUID()),checks=[];
+ const schema='master_wok_rehearsal',ids=Array.from({length:5},()=>crypto.randomUUID()),checks=[],customerIds=[],accountPhones=[];
  const assert=(condition,label)=>{if(!condition)throw Error(label);checks.push(label);};
  const gate=async c=>{const r=(await c.query('SELECT mode FROM master_wok_rehearsal.master_wok_launch_control WHERE id=1')).rows[0];if(r.mode!=='MASTER_WOK')throw Error('STAGING_NOT_READY');};
  const writer=createPaymentWriter({pool,schema,assertWriteAllowed:gate});
@@ -73,10 +73,28 @@ Deno.serve(async req=>{
   assert((await combined(historicalPayload)).replayed,'historical_payment_retry_once');
   const historyFailed=await late(payload(historicalIds[1],{action:'record_and_complete',billAmount:'51.50',expectedTotal:'51.50',tipAmount:'0.00',tipMethod:null}));assert(!historyFailed.success,'historical_late_capture_failure_refused');
   const historyRollback=(await pool.query("SELECT status,paid,(SELECT count(*)::int FROM master_wok_rehearsal.order_payments WHERE order_id=$1) payments FROM master_wok_rehearsal.orders WHERE id=$1",[historicalIds[1]])).rows[0];assert(historyRollback.status==='customer_accepted_time'&&!historyRollback.paid&&historyRollback.payments===0,'historical_failure_rolls_completion_back');
+  const pendingIds=[crypto.randomUUID(),crypto.randomUUID()];ids.push(...pendingIds);
+  const customerId=crypto.randomUUID(),phone='07700900997';
+  const pc=await pool.connect();try{await beginBookingTransaction(pc,{key:'historical-pending-loyalty'});
+   if((await pc.query('SELECT id FROM master_wok_rehearsal.loyalty_accounts WHERE customer_phone=$1',[phone])).rows.length)throw Error('LOYALTY_FIXTURE_PHONE_IN_USE');
+   customerIds.push(customerId);accountPhones.push(phone);
+   await pc.query("INSERT INTO master_wok_rehearsal.customers(id,full_name,email,phone) VALUES($1,'Synthetic historical loyalty','historical-loyalty@example.invalid',$2)",[customerId,phone]);
+   for(const id of pendingIds)await pc.query("INSERT INTO master_wok_rehearsal.orders(id,customer_id,status,total,subtotal,paid,is_test,loyalty_settled,loyalty_points_earned_pending,loyalty_points_redeem_pending,idempotency_key,capacity_scheduler,preferred_time,created_at) VALUES($1,$2,'confirmed',37,37,false,false,false,37,0,$3,'LEGACY','2026-10-31T19:30:00Z','2026-10-31T19:18:00Z')",[id,customerId,'payment-certification-'+id]);
+   await pc.query('COMMIT');}finally{pc.release();}
+  const pendingPayload=payload(pendingIds[0],{action:'record_and_complete',billAmount:'37.00',expectedTotal:'37.00',tipAmount:'0.00',tipMethod:null});
+  const pendingSaved=await combined(pendingPayload);assert(pendingSaved.success&&pendingSaved.loyalty_settled,'historical_pending_loyalty_completes');
+  let points=(await pool.query('SELECT points_balance,lifetime_points FROM master_wok_rehearsal.loyalty_accounts WHERE customer_phone=$1',[phone])).rows[0];assert(Number(points.points_balance)===37&&Number(points.lifetime_points)===37,'historical_pending_awards_exact_points');
+  assert((await combined(pendingPayload)).replayed,'historical_pending_retry_replays');
+  points=(await pool.query('SELECT points_balance,lifetime_points FROM master_wok_rehearsal.loyalty_accounts WHERE customer_phone=$1',[phone])).rows[0];assert(Number(points.points_balance)===37&&Number(points.lifetime_points)===37,'historical_pending_retry_no_double_award');
+  const ac=await pool.connect();try{await beginBookingTransaction(ac,{key:'historical-newer-account-date'});await ac.query("UPDATE master_wok_rehearsal.loyalty_accounts SET last_order_at='2026-11-12T20:00:00Z' WHERE customer_phone=$1",[phone]);await ac.query('COMMIT');}finally{ac.release();}
+  assert(!(await late(payload(pendingIds[1],{action:'record_and_complete',billAmount:'37.00',expectedTotal:'37.00',tipAmount:'0.00',tipMethod:null}))).success,'historical_pending_late_capture_failure');
+  const pendingRollback=(await pool.query('SELECT status,paid,loyalty_settled FROM master_wok_rehearsal.orders WHERE id=$1',[pendingIds[1]])).rows[0];points=(await pool.query('SELECT points_balance,lifetime_points FROM master_wok_rehearsal.loyalty_accounts WHERE customer_phone=$1',[phone])).rows[0];assert(pendingRollback.status==='confirmed'&&!pendingRollback.paid&&!pendingRollback.loyalty_settled&&Number(points.points_balance)===37&&Number(points.lifetime_points)===37,'historical_pending_all_effects_rollback');
+  assert((await combined(payload(pendingIds[1],{action:'record_and_complete',billAmount:'37.00',expectedTotal:'37.00',tipAmount:'0.00',tipMethod:null}))).success,'historical_pending_retry_after_rollback');
+  points=(await pool.query('SELECT points_balance,lifetime_points,last_order_at FROM master_wok_rehearsal.loyalty_accounts WHERE customer_phone=$1',[phone])).rows[0];assert(Number(points.points_balance)===74&&new Date(points.last_order_at).toISOString()==='2026-11-12T20:00:00.000Z','historical_settlement_preserves_newer_account_date');
   return Response.json({status:'PASS',checks,notifications:0,productionMutations:0});
  }catch(e){return Response.json({status:'FAIL',reason:e.message,checks},{status:500});}
  finally{
-  const c=await pool.connect();try{await beginBookingTransaction(c,{key:'payment-fixture-cleanup'});await c.query('DELETE FROM master_wok_rehearsal.order_payment_events WHERE order_id=ANY($1::uuid[])',[ids]);await c.query('DELETE FROM master_wok_rehearsal.order_payments WHERE order_id=ANY($1::uuid[])',[ids]);await c.query("DELETE FROM master_wok_rehearsal.orders WHERE id=ANY($1::uuid[]) AND idempotency_key LIKE 'payment-certification-%'",[ids]);await c.query('COMMIT');}catch(_){await c.query('ROLLBACK');}finally{c.release();}
+  const c=await pool.connect();try{await beginBookingTransaction(c,{key:'payment-fixture-cleanup'});await c.query('DELETE FROM master_wok_rehearsal.order_payment_events WHERE order_id=ANY($1::uuid[])',[ids]);await c.query('DELETE FROM master_wok_rehearsal.order_payments WHERE order_id=ANY($1::uuid[])',[ids]);await c.query("DELETE FROM master_wok_rehearsal.orders WHERE id=ANY($1::uuid[]) AND idempotency_key LIKE 'payment-certification-%'",[ids]);await c.query('DELETE FROM master_wok_rehearsal.loyalty_accounts WHERE customer_phone=ANY($1::text[])',[accountPhones]);await c.query('DELETE FROM master_wok_rehearsal.customers WHERE id=ANY($1::uuid[])',[customerIds]);await c.query('COMMIT');}catch(_){await c.query('ROLLBACK');}finally{c.release();}
  }
 });
 

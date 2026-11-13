@@ -25,8 +25,15 @@ test('legacy source alone never exempts a current/future service or existing Mas
   await assert.rejects(()=>complete({connection:c,order:o}),/PAYMENT_COMPLETION_NOT_VERIFIED/);assert.equal(assessments,1,kind);
  }
 });
-test('unsettled historical loyalty needs review rather than guessing an old award',async()=>{
+test('historical pending loyalty settles on the same connection without kitchen assessment',async()=>{
+ const c={query:async sql=>({rows:sql.startsWith('SELECT clock_timestamp')?[{now:'2026-11-13T07:00:00Z'}]:[]})};let calls=0;
+ const complete=createPaymentCompletion({assessMutation:async()=>{throw Error('must not assess');},planStore:{read:async()=>null},settleLoyalty:async(connection,o,options)=>{assert.equal(connection,c);assert.equal(o.status,'completed');assert.equal(options.allowLegacy,true);calls++;return {handled:true,settled:true};}});
+ const r=await complete({connection:c,order:{...order,capacity_scheduler:'LEGACY',loyalty_settled:false,preferred_time:'2026-10-31T17:30:00Z'}});assert.equal(r.loyalty_settled,true);assert.equal(calls,1);
+});
+test('historical loyalty failure propagates to the owning payment transaction',async()=>{
  const c={query:async sql=>({rows:sql.startsWith('SELECT clock_timestamp')?[{now:'2026-11-13T07:00:00Z'}]:[]})};
- const complete=createPaymentCompletion({assessMutation:async()=>{throw Error('must not assess');},planStore:{read:async()=>null}});
- await assert.rejects(()=>complete({connection:c,order:{...order,capacity_scheduler:'LEGACY',loyalty_settled:false,preferred_time:'2026-10-31T17:30:00Z'}}),/HISTORICAL_PAYMENT_LOYALTY_REVIEW_REQUIRED/);
+ for(const settlement of [async()=>{throw Error('LOYALTY_CUSTOMER_REQUIRED');},async()=>({handled:false})]){
+  const complete=createPaymentCompletion({assessMutation:async()=>{throw Error('must not assess');},planStore:{read:async()=>null},settleLoyalty:settlement});
+  await assert.rejects(()=>complete({connection:c,order:{...order,capacity_scheduler:'LEGACY',loyalty_settled:false,preferred_time:'2026-10-31T17:30:00Z'}}),/LOYALTY/);
+ }
 });
