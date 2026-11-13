@@ -1,0 +1,20 @@
+{
+  "status": "LIVE",
+  "date": "2026-11-13",
+  "ownerApproval": "Yeah looks good. Happy to deploy to prod",
+  "sourceSha256": "dc4f1ea892e37f1815055808be8ca48cb51b01ee1cb74c2199be7d856e449e6a",
+  "edgeVersion": 13,
+  "previousVersion": 12,
+  "websiteMergeCommit": "947ca7b38d96648c2c40cd589afee7bc3d1453ec",
+  "cloudflareDeployment": "6dfea077-1a01-4e68-95b7-73563f289dc4",
+  "mode": "MASTER_WOK",
+  "controlRevision": 8,
+  "schemaChanges": 0,
+  "verificationCustomerWrites": 0,
+  "validation": {
+    "core": 355,
+    "website": 67,
+    "postgres": 32
+  },
+  "liveRead": "Actual card receipt and explicit underpayment displayed correctly"
+}
