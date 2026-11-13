@@ -63,6 +63,16 @@ Deno.serve(async req=>{
   const actualList=await writer({action:'list',orderIds:extraIds.slice(0,2),staffActor:'payment-test@example.invalid'});assert(actualList.payments.find(p=>p.order_id===extraIds[0]).balance.underpayment==='0.30'&&actualList.payments.find(p=>p.order_id===extraIds[1]).balance.overpayment==='1.00','list_reports_actual_balances');
   const changed=await pool.connect();try{await beginBookingTransaction(changed,{key:'post-capture-total-fixture'});await changed.query('UPDATE master_wok_rehearsal.orders SET total=33 WHERE id=$1',[extraIds[0]]);await changed.query('COMMIT');}finally{changed.release();}
   assert((await combined(actual)).replayed,'same_key_replays_after_later_total_change');
+  const historicalIds=[crypto.randomUUID(),crypto.randomUUID()];ids.push(...historicalIds);
+  const hc=await pool.connect();try{await beginBookingTransaction(hc,{key:'historical-payment-fixtures'});
+   if((await hc.query("SELECT service_date FROM master_wok_rehearsal.master_wok_service_plans WHERE service_date='2026-10-31'")).rows.length)throw Error('HISTORICAL_FIXTURE_DATE_NOT_EMPTY');
+   for(const id of historicalIds)await hc.query("INSERT INTO master_wok_rehearsal.orders(id,status,total,subtotal,paid,is_test,loyalty_settled,idempotency_key,capacity_scheduler,preferred_time,confirmed_time) VALUES($1,'customer_accepted_time',51.5,51.5,false,true,true,$2,'LEGACY','2026-10-31T17:20:00Z','2026-10-31T17:30:00Z')",[id,'payment-certification-'+id]);await hc.query('COMMIT');}finally{hc.release();}
+  const historicalPayload=payload(historicalIds[0],{action:'record_and_complete',billAmount:'51.50',expectedTotal:'51.50',tipAmount:'0.00',tipMethod:null});
+  const historySaved=await combined(historicalPayload);assert(historySaved.success&&historySaved.historicalCompletion&&historySaved.status==='completed'&&historySaved.loyalty_settled,'historical_legacy_payment_completion_without_replanning');
+  const historyState=(await pool.query("SELECT status,capacity_scheduler,loyalty_settled FROM master_wok_rehearsal.orders WHERE id=$1",[historicalIds[0]])).rows[0];assert(historyState.status==='completed'&&historyState.capacity_scheduler==='LEGACY'&&historyState.loyalty_settled,'historical_source_and_settled_loyalty_preserved');
+  assert((await combined(historicalPayload)).replayed,'historical_payment_retry_once');
+  const historyFailed=await late(payload(historicalIds[1],{action:'record_and_complete',billAmount:'51.50',expectedTotal:'51.50',tipAmount:'0.00',tipMethod:null}));assert(!historyFailed.success,'historical_late_capture_failure_refused');
+  const historyRollback=(await pool.query("SELECT status,paid,(SELECT count(*)::int FROM master_wok_rehearsal.order_payments WHERE order_id=$1) payments FROM master_wok_rehearsal.orders WHERE id=$1",[historicalIds[1]])).rows[0];assert(historyRollback.status==='customer_accepted_time'&&!historyRollback.paid&&historyRollback.payments===0,'historical_failure_rolls_completion_back');
   return Response.json({status:'PASS',checks,notifications:0,productionMutations:0});
  }catch(e){return Response.json({status:'FAIL',reason:e.message,checks},{status:500});}
  finally{
