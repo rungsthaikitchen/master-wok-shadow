@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "DRAFT_PENDING_PRODUCTION_APPROVAL",
+  "status": "CERTIFIED_FOR_PRODUCTION",
   "releaseId": "master-wok-four-ring-2026-11-10",
   "projectRef": "ubyjrrsvbbqomitpaidb",
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
@@ -72,7 +72,7 @@
   },
   "actualPayments": {
     "scope": "Actual bill amount, explicit under/overpayment, separate tips and reason",
-    "productionApproval": "PENDING",
+    "productionApproval": "Owner: Yeah looks good. Happy to deploy to prod \u2014 13 November 2026",
     "tests": {
       "core": 355,
       "website": 67,

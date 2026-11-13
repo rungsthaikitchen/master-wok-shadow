@@ -1,6 +1,6 @@
 # Actual payment amounts — 13 November 2026
 
-Status: private staging only. Production unchanged; owner approval pending.
+Status: production live after owner preview acceptance and explicit deployment approval, 13 November 2026.
 
 The payment form defaults to the bill due but accepts the actual amount received towards it. Any difference requires a reason and the displayed order-total version. Tips are independently entered and never offset a bill underpayment. An overpayment remains an overpayment, not an invented tip or discount. No order prices, discount codes or loyalty formula are changed by payment capture.
 
@@ -12,4 +12,4 @@ Validation: 355 core tests, 67 website/access/receipt tests and 32 real PostgreS
 
 First release still captures one bill receipt per order. Additional instalments, refunds and corrections to an existing capture need their own audited adjustment path; do not create duplicate captures. Completed-order amendments remain a separate work item, with kitchen/driver history preserved. Synthetic RTK-PAYMENT-PREVIEW is the saved acceptance example; fresh RTK-PAYMENT-TRY is retained unpaid for owner testing (uncheck Today only).
 
-Release after owner acceptance: check production runtime/source drift, certify this exact source, deploy --release-actual-payments with the existing release binding and secrets, then merge the website change. Verify live read/preview without changing customer orders. Rollback restores previous Edge source and frontend scripts; retain actual receipts and audit events already captured. The prior schema can store these amounts unchanged.
+Production release: owner approved ("Yeah looks good. Happy to deploy to prod"). Inspected unchanged production source/version12 and launch-control revision8, certified the exact source, deployed --release-actual-payments as Edge13 with the existing release binding/secrets, and merged website PR77 at 947ca7b38d96648c2c40cd589afee7bc3d1453ec. Cloudflare reported success. Live payment read showed the corrected actual card receipt and 30p underpayment; no customer payments were written during verification. Rollback restores previous Edge source and frontend scripts; retain actual receipts and audit events already captured. The prior schema can store these amounts unchanged.
