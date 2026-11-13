@@ -1,6 +1,6 @@
 # Completed-order amendments
 
-Status: staging review; production certificate remains DRAFT_PENDING_PRODUCTION_APPROVAL.
+Status: owner accepted hosted preview on 13 November 2026; production certificate certified for exact tested source.
 
 Completed orders can correct collection/delivery classification, an explicit delivery charge and discount code using the existing review/save/reason/history flow. Existing basket prices are retained. New codes must pass current active/limit/date rules and the original service weekday; an unchanged existing code remains intact. Completed delivery corrections require an explicit charge and optional historical address. They do not geocode, reserve routes or alter historical kitchen/driver plans. Active unpaid amendments retain their existing certified operational assessment.
 
@@ -11,3 +11,5 @@ Settled loyalty changes by the earned-points delta and any released redemption i
 Validation: 365 core tests, 55 website tests, 37 real staging PostgreSQL scenarios (including real active-order scheduler and driver reservations). Completed checks cover preview rollback, paid discount, exact loyalty delta, retry once, audit-failure rollback, delivery/collection both ways, underpayment flag, unknown historical payment, unchanged receipt/tip bytes and unchanged service-plan bytes. No production writes or customer notifications during tests.
 
 Owner preview fixture RTK-COMPLETED-AMEND-PREVIEW: synthetic completed delivery, £22.50 food + £3 fee, £25.50 card receipt, £2 cash tip, 72 loyalty balance / 572 lifetime, 22 points earned. Original service Wednesday 24 February 2027 allows MIDWEEK10. Preview/sample changes may be saved in staging only. No production deployment yet. Rollback would restore prior frontend/runtime; retain legitimate amendment/audit/payment history already recorded.
+
+Owner acceptance: “Yep, makes sense. Very happy with that” after testing collection to delivery and confirming the explicit charge requirement. Hosted saved acceptance verified completed collection total £20.25, card receipt £25.50, cash tip £2, overpaid £5.25, loyalty balance70/lifetime570 and one amendment audit. Production source before rollout Edge15 / 389e89932369e2e9110534164a30f808511787130be2f66111ffa117df236f60 is retained as runtime rollback. No schema or Railway configuration change.

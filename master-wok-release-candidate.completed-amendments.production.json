@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "DRAFT_PENDING_PRODUCTION_APPROVAL",
+  "status": "CERTIFIED_FOR_PRODUCTION",
   "releaseId": "master-wok-four-ring-2026-11-10",
   "projectRef": "ubyjrrsvbbqomitpaidb",
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
@@ -91,8 +91,9 @@
   },
   "completedAmendments": {
     "scope": "Completed-order delivery/collection, explicit delivery fee and code correction; original receipts/tips and protected plans retained, settled loyalty delta audited",
-    "productionApproval": "PENDING",
+    "productionApproval": "Owner accepted hosted preview: Yep, makes sense. Very happy with that \u2014 13 November 2026",
     "coreTests": 365,
-    "postgresScenarios": 37
+    "postgresScenarios": 37,
+    "hostedAcceptance": "Saved delivery to collection with MIDWEEK10; total20.25, receipt25.50 card, tip2 cash preserved, overpaid5.25, loyalty72 to70; owner tested collection to delivery and accepted explicit charge"
   }
 }
