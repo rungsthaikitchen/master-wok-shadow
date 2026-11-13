@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-12",
+  "status": "LIVE_READ_ONLY_VERIFIED",
+  "ownerApproved": true,
+  "bookingRuntime": {
+    "version": 11,
+    "sha256": "7c7df23d91284202cc25e8337150f2ec09def1896852b9ad2ecc1aa81bd6f8ed"
+  },
+  "website": {
+    "combinedLogicCommit": "d5757518e7f6b54558ad43f35d1979c17944d71f",
+    "cacheVersionCommit": "2781eae110993248acc0d77861aae353b68c655e",
+    "cloudflareCheck": "completed/success"
+  },
+  "verification": {
+    "coreTests": 342,
+    "postgresScenarios": 22,
+    "hostedStagingCombinedSave": "PASS; synthetic fixtures cleaned",
+    "productionUI": "Take payment & complete; Save payment & complete; bill and tip methods present; closed without saving; Today only restored",
+    "productionPayments": 2,
+    "productionPaymentEvents": 2,
+    "productionFinancialWritesByAgent": 0,
+    "firstGenuineCombinedPayment": "Pending normal service"
+  },
+  "rollback": {
+    "adminBaseline": "27aa3666b0ddb353293feb62b114d6dea75a2694",
+    "runtimeBaselineVersion": 10,
+    "runtimeBaselineSha256": "045da2c60703163228e028397c131eac22a9ae463e3fedad078e0dc4ce19595b",
+    "preserve": "All orders, payments, payment events, plans, booking receipts, outbox and loyalty; retain scheduler authority"
+  },
+  "railwayRedeployed": false,
+  "schemaChanged": false
+}

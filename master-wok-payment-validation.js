@@ -17,7 +17,13 @@ function validatePayment(input, storedOrderTotal) {
   const due = pennies(storedOrderTotal, 'Stored order total');
   const bill = pennies(input.billAmount, 'Bill amount');
   const tip = pennies(input.tipAmount ?? '0.00', 'Tip amount');
-  if (bill !== due) throw new Error('Bill amount does not match final order total');
+  if (bill > 9999999999 || tip > 9999999999) throw new Error('Payment amount exceeds storage limit');
+  const hasExpected=Object.hasOwn(input,'expectedTotal');
+  if(hasExpected&&pennies(input.expectedTotal,'Expected order total')!==due)throw new Error('Order total changed; refresh payment details');
+  if(bill!==due&&!hasExpected)throw new Error('Bill amount does not match final order total; review expected total first');
+  const reason=typeof input.differenceReason==='string'?input.differenceReason.trim():'';
+  if(bill!==due&&(!reason||reason.length>500))throw new Error('Reason required for an underpayment or overpayment');
+  if(input.differenceReason!=null&&typeof input.differenceReason!=='string'||reason.length>500)throw new Error('Invalid payment difference reason');
   if (tip > 0 && !METHODS.has(input.tipMethod)) throw new Error('Tip method required for positive tip');
   if (tip === 0 && input.tipMethod != null && input.tipMethod !== '') throw new Error('Tip method must be empty when tip is zero');
   if (typeof input.idempotencyKey !== 'string' ||
@@ -29,8 +35,15 @@ function validatePayment(input, storedOrderTotal) {
     billMethod: input.billMethod,
     tipAmount: (tip / 100).toFixed(2),
     tipMethod: tip ? input.tipMethod : null,
-    idempotencyKey: input.idempotencyKey
+    idempotencyKey: input.idempotencyKey,
+    ...(hasExpected?{expectedTotal:(due/100).toFixed(2),differenceReason:reason||null}:{})
   });
 }
-module.exports = { validatePayment, pennies };
+function paymentBalance(storedOrderTotal,actualBillAmount){
+ const due=pennies(String(storedOrderTotal),'Stored order total'),received=pennies(String(actualBillAmount),'Bill amount');
+ return {orderTotal:(due/100).toFixed(2),billReceived:(received/100).toFixed(2),
+  underpayment:(Math.max(0,due-received)/100).toFixed(2),overpayment:(Math.max(0,received-due)/100).toFixed(2),
+  paid:received>=due,paymentStatus:received<due?'underpaid':received>due?'overpaid':'paid'};
+}
+module.exports = { validatePayment, pennies, paymentBalance };
 

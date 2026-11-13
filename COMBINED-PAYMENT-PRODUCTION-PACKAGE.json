@@ -1,0 +1,38 @@
+{
+  "status": "OWNER_APPROVED_DEPLOYMENT_IN_PROGRESS",
+  "runtimeSourceSha256": "7c7df23d91284202cc25e8337150f2ec09def1896852b9ad2ecc1aa81bd6f8ed",
+  "stagingVersion": 62,
+  "websitePR": 72,
+  "websiteCommit": "2bcb2cfaf32a5df24204b473842f93a529515a45",
+  "changes": [
+    "Add explicit atomic payment-and-completion action",
+    "Save protected kitchen plans and settle loyalty in the same transaction",
+    "Update normal Admin form/button; completed orders only record details"
+  ],
+  "schemaChanges": false,
+  "railwayChanges": false,
+  "validation": {
+    "coreTests": 342,
+    "postgresScenarios": 22,
+    "browserPreview": "https://538fcc91.rungsthaikitchen.pages.dev/admin",
+    "onePaymentOneAudit": true,
+    "pointsAwardedOnce": 10,
+    "notificationCount": 0
+  },
+  "rollout": [
+    "Owner approves changed production booking runtime and Admin UI",
+    "Back up live Edge runtime and bind production certificate to this tested digest",
+    "Deploy booking runtime first, retaining old record action for older open tabs",
+    "Merge website PR72 and verify deployed combined form using read-only access",
+    "Verify first genuine combined save during service without synthetic production payments"
+  ],
+  "rollback": [
+    "Restore payment-only Admin UI first",
+    "Restore prior compatible booking runtime if needed",
+    "Preserve every order, payment, audit event, loyalty entry and service plan; never reverse a completed order as code rollback"
+  ],
+  "rollbackRuntimeSha256": "045da2c60703163228e028397c131eac22a9ae463e3fedad078e0dc4ce19595b",
+  "rollbackEdgeVersion": 10,
+  "rollbackWebsiteCommit": "27aa3666b0ddb353293feb62b114d6dea75a2694",
+  "ownerApproval": "I approve!"
+}

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "status": "CERTIFIED_FOR_PRODUCTION",
+  "releaseId": "master-wok-four-ring-2026-11-10",
+  "projectRef": "ubyjrrsvbbqomitpaidb",
+  "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
+  "schema": "public",
+  "modelVersion": "combined-kitchen-four-ring-staging-v1",
+  "sourceSha256": "eef0b50c4c04d164ad41212446741af25af5da4773a1e70025282e6c40e32925",
+  "checks": {
+    "atomicConcurrency": "PASS",
+    "physicalCoverage": "PASS",
+    "lifecycle": "PASS",
+    "writeFence": "PASS",
+    "commercial": "PASS",
+    "delivery": "PASS",
+    "notifications": "PASS",
+    "wholeService": "PASS",
+    "rollback": "PASS",
+    "driverReservations": "PASS",
+    "combinedTrips": "PASS",
+    "deliveryCheckout": "PASS",
+    "deliveryRollback": "PASS"
+  },
+  "deliveryScheduling": 1,
+  "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
+  "evidence": {
+    "manifest": "FOUR-RING-CERTIFICATION-EVIDENCE.json",
+    "sha256": "b13892d4e1fbe3f7935b5560f8855062c49b4849f11e9a251a6c38376da7a354",
+    "note": "Source review complete for controlled pre-service launch only. Deployment/configuration verification, owner activation approval and locked preflight remain required. Rollback qualifications are explicit in the evidence manifest."
+  },
+  "hotfix": {
+    "date": "2026-11-11",
+    "ownerApproval": "You may \u2014 production completion hotfix approved",
+    "previousSourceSha256": "56a47189fd294172aac671b77a65dff12ef78aa5ceca46416b40f4e0e396c80d",
+    "evidence": "COMPLETION-COORDINATE-HOTFIX-2026-11-11.json",
+    "scope": "Retained delivery coordinate identity comparison tolerates floating-point round-trip only",
+    "regressionTests": 317,
+    "offlineLiveCompletionReplays": 2,
+    "driverTripsPreserved": true
+  },
+  "paymentsEvidence": {
+    "manifest": "ADMIN-PAYMENTS-READINESS-2026-11-12.md",
+    "productionApproval": "Owner: I approve! \u2014 approved production database migration and deployment, 2026-11-12",
+    "tests": {
+      "core": 337,
+      "website": 43,
+      "backend": 21,
+      "postgresScenarios": 14
+    },
+    "hostedAcceptance": "https://19c16d6e.rungsthaikitchen.pages.dev/admin",
+    "scope": "Full bill payment plus separately recorded tip; no completion or schedule changes"
+  },
+  "combinedPayment": {
+    "productionApproval": "Owner: I approve! \u2014 combined production runtime and Admin flow, 2026-11-12",
+    "coreTests": 342,
+    "databaseScenarios": 22,
+    "hostedPreview": "https://538fcc91.rungsthaikitchen.pages.dev/admin",
+    "behavior": "One atomic save records payment and tip, completes the order, saves certified plans and settles loyalty once",
+    "evidence": "COMBINED-PAYMENT-READINESS.md"
+  },
+  "amendmentEvidence": {
+    "scope": "Active unpaid orders with unsettled loyalty; type, delivery charge, discount code",
+    "tests": {
+      "core": 352,
+      "website": 64,
+      "postgresScenarios": 22
+    },
+    "productionApproval": "Owner: Yes please Sensei! \u2014 production Admin, database and scheduler deployment approved, 12 November 2026",
+    "manifest": "ADMIN-ORDER-AMENDMENTS-READINESS.md",
+    "ownerAcceptance": "POLICE10 with collection\u2192delivery, \u00a33 delivery and \u00a32.25 discount; \u00a323.25 saved correctly in staging Admin"
+  }
+}

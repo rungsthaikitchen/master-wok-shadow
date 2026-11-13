@@ -1,0 +1,30 @@
+{
+  "status": "LIVE",
+  "date": "2026-11-12",
+  "ownerApproval": "Yes please Sensei!",
+  "edgeVersionBefore": 11,
+  "edgeVersionAfter": 12,
+  "sourceSha256": "eef0b50c4c04d164ad41212446741af25af5da4773a1e70025282e6c40e32925",
+  "productionMigration": "admin_order_amendments",
+  "websiteMergeCommit": "faa7d3b1a83ed18c14201eb30a5f794f638fbb2c",
+  "mode": "MASTER_WOK",
+  "controlRevision": 8,
+  "liveVerification": {
+    "formRead": "PASS",
+    "discountPreview": "PASS",
+    "previewDiscarded": true,
+    "customerOrderWrites": 0
+  },
+  "auditSecurity": {
+    "rls": true,
+    "anonRead": false,
+    "authenticatedWrite": false,
+    "serviceRoleUpdate": false
+  },
+  "validation": {
+    "coreTests": 352,
+    "websiteTests": 64,
+    "postgresScenarios": 22
+  },
+  "liveWriteAcceptance": "Staging only; owner accepted synthetic POLICE10 delivery change"
+}
