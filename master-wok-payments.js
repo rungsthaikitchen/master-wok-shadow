@@ -42,7 +42,7 @@ function createPaymentWriter({pool,schema='public',assertWriteAllowed,completeOr
    // Completion (when explicitly requested), payment and audit share this COMMIT.
    await c.query(`UPDATE ${table('orders')} SET paid=$2,payment_status=$3,paid_at=coalesce(paid_at,clock_timestamp()) WHERE id=$1`,[input.orderId,balance.paid,balance.paymentStatus]);
    await c.query('COMMIT');return {...response,committed:true};
-  }catch(error){if(c)try{await c.query('ROLLBACK');}catch(_){}return ['PAYMENT_COMPLETION_NOT_VERIFIED','PAYMENT_COMPLETION_STATE_REFUSED'].includes(error.message)?fail(error.message,409):fail('PAYMENT_TRANSACTION_FAILED',503);}
+  }catch(error){if(c)try{await c.query('ROLLBACK');}catch(_){}return ['PAYMENT_COMPLETION_NOT_VERIFIED','PAYMENT_COMPLETION_STATE_REFUSED','HISTORICAL_PAYMENT_LOYALTY_REVIEW_REQUIRED'].includes(error.message)?fail(error.message,409):fail('PAYMENT_TRANSACTION_FAILED',503);}
   finally{c?.release();}
  };
 }
