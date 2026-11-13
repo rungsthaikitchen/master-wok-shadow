@@ -1,0 +1,61 @@
+{
+  "dryRun": {
+    "success": true,
+    "applied": false,
+    "serviceDate": "2026-11-13",
+    "sourceOrders": 1,
+    "oldModel": "combined-kitchen-protected-v3",
+    "newModel": "combined-kitchen-four-ring-staging-v1",
+    "before": {
+      "status": "UNVERIFIED",
+      "reason": "SCHEDULER_MODEL_CHANGE_REQUIRES_DRAIN"
+    },
+    "after": {
+      "status": "VERIFIED_KITCHEN_CAPACITY",
+      "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+    },
+    "notifications": 0,
+    "productionMutations": 0
+  },
+  "applied": {
+    "success": true,
+    "applied": true,
+    "serviceDate": "2026-11-13",
+    "sourceOrders": 1,
+    "oldModel": "combined-kitchen-protected-v3",
+    "newModel": "combined-kitchen-four-ring-staging-v1",
+    "before": {
+      "status": "UNVERIFIED",
+      "reason": "SCHEDULER_MODEL_CHANGE_REQUIRES_DRAIN"
+    },
+    "after": {
+      "status": "VERIFIED_KITCHEN_CAPACITY",
+      "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+    },
+    "notifications": 0,
+    "productionMutations": 0
+  },
+  "reviewedBasketCollectionHints": {
+    "success": true,
+    "hints": [
+      {
+        "time": "2026-11-13T17:00:00Z",
+        "available": true
+      },
+      {
+        "time": "2026-11-13T18:30:00Z",
+        "available": true
+      },
+      {
+        "time": "2026-11-13T19:00:00Z",
+        "available": true
+      },
+      {
+        "time": "2026-11-13T20:00:00Z",
+        "available": true
+      }
+    ],
+    "bookingApprovalAllowed": false
+  },
+  "note": "Existing synthetic order RTK-180 and its 17:00 commitment retained. Source order remains pending. Prior plan archived in private order_amendments under repair idempotency key. No production code, configuration or data changed; no notifications sent. Production current/future plan inventory had no incompatible plan."
+}
