@@ -18,16 +18,17 @@ function createPaymentCompletion({schema='public',assessMutation,planStore=creat
   await lockServiceDates(connection,dates);
   // An imported legacy service from a previous day cannot be reconstructed
   // by today's kitchen model. Finalise its bookkeeping only when no Master
-  // Wok booking/plan owns that service, and loyalty was already settled.
+  // Wok booking/plan owns that service. Pending loyalty settles atomically.
   const historicalLegacy=order.capacity_scheduler==='LEGACY'&&dates.length>0&&dates.every(date=>date<localDate(now))&&
    (!order.proposed_time||localDate(order.proposed_time)<localDate(now));
   if(historicalLegacy){
    const receipt=(await connection.query(`SELECT order_id FROM "${schema}".master_wok_booking_receipts WHERE order_id=$1`,[order.id])).rows[0];
    let hasPlan=false;for(const date of dates)if(await planStore.read(connection,date))hasPlan=true;
    if(!receipt&&!hasPlan){
-    if(order.loyalty_settled!==true)throw Error('HISTORICAL_PAYMENT_LOYALTY_REVIEW_REQUIRED');
     await connection.query(`UPDATE "${schema}".orders SET status='completed' WHERE id=$1`,[order.id]);
-    return {status:'completed',loyalty_settled:true,historicalCompletion:true,previousStatus:order.status,capacityScheduler:'LEGACY'};
+    const loyalty=order.loyalty_settled===true?{handled:true,settled:true}:await settleLoyalty(connection,{...order,status:'completed'},{schema,allowLegacy:true});
+    if(!order.is_test&&(!loyalty.handled||!loyalty.settled))throw Error('HISTORICAL_PAYMENT_LOYALTY_REVIEW_REQUIRED');
+    return {status:'completed',...(loyalty.handled?{loyalty_settled:loyalty.settled}:{}),historicalCompletion:true,previousStatus:order.status,capacityScheduler:'LEGACY'};
    }
   }
   await connection.query(`UPDATE "${schema}".orders SET status='completed',capacity_scheduler='MASTER_WOK' WHERE id=$1`,[order.id]);
