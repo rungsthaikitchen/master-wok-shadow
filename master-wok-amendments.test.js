@@ -36,7 +36,7 @@ function harness({order=base,payment=null,assessment=true,failAudit=false}={}){
   if(sql==='ROLLBACK')state=backup;
   if(sql.startsWith('SELECT request_fingerprint'))return {rows:audit.filter(x=>x.key===args[0])};
   if(sql.startsWith('SELECT * FROM "public".orders'))return {rows:[structuredClone(state)]};
-  if(sql.startsWith('SELECT id FROM "public".order_payments'))return {rows:payment?[payment]:[]};
+  if(sql.startsWith('SELECT * FROM "public".order_payments'))return {rows:payment?[payment]:[]};
   if(sql.startsWith('SELECT actor,reason'))return {rows:[]};
   if(sql.startsWith('SELECT clock_timestamp'))return {rows:[{now}]};
   if(sql.startsWith('SELECT * FROM "public".discount_codes'))return {rows:[discount]};
@@ -55,8 +55,8 @@ test('preview rolls back; save writes order, plan and audit; retry replays befor
  const retry=await h.run(save);assert.equal(retry.replayed,true);assert.equal(h.audit.length,1);
  assert.equal((await h.run({...save,reason:'different'})).reason,'AMENDMENT_IDEMPOTENCY_CONFLICT');
 });
-test('stale order, paid order, completed order and failed capacity refuse without a commit',async()=>{
- for(const order of [{...base,paid:true},{...base,loyalty_settled:true},{...base,status:'completed'}]){const h=harness({order});assert.equal((await h.read()).success,false);assert.ok(!h.queries.includes('COMMIT'));}
+test('stale order, active paid order and failed capacity refuse without a commit',async()=>{
+ for(const order of [{...base,paid:true},{...base,loyalty_settled:true}]){const h=harness({order});assert.equal((await h.read()).success,false);assert.ok(!h.queries.includes('COMMIT'));}
  const paid=harness({payment:{id:'p'}});assert.equal((await paid.read()).reason,'AMENDMENT_PAYMENT_ALREADY_RECORDED');
  const h=harness({assessment:false}),r=await h.read();assert.equal((await h.run({...input,action:'amend_preview',expectedVersion:r.version})).reason,'AMENDMENT_SCHEDULE_NOT_AVAILABLE');assert.equal(h.state.order_type,'delivery');
  assert.equal((await h.run({...input,action:'amend_preview',expectedVersion:'wrong'})).reason,'AMENDMENT_ORDER_CHANGED_REFRESH');
@@ -76,4 +76,15 @@ test('SQL numeric coordinate round trips do not turn a fee correction into a sch
  const h=harness({order,assessment:false}),r=await h.read();
  const p=await h.run({...input,action:'amend_preview',expectedVersion:r.version,changes:{...changes,orderType:'delivery',deliveryAddress:'Synthetic address',deliveryFee:'0.00'}});
  assert.equal(p.success,true);assert.equal(p.after.total,'22.50');assert.equal(h.saves,0);
+});
+
+test('completed paid amendment preserves receipt and never reads or saves kitchen plans',async()=>{
+ const h=harness({order:{...base,status:'completed',paid:true},payment:{id:'p',bill_amount:'25.50',bill_method:'card',tip_amount:'2.00',tip_method:'cash'},assessment:false});
+ const r=await h.read();assert.equal(r.completedAmendment,true);
+ const p=await h.run({...input,action:'amend_preview',expectedVersion:r.version});assert.equal(p.success,true);assert.equal(p.paymentAfter.balance.overpayment,'3.00');assert.equal(p.paymentAfter.tipAmount,'2.00');
+ const saved=await h.run({...input,action:'amend_save',expectedVersion:r.version,expectedPreview:p.preview});assert.equal(saved.committed,true);assert.equal(h.state.status,'completed');assert.equal(h.state.payment_status,'overpaid');assert.equal(h.saves,0);assert.ok(!h.queries.some(s=>s.includes('UPDATE "public".order_payments')));
+});
+test('completed delivery classification requires explicit fee and never invents a route',()=>{
+ const p=calculateAmendment({...base,status:'completed'}, {...changes,orderType:'delivery',deliveryAddress:'',deliveryFee:'4.00'},{now,completed:true});assert.equal(p.delivery_fee,4);assert.equal(p.total,26.5);assert.equal(p.customer_lat,null);
+ assert.throws(()=>calculateAmendment(base,{...changes,orderType:'delivery'},{now,completed:true}),/COMPLETED_DELIVERY_FEE/);
 });
