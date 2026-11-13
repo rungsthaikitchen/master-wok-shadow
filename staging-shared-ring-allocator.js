@@ -46,14 +46,15 @@ function allocateSharedRings(jobs,options={}){
  // Necessary workload bounds for this fixed batch partition. Reject an
  // overloaded interval before enumerating equivalent vessel permutations.
  for(const [capacity,eligible] of [[4,pending.filter(j=>!j.vessels.includes('cold-prep-1'))],
-  [2,pending.filter(j=>j.vessels.every(v=>v.startsWith('large-')))]]){
+  [2,pending.filter(j=>j.vessels.every(v=>v.startsWith('large-')))],
+  [1,pending.filter(j=>j.vessels.every(v=>v==='cold-prep-1'))]]){
   // Distant orders must not enlarge a single promise's holding window. Check
   // each promise as well as the whole service before entering bounded search.
   for(const group of [eligible,...[...new Set(eligible.map(j=>j.readyMinute))]
    .map(ready=>eligible.filter(j=>j.readyMinute===ready))]){
   if(group.length&&group.reduce((n,j)=>n+j.duration,0)>
    capacity*(Math.max(...group.map(j=>j.latest+j.duration))-Math.min(...group.map(j=>j.earliest))))
-   return fail('FIXED_RING_WORKLOAD_EXCEEDS_WINDOW');
+   return fail(group.every(j=>j.vessels.includes('cold-prep-1'))?'FIXED_COLD_PREP_WORKLOAD_EXCEEDS_WINDOW':'FIXED_RING_WORKLOAD_EXCEEDS_WINDOW');
   }
  }
  const placed=[];let nodes=0,completeChecks=0,exhausted=false;

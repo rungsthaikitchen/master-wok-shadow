@@ -159,3 +159,10 @@ test('distant orders cannot hide an overloaded noodle promise, while six portion
  assert.equal(feasible.status,'PHYSICAL_FIT_PROTOTYPE');
  assert.ok(feasible.jobs.filter(j=>j.itemId==='pad-thai').every(j=>j.readyMinute-j.finish<=20));
 });
+
+test('single cold-prep workload gets the same necessary interval bound as hob resources',()=>{
+ const {allocateSharedRings}=require('./staging-shared-ring-allocator');
+ const jobs=Array.from({length:3},()=>({itemId:'beef-salad',portions:1,readyMinute:1020,duration:10,earliest:1000,latest:1010}));
+ assert.equal(allocateSharedRings(jobs).reason,'FIXED_COLD_PREP_WORKLOAD_EXCEEDS_WINDOW');
+ assert.equal(allocateSharedRings(jobs.slice(0,1)).status,'PHYSICAL_FIT_PROTOTYPE');
+});

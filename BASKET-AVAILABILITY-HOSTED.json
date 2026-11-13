@@ -1,0 +1,51 @@
+{
+  "project": "private staging",
+  "runtimeVersion": 72,
+  "sourceSha256": "db3ab859d9e6be48756fe0175e77a00020a2a2d86c6a29b9ea692097d69af694",
+  "requestHintCount": 61,
+  "results": [
+    {
+      "beef": 2,
+      "elapsed": 8.32,
+      "success": true,
+      "available": 61,
+      "unverified": 0,
+      "first": [
+        "2026-11-13T17:00:00Z",
+        "2026-11-13T17:05:00Z"
+      ]
+    },
+    {
+      "beef": 8,
+      "elapsed": 7.94,
+      "success": true,
+      "available": 60,
+      "unverified": 1,
+      "first": [
+        "2026-11-13T17:05:00Z",
+        "2026-11-13T17:10:00Z"
+      ]
+    },
+    {
+      "beef": 9,
+      "elapsed": 7.12,
+      "success": true,
+      "available": 0,
+      "unverified": 61,
+      "first": []
+    },
+    {
+      "beef": 2,
+      "elapsed": 7.28,
+      "success": true,
+      "available": 61,
+      "unverified": 0,
+      "first": [
+        "2026-11-13T17:00:00Z",
+        "2026-11-13T17:05:00Z"
+      ]
+    }
+  ],
+  "bookingWrites": 0,
+  "notifications": 0
+}

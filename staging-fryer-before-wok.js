@@ -13,7 +13,20 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
  if(!wokPlan||wokPlan.status!=='FEASIBLE_PROTOTYPE')return fail('WOK_PLAN_UNVERIFIED');
  const known=new Map(orders.map(o=>[String(o.orderId),o]));
  const portions=[];
+ // Identical source lines share the same physical recipe batches. Aggregate
+ // their fryer counts before attributing them to one-portion wok jobs; dividing
+ // each individual line across all matching jobs creates fractional portions.
+ const grouped=new Map(),dependencies=[];
  for(const dep of inventory.dependencies){
+  if(dep.standalone){dependencies.push(dep);continue;}
+  const order=known.get(dep.orderId),line=(rows.find(r=>String(r.id)===dep.orderId)?.items||[])[dep.lineIndex];
+  if(!order||!line)return fail('FRY_WOK_BATCH_MAPPING_UNVERIFIED');
+  const key=JSON.stringify([dep.orderId,recipeKey(order.readyMinute,line)]);
+  let group=grouped.get(key);
+  if(!group){group={...dep,counts:{}};grouped.set(key,group);dependencies.push(group);}
+  for(const [type,count] of Object.entries(dep.counts))group.counts[type]=(group.counts[type]||0)+count;
+ }
+ for(const dep of dependencies){
   const order=known.get(dep.orderId);
   const placed=order?.placedAt instanceof Date?order.placedAt.getHours()*60+order.placedAt.getMinutes():NaN;
   const notBefore=Math.max(990,placed,options.notBeforeByOrder?.[dep.orderId]??0);
@@ -40,8 +53,8 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
   }
   const attributed=matches.map(w=>({w,qty:(w.portionAllocations||[])
    .filter(a=>String(a.orderId)===dep.orderId).reduce((n,a)=>n+a.qty,0)}));
-  // More than one identical source line is aggregated below, using its share
-  // of each batch. Fractions cannot be represented safely and fail closed.
+  // Counts now cover all identical source lines. Match their complete physical
+  // quantity to the attributed wok batches; fractions still fail closed.
   const totalLineQty=(rows.find(r=>String(r.id)===dep.orderId)?.items||[])
    .filter(l=>recipeKey(order.readyMinute,l)===recipeKey(order.readyMinute,line))
    .reduce((n,l)=>n+l.qty,0);
