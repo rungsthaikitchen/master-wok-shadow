@@ -89,3 +89,22 @@ test('invalid payment payload shape rejected', () => {
   }
 });
 
+
+test('actual receipt can be below or above a reviewed total, independently of tips',()=>{
+ const {paymentBalance}=require('./master-wok-payment-validation');
+ const p=validatePayment({...base,billAmount:'22.95',expectedTotal:'23.25',differenceReason:'Customer underpaid by 30p',tipAmount:'2.00',tipMethod:'cash'},'23.25');
+ assert.equal(p.billAmount,'22.95');assert.equal(p.tipAmount,'2.00');assert.equal(p.differenceReason,'Customer underpaid by 30p');
+ assert.deepEqual(paymentBalance('23.25',p.billAmount),{orderTotal:'23.25',billReceived:'22.95',underpayment:'0.30',overpayment:'0.00',paid:false,paymentStatus:'underpaid'});
+ const over=validatePayment({...base,billAmount:'33.00',expectedTotal:'32.00',differenceReason:'Received £1 extra; not a tip'},'32.00');
+ assert.equal(over.tipAmount,'0.00');assert.equal(paymentBalance('32.00',over.billAmount).overpayment,'1.00');
+});
+test('differences require a reason and stale reviewed totals cannot be recorded',()=>{
+ for(const input of [{...base,billAmount:'31.00',expectedTotal:'32.00'},{...base,billAmount:'31.00',expectedTotal:'32.00',differenceReason:' '},{...base,billAmount:'31.00',expectedTotal:'32.00',differenceReason:'x'.repeat(501)}])assert.throws(()=>validatePayment(input,'32.00'),/Reason required/);
+ assert.throws(()=>validatePayment({...base,expectedTotal:'31.00'},'32.00'),/Order total changed/);
+ assert.throws(()=>validatePayment({...base,billAmount:'100000000.00',expectedTotal:'32.00',differenceReason:'Invalid'},'32.00'),/storage limit/);
+});
+test('zero received and an exact payment both have explicit balances',()=>{
+ const {paymentBalance}=require('./master-wok-payment-validation');
+ const zero=validatePayment({...base,billAmount:'0.00',expectedTotal:'32.00',differenceReason:'Nothing received yet'},'32.00');
+ assert.equal(paymentBalance('32.00',zero.billAmount).underpayment,'32.00');assert.equal(paymentBalance('32.00','32.00').paymentStatus,'paid');
+});

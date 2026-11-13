@@ -49,6 +49,20 @@ Deno.serve(async req=>{
   const late=createPaymentWriter({pool:lateFaultPool,schema,assertWriteAllowed:gate,completeOrder:completion});
   assert((await late(payload(failId,{action:'record_and_complete'}))).reason==='PAYMENT_TRANSACTION_FAILED','payment_insert_failure_after_completion_refused');
   const lateState=(await pool.query('SELECT status,paid FROM master_wok_rehearsal.orders WHERE id=$1',[failId])).rows[0];assert(lateState.status==='confirmed'&&!lateState.paid,'late_failure_rolls_completion_back');
+  const extraIds=Array.from({length:3},()=>crypto.randomUUID());ids.push(...extraIds);
+  const extra=await pool.connect();try{await beginBookingTransaction(extra,{key:'actual-payment-fixtures'});for(const id of extraIds)await extra.query("INSERT INTO master_wok_rehearsal.orders(id,status,total,subtotal,paid,is_test,idempotency_key,capacity_scheduler) VALUES($1,'confirmed',32,32,false,true,$2,'MASTER_WOK')",[id,'payment-certification-'+id]);await extra.query('COMMIT');}finally{extra.release();}
+  const actual=payload(extraIds[0],{action:'record_and_complete',billAmount:'31.70',expectedTotal:'32.00',differenceReason:'Synthetic 30p underpayment',tipAmount:'2.00',tipMethod:'cash'});
+  const under=await combined(actual);assert(under.success&&under.status==='completed'&&under.paid===false&&under.balance.underpayment==='0.30','actual_underpayment_completes_without_claiming_full_payment');
+  const underDb=(await pool.query('SELECT status,paid,payment_status FROM master_wok_rehearsal.orders WHERE id=$1',[extraIds[0]])).rows[0];assert(underDb.status==='completed'&&!underDb.paid&&underDb.payment_status==='underpaid','underpaid_state_persisted');
+  const auditActual=(await pool.query('SELECT new_details FROM master_wok_rehearsal.order_payment_events WHERE order_id=$1',[extraIds[0]])).rows[0].new_details;assert(auditActual.billAmount==='31.70'&&auditActual.differenceReason==='Synthetic 30p underpayment'&&auditActual.balance.underpayment==='0.30','actual_receipt_and_reason_audited');
+  assert((await combined(actual)).replayed,'actual_payment_retry_replays');
+  assert((await combined({...actual,differenceReason:'changed retry'})).reason==='PAYMENT_IDEMPOTENCY_CONFLICT','changed_difference_reason_conflicts');
+  const stale=await combined({...payload(extraIds[1]),expectedTotal:'31.00',billAmount:'31.00',tipAmount:'0.00',tipMethod:null});assert(stale.reason==='PAYMENT_TOTAL_CHANGED_REFRESH','stale_displayed_total_refused');
+  const over=await combined({...payload(extraIds[1]),action:'record_and_complete',expectedTotal:'32.00',billAmount:'33.00',differenceReason:'Synthetic extra receipt; not a tip',tipAmount:'0.00',tipMethod:null});assert(over.success&&over.paid&&over.balance.overpayment==='1.00'&&Number(over.payment.tip_amount)===0,'overpayment_is_not_invented_tip');
+  const missingReason=await combined({...payload(extraIds[2]),expectedTotal:'32.00',billAmount:'31.00',tipAmount:'0.00',tipMethod:null});assert(missingReason.reason==='INVALID_PAYMENT_DETAILS','missing_difference_reason_refused');
+  const actualList=await writer({action:'list',orderIds:extraIds.slice(0,2),staffActor:'payment-test@example.invalid'});assert(actualList.payments.find(p=>p.order_id===extraIds[0]).balance.underpayment==='0.30'&&actualList.payments.find(p=>p.order_id===extraIds[1]).balance.overpayment==='1.00','list_reports_actual_balances');
+  const changed=await pool.connect();try{await beginBookingTransaction(changed,{key:'post-capture-total-fixture'});await changed.query('UPDATE master_wok_rehearsal.orders SET total=33 WHERE id=$1',[extraIds[0]]);await changed.query('COMMIT');}finally{changed.release();}
+  assert((await combined(actual)).replayed,'same_key_replays_after_later_total_change');
   return Response.json({status:'PASS',checks,notifications:0,productionMutations:0});
  }catch(e){return Response.json({status:'FAIL',reason:e.message,checks},{status:500});}
  finally{
