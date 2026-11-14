@@ -14,7 +14,7 @@ function candidate(id='a',time=1110,type='delivery'){
   validatedHeader:{order_type:type,preferred_time:`2026-11-04T${String(Math.floor(time/60)).padStart(2,'0')}:${String(time%60).padStart(2,'0')}:00Z`,customer_lat:53.75,customer_lng:-1.58}};
 }
 const context=c=>({proposedOrder:c,acceptedOrders:[],rawRows:[],serviceDate,state:{now,availability}});
-function accepted(c){return {...c.rawRow,order_type:c.validatedHeader.order_type,customer_lat:53.75,customer_lng:-1.58,source_order_id:c.orderId,confirmed_time:c.validatedHeader.preferred_time};}
+function accepted(c){return {...c.rawRow,order_type:c.validatedHeader.order_type,customer_lat:c.validatedHeader.customer_lat,customer_lng:c.validatedHeader.customer_lng,source_order_id:c.orderId,confirmed_time:c.validatedHeader.preferred_time};}
 test('actual kitchen finishes before loading, not at customer arrival',async()=>{
  const result=await capacity.verify(context(candidate()));
  assert.equal(result.status,'VERIFIED_KITCHEN_CAPACITY',result.reason);assert.equal(result.bookingApprovalAllowed,false);
@@ -39,13 +39,17 @@ test('kitchen blackouts and minimum lead apply after subtracting travel',async()
  assert.equal((await capacity.verify(c)).reason,'BLACKOUT');
 });
 test('explicit combination re-assesses actual kitchen baskets and leaves the previous plan immutable',async()=>{
- const a=candidate(),b=candidate('b',1130),first=await capacity.verify(context(a)),ctx=context(b);
+ // Opposite directions: a combined route needs eight minutes between doors.
+ // Both separate promises and the combined route must meet their deadlines.
+ const combineCapacity=createDeliveryCapacity({quoteLeg:async({origin,destination})=>({durationSeconds:origin.lat===53.744437?300:destination.lat===53.744437?420:480})});
+ const a=candidate(),b=candidate('b',1130);b.validatedHeader.customer_lat=53.76;
+ const first=await combineCapacity.verify(context(a)),ctx=context(b);
  ctx.acceptedOrders=[a];ctx.rawRows=[accepted(a)];ctx.state.previousPlan=first.plan;
- const second=await capacity.verify(ctx);assert.equal(second.status,'VERIFIED_KITCHEN_CAPACITY',second.reason);
+ const second=await combineCapacity.verify(ctx);assert.equal(second.status,'VERIFIED_KITCHEN_CAPACITY',second.reason);
  const snapshot=JSON.stringify(second.plan);
- const r=await capacity.replan({orders:[a,b],rows:[accepted(a),accepted(b)],previousPlan:second.plan,serviceDate,now,availability,combine:['a','b']});
+ const r=await combineCapacity.replan({orders:[a,b],rows:[accepted(a),accepted(b)],previousPlan:second.plan,serviceDate,now,availability,combine:['a','b']});
  assert.equal(r.status,'VALIDATED_PROTECTED_PLAN',r.reason);assert.equal(r.plan.delivery.trips.length,1);assert.equal(JSON.stringify(second.plan),snapshot);
- const trip=r.plan.delivery.trips[0];assert.ok(r.plan.wok.jobs.every(j=>j.finish<=trip.start));
+ const trip=r.plan.delivery.trips[0];assert.ok(trip.stops.every(s=>s.arrival<=s.target));assert.ok(r.plan.wok.jobs.every(j=>j.finish<=trip.start));
 });
 test('persisted IDs are remapped in kitchen jobs and the delivery reservation together',async()=>{
  const first=await capacity.verify(context(candidate('candidate:key')));
@@ -99,4 +103,17 @@ test('delivery time proposal searches for a plan whose every dish meets door-arr
  const {validateFoodAge}=require('./master-wok-driver-plan');assert.equal(validateFoodAge(result.plan),true);
  assert.equal(result.plan.delivery.trips.length,3);
  assert.ok(result.plan.wok.jobs.every(j=>j.portions===1));
+});
+
+test('booking assessment refuses an arrival promise that only fits by planning late',async()=>{
+ const strict=createDeliveryCapacity({stagingSharedRings:true,quoteLeg:async({origin,destination})=>({durationSeconds:origin.lat===53.75||destination.lat===53.75?600:480})});
+ const prior=candidate('prior',1170),first=await strict.verify(context(prior));
+ assert.equal(first.status,'VERIFIED_KITCHEN_CAPACITY');assert.equal(first.plan.delivery.trips[0].finish,1182);
+ for(const ready of [1185,1190,1195]){
+  const next=candidate('next',ready);next.validatedHeader.customer_lat=53.76;
+  const c=context(next);c.acceptedOrders=[prior];c.rawRows=[accepted(prior)];c.state.previousPlan=first.plan;
+  const result=await strict.verify(c,{maxSearchNodes:1000,maxCompleteChecks:8});
+  if(ready<1195){assert.equal(result.status,'UNVERIFIED');assert.equal(result.reason,'DRIVER_UNAVAILABLE');}
+  else{assert.equal(result.status,'VERIFIED_KITCHEN_CAPACITY',result.reason);assert.equal(result.plan.delivery.trips.find(t=>t.stops[0].id==='next').stops[0].arrival,1195);}
+ }
 });

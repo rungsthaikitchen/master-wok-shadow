@@ -5,6 +5,8 @@ const {holdFor,validateExceptions}=require('./master-wok-hold-policy');
 const {RESTAURANT}=require('./master-wok-delivery-quote');
 const {relativePlacement}=require('./master-wok-clock');
 const {AUXILIARY}=require('./master-wok-recipe-rules');
+// The symmetric tolerance is retained only to read existing reservations.
+// New trips may arrive early within it, but must never be planned late.
 const POLICY=Object.freeze({arrivalTolerance:10,loading:2,handover:2,maxFoodAge:20,preferredFoodAge:15});
 const overlap=(a,b)=>a.start<b.finish&&b.start<a.finish;
 const coordinate=p=>p&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)&&Math.abs(p.lat)<=90&&Math.abs(p.lng)<=180;
@@ -93,7 +95,8 @@ function createDriverPlanner({quoteLeg}={}){
    travel.push(await duration(from,RESTAURANT));
    let offset=0;const offsets=stops.map((s,i)=>{offset+=travel[i];const v=offset;offset+=POLICY.handover;return v;});
    const low=Math.max(992,Math.ceil(asOf)+POLICY.loading,...stops.map((s,i)=>s.target-POLICY.arrivalTolerance-offsets[i]));
-   const high=Math.min(...stops.map((s,i)=>s.target+POLICY.arrivalTolerance-offsets[i]));
+   // The selected arrival is a deadline, not the centre of a late window.
+   const high=Math.min(...stops.map((s,i)=>s.target-offsets[i]));
    if(Math.max(...offsets)+POLICY.loading>POLICY.maxFoodAge)return null;
    const possibilities=[];
    for(let departure=low;departure<=high;departure++){

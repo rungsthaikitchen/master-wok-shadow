@@ -28,6 +28,10 @@ function createDeliveryCapacity({quoteLeg,stagingSharedRings=false}={}){
     const p=await prepare({orders:[...context.acceptedOrders,c],rows:[...context.rawRows,row],
      previousPlan:context.state.previousPlan,serviceDate:context.serviceDate,now:context.state.now});
     const candidate=p.orders.find(o=>String(o.orderId)===id),candidateRow=p.rows.find(r=>String(r.id)===id);
+    if(row.order_type==='delivery'){
+     const stop=p.delivery.trips.flatMap(t=>t.stops).find(s=>s.id===id);
+     if(!stop||stop.arrival>stop.target)throw Error('DELIVERY_PROMISE_UNMET');
+    }
     const result=verifyCombinedCapacity({...context,acceptedOrders:p.orders.filter(o=>o!==candidate),
      rawRows:p.rows.filter(r=>r!==candidateRow),proposedOrder:{...candidate,rawRow:candidateRow}},
      {...kitchenOptions,...foodAgeConstraint(p.delivery,{...context.state.previousPlan?.holdExceptions,...(c.staffHoldException?{[id]:c.staffHoldException}:{})}),maxSearchNodes:searchOptions.maxSearchNodes,
