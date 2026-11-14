@@ -1,0 +1,17 @@
+# Duplicate recipe lines and availability freshness
+
+Status: staging review only. Production certificate is draft; no production deployment.
+
+Exact reported screenshot: 2 prawn tom yum (£15), 3 vegetable spring rolls (£16.50), 2 beef salads (£19), and separate identical salt/pepper chicken-and-chips lines of 2 (£18) and 4 (£36): £104.50. Earlier reported running totals were corrected by the owner and do not all describe this screenshot; tests bind actual item/quantity/modifier/spice data.
+
+Root cause: fryer attribution divided each duplicate source line's counts across every matching one-portion wok job. For 2+4 identical portions this produced fractions and refused the physical mapping on every candidate. Aggregate exact order/recipe dependency counts first, then attribute whole counts to batches. Different proteins/spice/notes/order identities stay isolated. Independent final validators still require exact physical coverage; timings, hardware and hold limits remain unchanged.
+
+Large salad baskets additionally exhausted worker compute. Add the same necessary fixed-window workload bound for the single cold-prep station that already exists for hob resources. Insufficient interval capacity fails before enumerating unrelated vessel permutations. An unverified result remains unverified, never a kitchen impossibility claim or booking approval. Availability responses mark unverified hints explicitly.
+
+Frontend: basket render changes invalidate time hints/selection and cancel old requests; quantity-independent rerenders do not. A response must match the current basket/date/type/address and generation. New availability calls abort older requests and late responses are rejected even if transport ignores abort. Unverified hints are disabled and labeled Not verified; the review dialog explains that the check could not verify times. No booking, SMS, customer payment or database mutation is triggered by these checks.
+
+Validation: 371 core tests and 59 website tests pass. Native repeated exact-basket and quantity replay includes fryer coverage of six crispy-chicken plus six chips portions and isolation of different-spice recipes. Frontend tests cover late/out-of-order responses, cancellation and quantity invalidation. Staging runtime72 uses source db3ab859d9e6be48756fe0175e77a00020a2a2d86c6a29b9ea692097d69af694. Full-day hosted verification and browser review recorded after deployment. Production remains on the previous certified source.
+
+Hosted exact-basket replay: two beef salads returned61 verified hint slots; eight salads returned60 plus one unverified; nine returned0 verified and61 explicitly unverified without a worker failure; reverting to two returned61 again. HTTP calls completed in7.12–8.32 seconds including server transport/locking. Normal UI offers17:00–21:00 first (49 slots); overrun hints remain subject to existing display rules. No orders submitted.
+
+Hosted customer acceptance (057fb077 preview): recreated all five screenshot lines and exact £104.50 total; normal-service dropdown49 verified/0 unverified, selected18:30. Cancelled checkout, increased beef salad2→9, old selected time cleared, then zero verified61 Not verified and basket-review dialog; no worker error. Decreased9→2, reopened, restored49 verified/0 unverified and selected18:30 again. No site JavaScript errors, no contact information entered and no booking submitted. Owner-ready preview: https://057fb077.rungsthaikitchen.pages.dev/.

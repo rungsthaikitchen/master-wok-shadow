@@ -22,16 +22,17 @@ test('arrival means the door: reserve loading, distinct outbound, handover and r
  validateDriverPlan(p.delivery);
 });
 test('default remains separate trips and includes driver return when choosing another arrival',async()=>{
- const p=await run([row('a'),row('b',1120,53.76)]),[a,b]=p.delivery.trips;
- assert.equal(p.delivery.trips.length,2);assert.equal(b.start,a.finish);assert.equal(b.stops[0].arrival,1126);
+ await assert.rejects(()=>run([row('a'),row('b',1120,53.76)]),/DRIVER_UNAVAILABLE/);
+ const p=await run([row('a'),row('b',1130,53.76)]),[a,b]=p.delivery.trips;
+ assert.equal(p.delivery.trips.length,2);assert.ok(b.start>=a.finish);assert.equal(b.stops[0].arrival,1130);
 });
-test('overlapping deliveries beyond the arrival tolerance fail closed',async()=>{
+test('overlapping deliveries that cannot meet their arrival deadlines fail closed',async()=>{
  await assert.rejects(()=>run([row('a'),row('b'),row('c')]),/DRIVER_UNAVAILABLE/);
 });
 test('an explicit combined trip visits both doors and reserves one complete return',async()=>{
  const p=await run([row('a'),row('b',1115,53.76)],{combine:['a','b']});const t=p.delivery.trips[0];
  assert.equal(p.delivery.trips.length,1);assert.deepEqual(t.legs,[5,2,7]);
- assert.ok(t.stops.every(s=>Math.abs(s.arrival-s.target)<=10));assert.equal(p.deadlines.get('a'),p.deadlines.get('b'));
+ assert.ok(t.stops.every(s=>s.arrival<=s.target&&s.target-s.arrival<=10));assert.equal(p.deadlines.get('a'),p.deadlines.get('b'));
 });
 test('confirmed combinations persist when later orders are assessed',async()=>{
  const rows=[row('a'),row('b',1115,53.76)],first=await run(rows,{combine:['a','b']});
@@ -39,7 +40,7 @@ test('confirmed combinations persist when later orders are assessed',async()=>{
  assert.deepEqual(next.delivery.trips[0],first.delivery.trips[0]);assert.equal(next.delivery.trips.length,2);
 });
 test('driver trips already loading cannot be combined or split',async()=>{
- const rows=[row('a'),row('b',1120,53.76)],first=await run(rows);
+ const rows=[row('a'),row('b',1130,53.76)],first=await run(rows);
  await assert.rejects(()=>run(rows,{previousPlan:{delivery:first.delivery},now:'2026-11-04T18:25:00Z',combine:['a','b']}),/ALREADY_STARTED/);
 });
 test('proposed times reserve both alternatives without treating one order as two simultaneous trips',async()=>{
@@ -82,3 +83,22 @@ test('asymmetric routes and non-service-day placement work in both host time zon
 });
 
 test('PostgreSQL numeric coordinates survive the real pg string representation',async()=>{const p=await run([{...row('db'),customer_lat:'53.75',customer_lng:'-1.58'}]);assert.equal(p.delivery.trips[0].stops[0].destination.lat,53.75);});
+
+test('a 19:45 promise cannot borrow late tolerance after the driver returns at 19:42',async()=>{
+ const driver=createDriverPlanner({quoteLeg:async({origin,destination})=>({durationSeconds:origin.lat===53.75||destination.lat===53.75?600:480})});
+ const prior=row('previous',1170,53.75),first=await driver({rows:[prior],serviceDate:date,now});
+ assert.equal(first.delivery.trips[0].finish,1182);
+ for(const target of [1185,1190])await assert.rejects(()=>driver({rows:[prior,row('next',target,53.76)],previousPlan:{delivery:first.delivery},serviceDate:date,now}),/DRIVER_UNAVAILABLE/);
+ const result=await driver({rows:[prior,row('next',1195,53.76)],previousPlan:{delivery:first.delivery},serviceDate:date,now});
+ const trip=result.delivery.trips.find(t=>t.stops[0].id==='next');
+ assert.equal(trip.start,1185);assert.equal(trip.departure,1187);assert.equal(trip.stops[0].arrival,1195);
+ assert.deepEqual(result.delivery.trips[0],first.delivery.trips[0]);
+});
+test('existing reservations with legacy late tolerance remain intact when a new trip is assessed',async()=>{
+ const first=await run([row('existing')]),legacy=structuredClone(first.delivery);
+ const trip=legacy.trips[0];trip.start+=7;trip.departure+=7;trip.finish+=7;trip.stops[0].arrival+=7;
+ assert.equal(validateDriverPlan(legacy),true);
+ const result=await run([row('existing'),row('new',1200,53.76)],{previousPlan:{delivery:legacy}});
+ assert.deepEqual(result.delivery.trips[0],legacy.trips[0]);
+ assert.ok(result.delivery.trips.find(t=>t.stops[0].id==='new').stops.every(s=>s.arrival<=s.target));
+});

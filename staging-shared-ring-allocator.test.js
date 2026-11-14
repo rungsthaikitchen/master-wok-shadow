@@ -159,3 +159,24 @@ test('distant orders cannot hide an overloaded noodle promise, while six portion
  assert.equal(feasible.status,'PHYSICAL_FIT_PROTOTYPE');
  assert.ok(feasible.jobs.filter(j=>j.itemId==='pad-thai').every(j=>j.readyMinute-j.finish<=20));
 });
+
+test('single cold-prep workload gets the same necessary interval bound as hob resources',()=>{
+ const {allocateSharedRings}=require('./staging-shared-ring-allocator');
+ const jobs=Array.from({length:3},()=>({itemId:'beef-salad',portions:1,readyMinute:1020,duration:10,earliest:1000,latest:1010}));
+ assert.equal(allocateSharedRings(jobs).reason,'FIXED_COLD_PREP_WORKLOAD_EXCEEDS_WINDOW');
+ assert.equal(allocateSharedRings(jobs.slice(0,1)).status,'PHYSICAL_FIT_PROTOTYPE');
+});
+
+test('indexed vessel occupancy matches interval checks including the reset minute',()=>{
+ for(const itemId of ['pad-thai','stir-pepper','green-curry','beef-salad']){
+  const vessels=require('./staging-shared-ring-allocator').eligible(itemId);
+  const fixed=vessels.map((vessel,i)=>({itemId,vessel,start:1020+i,finish:1030+i}));
+  for(let start=1008;start<=1040;start++){
+   const duration=5,finish=start+duration;
+   const expected=vessels.some(vessel=>!fixed.some(j=>j.vessel===vessel&&start<j.finish+1&&finish+1>j.start)
+    &&(vessel==='cold-prep-1'||Array.from({length:duration},(_,i)=>start+i).every(t=>fixed.filter(j=>j.vessel!=='cold-prep-1'&&j.start<=t&&t<j.finish).length<4)));
+   const result=allocateSharedRings([{itemId,portions:1,duration,earliest:start,latest:start,readyMinute:finish}],{fixedWok:fixed});
+   assert.equal(result.status==='PHYSICAL_FIT_PROTOTYPE',expected,JSON.stringify({itemId,start}));
+  }
+ }
+});

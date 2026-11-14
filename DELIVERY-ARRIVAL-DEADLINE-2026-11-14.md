@@ -1,0 +1,11 @@
+# Delivery slots must be achievable arrival deadlines
+
+Approved by the owner after replaying the 13 November service, focusing on RTK-1635. Its requested delivery was 19:45, but the existing driver reservation for the preceding delivery ended at 19:42. Two minutes of loading plus eight minutes of outbound travel made 19:52 the earliest planned arrival. The former symmetric ten-minute allowance nevertheless admitted the 19:45 request.
+
+Newly planned trips retain the existing early-arrival allowance but cannot arrive after any stop's selected time. This applies to individual and explicitly combined trips. The booking-capacity seam additionally checks that its candidate's actual arrival meets the deadline before validating kitchen capacity. Existing committed reservations remain readable and unchanged; this does not retroactively move customers or invalidate existing trips with the former allowance.
+
+Read-only historical replay used the saved route durations and original order/time-change sequence, restoring RTK-1628's original collection type rather than its later post-completion delivery amendment. The eight earlier orders still validate. For RTK-1635, 19:45 and 19:50 now return DRIVER_UNAVAILABLE; 19:55 and 20:00 validate with exact on-time arrival. The replay correctly stops at the historically accepted 19:45 request because the new policy would refuse it, rather than pretending the entire old sequence remains admissible. No live order or notification was changed. Replay assumes normal service settings; exact historical control-change timestamps are not retained.
+
+Regression tests cover driver return/loading/travel, full booking assessment, unchanged legacy reservations, and combined trips that meet both deadlines. The complete suite passes 375 tests. Production deployment and certificate approval remain pending.
+
+Staging deployment: runtime 74, source SHA256 `0ba1e97de2efec9eb1a1f9b4c099330b26446c99f3cb1fb0d24d8293cd84c1e4`. Retrieved the deployed bundle and re-executed its driver planner against the recorded timing geometry: 19:45/19:50 refuse and 19:55 arrives on time. Hosted read-only collection availability smoke check returns HTTP 200 and one verified hint.

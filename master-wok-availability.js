@@ -45,7 +45,7 @@ function createBasketAvailability({pool,model,readAvailability,assessBooking,ass
      reason=result?.reason||'ASSESSMENT_UNVERIFIED';
      fits=result?.status==='GREEN'&&result.bookingApprovalAllowed===true;
     }
-    hints.push({time,available:fits,...(includeDiagnostics?{reason}:{})});
+    hints.push({time,available:fits,unverified:!fits,...(includeDiagnostics?{reason}:{})});
    }
    await connection.query('ROLLBACK');
    return {success:true,hints,bookingApprovalAllowed:false};
