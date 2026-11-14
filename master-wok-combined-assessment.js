@@ -66,7 +66,7 @@ function verifyCombinedCapacity({acceptedOrders,proposedOrder,rawRows,serviceDat
   const id=String(proposedOrder.orderId),warmup=5,buffer=10+extraLead;
   const holdExceptions=validateExceptions({...state.previousPlan?.holdExceptions,
    ...(proposedOrder.staffHoldException?{[id]:proposedOrder.staffHoldException}:{})});
-  const protectedResult=planWithProtectedWork({orders,rows,serviceDate,now,previousPlan:state.previousPlan,
+  const planInput={orders,rows,serviceDate,now,previousPlan:state.previousPlan,
    ...(typeof options.validateCompletePlan==='function'?{validateCompletePlan:options.validateCompletePlan}:{}),
    ...(options.earliestFinishByOrder?{earliestFinishByOrder:options.earliestFinishByOrder}:{}),
    maxSearchNodes:options.maxSearchNodes,maxCompleteChecks:options.maxCompleteChecks,
@@ -75,7 +75,15 @@ function verifyCombinedCapacity({acceptedOrders,proposedOrder,rawRows,serviceDat
    standaloneSpringRolls:true,
    fryerWarmupMinutes:5,
    confirmedStarterRecipes:true,
-   notBeforeByOrder:{[id]:Math.max(990,Math.ceil(minute+Math.max(warmup,buffer)))}});
+   notBeforeByOrder:{[id]:Math.max(990,Math.ceil(minute+Math.max(warmup,buffer)))}};
+  // First fit only the new basket around existing validated reservations.
+  // Avoid repeatedly searching every accepted dish for each dropdown time.
+  let protectedResult=options.sharedRings===true&&state.previousPlan
+   ?planWithProtectedWork({...planInput,preserveExistingWork:true}):null;
+  if(!protectedResult||protectedResult.status!=='VALIDATED_PROTECTED_PLAN'){
+   if(options.preserveOnly===true&&protectedResult)return fail(protectedResult.reason);
+   protectedResult=planWithProtectedWork(planInput);
+  }
   if(protectedResult.status!=='VALIDATED_PROTECTED_PLAN')return fail(protectedResult.reason);
   const plan=protectedResult.plan,unstartedPlan=protectedResult.futurePlan,unstartedRows=protectedResult.remainingRows;
   const validation=validateKitchenTimeline(orders,unstartedPlan,unstartedRows,options.sharedRings===true?{

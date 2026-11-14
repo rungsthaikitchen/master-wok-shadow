@@ -19,8 +19,10 @@ function checkEditable(o,payment){
  if(o.is_test)throw Error('AMENDMENT_TEST_ORDER_REFUSED');
 }
 function calculateAmendment(order,changes,{now,discount,quote,completed=false}={}){
- if(!changes||Array.isArray(changes)||Object.keys(changes).some(k=>!['orderType','deliveryAddress','deliveryFee','discountCode'].includes(k))||
+ if(!changes||Array.isArray(changes)||Object.keys(changes).some(k=>!['orderType','deliveryAddress','deliveryFee','discountCode','deliveryAreaOverride'].includes(k))||
   !['collection','delivery'].includes(changes.orderType)||typeof changes.discountCode!=='string'||changes.discountCode.length>80)throw Error('INVALID_AMENDMENT_CHANGES');
+ if(changes.deliveryAreaOverride!==undefined&&typeof changes.deliveryAreaOverride!=='boolean')throw Error('INVALID_AMENDMENT_CHANGES');
+ if(changes.deliveryAreaOverride===true&&(changes.orderType!=='delivery'||changes.deliveryFee===''||changes.deliveryFee==null))throw Error('AMENDMENT_AREA_OVERRIDE_MANUAL_FEE_REQUIRED');
  const type=changes.orderType,code=changes.discountCode.trim().toUpperCase(),oldCode=String(order.discount_code||'').trim().toUpperCase();
  const subtotal=money(order.subtotal),oldCodeDiscount=money(order.discount_amount||0),oldLoyalty=money(order.loyalty_discount||0),oldDiscount=money(order.discount||0);
  if(oldCodeDiscount+oldLoyalty!==oldDiscount||money(order.total)!==subtotal-oldDiscount+money(order.delivery_fee||0))throw Error('AMENDMENT_EXISTING_TOTALS_NEED_REVIEW');
@@ -39,7 +41,7 @@ function calculateAmendment(order,changes,{now,discount,quote,completed=false}={
   if(order.order_type==='delivery'&&address===(order.delivery_address||''))for(const k of Object.keys(delivery))delivery[k]=order[k]??null;
  }else if(type==='delivery'){
   if(typeof changes.deliveryAddress!=='string'||!changes.deliveryAddress.trim()||changes.deliveryAddress.length>1000)throw Error('DELIVERY_ADDRESS_REQUIRED');
-  if(!quote||!Number.isFinite(quote.straightLineMiles)||quote.straightLineMiles<0||quote.straightLineMiles>3||
+  if(!quote||!Number.isFinite(quote.straightLineMiles)||quote.straightLineMiles<0||(quote.straightLineMiles>3&&changes.deliveryAreaOverride!==true)||
    !Number.isFinite(quote.customerLatitude)||!Number.isFinite(quote.customerLongitude)||Math.abs(quote.customerLatitude)>90||Math.abs(quote.customerLongitude)>180)throw Error('DELIVERY_ADDRESS_NOT_ELIGIBLE');
   const route=quote.routeMiles;if(route!=null&&(!Number.isFinite(route)||route<0))throw Error('INVALID_ROUTE_QUOTE');
   const band=route==null?null:[{max:1.5,fee:200},{max:2.5,fee:300},{max:4,fee:400}].find(b=>route<=b.max);
@@ -81,6 +83,7 @@ function createAmendmentWriter({pool,schema='public',assertWriteAllowed,assessMu
     await c.query('ROLLBACK');return {success:true,committed:false,notification_managed:true,order:before,version,history,completedAmendment:completed,payment:paymentBefore};
    }
    if(input.expectedVersion!==version)throw Error('AMENDMENT_ORDER_CHANGED_REFRESH');
+   if(input.changes?.deliveryAreaOverride===true&&(typeof input.reason!=='string'||!input.reason.trim()||input.reason.length>500))throw Error('AMENDMENT_AREA_OVERRIDE_REASON_REQUIRED');
    const now=(await c.query('SELECT clock_timestamp() AS now')).rows[0]?.now;
    if(!now||!Number.isFinite(new Date(now).getTime()))throw Error('AMENDMENT_SERVER_CLOCK_REQUIRED');
    const code=String(input.changes?.discountCode||'').trim().toUpperCase(),oldCode=String(order.discount_code||'').trim().toUpperCase();
@@ -90,13 +93,16 @@ function createAmendmentWriter({pool,schema='public',assertWriteAllowed,assessMu
    let quote=null;
    if(input.changes?.orderType==='delivery'&&!completed){
     const retained=order.order_type==='delivery'&&typeof input.changes.deliveryAddress==='string'&&input.changes.deliveryAddress.trim()===order.delivery_address&&order.delivery_straight_line_miles!=null&&order.customer_lat!=null&&order.customer_lng!=null;
-    quote=retained?{straightLineMiles:Number(order.delivery_straight_line_miles),routeMiles:order.delivery_route_miles==null?null:Number(order.delivery_route_miles),customerLatitude:Number(order.customer_lat),customerLongitude:Number(order.customer_lng)}:await quoteDelivery({address:input.changes.deliveryAddress,subtotalCents:money(order.subtotal)});
+    quote=retained?{straightLineMiles:Number(order.delivery_straight_line_miles),routeMiles:order.delivery_route_miles==null?null:Number(order.delivery_route_miles),customerLatitude:Number(order.customer_lat),customerLongitude:Number(order.customer_lng)}:await quoteDelivery({address:input.changes.deliveryAddress,subtotalCents:money(order.subtotal),allowOutsideArea:input.changes.deliveryAreaOverride===true});
    }
    const patch=calculateAmendment(order,input.changes,{now,discount,quote,completed}),after={...order,...patch};
    const paymentAfter=paymentSummary(after,payment);
    if(completed&&payment){after.paid=paymentAfter.balance.paid;after.payment_status=paymentAfter.balance.paymentStatus;}
    const loyaltyAdjustment=completed?await completedLoyalty(c,order,after,{schema}):null;
-   const preview=await digest([version,snapshot(after),paymentAfter,loyaltyAdjustment]);
+   const deliveryAreaOverride=input.changes?.deliveryAreaOverride===true?{
+    approved:true,applied:!completed&&Number(quote?.straightLineMiles)>3,actor,
+    reason:input.reason.trim(),normalLimitMiles:3,straightLineMiles:quote?.straightLineMiles??null}:null;
+   const preview=await digest([version,snapshot(after),paymentAfter,loyaltyAdjustment,deliveryAreaOverride]);
    if(input.action==='amend_save'&&input.expectedPreview!==preview)throw Error('AMENDMENT_PRICE_CHANGED_REVIEW');
    if(FIELDS.every(k=>JSON.stringify(before[k])===JSON.stringify(snapshot(after)[k])))throw Error('AMENDMENT_NO_CHANGES');
    // Prices alone never move work. A mode/address change must validate and save
@@ -125,7 +131,7 @@ function createAmendmentWriter({pool,schema='public',assertWriteAllowed,assessMu
     if(assessment?.status!=='GREEN'||assessment.bookingApprovalAllowed!==true||dates.some(d=>!assessment.plansByDate?.[d]))throw Error('AMENDMENT_SCHEDULE_NOT_AVAILABLE');
    }
    const response={success:true,notification_managed:true,orderId:order.id,before,after:snapshot(after),version,preview,
-    completedAmendment:completed,paymentBefore,paymentAfter,loyaltyAdjustment,
+    completedAmendment:completed,paymentBefore,paymentAfter,loyaltyAdjustment,deliveryAreaOverride,
     customerTimeMeaning:patch.order_type==='delivery'?'Arrival at the customer’s door':'Ready for collection',customerNotificationSent:false};
    if(input.action==='amend_preview'){await c.query('ROLLBACK');return {...response,committed:false};}
    if(loyaltyAdjustment)await c.query(`UPDATE ${q}loyalty_accounts SET points_balance=$2,lifetime_points=$3,updated_at=clock_timestamp() WHERE id=$1`,[loyaltyAdjustment.accountId,loyaltyAdjustment.after.pointsBalance,loyaltyAdjustment.after.lifetimePoints]);
@@ -135,7 +141,7 @@ function createAmendmentWriter({pool,schema='public',assertWriteAllowed,assessMu
    }
    for(const date of dates)await planStore.save(c,date,assessment.plansByDate[date]);
    await c.query(`INSERT INTO ${q}order_amendments(order_id,idempotency_key,request_fingerprint,actor,reason,before_details,after_details,response) VALUES($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8::jsonb)`,
-    [order.id,input.idempotencyKey,requestFingerprint,actor,input.reason.trim(),JSON.stringify(before),JSON.stringify(response.after),JSON.stringify(response)]);
+    [order.id,input.idempotencyKey,requestFingerprint,actor,input.reason.trim(),JSON.stringify(before),JSON.stringify({...response.after,...(deliveryAreaOverride?{delivery_area_override:deliveryAreaOverride}:{})}),JSON.stringify(response)]);
    await c.query('COMMIT');return {...response,committed:true};
   }catch(error){if(c)try{await c.query('ROLLBACK');}catch(_){}const known=/^(AMENDMENT_|INVALID_AMENDMENT_|DISCOUNT_|INVALID_DISCOUNT_|DELIVERY_|COLLECTION_|INVALID_ROUTE_)/.test(error.message||'');return fail(known?error.message:'AMENDMENT_UNAVAILABLE',known?409:503);}
   finally{c?.release();}

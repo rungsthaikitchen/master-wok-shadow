@@ -1,0 +1,7 @@
+# Preserved availability — 14 November 2026
+
+After three live reservations, read-only whole-day hint batches repeatedly exhausted hosted CPU, leaving only 22:00 verified for a £29 basket.
+
+Shared-ring booking assessment first attempts to preserve all existing work and fit the candidate around it. Existing allocations are independently validated, subtracted from current demand and passed as fixed resource occupancy. A newly closed production blackout prevents this path. Read-only hints and reviews stop at the bounded preserved assessment; uncertainty never becomes approval. Locked booking falls back to the existing full search when needed. All ordinary validation, lead time, food age, delivery deadlines, resource and coverage checks remain in place.
+
+379 tests pass. Exact reported basket passed saved-live-state replay at 18:15/18:20/18:25/18:30 in 2–12ms. Hosted staging75 whole-day read-only test returned 60 verified hints, one unverified, all four target times verified, twelve HTTP200 responses and no CPU failures in 22.555 seconds. No booking or notification was created. Production runtime19 fetched source matches tested bundle; SHA256 a5c5c195eec42c94a94a3b92080844a56073373de69d5ae1918fb6e4ea5114b8. Runtime18 code is recoverable from hotfix/accept-cpu-2026-11-14 at d021ecf02a91c450c8e9dd4014aabefbb404df24. No database migration or booking-mode change. Customer verification pending; 22-second full-day scans remain a performance limitation.

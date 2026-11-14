@@ -10,10 +10,12 @@ function demands(order){
 }
 function createMutationAssessment({model,readAvailability,readOrders=readCapacityCommitments,planStore=createServicePlanStore(),deliveryCapacity,stagingSharedRings=false}={}){
  const kitchenOptions=stagingSharedRings===true?{sharedRings:true,stagingSharedRings:true}:{};
- return async function assessMutation({connection,before,after,dates,now}){
+ return async function assessMutation({connection,before,after,dates,now,action}){
   const old=demands(before),next=demands(after);
   const plansByDate={};
   const reduced=next.every(time=>old.includes(time));
+  const retainExistingPlan=action==='accept'&&before.capacity_scheduler==='MASTER_WOK'&&reduced&&next.length===old.length&&
+   ['order_type','customer_lat','customer_lng','is_test'].every(key=>before[key]===after[key]);
   for(const serviceDate of dates){
    const rows=await readOrders(connection,serviceDate);
    const orders=normalizeStagingOrders({rows,model,serviceDate})
@@ -22,8 +24,8 @@ function createMutationAssessment({model,readAvailability,readOrders=readCapacit
    const previousPlan=await planStore.read(connection,serviceDate);
    const availability=await readAvailability(connection,serviceDate);
    if(!changed.length){
-    const protectedResult=deliveryCapacity?await deliveryCapacity.replan({orders,rows,previousPlan,now,serviceDate,availability}):planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,
-     ...kitchenOptions,
+    const protectedResult=deliveryCapacity?await deliveryCapacity.replan({orders,rows,previousPlan,now,serviceDate,availability,retainExistingPlan}):planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,
+     ...kitchenOptions,retainExistingPlan,
      standaloneSpringRolls:true,confirmedStarterRecipes:true,fryerWarmupMinutes:5});
     if(protectedResult.status!=='VALIDATED_PROTECTED_PLAN')return protectedResult;
     plansByDate[serviceDate]=protectedResult.plan;

@@ -30,3 +30,16 @@ test('unavailable route keeps the existing fee fallback while missing geocoding 
 test('quote bootstrap rejects credentials and destinations outside the existing public service contract',()=>{
  for(const config of [{supabaseUrl:'http://staging.invalid',publicKey:key},{supabaseUrl:url,publicKey:'sb_secret_do_not_use'}])assert.throws(()=>createDeliveryQuoter(config));
 });
+
+test('only an explicit server-selected override relaxes radius; geocoding remains mandatory',async()=>{
+ const geo={ok:true,customer_lat:53.80,customer_lng:-1.58};
+ const result=await fixture(geo).quote({address:'Synthetic exception',subtotalCents:900,allowOutsideArea:true});assert.ok(result.straightLineMiles>3);
+ await assert.rejects(()=>fixture(geo).quote({address:'Synthetic exception',subtotalCents:900}),/NOT_ELIGIBLE/);
+ await assert.rejects(()=>fixture({ok:false}).quote({address:'Synthetic exception',subtotalCents:900,allowOutsideArea:true}),/NOT_ELIGIBLE/);
+});
+test('public checkout ignores a browser-supplied delivery-area override',async()=>{
+ const {createCommercialValidator}=require('./master-wok-commercial-validator');let request;
+ const validate=createCommercialValidator({customerResolver:async()=>({id:'fixture',phone:'07800000000'}),quoteDelivery:async input=>{request=input;throw Error('DELIVERY_ADDRESS_NOT_ELIGIBLE');}});
+ await assert.rejects(()=>validate({query:async()=>({rows:[]})},{orderType:'delivery',customer:{address:'Synthetic'},items:[{item_id:'green-curry',qty:1,modifiers:[{id:'chicken'}],spice:2}],deliveryAreaOverride:true,allowOutsideArea:true},{now:'2026-11-14T15:00:00Z'}),/NOT_ELIGIBLE/);
+ assert.equal(request.allowOutsideArea,undefined);assert.equal(request.deliveryAreaOverride,undefined);
+});

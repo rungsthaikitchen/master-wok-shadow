@@ -35,13 +35,13 @@ function createDeliveryCapacity({quoteLeg,stagingSharedRings=false}={}){
     const result=verifyCombinedCapacity({...context,acceptedOrders:p.orders.filter(o=>o!==candidate),
      rawRows:p.rows.filter(r=>r!==candidateRow),proposedOrder:{...candidate,rawRow:candidateRow}},
      {...kitchenOptions,...foodAgeConstraint(p.delivery,{...context.state.previousPlan?.holdExceptions,...(c.staffHoldException?{[id]:c.staffHoldException}:{})}),maxSearchNodes:searchOptions.maxSearchNodes,
-      maxCompleteChecks:searchOptions.maxCompleteChecks});
+      maxCompleteChecks:searchOptions.maxCompleteChecks,preserveOnly:searchOptions.preserveOnly});
     if(result.status!=='VERIFIED_KITCHEN_CAPACITY')return result;
     const plan={...result.plan,delivery:p.delivery};validateFoodAge(plan);
     return {...result,plan};
    }catch(error){return {status:'UNVERIFIED',reason:error.message,bookingApprovalAllowed:false};}
   },
-  async replan({orders,rows,previousPlan,serviceDate,now,availability,combine,splitTripId}){
+  async replan({orders,rows,previousPlan,serviceDate,now,availability,combine,splitTripId,retainExistingPlan=false}){
    try{
     const p=await prepare({orders,rows,previousPlan,serviceDate,now,combine,splitTripId});
     // Closures affect production as well as customer handover. Capacity-only
@@ -57,7 +57,7 @@ function createDeliveryCapacity({quoteLeg,stagingSharedRings=false}={}){
      }
     }
     const result=planWithProtectedWork({orders:p.orders,rows:p.rows,previousPlan,serviceDate,now,blackouts,
-     ...kitchenOptions,...foodAgeConstraint(p.delivery,previousPlan?.holdExceptions),
+     ...kitchenOptions,...foodAgeConstraint(p.delivery,previousPlan?.holdExceptions),retainExistingPlan:retainExistingPlan&&!combine&&!splitTripId,
      standaloneSpringRolls:true,confirmedStarterRecipes:true,fryerWarmupMinutes:5});
     if(result.status!=='VALIDATED_PROTECTED_PLAN')return result;
     const plan={...result.plan,delivery:p.delivery};validateFoodAge(plan);

@@ -124,7 +124,12 @@ function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...opti
   const asOfMinute=serviceMinute(now,serviceDate);
   if(!previousPlan&&asOfMinute>=990&&orders.some(o=>String(o.orderId)!==options.newOrderId))
    return fail('COMMITTED_PLAN_REQUIRED_DURING_SERVICE');
-  const fixed=protectStartedWork(previousPlan,asOfMinute);
+  const fixed=protectStartedWork(previousPlan,options.preserveExistingWork===true?1440:asOfMinute);
+  if(options.preserveExistingWork===true&&previousPlan){
+   const all=[...fixed.wok,...fixed.fryer,...fixed.auxiliary];
+   if(all.some(j=>(options.blackouts||[]).some(b=>j.start<b.finish&&b.start<j.finish)))
+    return fail('PRESERVED_WORK_BLACKOUT');
+  }
   const remaining=subtractProtectedPortions(orders,rows,fixed);
   const notBeforeByOrder=Object.fromEntries(orders.map(o=>[String(o.orderId),
    Math.max(Math.ceil(asOfMinute),options.notBeforeByOrder?.[String(o.orderId)]??0)]));
@@ -134,7 +139,16 @@ function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...opti
   const fryerBlackouts=[...(options.fryerBlackouts||[]),
    ...(warmup?['large','small-1','small-2'].map(basket=>({basket,start:990,finish:990+warmup})):[]),
    ...fixed.fryer.map(j=>({basket:j.basket,start:j.start,finish:j.finish}))];
-  const future=planCoordinatedKitchen(remaining.orders,remaining.rows,{...options,
+  // Revalidate the existing unstarted schedule before searching for a new one.
+  // Accepting an unchanged reservation needs validation, not combinatorial search.
+  const retained=shared&&options.retainExistingPlan===true&&previousPlan&&{...previousPlan,
+   wok:{...previousPlan.wok,jobs:previousPlan.wok.jobs.filter(j=>!fixed.wok.includes(j))},
+   fryer:{...previousPlan.fryer,jobs:previousPlan.fryer.jobs.filter(j=>!fixed.fryer.includes(j))},
+   auxiliary:{...previousPlan.auxiliary,jobs:(previousPlan.auxiliary?.jobs||[]).filter(j=>!fixed.auxiliary.includes(j))}};
+  const retainedOptions=shared?{auxiliaryRows:rows,fixedWok:fixed.wok,fixedAuxiliary:fixed.auxiliary,fixedFryer:fixed.fryer,notBeforeByOrder,blackouts:options.blackouts||[]} : {};
+  const retainedValid=retained&&validateKitchenTimeline(remaining.orders,retained,remaining.rows,retainedOptions).status==='VALIDATED_STAGING_TIMELINE'&&
+   (!options.confirmedStarterRecipes||validateAuxiliaryWork(orders,rows,retained.auxiliary.jobs,{holdExceptions:retained.holdExceptions,holdingLimitMinutes:retained.holdingLimitMinutes,notBeforeByOrder,fixedAuxiliary:fixed.auxiliary,mainJobs:[...fixed.wok,...retained.wok.jobs]}));
+  const future=retainedValid?retained:planCoordinatedKitchen(remaining.orders,remaining.rows,{...options,
    blackouts:wokBlackouts,kitchenBlackouts:options.blackouts||[],fryerBlackouts,notBeforeByOrder,
    auxiliaryRows:rows,fixedAuxiliary:fixed.auxiliary,fixedWok:fixed.wok,fixedFryer:fixed.fryer});
   if(future.status!=='COORDINATED_PROTOTYPE')return fail(future.fryer?.reason||future.wok?.reason||future.reason);

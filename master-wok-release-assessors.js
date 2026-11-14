@@ -45,7 +45,7 @@ function createReleaseAssessors({certificate,releaseId,sourceSha256,projectRef,s
    // An exhausted search is unverified, never a rejection of physical ability.
    // Only the locked checkout receives the full booking search budget.
    const searchOptions=['AVAILABILITY_HINT','BASKET_REVIEW'].includes(context.assessmentPurpose)
-    ?{maxSearchNodes:1000,maxCompleteChecks:8}:{};
+    ?{maxSearchNodes:1000,maxCompleteChecks:8,preserveOnly:true}:{};
    // Call the complete validator directly, not an injected prototype assessor.
    if(deliveryCapacity)return deliveryCapacity.verify(context,searchOptions).then(finish);
    return finish(verifyCombinedCapacity(context,{...kitchenOptions,...searchOptions}));

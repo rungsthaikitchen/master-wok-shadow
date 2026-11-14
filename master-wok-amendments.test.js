@@ -29,7 +29,7 @@ test('unchanged expired code is preserved and inconsistent historic totals are r
  assert.throws(()=>calculateAmendment(base,{...changes,deliveryFee:'1.00'},{now}),/COLLECTION/);
  assert.throws(()=>calculateAmendment(base,{...changes,total:1},{now}),/INVALID_AMENDMENT/);
 });
-function harness({order=base,payment=null,assessment=true,failAudit=false}={}){
+function harness({order=base,payment=null,assessment=true,failAudit=false,deliveryQuote=quote}={}){
  let state=structuredClone(order),backup,audit=[],queries=[],saves=0;
  const c={release(){},async query(sql,args=[]){queries.push(sql);
   if(sql==='BEGIN')backup=structuredClone(state);
@@ -41,9 +41,9 @@ function harness({order=base,payment=null,assessment=true,failAudit=false}={}){
   if(sql.startsWith('SELECT clock_timestamp'))return {rows:[{now}]};
   if(sql.startsWith('SELECT * FROM "public".discount_codes'))return {rows:[discount]};
   if(sql.startsWith('UPDATE "public".orders')){const fields=[...sql.matchAll(/"([a-z_]+)"=\$/g)].map(m=>m[1]);fields.forEach((k,i)=>state[k]=args[i+1]);}
-  if(sql.startsWith('INSERT INTO "public".order_amendments')){if(failAudit)throw Error('AUDIT_DOWN');audit.push({key:args[1],request_fingerprint:args[2],response:JSON.parse(args[7])});}
+  if(sql.startsWith('INSERT INTO "public".order_amendments')){if(failAudit)throw Error('AUDIT_DOWN');audit.push({key:args[1],request_fingerprint:args[2],response:JSON.parse(args[7]),after:JSON.parse(args[6]),actor:args[3],reason:args[4]});}
   return {rows:[]};}};
- const run=createAmendmentWriter({pool:{connect:async()=>c},assertWriteAllowed:async()=>{},quoteDelivery:async()=>quote,assessMutation:async()=>assessment?{status:'GREEN',bookingApprovalAllowed:true,plansByDate:{'2026-11-12':{ok:true}}}:{status:'RED'},planStore:{read:async()=>null,save:async()=>saves++}});
+ const run=createAmendmentWriter({pool:{connect:async()=>c},assertWriteAllowed:async()=>{},quoteDelivery:async()=>deliveryQuote,assessMutation:async()=>assessment?{status:'GREEN',bookingApprovalAllowed:true,plansByDate:{'2026-11-12':{ok:true}}}:{status:'RED'},planStore:{read:async()=>null,save:async()=>saves++}});
  const read=()=>run({action:'amend_read',orderId:base.id,staffActor:'staff@example.invalid'});
  return {run,read,get state(){return state;},queries,audit,get saves(){return saves;}};
 }
@@ -87,4 +87,26 @@ test('completed paid amendment preserves receipt and never reads or saves kitche
 test('completed delivery classification requires explicit fee and never invents a route',()=>{
  const p=calculateAmendment({...base,status:'completed'}, {...changes,orderType:'delivery',deliveryAddress:'',deliveryFee:'4.00'},{now,completed:true});assert.equal(p.delivery_fee,4);assert.equal(p.total,26.5);assert.equal(p.customer_lat,null);
  assert.throws(()=>calculateAmendment(base,{...changes,orderType:'delivery'},{now,completed:true}),/COMPLETED_DELIVERY_FEE/);
+});
+
+test('staff delivery-area exception requires an explicit charge and never skips valid coordinates',()=>{
+ const o={...base,order_type:'collection',delivery_fee:0,total:22.5},c={...changes,orderType:'delivery',deliveryAddress:'Synthetic outside address',deliveryAreaOverride:true,deliveryFee:'4.00'},outside={...quote,straightLineMiles:3.28};
+ assert.equal(calculateAmendment(o,c,{now,quote:outside}).total,26.5);
+ assert.throws(()=>calculateAmendment(o,{...c,deliveryAreaOverride:false},{now,quote:outside}),/NOT_ELIGIBLE/);
+ assert.throws(()=>calculateAmendment(o,{...c,deliveryFee:''},{now,quote:outside}),/MANUAL_FEE/);
+ assert.throws(()=>calculateAmendment(o,{...c,deliveryAreaOverride:'true'},{now,quote:outside}),/INVALID_AMENDMENT/);
+ assert.throws(()=>calculateAmendment(o,c,{now,quote:{...outside,customerLatitude:NaN}}),/NOT_ELIGIBLE/);
+});
+test('staff area override is previewed, tied to the reason, saved and audited atomically',async()=>{
+ const h=harness({order:{...base,order_type:'collection',delivery_fee:0,total:22.5},deliveryQuote:{...quote,straightLineMiles:3.28}}),r=await h.read();
+ const i={...input,changes:{...changes,orderType:'delivery',deliveryAddress:'Synthetic address',deliveryAreaOverride:true,deliveryFee:'4.00'},reason:'Staff agreed delivery-area exception',action:'amend_preview',expectedVersion:r.version};
+ assert.equal((await h.run({...i,reason:''})).reason,'AMENDMENT_AREA_OVERRIDE_REASON_REQUIRED');
+ const p=await h.run(i);assert.equal(p.success,true);assert.equal(p.deliveryAreaOverride.applied,true);assert.equal(h.audit.length,0);
+ assert.equal((await h.run({...i,action:'amend_save',reason:'Changed reason',expectedPreview:p.preview})).reason,'AMENDMENT_PRICE_CHANGED_REVIEW');
+ const save=await h.run({...i,action:'amend_save',expectedPreview:p.preview});assert.equal(save.committed,true);assert.equal(h.audit[0].after.delivery_area_override.actor,'staff@example.invalid');assert.equal(h.audit[0].after.delivery_area_override.straightLineMiles,3.28);assert.equal(h.audit[0].reason,i.reason);
+});
+test('area override cannot bypass a failed kitchen or driver assessment',async()=>{
+ const h=harness({order:{...base,order_type:'collection',delivery_fee:0,total:22.5},deliveryQuote:{...quote,straightLineMiles:3.28},assessment:false}),r=await h.read();
+ const p=await h.run({...input,action:'amend_preview',expectedVersion:r.version,changes:{...changes,orderType:'delivery',deliveryAddress:'Synthetic',deliveryAreaOverride:true,deliveryFee:'4.00'}});
+ assert.equal(p.reason,'AMENDMENT_SCHEDULE_NOT_AVAILABLE');assert.equal(h.state.order_type,'collection');assert.equal(h.audit.length,0);
 });
