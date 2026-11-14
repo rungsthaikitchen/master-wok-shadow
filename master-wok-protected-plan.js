@@ -124,7 +124,12 @@ function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...opti
   const asOfMinute=serviceMinute(now,serviceDate);
   if(!previousPlan&&asOfMinute>=990&&orders.some(o=>String(o.orderId)!==options.newOrderId))
    return fail('COMMITTED_PLAN_REQUIRED_DURING_SERVICE');
-  const fixed=protectStartedWork(previousPlan,asOfMinute);
+  const fixed=protectStartedWork(previousPlan,options.preserveExistingWork===true?1440:asOfMinute);
+  if(options.preserveExistingWork===true&&previousPlan){
+   const all=[...fixed.wok,...fixed.fryer,...fixed.auxiliary];
+   if(all.some(j=>(options.blackouts||[]).some(b=>j.start<b.finish&&b.start<j.finish)))
+    return fail('PRESERVED_WORK_BLACKOUT');
+  }
   const remaining=subtractProtectedPortions(orders,rows,fixed);
   const notBeforeByOrder=Object.fromEntries(orders.map(o=>[String(o.orderId),
    Math.max(Math.ceil(asOfMinute),options.notBeforeByOrder?.[String(o.orderId)]??0)]));

@@ -35,7 +35,7 @@ function createDeliveryCapacity({quoteLeg,stagingSharedRings=false}={}){
     const result=verifyCombinedCapacity({...context,acceptedOrders:p.orders.filter(o=>o!==candidate),
      rawRows:p.rows.filter(r=>r!==candidateRow),proposedOrder:{...candidate,rawRow:candidateRow}},
      {...kitchenOptions,...foodAgeConstraint(p.delivery,{...context.state.previousPlan?.holdExceptions,...(c.staffHoldException?{[id]:c.staffHoldException}:{})}),maxSearchNodes:searchOptions.maxSearchNodes,
-      maxCompleteChecks:searchOptions.maxCompleteChecks});
+      maxCompleteChecks:searchOptions.maxCompleteChecks,preserveOnly:searchOptions.preserveOnly});
     if(result.status!=='VERIFIED_KITCHEN_CAPACITY')return result;
     const plan={...result.plan,delivery:p.delivery};validateFoodAge(plan);
     return {...result,plan};

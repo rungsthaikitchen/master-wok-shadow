@@ -113,7 +113,7 @@ test('read-only hints and reviews are bounded while checkout retains the full se
   const result=await a.assessBooking({...context(),assessmentPurpose:purpose});
   assert.equal(result.bookingApprovalAllowed,false);
  }
- assert.deepEqual(calls,[{maxSearchNodes:1000,maxCompleteChecks:8},{maxSearchNodes:1000,maxCompleteChecks:8},{}]);
+ assert.deepEqual(calls,[{maxSearchNodes:1000,maxCompleteChecks:8,preserveOnly:true},{maxSearchNodes:1000,maxCompleteChecks:8,preserveOnly:true},{}]);
 });
 
 
