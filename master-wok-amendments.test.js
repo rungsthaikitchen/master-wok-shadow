@@ -110,3 +110,26 @@ test('area override cannot bypass a failed kitchen or driver assessment',async()
  const p=await h.run({...input,action:'amend_preview',expectedVersion:r.version,changes:{...changes,orderType:'delivery',deliveryAddress:'Synthetic',deliveryAreaOverride:true,deliveryFee:'4.00'}});
  assert.equal(p.reason,'AMENDMENT_SCHEDULE_NOT_AVAILABLE');assert.equal(h.state.order_type,'collection');assert.equal(h.audit.length,0);
 });
+
+test('staff correction confirms stored proposed time, preserves decline history, audits and sends no message',async()=>{
+ const h=harness({order:{...base,status:'customer_declined_time',confirmed_time:null,preferred_time:'2026-11-12T18:30:00Z',proposed_time:'2026-11-12T18:45:00Z'}}),r=await h.read();
+ assert.equal(r.staffTimeConfirmationAvailable,true);
+ const i={...input,action:'amend_confirm_time',expectedVersion:r.version,reason:'Customer selected decline by mistake; agreed time confirmed verbally',proposedTime:'2026-11-12T19:00:00Z'};
+ const save=await h.run(i);assert.equal(save.committed,true);assert.equal(h.state.status,'confirmed');assert.equal(h.state.confirmed_time,'2026-11-12T18:45:00.000Z');assert.equal(h.state.preferred_time,'2026-11-12T18:30:00Z');assert.equal(h.state.confirm_token,null);assert.equal(save.customerNotificationSent,false);
+ assert.equal(h.audit[0].after.time_confirmation.source,'STAFF_RECORDED_CUSTOMER_AGREEMENT');assert.equal(h.audit[0].actor,'staff@example.invalid');assert.ok(!h.queries.some(q=>q.includes('master_wok_notification_outbox')||q.includes('master_wok_time_responses')));
+ assert.equal((await h.run(i)).replayed,true);assert.equal(h.audit.length,1);
+ assert.equal((await h.run({...i,reason:'Different'})).reason,'AMENDMENT_IDEMPOTENCY_CONFLICT');
+});
+test('staff confirmation refuses stale state, missing reason, nonstaff and failed capacity',async()=>{
+ const o={...base,status:'customer_declined_time',proposed_time:'2026-11-12T20:15:00Z'};
+ const h=harness({order:o,assessment:false}),r=await h.read(),i={...input,action:'amend_confirm_time',expectedVersion:r.version};
+ assert.equal((await h.run({...i,reason:''})).reason,'AMENDMENT_REASON_AND_KEY_REQUIRED');
+ assert.equal((await h.run({...i,staffActor:''})).reason,'AMENDMENT_STAFF_REQUIRED');
+ assert.equal((await h.run({...i,expectedVersion:'stale'})).reason,'AMENDMENT_ORDER_CHANGED_REFRESH');
+ assert.equal((await h.run(i)).reason,'AMENDMENT_SCHEDULE_NOT_AVAILABLE');assert.equal(h.state.status,'customer_declined_time');assert.equal(h.audit.length,0);
+});
+test('staff confirmation needs an unresolved proposal and audit insertion must succeed',async()=>{
+ const h=harness(),r=await h.read();assert.equal((await h.run({...input,action:'amend_confirm_time',expectedVersion:r.version})).reason,'AMENDMENT_NO_PROPOSED_TIME_TO_CONFIRM');
+ const bad=harness({order:{...base,status:'proposed',proposed_time:'2026-11-12T20:15:00Z'},failAudit:true}),read=await bad.read();
+ assert.equal((await bad.run({...input,action:'amend_confirm_time',expectedVersion:read.version})).success,false);assert.equal(bad.state.status,'proposed');
+});

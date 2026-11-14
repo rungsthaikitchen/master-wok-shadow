@@ -50,3 +50,5 @@ test('lifecycle default does not acquire a connection or change production state
  const writer=createLifecycleWriter({pool:{connect:async()=>{throw Error('NO_ACCESS');}},assessMutation:async()=>{}});
  assert.equal((await writer.adminAction({orderId:id,action:'accept'})).reason,'USE_EXISTING_LIFECYCLE');
 });
+
+test('ordinary Accept cannot restore the original time after a declined proposal',()=>{assert.throws(()=>actionPatch({...order(),status:'customer_declined_time',proposed_time:'2026-11-04T19:00:00Z'},{action:'accept'},admin),/ACKNOWLEDGEMENT/);});
