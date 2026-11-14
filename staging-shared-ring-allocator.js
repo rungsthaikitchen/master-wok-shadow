@@ -59,13 +59,29 @@ function allocateSharedRings(jobs,options={}){
  }
  const placed=[];let nodes=0,completeChecks=0,exhausted=false;
  const ringOccupancy=Array(1321).fill(0);
+ // Index occupied minutes by vessel. Search calls this check many thousands
+ // of times; rebuilding and scanning every placed job creates avoidable CPU
+ // work and garbage, especially when checking a whole service's hints.
+ const vesselOccupancy=new Map(),vesselJobs=new Map(),vesselSignatures=new Map();
+ for(const vessel of new Set([...pending.flatMap(j=>j.vessels),...fixed.map(j=>j.vessel)])){
+  vesselOccupancy.set(vessel,new Int16Array(1322));
+  vesselJobs.set(vessel,[]);
+  vesselSignatures.set(vessel,JSON.stringify([vessel.replace(/-\d+$/,''),[]]));
+ }
  function reserveRing(job,delta){
   if(job.vessel!=='cold-prep-1')for(let t=job.start;t<job.finish;t++)ringOccupancy[t]+=delta;
+  const occupied=vesselOccupancy.get(job.vessel),assigned=vesselJobs.get(job.vessel);
+  for(let t=job.start;t<job.finish;t++)occupied[t]+=delta;
+  if(delta===1)assigned.push(job);else assigned.pop();
+  vesselSignatures.set(job.vessel,JSON.stringify([job.vessel.replace(/-\d+$/,''),
+   assigned.map(j=>[j.start,j.finish]).sort((a,b)=>a[0]-b[0])]));
  }
  for(const job of fixed)reserveRing(job,1);
  function fits(vessel,start,finish){
   if(blackouts.some(b=>start<b.finish&&finish>b.start))return false;
-  if([...fixed,...placed].some(j=>j.vessel===vessel&&start<j.finish+1&&finish+1>j.start))return false;
+  const occupied=vesselOccupancy.get(vessel);
+  // One full reset minute is required on either side of existing work.
+  for(let t=Math.max(0,start-1);t<=finish;t++)if(occupied[t]>0)return false;
   if(vessel!=='cold-prep-1')for(let t=start;t<finish;t++)if(ringOccupancy[t]>=4)return false;
   return true;
  }
@@ -79,8 +95,7 @@ function allocateSharedRings(jobs,options={}){
   const job=pending[i];
   const equivalent=new Set();
   const vessels=options.equivalentVessels===true?job.vessels.filter(vessel=>{
-   const signature=JSON.stringify([vessel.replace(/-\d+$/,''),[...fixed,...placed]
-    .filter(j=>j.vessel===vessel).map(j=>[j.start,j.finish]).sort((a,b)=>a[0]-b[0])]);
+   const signature=vesselSignatures.get(vessel);
    if(equivalent.has(signature))return false;equivalent.add(signature);return true;
   }):job.vessels;
   for(let start=job.latest;start>=job.earliest;start--){
