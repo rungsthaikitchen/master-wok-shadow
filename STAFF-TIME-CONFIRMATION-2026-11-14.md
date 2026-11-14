@@ -1,0 +1,7 @@
+# Staff recording of an agreed proposed time
+
+For an unresolved proposal or mistaken customer decline, Amend now exposes a separate Record agreed time action. Staff identity comes from the existing signed Cloudflare Access amendment boundary. A reason and idempotency key are required. The target is always the server-stored proposed_time, never an arbitrary client time. Stale versions, unavailable scheduling and audit failure roll back. The saved status is confirmed, with an audit explicitly identifying staff-recorded customer agreement; the original customer response receipt remains unchanged. No customer notification is enqueued.
+
+Ordinary Accept now refuses declined proposals as well as pending proposals, avoiding accidental restoration of the original preferred time. Other amendment controls remain unavailable while a proposal needs resolution.
+
+Validation: 388 backend and 72 website tests pass, covering the exact original18:30/proposed18:45 correction, immutable original request, idempotent retries, missing staff/reason, stale state, failed capacity, audit rollback, no notification/outbox write and signed actor enforcement. Production runtime21 deployed and fetched source verified; source SHA256 cfe3eb5bd705f6eebf94945fad2f733c215de6dd0c50926942831403165eb817. Runtime20 rollback code remains in core merge81db4d3. No SQL migration. The real order still requires staff to use the action in Admin; no real order was mutated by tests.

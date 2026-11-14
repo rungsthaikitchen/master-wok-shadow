@@ -62,30 +62,47 @@ function createAmendmentWriter({pool,schema='public',assertWriteAllowed,assessMu
  const q='"'+schema+'".';
  return async input=>{
   const fail=(reason,statusCode=409)=>({success:false,committed:false,reason,statusCode});
-  if(!input||!['amend_read','amend_preview','amend_save'].includes(input.action)||!UUID.test(input.orderId||''))return fail('INVALID_AMENDMENT_REQUEST',400);
+  if(!input||!['amend_read','amend_preview','amend_save','amend_confirm_time'].includes(input.action)||!UUID.test(input.orderId||''))return fail('INVALID_AMENDMENT_REQUEST',400);
   if(typeof input.staffActor!=='string'||!/^\S+@\S+\.\S+$/.test(input.staffActor)||input.staffActor.length>254)return fail('AMENDMENT_STAFF_REQUIRED',403);
   const actor=input.staffActor.toLowerCase();let c;
   try{
    c=await pool.connect();await beginBookingTransaction(c,{key:'order:'+input.orderId});await assertWriteAllowed(c);
    let requestFingerprint;
-   if(input.action==='amend_save'){
+   if(['amend_save','amend_confirm_time'].includes(input.action)){
     if(!UUID.test(input.idempotencyKey||'')||typeof input.reason!=='string'||!input.reason.trim()||input.reason.length>500)throw Error('AMENDMENT_REASON_AND_KEY_REQUIRED');
-    requestFingerprint=await digest([input.orderId,actor,input.expectedVersion,input.expectedPreview,input.changes,input.reason.trim()]);
+    requestFingerprint=await digest(input.action==='amend_confirm_time'?[input.action,input.orderId,actor,input.expectedVersion,input.reason.trim()]:[input.orderId,actor,input.expectedVersion,input.expectedPreview,input.changes,input.reason.trim()]);
     const prior=(await c.query(`SELECT request_fingerprint,response FROM ${q}order_amendments WHERE idempotency_key=$1`,[input.idempotencyKey])).rows[0];
     if(prior){await c.query('ROLLBACK');return prior.request_fingerprint===requestFingerprint?{...prior.response,replayed:true,committed:false}:fail('AMENDMENT_IDEMPOTENCY_CONFLICT');}
    }
    const order=(await c.query(`SELECT * FROM ${q}orders WHERE id=$1 FOR UPDATE`,[input.orderId])).rows[0];
    if(!order){await c.query('ROLLBACK');return fail('ORDER_NOT_FOUND',404);}
    const payment=(await c.query(`SELECT * FROM ${q}order_payments WHERE order_id=$1`,[input.orderId])).rows[0];
-   checkEditable(order,payment);const completed=order.status==='completed',before=snapshot(order),paymentBefore=paymentSummary(order,payment),version=await digest([before,paymentBefore]);
+   const timeResolution=['proposed','customer_declined_time'].includes(order.status)&&!!order.proposed_time;
+   if(!timeResolution||!['amend_read','amend_confirm_time'].includes(input.action))checkEditable(order,payment);const completed=order.status==='completed',before=snapshot(order),paymentBefore=paymentSummary(order,payment),version=await digest([before,paymentBefore]);
    if(input.action==='amend_read'){
     const history=(await c.query(`SELECT actor,reason,occurred_at,before_details,after_details FROM ${q}order_amendments WHERE order_id=$1 ORDER BY occurred_at DESC LIMIT 20`,[order.id])).rows;
-    await c.query('ROLLBACK');return {success:true,committed:false,notification_managed:true,order:before,version,history,completedAmendment:completed,payment:paymentBefore};
+    await c.query('ROLLBACK');return {success:true,committed:false,notification_managed:true,order:before,version,history,completedAmendment:completed,payment:paymentBefore,staffTimeConfirmationAvailable:timeResolution};
    }
    if(input.expectedVersion!==version)throw Error('AMENDMENT_ORDER_CHANGED_REFRESH');
    if(input.changes?.deliveryAreaOverride===true&&(typeof input.reason!=='string'||!input.reason.trim()||input.reason.length>500))throw Error('AMENDMENT_AREA_OVERRIDE_REASON_REQUIRED');
    const now=(await c.query('SELECT clock_timestamp() AS now')).rows[0]?.now;
    if(!now||!Number.isFinite(new Date(now).getTime()))throw Error('AMENDMENT_SERVER_CLOCK_REQUIRED');
+   if(input.action==='amend_confirm_time'){
+    if(!timeResolution)throw Error('AMENDMENT_NO_PROPOSED_TIME_TO_CONFIRM');
+    const agreed=new Date(order.proposed_time);if(!Number.isFinite(agreed.getTime()))throw Error('AMENDMENT_NO_PROPOSED_TIME_TO_CONFIRM');
+    const after={...order,status:'confirmed',confirmed_time:agreed.toISOString(),confirm_token:null};
+    const dates=[...new Set([...commitmentTimes(order),...commitmentTimes(after)].map(localDate))].sort();
+    await lockServiceDates(c,dates);
+    await c.query(`UPDATE ${q}orders SET "status"=$2,"confirmed_time"=$3,"confirm_token"=$4 WHERE id=$1`,[order.id,after.status,after.confirmed_time,null]);
+    const assessment=await assessMutation({connection:c,before:order,after,dates,now,action:'staff_confirm_time'});
+    if(assessment?.status!=='GREEN'||assessment.bookingApprovalAllowed!==true||dates.some(d=>!assessment.plansByDate?.[d]))throw Error('AMENDMENT_SCHEDULE_NOT_AVAILABLE');
+    for(const date of dates)await planStore.save(c,date,assessment.plansByDate[date]);
+    const confirmation={source:'STAFF_RECORDED_CUSTOMER_AGREEMENT',actor,reason:input.reason.trim(),agreedTime:after.confirmed_time};
+    const response={success:true,notification_managed:true,customerNotificationSent:false,orderId:order.id,before,after:snapshot(after),timeConfirmation:confirmation};
+    await c.query(`INSERT INTO ${q}order_amendments(order_id,idempotency_key,request_fingerprint,actor,reason,before_details,after_details,response) VALUES($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8::jsonb)`,
+     [order.id,input.idempotencyKey,requestFingerprint,actor,input.reason.trim(),JSON.stringify(before),JSON.stringify({...response.after,time_confirmation:confirmation}),JSON.stringify(response)]);
+    await c.query('COMMIT');return {...response,committed:true};
+   }
    const code=String(input.changes?.discountCode||'').trim().toUpperCase(),oldCode=String(order.discount_code||'').trim().toUpperCase();
    // Lock both counters in stable order; an unchanged code is not used twice.
    const discounts=(await c.query(`SELECT * FROM ${q}discount_codes WHERE code=ANY($1::text[]) ORDER BY code FOR UPDATE`,[[...new Set([code,oldCode].filter(Boolean))]])).rows;

@@ -19,7 +19,7 @@ function actionPatch(order,input,{actor,now,tokenFactory=()=>crypto.randomUUID()
  if(actor!=='admin')throw Error('UNAUTHORIZED_ACTOR');
  switch(action){
   case 'accept':
-   if(order.status==='proposed')throw Error('CUSTOMER_TIME_ACKNOWLEDGEMENT_REQUIRED');
+   if(['proposed','customer_declined_time'].includes(order.status))throw Error('CUSTOMER_TIME_ACKNOWLEDGEMENT_REQUIRED');
    if(['cancelled','completed'].includes(order.status))throw Error('EXPLICIT_REOPEN_REQUIRED');
    if(!order.confirmed_time&&!order.preferred_time)throw Error('NO_BOOKED_TIME');
    return {status:'confirmed',confirmed_time:order.confirmed_time||order.preferred_time,confirm_token:null};
