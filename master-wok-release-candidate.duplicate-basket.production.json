@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "DRAFT_PENDING_PRODUCTION_APPROVAL",
+  "status": "CERTIFIED_FOR_PRODUCTION",
   "releaseId": "master-wok-four-ring-2026-11-10",
   "projectRef": "ubyjrrsvbbqomitpaidb",
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
@@ -97,8 +97,24 @@
     "hostedAcceptance": "Saved delivery to collection with MIDWEEK10; total20.25, receipt25.50 card, tip2 cash preserved, overpaid5.25, loyalty72 to70; owner tested collection to delivery and accepted explicit charge"
   },
   "duplicateBasketFix": {
-    "productionApproval": "PENDING",
-    "coreTests": 371,
-    "scope": "Aggregate identical source recipe dependencies before fryer attribution; necessary cold-prep workload bound; unverified availability marker. No timing, hardware, hold-limit or booking authorization relaxation."
+    "productionApproval": "Owner approved production release: Let\u2019s do it Sensei, 14 November 2026, after accepting the preview and delivery arrival-deadline replay.",
+    "coreTests": 375,
+    "scope": "Aggregate identical source recipe dependencies before fryer attribution; necessary cold-prep workload bound; unverified availability marker. No timing, hardware, hold-limit or booking authorization relaxation.",
+    "websiteTests": 70
+  },
+  "deliveryArrivalDeadline": {
+    "productionApproval": "Owner: Cool, happy with that; subsequent production release approval, 14 November 2026",
+    "scope": "New delivery trips may not arrive after the selected time; retained existing reservations remain readable",
+    "replay": "RTK-1635: 19:45 and 19:50 refused, 19:55 and 20:00 on time",
+    "manifest": "DELIVERY-ARRIVAL-DEADLINE-2026-11-14.md"
+  },
+  "release20261114": {
+    "scope": "Customer script extraction; current-basket availability with bounded six-hint checks and one transient read retry; checkout loading/progress; duplicate fryer-line and search-performance fixes; delivery arrival deadline",
+    "coreTests": 375,
+    "websiteTests": 70,
+    "databaseMigration": "NONE",
+    "rollbackRuntimeSourceSha256": "dc376ff1e3f49b7a60deb1196c405ab85386c521e8e09b6d879759d97e38994a",
+    "productionSourceSha256": "0ba1e97de2efec9eb1a1f9b4c099330b26446c99f3cb1fb0d24d8293cd84c1e4",
+    "evidence": "PRODUCTION-ORDERING-RELEASE-2026-11-14.md"
   }
 }
