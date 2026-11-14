@@ -14,4 +14,8 @@ Pre-service read-only inventory found no active/future orders and no plans dated
 
 Rollback: retain the previous deployed Edge bundle and production website commit 572d61ad84a0716239bc167e4e935f2ed0ae824e. Restore prior application code without deleting orders, receipts, plans or notifications. There is no schema or data rollback. Old readers accept the unchanged plan shape and on-time trips; the old availability limitations return if its code is restored. Any new orders remain authoritative and must not be discarded. Do not switch to LEGACY as part of this application rollback.
 
-Deployment status: prepared; final runtime/website deployment and read-only production smoke evidence to be appended.
+Deployment completed: production Edge runtime 17, source 0ba1e97de2efec9eb1a1f9b4c099330b26446c99f3cb1fb0d24d8293cd84c1e4, certified with no staging configuration overrides. Core PR12 merged as 0b8ad3012aa47c7723fbd6adcfa626d5c1fa5032. Website PR84 merged as 697f8c8f0b3c42cb79706fe5cbae80a80b55c3bc; Cloudflare Pages reports successful deployment. PR80/81 are closed as included in the integrated release.
+
+The live https://rungsthaikitchen.co.uk/ browser check recreated the exact six-line £104.50 basket. Opening feedback appeared immediately; selecting 14 November returned 49 selectable normal-service times, zero unverified, and 18:30 was successfully selected. No customer details entered or order submitted.
+
+Before/after read-only inventories: 1,519 orders, 5,999 items, 21 booking receipts, 47 outbox events, zero current/future service plans. Booking mode remains MASTER_WOK revision 8. No data or notification write was introduced by the smoke check. Both repositories retain rollback/pre-ordering-release-2026-11-14; rebuilding the backend rollback branch reproduces the exact previous source hash.
