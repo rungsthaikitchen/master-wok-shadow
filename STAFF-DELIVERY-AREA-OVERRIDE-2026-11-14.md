@@ -1,0 +1,9 @@
+# Staff delivery-area override
+
+Admin amendments support an explicit deliveryAreaOverride boolean for authenticated staff, with a mandatory manual delivery charge and a non-empty reason in preview and save. The server-derived address and coordinates remain required. Normal public checkout and availability pass no override into the trusted quoter and retain the 3-mile limit. Operational amendments still require locked kitchen and driver validation; no delivery time is silently moved. Completed corrections retain their existing explicit-charge workflow.
+
+The preview displays measured straight-line miles and the exception reason. The preview digest binds the exception actor and reason, and a changed reason requires a new review. Atomic amendment audit after_details contains delivery_area_override metadata with actor, reason, normal limit, measured miles and whether the exception applied. No schema migration or customer notification is introduced.
+
+Validation: 384 backend tests and 71 website tests pass. Tests cover radius enforcement without the override, explicit manual charge, valid coordinates, audit persistence, changed-reason preview mismatch, schedule rejection and ignoring browser-supplied public-checkout override flags. Hosted staging76 negative controls using a public landmark returned address rejection without the flag and scheduling rejection with it, with neither request committed. Automatic approval review blocked real-customer staging and route diagnostics; the actual delivery appointment remains subject to review in Admin.
+
+Production master-wok-booking runtime20 source SHA256 5329203e985f09fa0c57eeecc3637fc29683c52ce2c46bb38b0b1d552f6054c6. Runtime19 rollback source is recoverable from hotfix/preserved-availability-2026-11-14 at f554309e8a106382080fabdbe1c920a99fa478d5.

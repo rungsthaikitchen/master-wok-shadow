@@ -23,7 +23,7 @@ function createDeliveryQuoter({supabaseUrl,publicKey,fetch:transport=globalThis.
   if(!response.ok)throw Error('DELIVERY_PROVIDER_UNAVAILABLE');
   return response.json();
  }
- return async function quote({address,subtotalCents}){
+ return async function quote({address,subtotalCents,allowOutsideArea=false}){
   if(typeof address!=='string'||!address.trim()||address.length>1000||!Number.isInteger(subtotalCents)||subtotalCents<0)
    throw Error('INVALID_DELIVERY_ADDRESS');
   let geo;try{geo=await call('geocode-address',{customer_address:address.trim()},5000);}
@@ -33,7 +33,7 @@ function createDeliveryQuoter({supabaseUrl,publicKey,fetch:transport=globalThis.
   if(!Number.isFinite(customer.lat)||Math.abs(customer.lat)>90||!Number.isFinite(customer.lng)||Math.abs(customer.lng)>180)
    throw Error('DELIVERY_GEOCODING_UNAVAILABLE');
   const straightLineMiles=haversineMiles(RESTAURANT,customer);
-  if(straightLineMiles>3)throw Error('DELIVERY_ADDRESS_NOT_ELIGIBLE');
+  if(straightLineMiles>3&&allowOutsideArea!==true)throw Error('DELIVERY_ADDRESS_NOT_ELIGIBLE');
   let routeMiles=null;
   if(subtotalCents<3000)try{
    const route=await call('get-delivery-route-quote',{origin:RESTAURANT,destination:customer},2500);
