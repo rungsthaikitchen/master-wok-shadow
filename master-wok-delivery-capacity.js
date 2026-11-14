@@ -41,7 +41,7 @@ function createDeliveryCapacity({quoteLeg,stagingSharedRings=false}={}){
     return {...result,plan};
    }catch(error){return {status:'UNVERIFIED',reason:error.message,bookingApprovalAllowed:false};}
   },
-  async replan({orders,rows,previousPlan,serviceDate,now,availability,combine,splitTripId}){
+  async replan({orders,rows,previousPlan,serviceDate,now,availability,combine,splitTripId,retainExistingPlan=false}){
    try{
     const p=await prepare({orders,rows,previousPlan,serviceDate,now,combine,splitTripId});
     // Closures affect production as well as customer handover. Capacity-only
@@ -57,7 +57,7 @@ function createDeliveryCapacity({quoteLeg,stagingSharedRings=false}={}){
      }
     }
     const result=planWithProtectedWork({orders:p.orders,rows:p.rows,previousPlan,serviceDate,now,blackouts,
-     ...kitchenOptions,...foodAgeConstraint(p.delivery,previousPlan?.holdExceptions),
+     ...kitchenOptions,...foodAgeConstraint(p.delivery,previousPlan?.holdExceptions),retainExistingPlan:retainExistingPlan&&!combine&&!splitTripId,
      standaloneSpringRolls:true,confirmedStarterRecipes:true,fryerWarmupMinutes:5});
     if(result.status!=='VALIDATED_PROTECTED_PLAN')return result;
     const plan={...result.plan,delivery:p.delivery};validateFoodAge(plan);
