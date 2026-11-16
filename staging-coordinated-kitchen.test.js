@@ -16,6 +16,22 @@ test('coordinated staging prototype places crispy chicken frying before wok',()=
  assert.equal(r.bookingApprovalAllowed,false);
  assert.ok(r.fryer.jobs.every(f=>f.finish<=r.wok.jobs[0].start));
 });
+
+test('cached fryer plans follow changed wok deadlines and never survive a new assessment',()=>{
+ let checks=0;
+ const basket=rows([line('stir-crispy')]);
+ const options={sharedRings:true,confirmedStarterRecipes:true,maxSearchNodes:1000,maxCompleteChecks:128,
+  validateCompletePlan:plan=>{checks++;return plan.wok.jobs.find(j=>j.itemId==='stir-crispy').start<=1134;}};
+ const result=planCoordinatedKitchen(orders,basket,options);
+ assert.equal(result.status,'COORDINATED_PROTOTYPE');
+ assert.ok(checks>1);
+ const main=result.wok.jobs.find(j=>j.itemId==='stir-crispy');
+ assert.ok(result.fryer.jobs.every(j=>j.finish<=main.start));
+ assert.equal(result.fryer.jobs.flatMap(j=>j.allocations).filter(a=>a.itemId==='stir-crispy').length,1);
+ const blocked=planCoordinatedKitchen(orders,basket,{...options,
+  fryerBlackouts:[{start:990,finish:1320}]});
+ assert.equal(blocked.status,'UNVERIFIED');
+});
 test('standalone fried starters prevent complete coordinated kitchen validation',()=>{
  const r=planCoordinatedKitchen(orders,rows([line('stir-crispy'),line('veg-spring-rolls')]));
  assert.equal(r.status,'UNVERIFIED');

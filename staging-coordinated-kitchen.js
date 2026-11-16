@@ -18,13 +18,27 @@ function planCoordinatedKitchen(orders,rows,options={}){
   const mainSearchBudget=curryHoldMinutes===10?
    Math.min(options.maxSearchNodes??100000,100):options.maxSearchNodes;
   let fryer,auxiliary;
+  // Ring search can revisit the same frying deadlines with different wok/pan
+  // assignments. Fryer feasibility depends on these attributed deadlines, not
+  // on which interchangeable hob vessel was selected. Reuse only within this
+  // assessment and hold-policy attempt; never across bookings or snapshots.
+  const dependentItems=new Set(inventory.dependencies.filter(d=>!d.standalone).map(d=>d.itemId));
+  const fryerCache=new Map();
+  function fryerFor(jobs){
+   const key=JSON.stringify(jobs.filter(j=>dependentItems.has(j.itemId)).map(j=>JSON.stringify([
+    j.itemId,j.recipeKey,j.start,j.portions,j.orderIds,j.portionAllocations
+   ])).sort());
+   if(!fryerCache.has(key))fryerCache.set(key,planFryerBeforeWok(orders,rows,
+    {status:'FEASIBLE_PROTOTYPE',jobs},attemptOptions));
+   return fryerCache.get(key);
+  }
   const wok=scheduleCrossOrderPanang(orders,rows,{sharedRings:options.sharedRings===true,allowFryerDependent:true,curryHoldMinutes,holdingLimitMinutes:curryHoldMinutes,
    holdExceptions:options.holdExceptions,blackouts:options.blackouts,fixedWok:options.fixedWok,notBeforeByOrder:options.notBeforeByOrder,
    earliestFinishByOrder:options.earliestFinishByOrder,equivalentVessels:options.sharedRings===true,
    maxSearchNodes:mainSearchBudget,maxCompleteChecks:options.maxCompleteChecks,
    originalJobOrder:inventory.dependencies.some(d=>!d.standalone),
    validateComplete:jobs=>{
-    fryer=planFryerBeforeWok(orders,rows,{status:'FEASIBLE_PROTOTYPE',jobs},attemptOptions);
+    fryer=fryerFor(jobs);
     auxiliary=options.confirmedStarterRecipes?planAuxiliaryWork(orders,options.auxiliaryRows||rows,jobs,attemptOptions):{status:'AUXILIARY_PLACED_PROTOTYPE',jobs:[]};
     if(fryer.status!=='PREREQUISITES_PLACED_PROTOTYPE'||auxiliary.status!=='AUXILIARY_PLACED_PROTOTYPE')return false;
     return typeof options.validateCompletePlan!=='function'||options.validateCompletePlan({
@@ -36,7 +50,7 @@ function planCoordinatedKitchen(orders,rows,options={}){
    last={status:'UNVERIFIED',reason:'WOK_PLAN_UNVERIFIED',wok,bookingApprovalAllowed:false};
    continue;
   }
-  fryer=planFryerBeforeWok(orders,rows,{...wok,status:'FEASIBLE_PROTOTYPE'},attemptOptions);
+  fryer=fryerFor(wok.jobs);
   if(fryer.status!=='PREREQUISITES_PLACED_PROTOTYPE'){
    last={status:'UNVERIFIED',reason:fryer.reason,wok,fryer,bookingApprovalAllowed:false};
    continue;

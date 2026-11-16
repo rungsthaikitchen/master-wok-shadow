@@ -76,6 +76,22 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
  const groups=[...buckets.values()].sort((a,b)=>a[0].deadline-b[0].deadline)
   .map(g=>g.sort((a,b)=>b.notBefore-a.notBefore));
  const jobs=[];let nodes=0,exhausted=false;
+ // Index occupied minutes once. Re-scanning every previous job and blackout
+ // in every nested fryer branch consumed most of the availability CPU time.
+ const occupied=new Map(BASKETS.map(b=>[b.id,new Int16Array(1321)]));
+ for(const basket of BASKETS)for(const b of options.fryerBlackouts||[]){
+  if(b.basket&&b.basket!==basket.id)continue;
+  for(let t=Math.max(0,Math.floor(b.start));t<Math.min(1321,Math.ceil(b.finish));t++)occupied.get(basket.id)[t]++;
+ }
+ function reserve(basket,start,finish,delta){
+  const minutes=occupied.get(basket);
+  for(let t=start;t<finish;t++)minutes[t]+=delta;
+ }
+ function fits(basket,start,finish){
+  const minutes=occupied.get(basket);
+  for(let t=start;t<finish;t++)if(minutes[t])return false;
+  return true;
+ }
  function search(groupIndex,remaining){
   if(++nodes>(options.maxNodes??20000)){exhausted=true;return false;}
   if(groupIndex===groups.length)return true;
@@ -85,20 +101,18 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
   for(let start=first.deadline-first.duration;start>=Math.max(990,first.deadline-first.duration-hold,first.notBefore);start--){
    const finish=start+first.duration;
    if((options.kitchenBlackouts||options.blackouts||[]).some(b=>start<b.finish&&finish>b.start))continue;
-   const blocked=options.fryerBlackouts||[];
    for(const basket of BASKETS){
-    if(jobs.some(j=>j.basket===basket.id&&start<j.finish&&finish>j.start)||
-      blocked.some(b=>(!b.basket||b.basket===basket.id)&&start<b.finish&&finish>b.start))continue;
+    if(!fits(basket.id,start,finish))continue;
     for(let size=Math.min(fryerCapacity(first.type,basket.id),remaining.length);size>=1;size--){
      const assigned=remaining.slice(0,size);
      if(assigned.some(p=>finish<(p.earliestFinish??0)))continue;
      const job={type:first.type,basket:basket.id,portions:size,start,finish,
-      orderIds:[...new Set(assigned.map(p=>p.orderId))],
-      itemIds:[...new Set(assigned.map(p=>p.itemId))],
-      allocations:assigned.map(p=>({...p,qty:1})),
+      assigned,
       ...(first.standalone?{standalone:true,readyMinute:first.deadline}:{wokStart:first.deadline})};
      jobs.push(job);
+     reserve(basket.id,start,finish,1);
      if(search(groupIndex,remaining.slice(size)))return true;
+     reserve(basket.id,start,finish,-1);
      jobs.pop();if(exhausted)return false;
     }
    }
@@ -107,6 +121,12 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
  }
  if(!search(0,groups[0]||[]))return fail(exhausted?'FRY_SEARCH_LIMIT':'FRY_BEFORE_WOK_CAPACITY_UNVERIFIED');
  return {status:'PREREQUISITES_PLACED_PROTOTYPE',reason:'ATTRIBUTED_FRYER_TIMELINE',
-  jobs:jobs.sort((a,b)=>a.start-b.start),inventory,nodes,bookingApprovalAllowed:false};
+  // Attribution is needed only for the successful plan, not for thousands of
+  // discarded branches. Keep every original portion and recipe key intact.
+  jobs:jobs.map(({assigned,...job})=>({...job,
+   orderIds:[...new Set(assigned.map(p=>p.orderId))],
+   itemIds:[...new Set(assigned.map(p=>p.itemId))],
+   allocations:assigned.map(p=>({...p,qty:1}))})).sort((a,b)=>a.start-b.start),
+  inventory,nodes,bookingApprovalAllowed:false};
 }
 module.exports={planFryerBeforeWok};

@@ -63,3 +63,20 @@ test('different spice recipes still cannot borrow each other’s attributed frye
  const jobs=Array.from({length:6},(_,i)=>({itemId:'stir-crispy',orderIds:['A'],recipeKey:key,start:1120+i*2,portionAllocations:[{orderId:'A',qty:1}]}));
  assert.equal(planFryerBeforeWok(orders,[{id:'A',items}],{status:'FEASIBLE_PROTOTYPE',jobs}).reason,'FRY_WOK_BATCH_MAPPING_UNVERIFIED');
 });
+
+test('indexed fryer occupancy retains exclusive boundaries and fractional blackout overlap',()=>{
+ const basket=[{id:'A',items:[{item_id:'veg-spring-rolls',qty:1,modifiers:[]}]}];
+ const options={standaloneSpringRolls:true};
+ const baseline=planFryerBeforeWok(orders,basket,wok(1130),options);
+ assert.equal(baseline.status,'PREREQUISITES_PLACED_PROTOTYPE');
+ const job=baseline.jobs[0];
+ const touches=planFryerBeforeWok(orders,basket,wok(1130),{...options,
+  fryerBlackouts:[{start:job.finish,finish:job.finish+5}]});
+ assert.equal(touches.status,'PREREQUISITES_PLACED_PROTOTYPE');
+ assert.deepEqual(touches.jobs,baseline.jobs);
+ const blocked=planFryerBeforeWok(orders,basket,wok(1130),{...options,
+  fryerBlackouts:[{start:job.finish-0.5,finish:job.finish+5}]});
+ assert.equal(blocked.status,'PREREQUISITES_PLACED_PROTOTYPE');
+ assert.ok(blocked.jobs.every(j=>j.finish<=job.finish-0.5));
+ assert.ok(blocked.jobs.every(j=>j.allocations.length===j.portions&&!('assigned' in j)));
+});
