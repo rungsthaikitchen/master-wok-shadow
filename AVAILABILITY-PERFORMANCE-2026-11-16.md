@@ -26,7 +26,8 @@ add expensive symmetry bookkeeping were discarded.
 
 ## Validation
 
-- `npm test`: 390 passed, zero failed, after rebasing onto the latest staff-time
+- `npm test`: 391 passed, zero failed, including the hosted-harness regression,
+  after rebasing onto the latest staff-time
   confirmation release (0ebfec4).
 - 150 deterministic comparisons against the original fryer implementation gave
   identical complete outputs, including attribution and search-node counts.
@@ -43,8 +44,18 @@ historical snapshot of every attempted checkout. Route durations come only from
 stored plan legs; no customer address/coordinates were sent to routing services.
 Private source snapshots and benchmark scripts are not committed.
 
-These local measurements are not evidence that hosted CPU failures are resolved.
-Hosted rehearsal under the Edge runtime limit remains required. In particular,
+An isolated hosted Edge rehearsal subsequently passed 44 authenticated requests:
+two complete scans of each basket, using batches of six times and two concurrent
+requests. All 244 status/reason pairs matched local results; no HTTP failures or
+CPU-limit responses occurred. The slowest internal six-time assessment took
+456 ms; the slowest test-client round trip took 6735 ms. This isolates scheduling
+CPU from the website, database transaction and gateway; it is not end-to-end
+checkout certification. Evidence is in
+`staging-tests/availability-hosted-evidence-2026-11-16.json`. The rehearsal used
+fictional coordinates and anonymised order identifiers, made no database/provider
+requests and was disabled immediately afterwards (function version 3).
+
+Full website/gateway/transaction rehearsal remains required. In particular,
 the heavier-basket scan still has unverified results; it is not a complete
 availability fix. Approval-link mismatch, delivery amendment diagnostics, staff
 order entry and rollback independence remain separate work.
