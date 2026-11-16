@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "scope": "ISOLATED_HOSTED_CPU_REHEARSAL_NOT_FULL_CHECKOUT",
+  "project": "hvrqgufqjslvgiohgkvu",
+  "functionVersion": 2,
+  "sourceCommit": "5ab7c93b1dd9bc25fb30ed578a130a6027bb4171",
+  "requests": 44,
+  "httpFailures": 0,
+  "allHintsMatchLocal": true,
+  "maxAssessmentMs": 456,
+  "maxTransportMs": 6735,
+  "runs": [
+    {
+      "run": 0,
+      "basket": "small",
+      "hints": 61,
+      "verified": 56
+    },
+    {
+      "run": 0,
+      "basket": "heavy",
+      "hints": 61,
+      "verified": 47
+    },
+    {
+      "run": 1,
+      "basket": "small",
+      "hints": 61,
+      "verified": 56
+    },
+    {
+      "run": 1,
+      "basket": "heavy",
+      "hints": 61,
+      "verified": 47
+    }
+  ],
+  "databaseRequests": 0,
+  "bookings": 0,
+  "notifications": 0,
+  "endpointDisabledVersion": 3
+}
