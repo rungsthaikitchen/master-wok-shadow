@@ -1,0 +1,81 @@
+{
+  "status": "PASS_WITH_REMAINING_UNVERIFIED_SLOTS",
+  "project": "hvrqgufqjslvgiohgkvu",
+  "schema": "master_wok_rehearsal",
+  "edgeVersion": 77,
+  "sourceSha256": "05fc96ca7e7e2ead6e0c216eb19316a2e64dec99de709142a12d57f3cb8561de",
+  "apiChecks": [
+    "review-created",
+    "review-approved",
+    "approval-lookup",
+    "agreed-type-and-time-restored",
+    "missing-acknowledgement-refused",
+    "approval-checkout-committed-with-international-phone",
+    "expected-total-retained",
+    "same-key-retry-no-duplicate",
+    "approval-consumed-after-commit"
+  ],
+  "apiOrder": "RTK-209",
+  "browserDelivery": {
+    "order": "RTK-210",
+    "date": "2026-11-20",
+    "time": "18:20",
+    "food": 29,
+    "delivery": 2,
+    "total": 31,
+    "allNormalWindowTimesVerified": 49,
+    "deliveryRetainedOnReopen": true
+  },
+  "browserApprovalBeforeCleanupFix": {
+    "order": "RTK-211",
+    "date": "2026-11-20",
+    "time": "19:30",
+    "total": 48,
+    "consumedApprovals": 1
+  },
+  "heavyRuntimeAvailability": {
+    "scope": "ACTUAL_STAGING_RUNTIME_DATABASE_TRANSACTIONS",
+    "status": "PASS",
+    "basket": 104.5,
+    "date": "2026-11-21",
+    "requests": 9,
+    "hints": 49,
+    "available": 46,
+    "unverified": 3,
+    "httpFailures": 0,
+    "maxTransportMs": 8914,
+    "bookings": 0,
+    "messages": 0
+  },
+  "confirmedBugs": [
+    "Consumed approval remained attached to the next basket",
+    "Restored delivery address did not trigger its blur-based geocoder in a fresh session"
+  ],
+  "realMessages": 0,
+  "productionChanges": 0,
+  "browserPreview": "https://fix-review-approval-cleanup.rungsthaikitchen.pages.dev/",
+  "websiteCommit": "95995039a6951ef92d5fd7d41e19d2f92e7a3981",
+  "runtimeTestsPassed": 393,
+  "websiteTestsPassed": 89,
+  "browserApprovalAfterFix": {
+    "order": "RTK-212",
+    "time": "20:30",
+    "total": 48,
+    "deliveryAddressAutomaticallyVerified": true,
+    "consumedApprovals": 1,
+    "newBasketNormalTimes": 49,
+    "oldApprovalCheckboxes": 0
+  },
+  "productionMode": "LEGACY",
+  "productionRevision": 10,
+  "cleanup": {
+    "cancelledSyntheticOrders": [
+      "RTK-209",
+      "RTK-210",
+      "RTK-211",
+      "RTK-212"
+    ],
+    "notificationDeliveries": 0,
+    "pendingEventsSkipped": 8
+  }
+}
