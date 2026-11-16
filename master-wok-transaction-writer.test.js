@@ -56,3 +56,14 @@ test('transaction diagnostics retain internal enum codes without leaking excepti
   {event:'MASTER_WOK_TRANSACTION_FAILED',diagnostic:'INTERNAL_ERROR',sqlState:null}]);
 });
 
+test('review mismatch diagnostics contain only approved field names and preserve rollback',async t=>{
+ const diagnostics=[],log=[];t.mock.method(console,'error',message=>diagnostics.push(JSON.parse(message)));
+ const error=Error('REVIEW_APPROVAL_MISMATCH');
+ error.reviewMismatchFields=['phone','delivery_address','customer@example.invalid'];
+ const result=await reserveWithMasterWok({connection:connection(log),serviceDate:'2026-11-14',key:'fixture-key',candidate:{},
+  readCommitted:async()=>({acceptedOrders:[]}),assess:async()=>{throw error;},persist:async()=>{throw Error('must not persist');}});
+ assert.equal(result.committed,false);assert.equal(result.reason,'REVIEW_APPROVAL_MISMATCH');assert.equal(log.at(-1),'ROLLBACK');
+ assert.deepEqual(diagnostics,[{event:'MASTER_WOK_TRANSACTION_FAILED',diagnostic:'REVIEW_APPROVAL_MISMATCH',sqlState:null,
+  reviewMismatchFields:['phone','delivery_address']}]);
+});
+

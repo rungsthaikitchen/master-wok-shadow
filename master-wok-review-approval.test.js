@@ -53,6 +53,29 @@ test('checkout authorization rejects changed baskets, time, contact, address, ex
   const before=stored;stored={...stored,...change};await assert.rejects(a.authorize(c,request),/INVALID|EXPIRED/);stored=before;
  }
 });
+
+test('review checkout recognises the same UK phone and diagnoses each genuine changed field',async()=>{
+ const items=[{item_id:'green-curry',qty:1,modifiers:[{id:'chicken'}],spice:1}];
+ const stored={id:uuid,review_id:uuid,review_status:'approved',order_id:null,basket:items,
+  order_type:'delivery',customer_phone:'07700900982',delivery_address:'Fixture address',agreed_time:payload.agreedTime,
+  max_hold_minutes:20,reason:exception.reason,staff_actor:exception.staffActor,
+  created_at:exception.approvedAt,expires_at:'2026-11-11T10:30:00Z'};
+ const c={query:async sql=>({rows:sql.includes('clock_timestamp() AS now')?[{now:'2026-11-11T10:05:00Z'}]:[stored]})};
+ const approval=createReviewApproval({pool:{},assertWriteAllowed:async()=>{}});
+ const request={items,orderType:'delivery',preferredTime:payload.agreedTime,
+  customer:{phone:'07700900982',address:'Fixture address'},reviewApprovalToken:'a'.repeat(64),reviewHoldingAcknowledged:true};
+ for(const phone of ['07700 900982','+44 7700 900982','0044 7700 900982','+44 (0)7700 900982'])
+  assert.equal((await approval.authorize(c,{...request,customer:{...request.customer,phone}})).maxMinutes,20);
+ for(const [change,field] of [
+  [{items:[{...items[0],qty:2}]},'basket'],[{orderType:'collection'},'order_type'],
+  [{preferredTime:'2026-11-28T20:20:00Z'},'agreed_time'],
+  [{customer:{...request.customer,phone:'+44 7700 900981'}},'phone'],
+  [{customer:{...request.customer,address:'Different fixture address'}},'delivery_address'],
+  [{reviewHoldingAcknowledged:false},'holding_acknowledgement']
+ ])await assert.rejects(approval.authorize(c,{...request,...change}),error=>{
+  assert.equal(error.message,'REVIEW_APPROVAL_MISMATCH');assert.deepEqual(error.reviewMismatchFields,[field]);return true;
+ });
+});
 test('review checkout uses the existing booking transaction and atomically consumes the grant with the saved plan',async()=>{
  require('./master-wok-model-bundle');
  const {createAtomicCheckout}=require('./master-wok-atomic-checkout');

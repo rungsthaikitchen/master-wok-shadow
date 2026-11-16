@@ -43,7 +43,11 @@ async function reserveWithMasterWok({ connection, serviceDate, key, candidate, r
     // customer details, request keys or arbitrary exception text.
     const diagnostic=/^[A-Z][A-Z_]{2,79}$/.test(error?.message||'')?error.message:'INTERNAL_ERROR';
     const sqlState=/^[0-9A-Z]{5}$/.test(error?.code||'')?error.code:null;
-    console.error(JSON.stringify({event:'MASTER_WOK_TRANSACTION_FAILED',diagnostic,sqlState}));
+    const knownReviewFields=new Set(['basket','order_type','agreed_time','phone','delivery_address','holding_acknowledgement']);
+    const reviewMismatchFields=diagnostic==='REVIEW_APPROVAL_MISMATCH'&&Array.isArray(error?.reviewMismatchFields)
+      ?error.reviewMismatchFields.filter(field=>knownReviewFields.has(field)):[];
+    console.error(JSON.stringify({event:'MASTER_WOK_TRANSACTION_FAILED',diagnostic,sqlState,
+      ...(reviewMismatchFields.length?{reviewMismatchFields}:{})}));
     const publicReasons=new Set(['CHECKOUT_PRICE_CHANGED','CUSTOMER_CANNOT_SET_TEST_OR_ASAP',
       'INVALID_CUSTOMER_DETAILS','INVALID_BASKET','INVALID_BASKET_LINE','MODIFIER_NOT_ALLOWED',
       'INVALID_MODIFIER','SPICE_NOT_ALLOWED','DISCOUNT_NOT_AVAILABLE','DISCOUNT_WRONG_SERVICE_DAY',
