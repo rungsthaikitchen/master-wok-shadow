@@ -5,6 +5,11 @@ const {priceBasket}=require('./master-wok-commercial');
 const UUID=/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
 const TOKEN=/^[a-f0-9]{64}$/;
 const hash=async value=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value))),b=>b.toString(16).padStart(2,'0')).join('');
+function reviewPhone(value){
+ const text=String(value||'').replace(/[^+0-9]/g,'');
+ const uk=text.startsWith('+44')?text.slice(3):text.startsWith('0044')?text.slice(4):null;
+ return uk===null?text:uk.startsWith('0')?uk:'0'+uk;
+}
 const randomToken=()=>Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');
 function validApproval(input){
  return UUID.test(input?.reviewId||'')&&['pending','contacted','approved'].includes(input.expectedStatus)&&
@@ -57,10 +62,14 @@ function createReviewApproval({schema='public',pool,assertWriteAllowed}={}){
   async authorize(c,input){
    const row=await this.read(c,input.reviewApprovalToken,{forUpdate:true});
    const same=JSON.stringify(priceBasket(input.items).items)===JSON.stringify(priceBasket(row.basket).items);
-   const phone=s=>String(s||'').replace(/[^+0-9]/g,'');
-   if(!same||input.orderType!==row.order_type||new Date(input.preferredTime).getTime()!==new Date(row.agreed_time).getTime()||
-    phone(input.customer?.phone)!==phone(row.customer_phone)||(row.order_type==='delivery'&&input.customer?.address!==row.delivery_address)||
-    input.reviewHoldingAcknowledged!==true)throw Error('REVIEW_APPROVAL_MISMATCH');
+   const fields=[];
+   if(!same)fields.push('basket');
+   if(input.orderType!==row.order_type)fields.push('order_type');
+   if(new Date(input.preferredTime).getTime()!==new Date(row.agreed_time).getTime())fields.push('agreed_time');
+   if(reviewPhone(input.customer?.phone)!==reviewPhone(row.customer_phone))fields.push('phone');
+   if(row.order_type==='delivery'&&input.customer?.address!==row.delivery_address)fields.push('delivery_address');
+   if(input.reviewHoldingAcknowledged!==true)fields.push('holding_acknowledgement');
+   if(fields.length){const error=Error('REVIEW_APPROVAL_MISMATCH');error.reviewMismatchFields=fields;throw error;}
    return {approvalId:row.id,reviewId:row.review_id,maxMinutes:row.max_hold_minutes,reason:row.reason,
     staffActor:row.staff_actor,customerDiscussed:true,approvedAt:new Date(row.created_at).toISOString()};
   },
