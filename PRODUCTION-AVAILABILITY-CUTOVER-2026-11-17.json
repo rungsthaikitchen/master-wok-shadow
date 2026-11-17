@@ -1,0 +1,73 @@
+{
+  "date": "2026-11-17",
+  "status": "LIVE_ORDERING_REOPENED_OWNER_SUBMISSION_SMOKE_PENDING",
+  "ownerApproval": "Yeah sounds good; production release setting replacement confirmed Done",
+  "runtimeSourceSha256": "1c37c69c0b3542a4a21d1e301eade749da01d3500c9f2ef5eea1a7fef67c2d80",
+  "certificateCommit": "289a2a5139130c38c65dadc9ebbb4fccd26bd48c",
+  "website": {
+    "mergeCommit": "cdac13c0cc083eb34441668a1e9c235cd698e56f",
+    "pullRequest": 92,
+    "cloudflareDeployment": "33a62cd1-9178-4667-8a81-dc7a5c02cb7d",
+    "status": "SUCCESS"
+  },
+  "bookingFunction": {
+    "project": "ubyjrrsvbbqomitpaidb",
+    "version": 23,
+    "exactBundleReadback": true,
+    "verifyJwt": false,
+    "dedicatedBookingAndNotificationSecrets": true
+  },
+  "gateway": {
+    "serviceId": "f2eb904f-fc4a-41d0-9073-53a1b42fafe9",
+    "deployment": "37e19107-4c7a-48c9-b33a-70b1360ab074",
+    "sourceCommit": "42a1051cf5b960910f67e6ad9f14f91cb1d22977",
+    "status": "SUCCESS",
+    "mode": "MASTER_WOK",
+    "releaseId": "master-wok-availability-2026-11-17",
+    "readbackHttp": 200,
+    "routingCorrection": "Initial check found the previous explicit LEGACY gateway switch. Ordering was re-paused, gateway environment aligned and its known build redeployed before final reopen."
+  },
+  "control": {
+    "previousMode": "LEGACY",
+    "previousRevision": 10,
+    "mode": "MASTER_WOK",
+    "revision": 11,
+    "releaseId": "master-wok-availability-2026-11-17",
+    "activatedAt": "2026-11-17T21:02:09.669443Z",
+    "serviceMode": "normal",
+    "capacityThrottle": 0,
+    "reopenedAt": "2026-11-17T21:07:34.92686Z",
+    "futureOrdersAtActivation": 0,
+    "noSeedRequired": true
+  },
+  "validation": {
+    "backendAndPackageTests": 415,
+    "websiteTests": 92,
+    "visiblePausedCheckoutRefused": true,
+    "visibleLiveCheckoutOpened": true,
+    "visibleCheckingTimes": true,
+    "liveCollectionDate": "2026-11-18",
+    "liveBasket": "1 jasmine rice, £2",
+    "availabilityHttpStatuses": [
+      200,
+      200,
+      200,
+      200
+    ],
+    "availabilityHttpDurationsMs": [
+      890,
+      667,
+      1693,
+      684
+    ],
+    "worker": "healthy idle polling after deployment",
+    "outboxSent": 62,
+    "pendingNotifications": 0,
+    "newOrdersCreatedDuringCutover": 0
+  },
+  "remaining": {
+    "ownerSubmissionSmoke": "Submit one small controlled order for a future open service date, verify Admin acceptance and notifications, cancel it through the official lifecycle.",
+    "reason": "The test workspace and browser disconnected after the availability requests; no final dropdown result or submitted-order confirmation was observed. Production state and successful API requests were independently checked through connectors."
+  },
+  "rollback": "Pause new orders; finish/cancel authoritative orders and driver/hold work; only then final DRAINING guard and revision-checked Legacy restoration. Restore previous function and release setting together if reverting the installed package."
+}
