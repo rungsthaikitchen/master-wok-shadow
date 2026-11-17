@@ -48,7 +48,7 @@ async function reserveWithMasterWok({ connection, serviceDate, key, candidate, r
       ?error.reviewMismatchFields.filter(field=>knownReviewFields.has(field)):[];
     console.error(JSON.stringify({event:'MASTER_WOK_TRANSACTION_FAILED',diagnostic,sqlState,
       ...(reviewMismatchFields.length?{reviewMismatchFields}:{})}));
-    const publicReasons=new Set(['CHECKOUT_PRICE_CHANGED','CUSTOMER_CANNOT_SET_TEST_OR_ASAP',
+    const publicReasons=new Set(['PRIVATE_FIXTURE_EMAIL_REQUIRED','CHECKOUT_PRICE_CHANGED','CUSTOMER_CANNOT_SET_TEST_OR_ASAP',
       'INVALID_CUSTOMER_DETAILS','INVALID_BASKET','INVALID_BASKET_LINE','MODIFIER_NOT_ALLOWED',
       'INVALID_MODIFIER','SPICE_NOT_ALLOWED','DISCOUNT_NOT_AVAILABLE','DISCOUNT_WRONG_SERVICE_DAY',
       'DELIVERY_ADDRESS_NOT_ELIGIBLE','TRUSTED_DELIVERY_QUOTE_REQUIRED','INVALID_ITEM_NOTE',
