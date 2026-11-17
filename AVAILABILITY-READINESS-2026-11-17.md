@@ -28,3 +28,11 @@ Build the disabled production candidate with `node staging-tests/build-atomic-ch
 ## SMS provider receipt — 17 November
 
 Owner authorized one clearly labelled staging SMS to his number ending 9669 and confirmed handset receipt. The probe consumed no outbox events and created no booking. Its transport response was not observed, so it was not resent. The send deployment was replaced; its disabled flag prevented another send. Probe flag and recipient were cleared, background worker disabled, original start command restored in configuration, restart NEVER and no staged changes remain. Provider credentials were not copied or changed. This closes the SMS provider-access/handset check only; email, staff push and the intended order-outbox delivery path still need verification. See STAGING-SMS-RECEIPT-2026-11-17.json.
+
+## Notification follow-up
+
+The owner confirmed receipt of SMS, email and Pushover. Brevo accepted the final email with HTTP 201 after IP authorization. All standalone probes are disabled.
+
+RTK-214 was created through current staging checkout, then processed by the exact current backend worker and renderer through an isolated HTTP transport to the unchanged current dispatcher implementation. Fixture providers accepted one customer email and one staff push. Each delivery has one attempt, the event finished sent, and a second claim returned empty. Replaying checkout returned the same order, with one order-created event. No real provider calls occurred in this queue rehearsal. The order was officially cancelled, its cancellation notification skipped, and the isolated dispatcher replaced by an inactive JWT-protected 410 handler. Old staging events were untouched. See STAGING-NOTIFICATION-FLOW-2026-11-17.json.
+
+This is component and durable-flow evidence, not proof that the intended production worker is deployed and bound correctly. Its command must run the real worker rather than tests/run_release_notification_loop_staging.py (fixture-only), with the matching booking URL, notification secret and time-link base. Production mode was rechecked as LEGACY revision 10. Production scheduling tables have RLS and the eight write-fence triggers remain enabled. The current production certificate/configuration binding remains open.

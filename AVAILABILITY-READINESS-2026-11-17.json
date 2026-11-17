@@ -46,10 +46,16 @@
       "date": "2026-11-17",
       "scope": "ONE_OFF_PROVIDER_PROBE_NOT_ORDER_OUTBOX",
       "evidence": "STAGING-SMS-RECEIPT-2026-11-17.json"
+    },
+    "notificationVerification": {
+      "providerReceipt": "SMS_EMAIL_PUSH_OWNER_CONFIRMED",
+      "durableQueueFlow": "PASS_FIXTURE_PROVIDERS",
+      "evidence": "STAGING-NOTIFICATION-FLOW-2026-11-17.json",
+      "productionWorkerBinding": "PENDING"
     }
   },
   "remainingBeforeActivation": [
-    "Verify customer email, staff push and intended order-outbox notification delivery; the one-off SMS provider/handset probe passed on 17 November.",
+    "Bind and rehearse the intended real-provider worker deployment against the current booking transport; queue/renderer/HTTP/database fixture flow and separate owner-received provider probes pass.",
     "Complete current-source production schema/configuration binding and evidence reconciliation before certifying the release.",
     "Review and explicitly approve the concrete pre-service cutover with the guarded rollback sequence."
   ],
