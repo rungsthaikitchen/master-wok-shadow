@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-17",
+  "status": "SMS_HANDSET_RECEIPT_CONFIRMED",
+  "scope": "ONE_OWNER_APPROVED_STAGING_SMS_PROVIDER_PROBE",
+  "recipient": "Owner-approved number ending 9669; full number omitted",
+  "message": "Master Wok staging test. No order has been booked. Please confirm receipt in our chat. Thanks, David.",
+  "sourceCommit": "42a1051cf5b960910f67e6ad9f14f91cb1d22977",
+  "probeBlob": "55b68c695a1a5ce6f583a1e485d9e65b751b5306",
+  "probeDeployment": "adb54809-5c1f-4851-b2cb-4bd729c6adaf",
+  "provider": "Twilio",
+  "applicationSendInvocations": 1,
+  "automaticApplicationRetry": false,
+  "restartPolicy": "NEVER",
+  "providerResponseObserved": false,
+  "providerIdRecorded": false,
+  "handsetReceipt": "Owner explicitly confirmed: I received the SMS, Sensei",
+  "reconciliationDeployment": "fc8e41fa-5e7c-4c30-8ea5-bdeacd82fa1f",
+  "reconciliationResult": "Redeploy reused the probe start command rather than the updated read-only command. The disabled flag prevented another provider call (SMS_PROBE_DISABLED). No additional SMS was attempted.",
+  "cleanup": {
+    "probeDisabled": true,
+    "temporaryRecipientCleared": true,
+    "backgroundWorkerDisabled": true,
+    "originalStartCommandConfigured": "python -u tests/run_release_notification_loop_staging.py",
+    "pendingChanges": 0,
+    "probeDeploymentState": "REMOVED",
+    "credentialsCopiedOrChanged": false
+  },
+  "productionMutations": 0,
+  "bookingsCreated": 0,
+  "outboxEventsConsumedByProbe": 0,
+  "limits": [
+    "This proves provider-to-handset SMS delivery, not the full order-outbox notification flow.",
+    "Email and staff push delivery remain unverified for this release.",
+    "No automatic resend was attempted when the provider response was uncertain."
+  ]
+}

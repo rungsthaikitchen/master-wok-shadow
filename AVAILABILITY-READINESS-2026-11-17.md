@@ -15,7 +15,7 @@ Staging scheduling and order lifecycle pass. Production is not yet ready to acti
 
 ## Remaining work
 
-1. Verify customer SMS/email and kitchen/staff notification delivery via the intended provider path. Suppressed staging outbox events are not delivery evidence. Any actual test send must be explicitly authorized with recipient and content.
+1. The one-off SMS provider/handset test has passed. Verify customer email, staff push and the intended order-outbox delivery flow. Suppressed staging outbox events are not delivery evidence. Any further actual test send must be explicitly authorized with recipient and content.
 2. Complete source-bound production database/configuration verification and reconcile current evidence before changing the new certificate from DRAFT. The public-schema deployment must accept normal customer emails; synthetic-email restrictions are candidate-staging-only.
 3. Present the concrete pre-service cutover and guarded rollback for approval. Do not activate or merge/deploy production implicitly from this review.
 
@@ -24,3 +24,7 @@ Staging scheduling and order lifecycle pass. Production is not yet ready to acti
 Pause new orders while Master Wok remains active; finish or cancel its outstanding orders and wait for driver and extended-hold work to finish. Enter DRAINING only for the final locked, revision-checked guard and Legacy restore. Preserve order history, plans and receipts. DRAINING is not the mode for completing the service. Do not promise a safe instant switch while outstanding authoritative work remains.
 
 Build the disabled production candidate with `node staging-tests/build-atomic-checkout-edge.cjs --release-availability`. Its certificate is `master-wok-release-candidate.availability.production.json`; all certification checks remain PENDING. The staging runtime was not modified by the package review.
+
+## SMS provider receipt — 17 November
+
+Owner authorized one clearly labelled staging SMS to his number ending 9669 and confirmed handset receipt. The probe consumed no outbox events and created no booking. Its transport response was not observed, so it was not resent. The send deployment was replaced; its disabled flag prevented another send. Probe flag and recipient were cleared, background worker disabled, original start command restored in configuration, restart NEVER and no staged changes remain. Provider credentials were not copied or changed. This closes the SMS provider-access/handset check only; email, staff push and the intended order-outbox delivery path still need verification. See STAGING-SMS-RECEIPT-2026-11-17.json.

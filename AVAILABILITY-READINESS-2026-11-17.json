@@ -40,10 +40,16 @@
       "bookingHttpStatus": 503,
       "databaseConnections": 0,
       "certificateStatus": "DRAFT"
+    },
+    "smsProviderHandsetReceipt": {
+      "status": "PASS",
+      "date": "2026-11-17",
+      "scope": "ONE_OFF_PROVIDER_PROBE_NOT_ORDER_OUTBOX",
+      "evidence": "STAGING-SMS-RECEIPT-2026-11-17.json"
     }
   },
   "remainingBeforeActivation": [
-    "Verify customer SMS/email and staff notification delivery through the intended production provider path; staging messages were suppressed.",
+    "Verify customer email, staff push and intended order-outbox notification delivery; the one-off SMS provider/handset probe passed on 17 November.",
     "Complete current-source production schema/configuration binding and evidence reconciliation before certifying the release.",
     "Review and explicitly approve the concrete pre-service cutover with the guarded rollback sequence."
   ],
