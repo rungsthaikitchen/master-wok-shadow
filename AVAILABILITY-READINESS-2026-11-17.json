@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-17",
+  "productionReady": false,
+  "runtimeSourceSha256": "1c37c69c0b3542a4a21d1e301eade749da01d3500c9f2ef5eea1a7fef67c2d80",
+  "stagingVersion": 85,
+  "productionMode": "LEGACY",
+  "productionRevision": 10,
+  "websiteCommit": "f48d4d237e83456efec2d1169fcf0891d29345f9",
+  "websiteBase": "79b1a1ed4c78013609c6987265220b60061b6168",
+  "websiteBehindProductionBy": 0,
+  "validation": {
+    "backendAndPackagingTests": 414,
+    "websiteTests": 92,
+    "ownerJourney": {
+      "orderRef": "RTK-213",
+      "type": "delivery",
+      "serviceDate": "2026-11-25",
+      "arrival": "18:30",
+      "foodSubtotal": 29,
+      "deliveryFee": 3,
+      "loyaltyReward": 5,
+      "total": 27,
+      "submitted": true,
+      "adminAccepted": true,
+      "cleanupStatus": "cancelled",
+      "remainingKitchenJobs": 0,
+      "remainingDriverTrips": 0,
+      "receiptRetained": true,
+      "notificationEventsSkipped": 3,
+      "notificationAttempts": 0
+    },
+    "rollbackTemporaryCopy": {
+      "status": "PASS",
+      "cases": 10,
+      "permanentMutations": 0,
+      "evidence": "STAGING-ROLLBACK-REVIEW-2026-11-17.json"
+    },
+    "productionDraftBootstrap": {
+      "status": "PASS",
+      "bookingHttpStatus": 503,
+      "databaseConnections": 0,
+      "certificateStatus": "DRAFT"
+    }
+  },
+  "remainingBeforeActivation": [
+    "Verify customer SMS/email and staff notification delivery through the intended production provider path; staging messages were suppressed.",
+    "Complete current-source production schema/configuration binding and evidence reconciliation before certifying the release.",
+    "Review and explicitly approve the concrete pre-service cutover with the guarded rollback sequence."
+  ],
+  "knownLimitations": [
+    "Cold initial availability searches were observed by the owner at 10\u201315 seconds; repeat searches were 4\u20135 seconds.",
+    "The successful staging checkout used a synthetic email; prior failed attempts required a manual pending-key reset after the staging-only email rejection.",
+    "Offline/hosted control diagnostics used public landmarks or synthetic route durations rather than an additional direct routing diagnostic for the private customer address."
+  ]
+}
