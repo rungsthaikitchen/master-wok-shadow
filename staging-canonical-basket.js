@@ -25,6 +25,19 @@ function prepareStagingBasket({id,createdAt,serviceDate,readyMinute,items,model}
    ...(item.spice!=null?{spice:item.spice}:{}),...(item.item_note!=null?{item_note:item.item_note}:{})});
  }
  try{
+  // Bounded search must not depend on the customer's add-to-basket order.
+  // Use stable production phases: independent mains, standalone starters,
+  // cold preparation, then mains that need fryer prerequisites. Retain every
+  // line, quantity, modifier, spice and note; this changes traversal only.
+  const ranked=lines.map(line=>{
+   const c=model.classifyBasket([{itemId:line.item_id,qty:line.qty,mods:line.modifiers}]);
+   const dependent=Object.values(c.rungDependencies||{}).some(n=>n>0);
+   const standalone=Array.isArray(c.productionLines)&&c.productionLines.every(p=>!p.production?.length);
+   const phase=dependent?3:c.groups?.salad>0?2:standalone?1:0;
+   const key=JSON.stringify([line.item_id,line.modifiers.map(m=>m.id).sort(),line.spice??null,line.item_note??null,line.qty]);
+   return {line,phase,key};
+  }).sort((a,b)=>a.phase-b.phase||(a.key<b.key?-1:a.key>b.key?1:0));
+  lines.splice(0,lines.length,...ranked.map(r=>r.line));
   const classification=model.classifyBasket(lines.map(l=>({itemId:l.item_id,qty:l.qty,mods:l.modifiers})));
   if(!classification)return fail('UNCLASSIFIED_BASKET');
   return {status:'PREPARED',bookingApprovalAllowed:false,

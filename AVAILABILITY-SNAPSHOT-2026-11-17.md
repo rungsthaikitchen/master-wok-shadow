@@ -13,3 +13,11 @@ Hosted staging API measurements for the £104.50 basket on 21 November with two 
 - No booking, order, service-control or notification writes were made by these measurements. Production remains LEGACY. No production certification is claimed.
 
 The 17:00 opening-slot search remains unresolved; a separate offline four-minute-leg simulation exhausted search even with a higher budget. Do not relabel that uncertainty as fully booked or relax food-hold/resource limits.
+
+## Basket line-order regression (17 November)
+
+The customer's screenshot showed the same five lines in a different sequence. Replaying that sequence on staging v81 produced six unverified collection times: 18:20, 18:25, 18:30, 19:20, 19:25, 19:30. The previously used sequence produced only the last three. This reproduced a bounded-search traversal dependency, not a change in commitments (service plan still revision 6, two deliveries).
+
+Canonical basket preparation now sorts scheduling lines by stable production phase and a deterministic full-variant key before classification. It retains separate duplicate lines, quantities, spice, modifiers and notes, without changing prices, policy or search budgets. All 120 permutations of this five-line basket produce identical raw scheduling input and classification; 405 backend tests pass.
+
+Hosted v82 replay in the screenshot's sequence: 46 available, three unverified (19:20, 19:25, 19:30), 14.864 seconds, four HTTP 200 batches. The public-landmark delivery control still returns 38 available and the same 11 disabled times, in 12.003 seconds. Browser timings may differ. Production unchanged; the remaining search uncertainties are not claimed resolved.
