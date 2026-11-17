@@ -39,6 +39,7 @@ function createDeploymentRuntime({pool,model,certificate,sourceSha256,releaseId,
   .replaceAll('public.discount_codes',schema+'.discount_codes')
   .replace('SELECT public.get_next_order_number() AS value',`WITH bump AS (UPDATE ${schema}.order_counters SET current_num=current_num+1 WHERE id=1 RETURNING current_num) SELECT json_build_object('assigned',current_num) AS value FROM bump`),args)};
  return createBookingRuntime({pool,model,paymentsEnabled,reviewApprovalsEnabled,deliveryCapacity,quoteDelivery:deliveryCapacity?quoteDelivery:undefined,secret,notificationSecret,releaseId,schema,readOrders,readAvailability,
+  readHintSnapshot:require('./master-wok-hint-snapshot').createHintSnapshotReader({schema}),
   notificationOrderKeyPrefix:certificate.status==='CANDIDATE_FOR_STAGING'?certificate.fixturePrefix:undefined,
   readPreviewOrders:certificate.status==='CANDIDATE_FOR_STAGING'?async()=>{
    const r=await pool.query(`SELECT to_jsonb(o)||jsonb_build_object('customers',to_jsonb(c),

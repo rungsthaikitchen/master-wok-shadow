@@ -1,0 +1,1179 @@
+{
+  "scope": "STAGING_READ_ONLY_API_NO_BOOKINGS_OR_NOTIFICATIONS",
+  "collectionBefore": {
+    "seconds": 27.283,
+    "batches": [
+      {
+        "seconds": 7.619,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T17:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:25:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 7.754,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T17:30:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:35:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:55:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 3.938,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T18:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:25:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 3.964,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T18:30:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:35:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:55:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 5.837,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T19:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:20:00Z",
+            "available": false,
+            "unverified": true
+          },
+          {
+            "time": "2026-11-21T19:25:00Z",
+            "available": false,
+            "unverified": true
+          }
+        ]
+      },
+      {
+        "seconds": 6.013,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T19:30:00Z",
+            "available": false,
+            "unverified": true
+          },
+          {
+            "time": "2026-11-21T19:35:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:55:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 3.877,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T20:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:25:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 3.686,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T20:30:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:35:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:55:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 6.003,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T21:00:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      }
+    ]
+  },
+  "collectionAfter": {
+    "seconds": 11.466,
+    "batches": [
+      {
+        "seconds": 6.299,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T17:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:25:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:30:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:35:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:55:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:15:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 6.198,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T18:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:25:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:30:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:35:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:55:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:20:00Z",
+            "available": false,
+            "unverified": true
+          },
+          {
+            "time": "2026-11-21T19:25:00Z",
+            "available": false,
+            "unverified": true
+          },
+          {
+            "time": "2026-11-21T19:30:00Z",
+            "available": false,
+            "unverified": true
+          },
+          {
+            "time": "2026-11-21T19:35:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 5.258,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T19:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:55:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:25:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:30:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:35:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:55:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 5.159,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T21:00:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      }
+    ]
+  },
+  "publicLandmarkDeliveryBefore": {
+    "seconds": 26.457,
+    "batches": [
+      {
+        "seconds": 6.452,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T17:00:00Z",
+            "available": false,
+            "unverified": true
+          },
+          {
+            "time": "2026-11-21T17:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:25:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 6.444,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T17:30:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:35:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:55:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 5.297,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T18:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:25:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 5.21,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T18:30:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T18:35:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T18:40:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T18:45:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T18:50:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T18:55:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 4.966,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T19:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:25:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          }
+        ]
+      },
+      {
+        "seconds": 4.796,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T19:30:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T19:35:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T19:40:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T19:45:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T19:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:55:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 4.692,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T20:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:25:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 4.681,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T20:30:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:35:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:55:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 5.218,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T21:00:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      }
+    ]
+  },
+  "publicLandmarkDeliveryAfter": {
+    "seconds": 9.362,
+    "batches": [
+      {
+        "seconds": 5.389,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T17:00:00Z",
+            "available": false,
+            "unverified": true
+          },
+          {
+            "time": "2026-11-21T17:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:25:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:30:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:35:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T17:55:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:15:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 5.388,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T18:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:25:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T18:30:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T18:35:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T18:40:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T18:45:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T18:50:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T18:55:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:25:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T19:30:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T19:35:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          }
+        ]
+      },
+      {
+        "seconds": 3.957,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T19:40:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T19:45:00Z",
+            "available": false,
+            "unverified": false,
+            "availabilityReason": "DRIVER_BUSY"
+          },
+          {
+            "time": "2026-11-21T19:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T19:55:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:00:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:05:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:10:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:15:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:20:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:25:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:30:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:35:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:40:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:45:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:50:00Z",
+            "available": true,
+            "unverified": false
+          },
+          {
+            "time": "2026-11-21T20:55:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      },
+      {
+        "seconds": 3.966,
+        "status": 200,
+        "hints": [
+          {
+            "time": "2026-11-21T21:00:00Z",
+            "available": true,
+            "unverified": false
+          }
+        ]
+      }
+    ]
+  }
+}

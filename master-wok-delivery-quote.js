@@ -9,6 +9,7 @@ function haversineMiles(a,b){
  return 3958.8*2*Math.atan2(Math.sqrt(value),Math.sqrt(Math.max(0,1-value)));
 }
 function createDeliveryQuoter({supabaseUrl,publicKey,fetch:transport=globalThis.fetch}={}){
+ const geocodes=new Map();
  let url;try{url=new URL(supabaseUrl);}catch(_){throw Error('INVALID_DELIVERY_CONFIGURATION');}
  let publicAccess=typeof publicKey==='string'&&/^sb_publishable_[A-Za-z0-9_-]+$/.test(publicKey);
  if(!publicAccess&&typeof publicKey==='string')try{
@@ -23,15 +24,28 @@ function createDeliveryQuoter({supabaseUrl,publicKey,fetch:transport=globalThis.
   if(!response.ok)throw Error('DELIVERY_PROVIDER_UNAVAILABLE');
   return response.json();
  }
+ async function geocode(address){
+  const cached=geocodes.get(address);
+  if(cached&&cached.expires>Date.now())return cached.promise;
+  const promise=(async()=>{
+   let geo;try{geo=await call('geocode-address',{customer_address:address},5000);}
+   catch(_){throw Error('DELIVERY_GEOCODING_UNAVAILABLE');}
+   if(geo?.ok!==true)throw Error('DELIVERY_ADDRESS_NOT_ELIGIBLE');
+   const customer={lat:geo.customer_lat,lng:geo.customer_lng};
+   if(!Number.isFinite(customer.lat)||Math.abs(customer.lat)>90||!Number.isFinite(customer.lng)||Math.abs(customer.lng)>180)
+    throw Error('DELIVERY_GEOCODING_UNAVAILABLE');
+   return customer;
+  })();
+  if(geocodes.size>=256)geocodes.delete(geocodes.keys().next().value);
+  geocodes.set(address,{expires:Date.now()+300000,promise});
+  try{return await promise;}catch(error){if(geocodes.get(address)?.promise===promise)geocodes.delete(address);throw error;}
+ }
  return async function quote({address,subtotalCents,allowOutsideArea=false}){
   if(typeof address!=='string'||!address.trim()||address.length>1000||!Number.isInteger(subtotalCents)||subtotalCents<0)
    throw Error('INVALID_DELIVERY_ADDRESS');
-  let geo;try{geo=await call('geocode-address',{customer_address:address.trim()},5000);}
-  catch(_){throw Error('DELIVERY_GEOCODING_UNAVAILABLE');}
-  if(geo?.ok!==true)throw Error('DELIVERY_ADDRESS_NOT_ELIGIBLE');
-  const customer={lat:geo.customer_lat,lng:geo.customer_lng};
-  if(!Number.isFinite(customer.lat)||Math.abs(customer.lat)>90||!Number.isFinite(customer.lng)||Math.abs(customer.lng)>180)
-   throw Error('DELIVERY_GEOCODING_UNAVAILABLE');
+  // Cache successful coordinates only. Radius overrides, basket thresholds and
+  // delivery prices are still assessed for every request, not cached together.
+  const customer=await geocode(address.trim());
   const straightLineMiles=haversineMiles(RESTAURANT,customer);
   if(straightLineMiles>3&&allowOutsideArea!==true)throw Error('DELIVERY_ADDRESS_NOT_ELIGIBLE');
   let routeMiles=null;

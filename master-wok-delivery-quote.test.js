@@ -43,3 +43,24 @@ test('public checkout ignores a browser-supplied delivery-area override',async()
  await assert.rejects(()=>validate({query:async()=>({rows:[]})},{orderType:'delivery',customer:{address:'Synthetic'},items:[{item_id:'green-curry',qty:1,modifiers:[{id:'chicken'}],spice:2}],deliveryAreaOverride:true,allowOutsideArea:true},{now:'2026-11-14T15:00:00Z'}),/NOT_ELIGIBLE/);
  assert.equal(request.allowOutsideArea,undefined);assert.equal(request.deliveryAreaOverride,undefined);
 });
+
+test('concurrent hint batches share successful geocoding but not fees or radius permission',async()=>{
+ let geocodes=0,routes=0;
+ const quote=createDeliveryQuoter({supabaseUrl:url,publicKey:key,fetch:async u=>{
+  if(new URL(u).pathname.endsWith('geocode-address')){geocodes++;return {ok:true,json:async()=>({ok:true,customer_lat:53.75,customer_lng:-1.58})};}
+  routes++;return {ok:true,json:async()=>({ok:true,routeMiles:1.4})};
+ }});
+ const results=await Promise.all([quote({address:' Fixture ',subtotalCents:900}),quote({address:'Fixture',subtotalCents:10450})]);
+ assert.equal(geocodes,1);assert.equal(routes,1);assert.equal(results[0].routeMiles,1.4);assert.equal(results[1].routeMiles,null);
+ const outside=fixture({ok:true,customer_lat:54,customer_lng:-1.58});
+ await outside.quote({address:'Outside fixture',subtotalCents:10450,allowOutsideArea:true});
+ await assert.rejects(outside.quote({address:'Outside fixture',subtotalCents:10450}),/NOT_ELIGIBLE/);
+ assert.equal(outside.calls.length,1);
+});
+test('failed geocoding is retried instead of cached as an unavailable address',async()=>{
+ let calls=0;const quote=createDeliveryQuoter({supabaseUrl:url,publicKey:key,fetch:async()=>{
+  calls++;return {ok:true,json:async()=>calls===1?{ok:false}:{ok:true,customer_lat:53.75,customer_lng:-1.58}};
+ }});
+ await assert.rejects(quote({address:'Fixture',subtotalCents:10450}),/NOT_ELIGIBLE/);
+ await quote({address:'Fixture',subtotalCents:10450});assert.equal(calls,2);
+});

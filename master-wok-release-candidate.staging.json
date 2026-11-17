@@ -6,7 +6,7 @@
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
   "schema": "master_wok_rehearsal",
   "modelVersion": "combined-kitchen-four-ring-staging-v1",
-  "sourceSha256": "05fc96ca7e7e2ead6e0c216eb19316a2e64dec99de709142a12d57f3cb8561de",
+  "sourceSha256": "853d915dc6b189b1ebfb9d76f0399747166efe0aa5f3c7d82c6ded408a79a5af",
   "checks": {
     "atomicConcurrency": "PENDING",
     "physicalCoverage": "PENDING",

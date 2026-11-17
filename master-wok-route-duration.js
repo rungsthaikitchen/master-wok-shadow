@@ -1,5 +1,5 @@
 'use strict';
-const {createDeliveryQuoter}=require('./master-wok-delivery-quote');
+const {createDeliveryQuoter,haversineMiles}=require('./master-wok-delivery-quote');
 // The existing route Edge already returns Google's duration (e.g. "374s").
 // Direction matters: never assume the return leg equals the outbound leg.
 function createRouteDurationQuoter({supabaseUrl,publicKey,fetch:transport=globalThis.fetch}={}){
@@ -14,8 +14,18 @@ function createRouteDurationQuoter({supabaseUrl,publicKey,fetch:transport=global
    const response=await transport(new URL('/functions/v1/get-delivery-route-quote',supabaseUrl),{
     method:'POST',headers:{'Content-Type':'application/json',apikey:publicKey},
     body:JSON.stringify({origin,destination}),redirect:'error',signal:AbortSignal.timeout(2500)});
-   if(!response.ok)throw Error('DELIVERY_TRAVEL_TIME_UNAVAILABLE');
    const r=await response.json();
+   // Google's protobuf JSON omits a zero distance. The existing route endpoint
+   // then returns this specific 502 despite an explicit zero-second route.
+   // Recover only that proven co-located case, never a generic provider failure.
+   const omittedZero=response.status===502&&r?.ok===false&&r.error==='No route distance returned'&&
+    r.details?.routes?.length===1&&r.details.routes[0].duration==='0s'&&
+    r.details.routes[0].distanceMeters===undefined;
+   const explicitZero=response.ok&&r?.ok===true&&r.duration==='0s'&&
+    (r.distanceMeters===0||r.routeMiles===0);
+   if((omittedZero||explicitZero)&&haversineMiles(origin,destination)*1609.344<=10)
+    return {durationSeconds:60}; // Conservative one-minute leg; loading/handover remain separate.
+   if(!response.ok)throw Error('DELIVERY_TRAVEL_TIME_UNAVAILABLE');
    if(r?.ok!==true||typeof r.duration!=='string'||!/^\d+(?:\.\d+)?s$/.test(r.duration))throw Error('DELIVERY_TRAVEL_TIME_UNAVAILABLE');
    const durationSeconds=Number(r.duration.slice(0,-1));
    if(!Number.isFinite(durationSeconds)||durationSeconds<=0||durationSeconds>7200)throw Error('DELIVERY_TRAVEL_TIME_UNAVAILABLE');

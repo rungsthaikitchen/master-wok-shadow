@@ -50,7 +50,15 @@ function createReleaseAssessors({certificate,releaseId,sourceSha256,projectRef,s
    if(deliveryCapacity)return deliveryCapacity.verify(context,searchOptions).then(finish);
    return finish(verifyCombinedCapacity(context,{...kitchenOptions,...searchOptions}));
    function finish(r){
-   if(r.status!=='VERIFIED_KITCHEN_CAPACITY'||r.plan?.modelVersion!==certificate.modelVersion)return fail();
+   if(r.status!=='VERIFIED_KITCHEN_CAPACITY'||r.plan?.modelVersion!==certificate.modelVersion){
+    // Preserve only reviewed diagnostic codes for read-only assessments.
+    // Arbitrary exceptions and all checkout failures retain the generic code.
+    const reasons=['DRIVER_UNAVAILABLE','SEARCH_LIMIT','NO_PHYSICAL_TIMELINE',
+     'DELIVERY_TRAVEL_TIME_UNAVAILABLE','OUTSIDE_SERVICE_WINDOW','BLACKOUT',
+     'OVERRUN_NOT_AVAILABLE','MINIMUM_LEAD_TIME'];
+    return {...fail(),...(['AVAILABILITY_HINT','BASKET_REVIEW'].includes(context.assessmentPurpose)&&
+     reasons.includes(r.reason)?{reason:r.reason}:{})};
+   }
    try{protectStartedWork(r.plan,0);}catch(_){return fail();}
    return {...r,status:'GREEN',reason:'CERTIFIED_RELEASE_CAPACITY',bookingApprovalAllowed:true};
    }
