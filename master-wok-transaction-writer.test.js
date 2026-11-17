@@ -67,3 +67,10 @@ test('review mismatch diagnostics contain only approved field names and preserve
   reviewMismatchFields:['phone','delivery_address']}]);
 });
 
+
+test('private staging email rejection rolls back before any assessment or order write and returns a specific safe reason',async()=>{
+ const log=[];const result=await reserveWithMasterWok({connection:connection(log),serviceDate:'2026-11-25',key:'staging-email-retry',candidate:{},
+  readCommitted:async()=>({acceptedOrders:[]}),prepareCandidate:async()=>{throw Error('PRIVATE_FIXTURE_EMAIL_REQUIRED');},
+  assess:async()=>assert.fail('must not assess rejected details'),persist:async()=>assert.fail('must not save rejected details')});
+ assert.equal(result.committed,false);assert.equal(result.reason,'PRIVATE_FIXTURE_EMAIL_REQUIRED');assert.equal(log.at(-1),'ROLLBACK');assert.ok(!log.includes('COMMIT'));
+});
