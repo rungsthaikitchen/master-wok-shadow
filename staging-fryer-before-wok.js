@@ -69,12 +69,15 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
  if(portions.length>150)return fail('FRY_SEARCH_SIZE_LIMIT');
  const buckets=new Map();
  for(const p of portions){
-  const key=JSON.stringify([p.type,p.duration,p.deadline,p.standalone?p.recipeKey:null]);
+  // A compatible prerequisite batch can feed different wok start times.
+  // Each allocation retains its own deadline and ten-minute holding limit.
+  // Standalone recipes retain their original time/recipe grouping.
+  const key=JSON.stringify([p.type,p.duration,p.standalone?p.deadline:null,p.standalone?p.recipeKey:null]);
   if(!buckets.has(key))buckets.set(key,[]);
   buckets.get(key).push(p);
  }
- const groups=[...buckets.values()].sort((a,b)=>a[0].deadline-b[0].deadline)
-  .map(g=>g.sort((a,b)=>b.notBefore-a.notBefore));
+ const groups=[...buckets.values()].map(g=>g.sort((a,b)=>a.deadline-b.deadline||b.notBefore-a.notBefore))
+  .sort((a,b)=>a[0].deadline-b[0].deadline);
  const jobs=[];let nodes=0,exhausted=false;
  // Index occupied minutes once. Re-scanning every previous job and blackout
  // in every nested fryer branch consumed most of the availability CPU time.
@@ -105,7 +108,8 @@ function planFryerBeforeWok(orders,rows,wokPlan,options={}){
     if(!fits(basket.id,start,finish))continue;
     for(let size=Math.min(fryerCapacity(first.type,basket.id),remaining.length);size>=1;size--){
      const assigned=remaining.slice(0,size);
-     if(assigned.some(p=>finish<(p.earliestFinish??0)))continue;
+     if(assigned.some(p=>start<p.notBefore||finish<(p.earliestFinish??0)||finish>p.deadline||
+      p.deadline-finish>(p.standalone?holdFor(options,[p.orderId],options.holdingLimitMinutes===20?20:10):10)))continue;
      const job={type:first.type,basket:basket.id,portions:size,start,finish,
       assigned,
       ...(first.standalone?{standalone:true,readyMinute:first.deadline}:{wokStart:first.deadline})};

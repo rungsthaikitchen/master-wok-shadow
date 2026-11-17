@@ -70,6 +70,8 @@ function scheduleCrossOrderPanang(orders,rows,options={}) {
  // Optional staging-only physical-resource experiment. Keep the legacy
  // single-wok scheduler untouched unless explicitly requested.
  if(options.sharedRings===true){
+   const conflict=options.checkWindows?.(jobs);
+   if(conflict)return {status:'UNVERIFIED',reason:conflict,bookingApprovalAllowed:false};
    const {allocateSharedRings}=require('./staging-shared-ring-allocator');
    const allocation=allocateSharedRings(jobs,{blackouts:options.blackouts,fixedWok:options.fixedWok,
     equivalentVessels:options.equivalentVessels,

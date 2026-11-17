@@ -119,6 +119,10 @@ function allocateSharedRings(jobs,options={}){
   }
   return false;
  }
+ if(fixed.length){
+  const conflict=require('./staging-fixed-resource-bound').fixedResourceConflict(pending,{fits,ringOccupancy});
+  if(conflict)return fail(conflict);
+ }
  if(!search(0)){
   // Fryer/microwave dependencies can favour the original ordering. Retain it
   // as a second bounded search rather than losing previously feasible baskets.

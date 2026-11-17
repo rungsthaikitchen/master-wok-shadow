@@ -54,6 +54,8 @@ function createReleaseAssessors({certificate,releaseId,sourceSha256,projectRef,s
     // Preserve only reviewed diagnostic codes for read-only assessments.
     // Arbitrary exceptions and all checkout failures retain the generic code.
     const reasons=['DRIVER_UNAVAILABLE','SEARCH_LIMIT','NO_PHYSICAL_TIMELINE',
+     'FIXED_VESSEL_CAPACITY_EXCEEDED','FIXED_RESOURCE_WINDOW_EXCEEDED',
+     'FRYER_WINDOW_CAPACITY_EXCEEDED',
      'DELIVERY_TRAVEL_TIME_UNAVAILABLE','OUTSIDE_SERVICE_WINDOW','BLACKOUT',
      'OVERRUN_NOT_AVAILABLE','MINIMUM_LEAD_TIME'];
     return {...fail(),...(['AVAILABILITY_HINT','BASKET_REVIEW'].includes(context.assessmentPurpose)&&

@@ -80,3 +80,19 @@ test('indexed fryer occupancy retains exclusive boundaries and fractional blacko
  assert.ok(blocked.jobs.every(j=>j.finish<=job.finish-0.5));
  assert.ok(blocked.jobs.every(j=>j.allocations.length===j.portions&&!('assigned' in j)));
 });
+
+test('one compatible prerequisite batch can feed distinct wok deadlines while preserving every allocation deadline',()=>{
+ const items=[{item_id:'stir-crispy',qty:3,modifiers:[],spice:1}],key=JSON.stringify([1140,'stir-crispy',[],1,null]);
+ const mains=[1120,1122,1124].map(start=>({itemId:'stir-crispy',orderIds:['A'],recipeKey:key,start,portionAllocations:[{orderId:'A',qty:1}]}));
+ const r=planFryerBeforeWok(orders,[{id:'A',items}],{status:'FEASIBLE_PROTOTYPE',jobs:mains});
+ assert.equal(r.status,'PREREQUISITES_PLACED_PROTOTYPE');assert.equal(r.jobs.length,1);assert.equal(r.jobs[0].portions,3);
+ assert.deepEqual(r.jobs[0].allocations.map(a=>a.deadline),[1120,1122,1124]);
+ for(const a of r.jobs[0].allocations){assert.ok(r.jobs[0].finish<=a.deadline);assert.ok(a.deadline-r.jobs[0].finish<=10);}
+});
+test('compatible frying never shares a batch across incompatible holding windows',()=>{
+ const items=[{item_id:'stir-crispy',qty:2,modifiers:[],spice:1}],key=JSON.stringify([1140,'stir-crispy',[],1,null]);
+ const mains=[1110,1130].map(start=>({itemId:'stir-crispy',orderIds:['A'],recipeKey:key,start,portionAllocations:[{orderId:'A',qty:1}]}));
+ const r=planFryerBeforeWok(orders,[{id:'A',items}],{status:'FEASIBLE_PROTOTYPE',jobs:mains});
+ assert.equal(r.status,'PREREQUISITES_PLACED_PROTOTYPE');assert.equal(r.jobs.length,2);
+ for(const j of r.jobs)for(const a of j.allocations){assert.ok(j.finish<=a.deadline);assert.ok(a.deadline-j.finish<=10);}
+});
