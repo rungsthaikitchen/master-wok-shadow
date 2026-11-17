@@ -37,6 +37,7 @@ function planCoordinatedKitchen(orders,rows,options={}){
    earliestFinishByOrder:options.earliestFinishByOrder,equivalentVessels:options.sharedRings===true,
    maxSearchNodes:mainSearchBudget,maxCompleteChecks:options.maxCompleteChecks,
    originalJobOrder:inventory.dependencies.some(d=>!d.standalone),
+   checkWindows:jobs=>require('./staging-early-fryer-bound').earlyFryerConflict(orders,inventory,jobs,options),
    validateComplete:jobs=>{
     fryer=fryerFor(jobs);
     auxiliary=options.confirmedStarterRecipes?planAuxiliaryWork(orders,options.auxiliaryRows||rows,jobs,attemptOptions):{status:'AUXILIARY_PLACED_PROTOTYPE',jobs:[]};

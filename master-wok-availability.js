@@ -56,7 +56,9 @@ function createBasketAvailability({pool,model,readAvailability,assessBooking,ass
      fits=result?.status==='GREEN'&&result.bookingApprovalAllowed===true;
     }
     const driverBusy=!fits&&reason==='DRIVER_UNAVAILABLE';
-    hints.push({time,available:fits,unverified:!fits&&!driverBusy,
+    const kitchenBusy=!fits&&['FIXED_VESSEL_CAPACITY_EXCEEDED','FIXED_RESOURCE_WINDOW_EXCEEDED','FRYER_WINDOW_CAPACITY_EXCEEDED'].includes(reason);
+    hints.push({time,available:fits,unverified:!fits&&!driverBusy&&!kitchenBusy,
+     ...(kitchenBusy?{availabilityReason:'KITCHEN_BUSY'}:{}),
      ...(driverBusy?{availabilityReason:'DRIVER_BUSY'}:{}),...(includeDiagnostics?{reason}:{})});
    }
    return {success:true,hints,bookingApprovalAllowed:false};
