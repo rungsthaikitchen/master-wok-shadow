@@ -126,6 +126,23 @@ test('four-ring production draft cannot initialize a writer or connect to its da
   notificationSecret:'c'.repeat(64),deliveryPublicKey:'sb_publishable_fixture'}),/CERTIFICATION_REQUIRED/);
 });
 
+test('read-only diagnostic codes distinguish driver conflicts without exposing arbitrary failures',async()=>{
+ const c={...certificate(),status:'CANDIDATE_FOR_STAGING',fixturePrefix:'release-four-ring-',
+  modelVersion:'combined-kitchen-four-ring-staging-v1',kitchenConfiguration:'FOUR_RING_ONE_PORTION_V1',deliveryScheduling:1};
+ for(const name of ['driverReservations','combinedTrips','deliveryCheckout','deliveryRollback'])c.checks[name]='PENDING';
+ let reason='DRIVER_UNAVAILABLE';
+ const a=createReleaseAssessors({...binding,certificate:c,model:globalThis.MasterWokModelV1,
+  deliveryCapacity:{kitchenModelVersion:c.modelVersion,replan:async()=>{},verify:async()=>({status:'UNVERIFIED',reason})}});
+ for(const purpose of ['AVAILABILITY_HINT','BASKET_REVIEW']){
+  const r=await a.assessBooking({...context(),assessmentPurpose:purpose});
+  assert.equal(r.reason,'DRIVER_UNAVAILABLE');assert.equal(r.bookingApprovalAllowed,false);
+ }
+ assert.equal((await a.assessBooking(context())).reason,'RELEASE_ASSESSMENT_NOT_VERIFIED');
+ reason='SEARCH_LIMIT';assert.equal((await a.assessBooking({...context(),assessmentPurpose:'AVAILABILITY_HINT'})).reason,'SEARCH_LIMIT');
+ reason='private database or provider details';
+ assert.equal((await a.assessBooking({...context(),assessmentPurpose:'BASKET_REVIEW'})).reason,'RELEASE_ASSESSMENT_NOT_VERIFIED');
+});
+
 test('certified four-ring delivery bootstrap selects the same kitchen model without opening a connection',()=>{
  const draft=require('./master-wok-release-candidate.four-ring.production.json');
  const c={...draft,status:'CERTIFIED_FOR_PRODUCTION',checks:Object.fromEntries(Object.keys(draft.checks).map(k=>[k,'PASS']))};

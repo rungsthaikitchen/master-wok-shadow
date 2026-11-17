@@ -2,6 +2,7 @@
 // Basket-specific time hints from the same locked inputs/assessor as checkout.
 // Always rolls back: a hint never reserves capacity or approves a booking.
 const {beginBookingTransaction}=require('./master-wok-transaction-writer');
+const {beginHintSnapshot}=require('./master-wok-hint-snapshot');
 const {readCapacityCommitments}=require('./master-wok-commitment-reader');
 const {normalizeStagingOrders}=require('./staging-order-snapshot');
 const {prepareStagingBasket}=require('./staging-canonical-basket');
@@ -10,7 +11,7 @@ const {createServicePlanStore}=require('./master-wok-service-plan-store');
 const {localDate,relativePlacement}=require('./master-wok-clock');
 const {londonPlacement}=require('./staging-booking-integration');
 function createBasketAvailability({pool,model,readAvailability,assessBooking,assertWriteAllowed,
- includeDiagnostics=false,quoteDelivery,readOrders=readCapacityCommitments,planStore=createServicePlanStore()}={}){
+ includeDiagnostics=false,quoteDelivery,readSnapshot,readOrders=readCapacityCommitments,planStore=createServicePlanStore()}={}){
  if(!pool||!model||[readAvailability,assessBooking,assertWriteAllowed].some(f=>typeof f!=='function'))throw Error('INVALID_AVAILABILITY_CONFIGURATION');
  return async input=>{
   let connection;
@@ -24,12 +25,21 @@ function createBasketAvailability({pool,model,readAvailability,assessBooking,ass
    let delivery=null;
    if(quoteDelivery&&input.orderType==='delivery')delivery=await quoteDelivery({address:input.address,subtotalCents:priced.subtotalCents});
    if(quoteDelivery&&!['collection','delivery'].includes(input.orderType))throw Error('ORDER_TYPE_REQUIRED');
-   connection=await pool.connect();await beginBookingTransaction(connection,{serviceDates:[date]});
+   connection=await pool.connect();
+   if(readSnapshot)await beginHintSnapshot(connection,date);
+   else await beginBookingTransaction(connection,{serviceDates:[date]});
    await assertWriteAllowed(connection);
-   const now=(await connection.query('SELECT clock_timestamp() AS now')).rows[0]?.now;
-   const rows=await readOrders(connection,date),orders=normalizeStagingOrders({rows,model,serviceDate:date})
+   const snapshot=readSnapshot?await readSnapshot(connection,date):{
+    now:(await connection.query('SELECT clock_timestamp() AS now')).rows[0]?.now,
+    rows:await readOrders(connection,date),availability:await readAvailability(connection,date),previousPlan:await planStore.read(connection,date)};
+   const {now,rows,availability,previousPlan}=snapshot;
+   const orders=normalizeStagingOrders({rows,model,serviceDate:date})
     .map(o=>({...o,placedAt:relativePlacement(o.placedAt,date)}));
-   const availability=await readAvailability(connection,date),previousPlan=await planStore.read(connection,date);
+   // Release the consistent snapshot before routing and CPU search.
+   // These are advisory hints, never reservations; checkout
+   // always reads and verifies a fresh locked snapshot before committing.
+   await connection.query('ROLLBACK');
+   connection.release();connection=null;
    const hints=[];
    for(const time of input.times){
     const local=londonPlacement(time);
@@ -45,9 +55,10 @@ function createBasketAvailability({pool,model,readAvailability,assessBooking,ass
      reason=result?.reason||'ASSESSMENT_UNVERIFIED';
      fits=result?.status==='GREEN'&&result.bookingApprovalAllowed===true;
     }
-    hints.push({time,available:fits,unverified:!fits,...(includeDiagnostics?{reason}:{})});
+    const driverBusy=!fits&&reason==='DRIVER_UNAVAILABLE';
+    hints.push({time,available:fits,unverified:!fits&&!driverBusy,
+     ...(driverBusy?{availabilityReason:'DRIVER_BUSY'}:{}),...(includeDiagnostics?{reason}:{})});
    }
-   await connection.query('ROLLBACK');
    return {success:true,hints,bookingApprovalAllowed:false};
   }catch(_){if(connection)try{await connection.query('ROLLBACK');}catch(_){}
    return {success:false,statusCode:503,reason:'AVAILABILITY_UNAVAILABLE'};
