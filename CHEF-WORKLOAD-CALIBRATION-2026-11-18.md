@@ -22,3 +22,9 @@ The original saved fixture contains now-invalid small-wok assignments for chips.
 Exact curry hands-on phase positions and mixed attention capacity remain uncalibrated. Approximate hands-on totals do not establish minute-by-minute staffing availability. No production deployment or certificate changes are included here.
 
 Earlier evidence files retain the prior assumptions for comparison. chef-attention-final-inventory-20261118.json is the current replay evidence.
+
+## Chef workload review
+
+The offline review assigns salad and hot work to Rung and identifies their overlapping intervals. For five-minute curry jobs it records the reported three-to-four-minute hands-on estimate over the whole cook, without inventing exact phases or summing overlapping estimates as necessarily independent work. The estimate is not extrapolated to other cooking durations. No booking approval or rejection is derived.
+
+The 20:00 and 20:10 candidate replays overlap two curries, two wok dishes and a beef salad at 19:36–19:41. Clarification is needed on shared hands-on work across two curry pans before turning this observation into a staffing constraint. Thirty-eight focused tests pass. Evidence: chef-workload-review-20261118.json.

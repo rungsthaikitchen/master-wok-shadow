@@ -7,6 +7,7 @@ const {prepareStagingBasket}=require('./staging-canonical-basket');
 const {createDeliveryCapacity}=require('./master-wok-delivery-capacity');
 const {assessChefAttention}=require('./master-wok-chef-attention');
 const {warnings}=require('./master-wok-holding-advisory');
+const {reviewWorkload}=require('./master-wok-workload-review');
 const fixture=require('./staging-tests/current-overlap-replay-20261118.json');
 const clock=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
 async function replay(){
@@ -27,7 +28,8 @@ async function replay(){
    const active=jobs.filter(j=>j.start<=start&&j.finish>start);
    return {start:clock(start),finish:clock(bounds[i+1]),hotJobs:active.filter(j=>j.vessel!=='cold-prep-1').length,coldJobs:active.filter(j=>j.vessel==='cold-prep-1').length,items:active.map(j=>({itemId:j.itemId,vessel:j.vessel}))};
   }).sort((a,b)=>(b.hotJobs+b.coldJobs)-(a.hotJobs+a.coldJobs))[0];
-  results.push({arrival:clock(ready),status:r.status,peakEquipmentOverlap:peak,holdingWarnings:warnings(r.plan).map(w=>({estimatedMinutes:w.estimatedMinutes,dishes:w.dishes})),attentionStatus:assessment.status,unprofiledRecipes:[...new Set(assessment.unprofiled.map(j=>`${j.resource}:${j.itemId}`))].sort()});
+  const workload=reviewWorkload(r.plan);
+  results.push({arrival:clock(ready),status:r.status,peakEquipmentOverlap:peak,workloadReview:workload,holdingWarnings:warnings(r.plan).map(w=>({estimatedMinutes:w.estimatedMinutes,dishes:w.dishes})),attentionStatus:assessment.status,unprofiledRecipes:[...new Set(assessment.unprofiled.map(j=>`${j.resource}:${j.itemId}`))].sort()});
  }
  return {scope:'OFFLINE_DIAGNOSTIC_ONLY',fixture:'Saved 18 November collection basket rebuilt under corrected vessel rules; second identical basket delivered with fixed eight-minute legs',liveRouteReplay:false,bookingApprovalAllowed:false,results};
 }
