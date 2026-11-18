@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-18",
+  "status": "PASS_PRODUCTION_OWNER_JOURNEY_AND_CLEANUP",
+  "runtimeSourceSha256": "1c37c69c0b3542a4a21d1e301eade749da01d3500c9f2ef5eea1a7fef67c2d80",
+  "orderRef": "RTK-1649",
+  "orderId": "6b2973f5-d04d-47e5-95b3-4d67847767db",
+  "orderType": "collection",
+  "serviceDate": "2026-11-19",
+  "time": "18:00",
+  "subtotal": 47.5,
+  "loyaltyDiscount": 5,
+  "total": 42.5,
+  "bookingReceipts": 1,
+  "ownerAdminAccepted": true,
+  "ownerEmailReceiptConfirmed": true,
+  "ownerPushoverReceiptConfirmed": true,
+  "notificationEvents": {
+    "orderCreated": {
+      "status": "sent",
+      "attempts": 1
+    },
+    "timeConfirmed": {
+      "status": "sent",
+      "attempts": 1
+    },
+    "timeDeclined": {
+      "status": "sent",
+      "attempts": 1
+    }
+  },
+  "cleanup": {
+    "status": "cancelled",
+    "paid": false,
+    "loyaltySettled": false,
+    "rewardReservationActive": false,
+    "pendingRedeemFieldRetainedForHistory": 100,
+    "wokJobs": 0,
+    "fryerJobs": 0,
+    "auxiliaryJobs": 0,
+    "driverTrips": 0,
+    "servicePlanRevision": 3
+  },
+  "finalMode": "MASTER_WOK",
+  "finalServiceMode": "normal",
+  "qualification": "Owner executed checkout, Admin acceptance and cancellation. Database and notification ledgers were checked directly; no test payment or loyalty settlement was performed."
+}
