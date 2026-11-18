@@ -33,5 +33,14 @@
       "path": "staging-tests/evidence/holding-advisory-transaction-20261118.json",
       "sha256": "56c58ca2ce264a63e90ed8b7ab84389c01ddea090cd7e173e6299fa4f4224099"
     }
-  ]
+  ],
+  "deployment": {
+    "productionEdgeVersion": 25,
+    "stagingEdgeVersion": 88,
+    "websiteMergeSha": "cd1891a176eebee2be3868bcfecd1e77040c14a8",
+    "websitePagesDeployment": "1d40e50b-e62f-4225-b671-390f41f33c3c",
+    "websiteStatus": "SUCCESS",
+    "backendMergeSha": "62b07f473280a8a2d168a207716bc2153931c55c",
+    "rehearsalDisabledVersion": 3
+  }
 }
