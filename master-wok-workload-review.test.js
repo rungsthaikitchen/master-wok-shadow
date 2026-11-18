@@ -21,3 +21,15 @@ test('does not extrapolate a five-minute estimate or count touching intervals as
 test('missing and invalid plans are rejected',()=>{
  assert.throws(()=>reviewWorkload({}),/MISSING/);assert.throws(()=>reviewWorkload({wok:{jobs:[job('x','pan-1',5,0)]}}),/INVALID/);
 });
+test('matching complete recipes may share work without removing pans or subtracting time',()=>{
+ const {curryGroups}=require('./master-wok-workload-review');
+ const curry=(protein,ready=1200,spice=1)=>({...job('green-curry','pan-1'),recipeKey:JSON.stringify([ready,'green-curry',[{id:protein}],spice,null])});
+ const same=curryGroups([curry('chicken'),curry('chicken',1210)]);
+ assert.equal(same.length,1);assert.equal(same[0].panCount,2);assert.equal(same[0].potentialSharedWork,true);assert.equal(same[0].sharedMinutes,null);assert.equal(same[0].distinctPanReservationsRetained,true);
+ assert.equal(curryGroups([curry('chicken'),curry('beef')]).length,2);
+ assert.equal(curryGroups([curry('chicken'),curry('chicken',1200,2)]).length,2);
+ const different={...curry('chicken'),itemId:'red-curry',recipeKey:JSON.stringify([1200,'red-curry',[{id:'chicken'}],1,null])};
+ assert.equal(curryGroups([curry('chicken'),different]).length,2);
+ const unknown=curryGroups([job('green-curry','pan-1'),job('green-curry','pan-2')]);
+ assert.equal(unknown.length,2);assert.ok(unknown.every(g=>!g.potentialSharedWork));
+});

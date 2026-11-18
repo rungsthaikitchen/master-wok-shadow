@@ -28,3 +28,9 @@ Earlier evidence files retain the prior assumptions for comparison. chef-attenti
 The offline review assigns salad and hot work to Rung and identifies their overlapping intervals. For five-minute curry jobs it records the reported three-to-four-minute hands-on estimate over the whole cook, without inventing exact phases or summing overlapping estimates as necessarily independent work. The estimate is not extrapolated to other cooking durations. No booking approval or rejection is derived.
 
 The 20:00 and 20:10 candidate replays overlap two curries, two wok dishes and a beef salad at 19:36–19:41. Clarification is needed on shared hands-on work across two curry pans before turning this observation into a staffing constraint. Thirty-eight focused tests pass. Evidence: chef-workload-review-20261118.json.
+
+## Recipe-dependent shared work
+
+David clarified that curry hands-on work is partly shared when curry and protein match; sharing may differ when both differ. The review now groups complete matching canonical recipes (including modifiers, spice and notes, excluding handover time) as potential shared work. Different or missing identities remain separate. No fixed shared-minute deduction is assumed, and each physical pan remains reserved.
+
+The two simultaneous curries at 19:36–19:41 in the 20:00 replay are matching Rung curry/chicken recipes with the same spice choice. Thus their hands-on estimates must not automatically be doubled. The remaining wok/salad overlap still requires kitchen judgement. Thirty-nine focused tests pass; latest evidence is chef-workload-recipe-sharing-20261118.json.
