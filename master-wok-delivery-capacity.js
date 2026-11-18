@@ -8,7 +8,7 @@ function createDeliveryCapacity({quoteLeg,stagingSharedRings=false}={}){
  const kitchenOptions=stagingSharedRings===true?{sharedRings:true,stagingSharedRings:true}:{};
  const driver=createDriverPlanner({quoteLeg});
  const foodAgeConstraint=(delivery,holdExceptions={})=>stagingSharedRings?{
-  earliestFinishByOrder:Object.fromEntries(delivery.trips.flatMap(t=>t.stops.map(s=>[s.id,s.arrival-holdFor({holdExceptions},[s.id],POLICY.maxFoodAge)]))),
+  earliestFinishByOrder:Object.fromEntries(delivery.trips.flatMap(t=>t.stops.map(s=>[s.id,t.start-holdFor({holdExceptions},[s.id],POLICY.maxKitchenHold)]))),
   validateCompletePlan:plan=>{
   try{validateFoodAge({...plan,delivery,holdExceptions});return true;}catch(_){return false;}
  }}:{};

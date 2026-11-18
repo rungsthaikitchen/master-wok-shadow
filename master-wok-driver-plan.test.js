@@ -53,7 +53,7 @@ test('cancellation cannot free a driver already out on a trip',async()=>{
  assert.deepEqual(next.delivery,first.delivery);
  const home=await run([],{previousPlan:{delivery:first.delivery},now:'2026-11-04T19:00:00Z'});assert.equal(home.delivery.trips.length,0);
 });
-test('unsafe food age, missing duration and forged coordinates cannot approve delivery',async()=>{
+test('excessive driver trip duration, missing duration and forged coordinates cannot approve delivery',async()=>{
  const long=createDriverPlanner({quoteLeg:async()=>({durationSeconds:1200})});
  await assert.rejects(()=>long({rows:[row('a')],serviceDate:date,now}),/DRIVER_UNAVAILABLE/);
  const absent=createDriverPlanner({quoteLeg:async()=>({durationSeconds:null})});
@@ -68,10 +68,10 @@ test('cooking must finish before loading and actual food readiness must satisfy 
 
 test('each finished dish must meet the delivery holding limit, even when the final dish is fresh',async()=>{
  const d=await run([row('a')]);
- const plan={wok:{jobs:[{orderIds:['a'],finish:1089},{orderIds:['a'],finish:1103}]},fryer:{jobs:[]},delivery:d.delivery};
+ const plan={wok:{jobs:[{orderIds:['a'],finish:1082},{orderIds:['a'],finish:1103}]},fryer:{jobs:[]},delivery:d.delivery};
  assert.throws(()=>validateFoodAge(plan),/DELIVERY_FOOD_HOLDING_LIMIT/);
- plan.wok.jobs[0].finish=1090;assert.equal(validateFoodAge(plan),true);
- plan.auxiliary={jobs:[{itemId:'pork-dumplings',orderIds:['a'],finish:1089}]};
+ plan.wok.jobs[0].finish=1083;assert.equal(validateFoodAge(plan),true);
+ plan.auxiliary={jobs:[{itemId:'pork-dumplings',orderIds:['a'],finish:1082}]};
  assert.throws(()=>validateFoodAge(plan),/DELIVERY_FOOD_HOLDING_LIMIT/);
  plan.auxiliary.jobs[0].itemId='coconut-rice';assert.equal(validateFoodAge(plan),true);
 });
@@ -101,4 +101,13 @@ test('existing reservations with legacy late tolerance remain intact when a new 
  const result=await run([row('existing'),row('new',1200,53.76)],{previousPlan:{delivery:legacy}});
  assert.deepEqual(result.delivery.trips[0],legacy.trips[0]);
  assert.ok(result.delivery.trips.find(t=>t.stops[0].id==='new').stops.every(s=>s.arrival<=s.target));
+});
+
+test('the agreed kitchen hold is separate from loading and delivery travel',async()=>{
+ const d=await run([row('a')]),trip=d.delivery.trips[0];
+ const plan={wok:{jobs:[{orderIds:['a'],finish:trip.start-20}]},fryer:{jobs:[]},delivery:d.delivery};
+ assert.ok(trip.stops[0].arrival-plan.wok.jobs[0].finish>20);
+ assert.equal(validateFoodAge(plan),true);
+ plan.wok.jobs[0].finish--;assert.throws(()=>validateFoodAge(plan),/DELIVERY_FOOD_HOLDING_LIMIT/);
+ plan.wok.jobs[0].finish=trip.start+1;assert.throws(()=>validateFoodAge(plan),/DELIVERY_FOOD_HOLDING_LIMIT/);
 });

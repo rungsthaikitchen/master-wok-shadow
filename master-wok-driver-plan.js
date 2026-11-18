@@ -7,7 +7,7 @@ const {relativePlacement}=require('./master-wok-clock');
 const {AUXILIARY}=require('./master-wok-recipe-rules');
 // The symmetric tolerance is retained only to read existing reservations.
 // New trips may arrive early within it, but must never be planned late.
-const POLICY=Object.freeze({arrivalTolerance:10,loading:2,handover:2,maxFoodAge:20,preferredFoodAge:15});
+const POLICY=Object.freeze({arrivalTolerance:10,loading:2,handover:2,maxKitchenHold:20,maxTripToDoor:20,preferredFoodAge:15});
 const overlap=(a,b)=>a.start<b.finish&&b.start<a.finish;
 const coordinate=p=>p&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)&&Math.abs(p.lat)<=90&&Math.abs(p.lng)<=180;
 const key=p=>JSON.stringify([p.lat,p.lng]);
@@ -30,7 +30,7 @@ function validateDriverPlan(plan){
    if(!s||typeof s.id!=='string'||typeof s.sourceId!=='string'||stopIds.has(s.id)||!coordinate(s.destination)||
     !Number.isInteger(s.target)||!Number.isInteger(s.arrival)||!Number.isInteger(leg)||leg<1||
     s.arrival!==time+leg||Math.abs(s.arrival-s.target)>POLICY.arrivalTolerance||
-    s.arrival-t.start>POLICY.maxFoodAge)throw Error('INVALID_DRIVER_PLAN');
+    s.arrival-t.start>POLICY.maxTripToDoor)throw Error('INVALID_DRIVER_PLAN');
    stopIds.add(s.id);time=s.arrival+POLICY.handover;
   }
   const home=t.legs.at(-1);if(!Number.isInteger(home)||home<1||t.finish!==time+home)throw Error('INVALID_DRIVER_PLAN');
@@ -97,7 +97,7 @@ function createDriverPlanner({quoteLeg}={}){
    const low=Math.max(992,Math.ceil(asOf)+POLICY.loading,...stops.map((s,i)=>s.target-POLICY.arrivalTolerance-offsets[i]));
    // The selected arrival is a deadline, not the centre of a late window.
    const high=Math.min(...stops.map((s,i)=>s.target-offsets[i]));
-   if(Math.max(...offsets)+POLICY.loading>POLICY.maxFoodAge)return null;
+   if(Math.max(...offsets)+POLICY.loading>POLICY.maxTripToDoor)return null;
    const possibilities=[];
    for(let departure=low;departure<=high;departure++){
     const t={id:'trip:'+stops.map(s=>s.id).join('|'),start:departure-POLICY.loading,departure,
@@ -127,12 +127,15 @@ function foodAgeAtStop(plan,stop){
  const food=finishedFoodJobs(plan).filter(j=>j.orderIds.includes(stop.id));
  return food.length?Math.max(...food.map(j=>stop.arrival-j.finish)):null;
 }
+// Owner clarified 18 November: the 20-minute allowance covers kitchen
+// waiting before loading, not loading and travel to the customer's door.
+// The separate driver trip bound, arrival promise and conflicts still apply.
 function validateFoodAge(plan){
  if(!plan.delivery)return true;validateDriverPlan(plan.delivery);
  const jobs=finishedFoodJobs(plan);
  for(const t of plan.delivery.trips)for(const s of t.stops){
   const food=jobs.filter(j=>j.orderIds.includes(s.id));if(!food.length)continue;
-  if(food.some(j=>j.finish>t.start||s.arrival-j.finish>holdFor(plan,[s.id],POLICY.maxFoodAge)))throw Error('DELIVERY_FOOD_HOLDING_LIMIT');
+  if(food.some(j=>j.finish>t.start||t.start-j.finish>holdFor(plan,[s.id],POLICY.maxKitchenHold)))throw Error('DELIVERY_FOOD_HOLDING_LIMIT');
  }
  return true;
 }
