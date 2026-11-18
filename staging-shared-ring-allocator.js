@@ -1,19 +1,20 @@
 'use strict';
-// Staging only. Four shared rings, two large woks, two small woks, five confirmed pans.
+// Review model: four small-wok positions or two large woks, with shared pan space.
 // Physical feasibility does not validate chef attention or approve bookings.
 const CURRIES=new Set(['massaman-curry','panang-curry','rung-curry','green-curry','red-curry']);
 const SMALL=new Set(['stir-basil','stir-ginger','stir-cashew','stir-sweetsour','stir-yellow','stir-chilli','stir-pepper']);
 const PAN=new Set(['tom-yum','tom-kha','coconut-rice']);
 const PANS=['pan-1','pan-2','pan-3','pan-4','pan-5'];
+const WOKS=['small-1','small-2','small-3','small-4','large-1','large-2'];
 const SMALL_FINISH=new Set(['stir-crispy','salt-chicken','egg-rice','coconut-rice']);
 const NO_RING=new Set(['beef-salad','papaya-salad','pork-salad','laab']);
 const LARGE=new Set(['pad-thai','chef-pad-thai','pad-kee-mao','pad-see-ew','fried-rice','salt-chickenchips','salt-chips']);
 function eligible(itemId){
  if(NO_RING.has(itemId))return ['cold-prep-1'];
  if(PAN.has(itemId))return PANS;
- if(SMALL_FINISH.has(itemId))return ['small-1','small-2','large-1','large-2'];
+ if(SMALL_FINISH.has(itemId))return WOKS;
  if(CURRIES.has(itemId))return PANS;
- if(SMALL.has(itemId))return ['small-1','small-2','large-1','large-2'];
+ if(SMALL.has(itemId))return WOKS;
  if(LARGE.has(itemId))return ['large-1','large-2'];
  return null;
 }
@@ -59,6 +60,7 @@ function allocateSharedRings(jobs,options={}){
  }
  const placed=[];let nodes=0,completeChecks=0,exhausted=false;
  const ringOccupancy=Array(1321).fill(0);
+ const largeOccupancy=new Int16Array(1321),smallOccupancy=new Int16Array(1321);
  // Index occupied minutes by vessel. Search calls this check many thousands
  // of times; rebuilding and scanning every placed job creates avoidable CPU
  // work and garbage, especially when checking a whole service's hints.
@@ -70,6 +72,8 @@ function allocateSharedRings(jobs,options={}){
  }
  function reserveRing(job,delta){
   if(job.vessel!=='cold-prep-1')for(let t=job.start;t<job.finish;t++)ringOccupancy[t]+=delta;
+  const footprint=job.vessel.startsWith('large-')?largeOccupancy:job.vessel.startsWith('small-')?smallOccupancy:null;
+  if(footprint)for(let t=job.start;t<job.finish;t++)footprint[t]+=delta;
   const occupied=vesselOccupancy.get(job.vessel),assigned=vesselJobs.get(job.vessel);
   for(let t=job.start;t<job.finish;t++)occupied[t]+=delta;
   if(delta===1)assigned.push(job);else assigned.pop();
@@ -77,12 +81,20 @@ function allocateSharedRings(jobs,options={}){
    assigned.map(j=>[j.start,j.finish]).sort((a,b)=>a[0]-b[0])]));
  }
  for(const job of fixed)reserveRing(job,1);
+ if(largeOccupancy.some((n,t)=>n>=2&&smallOccupancy[t]>0))return fail('FIXED_HOB_FOOTPRINT_CONFLICT');
  function fits(vessel,start,finish){
   if(blackouts.some(b=>start<b.finish&&finish>b.start))return false;
   const occupied=vesselOccupancy.get(vessel);
   // One full reset minute is required on either side of existing work.
   for(let t=Math.max(0,start-1);t<=finish;t++)if(occupied[t]>0)return false;
   if(vessel!=='cold-prep-1')for(let t=start;t<finish;t++)if(ringOccupancy[t]>=4)return false;
+  // Kitchen-confirmed footprint: two large woks leave room for two pans,
+  // but no small wok. Pan occupancy is still bounded by the four rings.
+  for(let t=start;t<finish;t++){
+   const large=largeOccupancy[t]+(vessel.startsWith('large-')?1:0);
+   const small=smallOccupancy[t]+(vessel.startsWith('small-')?1:0);
+   if(large>=2&&small>0)return false;
+  }
   return true;
  }
  function search(i){
