@@ -43,11 +43,17 @@ function planAuxiliaryWork(orders,rows,wokJobs,options={}){
   if(portions.length>100)return {status:'UNVERIFIED',reason:'AUXILIARY_SEARCH_SIZE_LIMIT'};
   const buckets=new Map();
   for(const p of portions){const k=JSON.stringify([p.itemId,p.sourceRecipeKey,p.deadline??null]);if(!buckets.has(k))buckets.set(k,[]);buckets.get(k).push(p);}
-  const groups=[...buckets.values()].sort((a,b)=>(a[0].deadline??a[0].readyMinute)-(b[0].deadline??b[0].readyMinute));
+  // Finish constrained wok tasks before enumerating independent microwave
+  // arrangements. Otherwise an impossible wok finish repeats the entire
+  // microwave search for every placement of a different appliance.
+  const groups=[...buckets.values()].sort((a,b)=>
+   Number(AUXILIARY[b[0].itemId].resource==='wok')-Number(AUXILIARY[a[0].itemId].resource==='wok')||
+   (a[0].deadline??a[0].readyMinute)-(b[0].deadline??b[0].readyMinute));
   const jobs=[],occupied=[...[...wokJobs,...(options.fixedWok||[])].map(j=>({...j,resource:'wok'})),...(options.fixedAuxiliary||[])];
-  let nodes=0;
+  let nodes=0,exhausted=false;
   function search(index,remaining){
-   if(++nodes>20000)return false;if(index===groups.length)return true;
+   if(exhausted)return false;
+   if(++nodes>20000){exhausted=true;return false;}if(index===groups.length)return true;
    if(!remaining.length)return search(index+1,groups[index+1]||[]);
    const first=remaining[0],deadline=first.deadline??first.readyMinute,rule=AUXILIARY[first.itemId],reset=rule.resource==='wok'?1:0;
    for(let size=Math.min(rule.capacity,remaining.length);size>=1;size--){
@@ -60,6 +66,7 @@ function planAuxiliaryWork(orders,rows,wokJobs,options={}){
      jobs.push({resource:rule.resource,appliance:rule.appliance,itemId:first.itemId,sourceRecipeKey:first.sourceRecipeKey,
       start,finish,readyMinute:first.readyMinute,portions:size,orderIds:[...new Set(assigned.map(p=>p.orderId))],allocations:assigned});
      if(search(index,remaining.slice(size)))return true;jobs.pop();
+     if(exhausted)return false;
     }
    }
    return false;

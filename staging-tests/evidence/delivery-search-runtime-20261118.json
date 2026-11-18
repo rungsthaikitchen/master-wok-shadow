@@ -1,0 +1,20 @@
+{
+  "status": 200,
+  "body": {
+    "success": true,
+    "hints": [
+      {
+        "time": "2026-11-18T18:30:00Z",
+        "available": true,
+        "unverified": false
+      },
+      {
+        "time": "2026-11-18T18:35:00Z",
+        "available": true,
+        "unverified": false
+      }
+    ],
+    "bookingApprovalAllowed": false
+  },
+  "wallMs": 5111
+}

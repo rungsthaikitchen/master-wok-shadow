@@ -1,0 +1,646 @@
+{
+  "scope": "DATABASE_FREE_EXPIRING_STAGING_CPU_REHEARSAL",
+  "sourceSha256": "609238f27b712136bfbb30ab145ba230437151ed38c0155e2baacc4a54992414",
+  "results": [
+    {
+      "type": "delivery",
+      "start": 0,
+      "count": 4,
+      "status": 200,
+      "wallMs": 7601,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T17:00:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T17:05:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T17:10:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T17:15:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 67,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 4,
+      "count": 4,
+      "status": 200,
+      "wallMs": 7612,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T17:20:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T17:25:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T17:30:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T17:35:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 68,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 8,
+      "count": 4,
+      "status": 200,
+      "wallMs": 4286,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T17:40:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T17:45:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T17:50:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T17:55:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 26,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 12,
+      "count": 4,
+      "status": 200,
+      "wallMs": 4299,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T18:00:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T18:05:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T18:10:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T18:15:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 25,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 16,
+      "count": 4,
+      "status": 200,
+      "wallMs": 3833,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T18:20:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T18:25:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T18:30:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T18:35:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 26,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 20,
+      "count": 4,
+      "status": 200,
+      "wallMs": 3841,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T18:40:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T18:45:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T18:50:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T18:55:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 33,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 24,
+      "count": 4,
+      "status": 200,
+      "wallMs": 3895,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T19:00:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T19:05:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T19:10:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T19:15:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 25,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 28,
+      "count": 4,
+      "status": 200,
+      "wallMs": 3887,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T19:20:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T19:25:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T19:30:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T19:35:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 25,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 32,
+      "count": 4,
+      "status": 200,
+      "wallMs": 5938,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T19:40:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T19:45:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T19:50:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T19:55:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 25,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 36,
+      "count": 4,
+      "status": 200,
+      "wallMs": 5942,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T20:00:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T20:05:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T20:10:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T20:15:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 29,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 40,
+      "count": 4,
+      "status": 200,
+      "wallMs": 4594,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T20:20:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T20:25:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T20:30:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T20:35:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 23,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 44,
+      "count": 4,
+      "status": 200,
+      "wallMs": 4586,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T20:40:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T20:45:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T20:50:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T20:55:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 23,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 48,
+      "count": 4,
+      "status": 200,
+      "wallMs": 3872,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T21:00:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T21:05:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T21:10:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T21:15:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 24,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 52,
+      "count": 4,
+      "status": 200,
+      "wallMs": 3827,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T21:20:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T21:25:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T21:30:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T21:35:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 24,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 56,
+      "count": 4,
+      "status": 200,
+      "wallMs": 4042,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T21:40:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T21:45:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T21:50:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          },
+          {
+            "time": "2026-11-18T21:55:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 24,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "delivery",
+      "start": 60,
+      "count": 4,
+      "status": 200,
+      "wallMs": 4010,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T22:00:00.000Z",
+            "status": "UNVERIFIED",
+            "reason": "SEARCH_LIMIT"
+          }
+        ],
+        "elapsedMs": 6,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    },
+    {
+      "type": "collection",
+      "start": 16,
+      "count": 16,
+      "status": 200,
+      "wallMs": 3995,
+      "result": {
+        "results": [
+          {
+            "time": "2026-11-18T18:20:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T18:25:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T18:30:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T18:35:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T18:40:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T18:45:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T18:50:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T18:55:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T19:00:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T19:05:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T19:10:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T19:15:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T19:20:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T19:25:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T19:30:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          },
+          {
+            "time": "2026-11-18T19:35:00.000Z",
+            "status": "VERIFIED_KITCHEN_CAPACITY",
+            "reason": "COMPLETE_LOCKED_STATE_VALIDATED"
+          }
+        ],
+        "elapsedMs": 95,
+        "databaseRequests": 0,
+        "notifications": 0,
+        "bookings": 0
+      }
+    }
+  ]
+}
