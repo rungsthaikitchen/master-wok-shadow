@@ -14,7 +14,7 @@ function createMutationAssessment({model,readAvailability,readOrders=readCapacit
   const old=demands(before),next=demands(after);
   const plansByDate={};
   const reduced=next.every(time=>old.includes(time));
-  const retainExistingPlan=action==='accept'&&before.capacity_scheduler==='MASTER_WOK'&&reduced&&next.length===old.length&&
+  const retainExistingPlan=['accept','complete','mark_paid','record_and_complete','set_status'].includes(action)&&before.capacity_scheduler==='MASTER_WOK'&&reduced&&next.length===old.length&&
    ['order_type','customer_lat','customer_lng','is_test'].every(key=>before[key]===after[key]);
   for(const serviceDate of dates){
    const rows=await readOrders(connection,serviceDate);

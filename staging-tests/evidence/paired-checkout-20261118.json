@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "checks": [
+    "empty_fixture_date",
+    "first_collection_reserved",
+    "pending_checkout",
+    "customer_received_pending_review",
+    "idempotent_pending_receipt",
+    "admin_warning_visible",
+    "affected_dishes_and_estimate",
+    "old_accept_cannot_bypass",
+    "stale_warning_refused",
+    "refused_accept_rolled_back",
+    "staff_accept_committed_to_savepoint",
+    "staff_acknowledgement_audited",
+    "accept_retry_safe",
+    "capacity_neutral_completion",
+    "one_creation_and_one_confirmation_event",
+    "no_order_persisted",
+    "no_first_order_persisted",
+    "no_plan_persisted",
+    "no_notification_persisted"
+  ],
+  "estimatedMinutes": 26,
+  "notificationsSent": 0,
+  "persistentOrders": 0
+}
