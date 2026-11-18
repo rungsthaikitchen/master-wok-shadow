@@ -163,7 +163,11 @@ function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...opti
    return fail('AUXILIARY_COVERAGE_INVALID');
   // Keep the original immutable job objects in the persisted full plan. Future
   // allocations are independently validated against exactly the unstarted lines.
-  const plan={...future,schemaVersion:1,modelVersion:shared?RING_MODEL_VERSION:MODEL_VERSION,
+  // A new basket's preferred ten-minute plan must not lower the default
+  // holding allowance of reservations already saved under the twenty-minute
+  // policy. Their exact jobs remain valid and must validate on later Accept.
+  const combinedHoldingLimit=Math.max(future.holdingLimitMinutes||10,previousPlan?.holdingLimitMinutes||10);
+  const plan={...future,holdingLimitMinutes:combinedHoldingLimit,schemaVersion:1,modelVersion:shared?RING_MODEL_VERSION:MODEL_VERSION,
    wok:{...future.wok,jobs:[...fixed.wok,...future.wok.jobs].sort((a,b)=>a.start-b.start)},
    fryer:{...future.fryer,jobs:[...fixed.fryer,...future.fryer.jobs].sort((a,b)=>a.start-b.start)},
    auxiliary:{...future.auxiliary,jobs:[...fixed.auxiliary,...future.auxiliary.jobs].sort((a,b)=>a.start-b.start)}};

@@ -44,7 +44,7 @@ function createReleaseAssessors({certificate,releaseId,sourceSha256,projectRef,s
   assessBooking(context){
    // Suggestions and explanatory reviews are read-only, bounded searches.
    // An exhausted search is unverified, never a rejection of physical ability.
-   // Only the locked checkout receives the full booking search budget.
+   // The delivery component also bounds checkout while using its fresh locked snapshot.
    const searchOptions=['AVAILABILITY_HINT','BASKET_REVIEW'].includes(context.assessmentPurpose)
     ?{maxSearchNodes:1000,maxCompleteChecks:8,preserveOnly:true}:{};
    // Call the complete validator directly, not an injected prototype assessor.

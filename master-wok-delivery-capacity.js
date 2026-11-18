@@ -42,15 +42,22 @@ function createDeliveryCapacity({quoteLeg,stagingSharedRings=false,advisoryHoldi
  return {
   kitchenModelVersion:stagingSharedRings===true?RING_MODEL_VERSION:'combined-kitchen-protected-v3',
   async verify(context,searchOptions={}){
-   const first=await verifyOne(context,searchOptions);
+   // Availability and authoritative checkout use the same solver budget.
+   // Checkout still locks, prices and validates its own fresh snapshot; hints
+   // never confer booking authority. Preserve reservations instead of first
+   // exhausting a whole-service search before the advisory attempt can run.
+   const bounded=advisoryHolding?{...searchOptions,
+    maxSearchNodes:Math.min(searchOptions.maxSearchNodes??100000,1000),
+    maxCompleteChecks:Math.min(searchOptions.maxCompleteChecks??128,8),preserveOnly:true}:searchOptions;
+   const first=await verifyOne(context,bounded);
    const retryable=['SEARCH_LIMIT','NO_PHYSICAL_TIMELINE','WOK_PLAN_UNVERIFIED','FIXED_RING_WORKLOAD_EXCEEDS_WINDOW','FIXED_BATCH_CAPACITY_EXCEEDED','FIXED_VESSEL_CAPACITY_EXCEEDED','FIXED_RESOURCE_WINDOW_EXCEEDED','FRYER_WINDOW_CAPACITY_EXCEEDED','AUXILIARY_CAPACITY_UNVERIFIED','TIMELINE_VALIDATION_FAILED'];
    if(!advisoryHolding||!stagingSharedRings||first.status==='VERIFIED_KITCHEN_CAPACITY'||!retryable.includes(first.reason)||context.proposedOrder.staffHoldException)return first;
    // The service horizon is the search bound, not a new customer holding rule.
    // Try only one bounded alternative; a failed search remains unverified.
    const candidate={...context.proposedOrder,planningHoldMinutes:330};
-   const alternate=await verifyOne({...context,proposedOrder:candidate},{...searchOptions,
-    maxSearchNodes:Math.min(searchOptions.maxSearchNodes??100000,1000),
-    maxCompleteChecks:Math.min(searchOptions.maxCompleteChecks??128,8)});
+   const alternate=await verifyOne({...context,proposedOrder:candidate},{...bounded,
+    maxSearchNodes:Math.min(bounded.maxSearchNodes??100000,1000),
+    maxCompleteChecks:Math.min(bounded.maxCompleteChecks??128,8)});
    if(alternate.status!=='VERIFIED_KITCHEN_CAPACITY')return first;
    require('./master-wok-holding-advisory').clampAdvisory(alternate.plan,String(candidate.orderId));
    validateFoodAge(alternate.plan);require('./master-wok-protected-plan').protectStartedWork(alternate.plan,0);

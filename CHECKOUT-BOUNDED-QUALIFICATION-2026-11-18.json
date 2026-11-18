@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-18",
+  "scope": "AUTHORITATIVE_CHECKOUT_CPU_BOUND_AND_SAVED_HOLDING_POLICY_RETENTION",
+  "sourceSha256": "482f6e92cfe2ec62d95c0be4b2a034ff95fb57c0dd5048dedc8ae6302c43eb9a",
+  "parentSourceSha256": "863d496f38b4974cf1567af8e5bea2b35fd2c7893b8b91c9f44fc4dc49ed6a3e",
+  "incident": "Production booking at 12:16 returned 503 after Edge CPU exhaustion; no new order was found.",
+  "changes": [
+    "Use the same bounded preserved-reservation search at locked checkout and availability when advisory holding is enabled",
+    "Capacity-neutral acceptance/payment/status completion validates its existing saved plan",
+    "Combining a preferred-ten-minute new basket cannot downgrade the default holding allowance of existing twenty-minute reservations"
+  ],
+  "unchanged": [
+    "transaction locks and fresh snapshots",
+    "commercial expected-price validation and loyalty reservations",
+    "equipment, recipe, driver and arrival validation",
+    "staff acknowledgement of extended holding",
+    "checkout keys and pending-receipt idempotency"
+  ],
+  "tests": {
+    "backendPassed": 424,
+    "pairedStagingChecks": 19,
+    "pairedEstimatedKitchenHoldMinutes": 26,
+    "notificationsSent": 0,
+    "persistentOrders": 0
+  },
+  "stagingBasis": "Two matching mixed baskets at 20:00 using a fixed eight-minute trusted route fixture, real private staging SQL and production runtime components; outer transaction rolled back.",
+  "priorQualification": "HOLDING-ADVISORY-QUALIFICATION-2026-11-18.json",
+  "evidence": [
+    {
+      "path": "staging-tests/evidence/paired-checkout-20261118.json",
+      "sha256": "e24e3cd3e1edd2a2b49e20ddd513e248442bd239c2a2a13d3c677b0e04787f8e"
+    }
+  ],
+  "deployment": {
+    "productionVersion": 26,
+    "stagingVersion": 89,
+    "rehearsalDisabledVersion": 7
+  }
+}
