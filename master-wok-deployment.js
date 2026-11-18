@@ -28,7 +28,7 @@ function createDeploymentRuntime({pool,model,certificate,sourceSha256,releaseId,
  const stagingSharedRings=certificate.modelVersion===RING_MODEL_VERSION&&
   certificate.kitchenConfiguration==='FOUR_RING_ONE_PORTION_V1';
  const deliveryCapacity=certificate.deliveryScheduling===1?
-  require('./master-wok-delivery-capacity').createDeliveryCapacity({stagingSharedRings,quoteLeg:require('./master-wok-route-duration').createRouteDurationQuoter(deliveryService)}):undefined;
+  require('./master-wok-delivery-capacity').createDeliveryCapacity({stagingSharedRings,advisoryHolding:certificate.holdingAdvisory===1,quoteLeg:require('./master-wok-route-duration').createRouteDurationQuoter(deliveryService)}):undefined;
  const quoteDelivery=require('./master-wok-delivery-quote').createDeliveryQuoter(deliveryService);
  const assessors=createReleaseAssessors({certificate,releaseId,sourceSha256,projectRef,schema,model,readOrders,readAvailability,planStore,deliveryCapacity});
  // Staging commercial tables and counter are private as well.

@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-18",
+  "scope": "OWNER_CLARIFIED_KITCHEN_HOLD_VS_DELIVERY_TRAVEL",
+  "ownerDecision": {
+    "question": "When we agreed the 20-minute maximum, which period did you intend it to cover?",
+    "answer": "Kitchen waiting only",
+    "description": "Up to 20 minutes from finishing to dispatch, with delivery travel handled separately."
+  },
+  "parentSourceSha256": "609238f27b712136bfbb30ab145ba230437151ed38c0155e2baacc4a54992414",
+  "runtimeSourceSha256": "c3f3838c29fe463276ff1dbe969b530733e720518c6e90de6a11d378b644c8a2",
+  "changes": [
+    "Earliest finished-food boundary measured from loading start rather than customer arrival",
+    "Final holding validator uses the same kitchen boundary",
+    "Existing 20-minute loading-to-door trip bound retained under separate maxTripToDoor name"
+  ],
+  "unchanged": [
+    "arrival deadlines and driver conflict validation",
+    "ring, vessel, microwave and fryer capacity",
+    "recipe durations and batching",
+    "atomic writer, write fences, payments, loyalty, notifications and idempotency",
+    "browser retry and cancellation safeguards"
+  ],
+  "tests": {
+    "sourceBoundBackendPassed": 417,
+    "failed": 0,
+    "hostedBatches": 4,
+    "hostedHttp200": 4,
+    "hostedHints": 61,
+    "hostedVerified": 60,
+    "hostedRouteMinutes": 8,
+    "largestKitchenHoldMinutes": 17,
+    "largestFinishToDoorMinutes": 27
+  },
+  "stagingRuntimeVersion": 87,
+  "publicLandmarkDeliveryProbe": {
+    "status": 200,
+    "body": {
+      "success": true,
+      "hints": [
+        {
+          "time": "2026-11-18T18:30:00Z",
+          "available": true,
+          "unverified": false
+        },
+        {
+          "time": "2026-11-18T18:35:00Z",
+          "available": true,
+          "unverified": false
+        }
+      ],
+      "bookingApprovalAllowed": false
+    },
+    "wallMs": 7305
+  },
+  "qualificationBasis": "Prior release evidence retained for unchanged components; changed holding semantics requalified by complete source-bound backend suite, exact-basket full-day hosted replay and real staging delivery availability through the production route integration. No claim of a replay of both large customer baskets.",
+  "remaining": "Exact \u00a385.50 basket contents are required for the two-order 19:50/20:00 replay.",
+  "evidence": [
+    {
+      "path": "staging-tests/evidence/kitchen-hold-hosted-20261118.json",
+      "sha256": "4c0f4c7b3f353d626497daa8fb9518356a89808fd6e840d61e1b6edf30ff07ca"
+    },
+    {
+      "path": "staging-tests/evidence/kitchen-hold-runtime-20261118.json",
+      "sha256": "8363fe9f8075a2e1b142d0218cb607ec616c1baf2f296acef822fbc3f1fe4485"
+    },
+    {
+      "path": "master-wok-delivery-search-cost.test.js",
+      "sha256": "8ed4b78500c659c267c94eabf8b8bac832697855629432a1b107a8fe55bf895d"
+    },
+    {
+      "path": "master-wok-driver-plan.test.js",
+      "sha256": "b554409ae832cdfd9332179b0d5050b2d4e2410d3a974cb6ad9fffbeeef913a1"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-18",
+  "scope": "CUSTOMER_PENDING_ORDER_WITH_ADVISORY_KITCHEN_HOLD_AND_AUTHENTICATED_STAFF_ACCEPTANCE",
+  "ownerApproval": "Yes, agreed. I think that is the better approach. Let\u2019s do it Sensei!!!",
+  "sourceSha256": "863d496f38b4974cf1567af8e5bea2b35fd2c7893b8b91c9f44fc4dc49ed6a3e",
+  "parentProductionSourceSha256": "609238f27b712136bfbb30ab145ba230437151ed38c0155e2baacc4a54992414",
+  "inheritsKitchenHoldingClarification": "KITCHEN-HOLD-QUALIFICATION-2026-11-18.json",
+  "policy": {
+    "kitchenTargetMinutes": 20,
+    "travelSeparate": true,
+    "extendedHolding": "Pending order requires staff review; all existing physical, driver and arrival checks still apply",
+    "search": "One bounded alternative inside the existing service horizon; unverified remains unverified",
+    "staffAcceptance": "Signed staff identity from protected payments transport, current warning token, persisted acknowledgement"
+  },
+  "tests": {
+    "backendPassed": 422,
+    "websitePassed": 97,
+    "stagingTransactionChecks": 16,
+    "stagingEstimatedMinutes": 45,
+    "persistentRehearsalOrders": 0,
+    "notificationsSent": 0
+  },
+  "browserInteractionTest": {
+    "status": "ENVIRONMENT_BLOCKED",
+    "reason": "Headless Chromium could not create its process singleton socket; component test supplied but not claimed as passed."
+  },
+  "rollback": "Disable new advisory creation by removing holdingAdvisory from the certificate while retaining this runtime and its advisory-aware validators/readers. Do not restore a pre-advisory binary over advisory reservations. Existing drain guards remain required before LEGACY mode.",
+  "knownRemainingWork": [
+    "Exact \u00a385.50 basket contents required to replay the 19:50/20:00 pair"
+  ],
+  "evidence": [
+    {
+      "path": "staging-tests/evidence/holding-advisory-transaction-20261118.json",
+      "sha256": "56c58ca2ce264a63e90ed8b7ab84389c01ddea090cd7e173e6299fa4f4224099"
+    }
+  ]
+}

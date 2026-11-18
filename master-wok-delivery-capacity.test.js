@@ -72,7 +72,7 @@ test('staging four-ring delivery keeps door arrival and loading deadlines throug
  assert.equal(r.bookingApprovalAllowed,false);
 });
 
-test('delivery time proposal searches for a plan whose every dish meets door-arrival food age',async()=>{
+test('delivery time proposal keeps every dish within the kitchen hold before loading',async()=>{
  const parallel=createDeliveryCapacity({stagingSharedRings:true,quoteLeg:async()=>({durationSeconds:420})});
  const items=[['pork-dumplings'],['red-curry','chicken'],['stir-pepper','beef'],
   ['chef-pad-thai','pork'],['fried-rice','chicken'],['jasmine-rice'],['coconut-rice'],['chips']]

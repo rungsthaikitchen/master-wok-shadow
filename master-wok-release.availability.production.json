@@ -6,7 +6,7 @@
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
   "schema": "public",
   "modelVersion": "combined-kitchen-four-ring-staging-v1",
-  "sourceSha256": "609238f27b712136bfbb30ab145ba230437151ed38c0155e2baacc4a54992414",
+  "sourceSha256": "863d496f38b4974cf1567af8e5bea2b35fd2c7893b8b91c9f44fc4dc49ed6a3e",
   "checks": {
     "atomicConcurrency": "PASS",
     "physicalCoverage": "PASS",
@@ -28,5 +28,6 @@
     "manifest": "AVAILABILITY-CERTIFICATION-2026-11-17.json",
     "sha256": "429fac9142a39655f31483bd0236cb01d4cee6a4c76886b0647695dd5b6d0007",
     "note": "Owner-approved controlled installation; qualifications and deployment/activation gates remain mandatory."
-  }
+  },
+  "holdingAdvisory": 1
 }

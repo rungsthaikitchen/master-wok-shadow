@@ -47,7 +47,7 @@ function validateKitchenTimeline(orders,plan,rows,options={}){
   issues.push(...validateRingOccupancy([...wok,...(options.fixedWok||[])],
    [...(plan.auxiliary?.jobs||[]),...(options.fixedAuxiliary||[])]));
   if(!validateAuxiliaryWork(orders,options.auxiliaryRows||rows,plan.auxiliary?.jobs||[],{
-   ...options,holdExceptions:plan.holdExceptions,holdingLimitMinutes:plan.holdingLimitMinutes,mainJobs:[...wok,...(options.fixedWok||[])]}))issues.push({code:'AUXILIARY_COVERAGE_INVALID'});
+   ...options,holdExceptions:plan.holdExceptions,holdingAdvisories:plan.holdingAdvisories,holdingLimitMinutes:plan.holdingLimitMinutes,mainJobs:[...wok,...(options.fixedWok||[])]}))issues.push({code:'AUXILIARY_COVERAGE_INVALID'});
   const inventory=diagnoseFryer(orders,rows,{confirmedStarterRecipes:true,standaloneSpringRolls:true});
   const expected=new Map(),actual=new Map(),deadlineExpected=new Map(),deadlineActual=new Map();
   const key=(id,item,type,recipe)=>JSON.stringify([String(id),item,type,recipe]);

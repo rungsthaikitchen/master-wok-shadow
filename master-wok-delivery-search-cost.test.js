@@ -15,8 +15,12 @@ test('mixed delivery basket checks a full service without repeating independent 
    state:{now,availability:{blackouts:[],serviceState:{mode:'normal',capacity_throttle:0}},previousPlan:null},
    proposedOrder:{...p.candidate,rawRow:p.rawRow,validatedHeader:{order_type:'delivery',preferred_time:time,customer_lat:53.752,customer_lng:-1.58}}},
    {maxSearchNodes:1000,maxCompleteChecks:8,preserveOnly:true});
-  // Search exhaustion remains unverified; speed must never manufacture a slot.
-  assert.equal(result.status,'UNVERIFIED');assert.equal(result.reason,'SEARCH_LIMIT');assert.equal(result.bookingApprovalAllowed,false);
+  assert.equal(result.status,'VERIFIED_KITCHEN_CAPACITY',result.reason);
+  assert.equal(result.bookingApprovalAllowed,false);
+  assert.equal(require('./master-wok-driver-plan').validateFoodAge(result.plan),true);
+  const finish=result.plan.auxiliary.jobs.find(j=>j.itemId==='moo-ping');
+  assert.ok(finish);
+  assert.ok(result.plan.wok.jobs.every(j=>finish.start>=j.finish+1||finish.finish+1<=j.start));
  }
  const used=process.cpuUsage(cpu);
  assert.ok(used.user+used.system<5000000,'61 read-only hints must use less than five CPU seconds');
