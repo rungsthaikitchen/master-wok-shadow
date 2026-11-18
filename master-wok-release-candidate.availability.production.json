@@ -6,7 +6,7 @@
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
   "schema": "public",
   "modelVersion": "combined-kitchen-four-ring-staging-v1",
-  "sourceSha256": "c3f3838c29fe463276ff1dbe969b530733e720518c6e90de6a11d378b644c8a2",
+  "sourceSha256": "863d496f38b4974cf1567af8e5bea2b35fd2c7893b8b91c9f44fc4dc49ed6a3e",
   "checks": {
     "atomicConcurrency": "PENDING",
     "physicalCoverage": "PENDING",
@@ -27,5 +27,6 @@
   "evidence": {
     "manifest": "AVAILABILITY-READINESS-2026-11-17.json",
     "note": "Staging functional and temporary-copy rollback evidence only. Current production binding, notification verification and explicit activation approval remain required. Historical certification is not transferred."
-  }
+  },
+  "holdingAdvisory": 1
 }

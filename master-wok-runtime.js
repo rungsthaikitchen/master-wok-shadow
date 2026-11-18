@@ -30,8 +30,8 @@ function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,sc
   const admin=lifecycle.adminAction;
   const deliveryAdmin=createDeliveryAdmin({...shared,model,readOrders,readAvailability,
    planStore:createServicePlanStore({schema}),deliveryCapacity,schema});
-  lifecycle.adminAction=input=>['delivery_trip_options','preview_delivery_combination','combine_deliveries','split_delivery_trip'].includes(input?.action)
-   ?deliveryAdmin(input):admin(input);
+  lifecycle.adminAction=(input,auth)=>['delivery_trip_options','preview_delivery_combination','combine_deliveries','split_delivery_trip'].includes(input?.action)
+   ?deliveryAdmin(input):admin(input,auth);
  }
  const serviceControl=createServiceControlWriter({...shared,schema});
  const availability=createBasketAvailability({pool,model,readAvailability,assessBooking,readSnapshot:readHintSnapshot,
@@ -49,7 +49,9 @@ function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,sc
  };
  const paymentWriter=paymentsEnabled?createPaymentWriter({...shared,schema,completeOrder:createPaymentCompletion({schema,assessMutation})}):undefined;
  const amendmentWriter=paymentsEnabled&&quoteDelivery?createAmendmentWriter({...shared,schema,assessMutation,quoteDelivery}):undefined;
- const payments=paymentWriter?input=>input?.action?.startsWith('amend_')?(amendmentWriter?amendmentWriter(input):Promise.resolve({success:false,reason:'AMENDMENTS_DISABLED',statusCode:503})):paymentWriter(input):undefined;
+ const holdingAdmin=require('./master-wok-holding-admin').createHoldingAdmin({...shared,schema});
+ const payments=paymentWriter?input=>input?.action==='holding_list'?holdingAdmin(input):input?.action==='holding_accept'?
+   lifecycle.adminAction({...input,action:'accept'},{staffActor:input.staffActor}):input?.action?.startsWith('amend_')?(amendmentWriter?amendmentWriter(input):Promise.resolve({success:false,reason:'AMENDMENTS_DISABLED',statusCode:503})):paymentWriter(input):undefined;
  const booking=createBookingHttpHandler({secret,payments,checkout,lifecycle,serviceControl,availability,basketReview,basketReviewAdmin:createBasketReviewAdmin({pool,schema,reviewApproval}),
   readPreviewOrders:readPreviewOrders?async()=>{
    if((await gate.read(pool)).mode!=='MASTER_WOK')throw Error('PREVIEW_READER_DISABLED');

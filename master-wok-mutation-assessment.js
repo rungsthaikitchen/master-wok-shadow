@@ -10,7 +10,7 @@ function demands(order){
 }
 function createMutationAssessment({model,readAvailability,readOrders=readCapacityCommitments,planStore=createServicePlanStore(),deliveryCapacity,stagingSharedRings=false}={}){
  const kitchenOptions=stagingSharedRings===true?{sharedRings:true,stagingSharedRings:true}:{};
- return async function assessMutation({connection,before,after,dates,now,action}){
+ return async function assessMutation({connection,before,after,dates,now,action,holdingAuthorization}){
   const old=demands(before),next=demands(after);
   const plansByDate={};
   const reduced=next.every(time=>old.includes(time));
@@ -39,6 +39,10 @@ function createMutationAssessment({model,readAvailability,readOrders=readCapacit
     proposedOrder:{...candidate,items:row.items,rawRow:row,validatedHeader:{preferred_time:row.confirmed_time,order_type:row.order_type,customer_lat:row.customer_lat,customer_lng:row.customer_lng}}},kitchenOptions);
    if(!['VALIDATED_COMBINED_ASSESSMENT','VERIFIED_KITCHEN_CAPACITY'].includes(result.status))return result;
    plansByDate[serviceDate]=result.plan;
+  }
+  if(['confirmed','accepted','completed'].includes(after.status)){
+   const review=require('./master-wok-holding-advisory').reviewPlans(plansByDate,after,holdingAuthorization,now);
+   if(!review.ok)return {status:'UNVERIFIED',bookingApprovalAllowed:false,...review};
   }
   return {status:'VALIDATED_LIFECYCLE_ASSESSMENT',reason:reduced?'CAPACITY_UNCHANGED_OR_REDUCED':'LOCKED_POST_MUTATION_STATE_VALIDATED',plansByDate,bookingApprovalAllowed:false};
  };

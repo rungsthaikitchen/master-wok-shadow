@@ -51,7 +51,7 @@ function createLifecycleWriter({pool,assessMutation,mode='LEGACY',schema='public
   !['public','master_wok_rehearsal'].includes(schema))throw Error('INVALID_LIFECYCLE_CONFIGURATION');
  const planStore=createServicePlanStore({schema});
  const orders='"'+schema+'".orders',receipts='"'+schema+'".master_wok_time_responses';
- async function mutate(input,actor){
+ async function mutate(input,actor,auth){
   const fail=(reason,statusCode=409)=>({success:false,committed:false,reason,statusCode});
   if(mode==='LEGACY')return {success:false,committed:false,reason:'USE_EXISTING_LIFECYCLE',statusCode:409};
   if(mode!=='MASTER_WOK')return fail('INVALID_BOOKING_MODE',503);
@@ -83,9 +83,9 @@ function createLifecycleWriter({pool,assessMutation,mode='LEGACY',schema='public
     [input.orderId,...fields.map(k=>patch[k])]);
    // This runs after the tentative update but before COMMIT, so the existing
    // assessor sees the exact state that would become authoritative.
-   const assessment=await assessMutation({connection,before:order,after,dates,now,action:input.action});
+   const assessment=await assessMutation({connection,before:order,after,dates,now,action:input.action,...(actor==='admin'&&auth?.staffActor?{holdingAuthorization:{staffActor:auth.staffActor,warningToken:input.holdingWarningToken}}:{})});
    if(assessment?.status!=='GREEN'||assessment.bookingApprovalAllowed!==true){
-    await connection.query('ROLLBACK');return fail(assessment?.reason||'UNCERTIFIED_LIFECYCLE_ASSESSMENT');
+    await connection.query('ROLLBACK');return {...fail(assessment?.reason||'UNCERTIFIED_LIFECYCLE_ASSESSMENT'),...(assessment?.reason==='EXTENDED_HOLDING_REVIEW_REQUIRED'?{holdingWarnings:assessment.holdingWarnings,warningToken:assessment.warningToken}:{})};
    }
    if(dates.some(date=>!assessment.plansByDate?.[date]))throw Error('VALIDATED_SERVICE_PLANS_REQUIRED');
    for(const date of dates)await planStore.save(connection,date,assessment.plansByDate[date]);
@@ -107,6 +107,6 @@ function createLifecycleWriter({pool,assessMutation,mode='LEGACY',schema='public
    return fail(known.has(error.message)?error.message:'LIFECYCLE_TRANSACTION_FAILED');
   }finally{connection.release();}
  }
- return {adminAction:input=>mutate(input,'admin'),customerResponse:input=>mutate(input,'customer')};
+ return {adminAction:(input,auth)=>mutate(input,'admin',auth),customerResponse:input=>mutate(input,'customer')};
 }
 module.exports={createLifecycleWriter,actionPatch};

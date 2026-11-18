@@ -58,7 +58,7 @@ function planAuxiliaryWork(orders,rows,wokJobs,options={}){
    const first=remaining[0],deadline=first.deadline??first.readyMinute,rule=AUXILIARY[first.itemId],reset=rule.resource==='wok'?1:0;
    for(let size=Math.min(rule.capacity,remaining.length);size>=1;size--){
     const minutes=rule.batchMinutes?.[size]??rule.minutes;
-    for(let start=deadline-minutes;start>=Math.max(990,first.notBefore,deadline-minutes-holdFor(options,remaining.slice(0,size).map(p=>p.orderId),options.holdingLimitMinutes===20?20:10));start--){
+    for(let start=deadline-minutes;start>=Math.max(990,first.notBefore,deadline-minutes-holdFor(rule.beforeMain?{...options,holdingAdvisories:{}}:options,remaining.slice(0,size).map(p=>p.orderId),options.holdingLimitMinutes===20?20:10));start--){
      const finish=start+minutes;
      if([...(options.kitchenBlackouts||options.blackouts||[])].some(b=>start<b.finish&&finish>b.start)||
       [...occupied,...jobs].some(j=>j.resource===rule.resource&&start<j.finish+reset&&finish+reset>j.start))continue;
@@ -82,7 +82,7 @@ function validateAuxiliaryWork(orders,rows,jobs,options={}){
   for(const j of jobs){
    const rule=AUXILIARY[j.itemId];
    if(!rule||j.resource!==rule.resource||j.finish-j.start!==(rule.batchMinutes?.[j.portions]??rule.minutes)||!Number.isInteger(j.portions)||j.portions<1||j.portions>rule.capacity||
-    j.allocations?.length!==j.portions||j.start<990||j.finish>1320||j.finish>Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))||Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))-j.finish>holdFor(options,j.orderIds,options.holdingLimitMinutes===20?20:10))return false;
+    j.allocations?.length!==j.portions||j.start<990||j.finish>1320||j.finish>Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))||Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))-j.finish>holdFor(rule.beforeMain?{...options,holdingAdvisories:{}}:options,j.orderIds,options.holdingLimitMinutes===20?20:10))return false;
    for(const p of j.allocations){const original=bounds.get(key(p));
     if(!original||p.qty!==1||p.itemId!==j.itemId||p.sourceRecipeKey!==j.sourceRecipeKey||j.readyMinute!==original.readyMinute||j.finish>(original.deadline??original.readyMinute)||j.start<original.notBefore||j.start<p.notBefore||!j.orderIds.includes(p.orderId))return false;
     actual.set(key(p),(actual.get(key(p))||0)+1);}
