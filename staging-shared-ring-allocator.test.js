@@ -5,6 +5,16 @@ const {allocateSharedRings}=require('./staging-shared-ring-allocator');
 const job=(itemId,earliest=1040,latest=1040)=>({
  itemId,earliest,latest,duration:5,readyMinute:1050,holdingLimitMinutes:10
 });
+test('kitchen-confirmed Dave Style chips dishes share the two large wok spaces with noodles',()=>{
+ const {eligible}=require('./staging-shared-ring-allocator');
+ for(const id of ['salt-chickenchips','salt-chips'])assert.deepEqual(eligible(id),['large-1','large-2']);
+ assert.equal(allocateSharedRings([job('salt-chips'),job('salt-chickenchips')]).status,'PHYSICAL_FIT_PROTOTYPE');
+ assert.equal(allocateSharedRings([job('salt-chips'),job('salt-chickenchips'),job('pad-thai')]).status,'UNVERIFIED');
+});
+test('four confirmed small wok dishes can occupy the four rings',()=>{
+ const result=allocateSharedRings(['stir-basil','stir-pepper','stir-cashew','stir-crispy'].map(id=>job(id)));
+ assert.equal(result.status,'PHYSICAL_FIT_PROTOTYPE');assert.equal(new Set(result.jobs.map(j=>j.vessel)).size,4);
+});
 test('noodles, small stir fry and two curries can use four rings',()=>{
  const r=allocateSharedRings([
   job('pad-thai'),job('stir-basil'),job('panang-curry'),job('green-curry')

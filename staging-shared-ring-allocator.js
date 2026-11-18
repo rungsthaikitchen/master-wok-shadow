@@ -5,9 +5,9 @@ const CURRIES=new Set(['massaman-curry','panang-curry','rung-curry','green-curry
 const SMALL=new Set(['stir-basil','stir-ginger','stir-cashew','stir-sweetsour','stir-yellow','stir-chilli','stir-pepper']);
 const PAN=new Set(['tom-yum','tom-kha','coconut-rice']);
 const PANS=['pan-1','pan-2','pan-3','pan-4','pan-5'];
-const SMALL_FINISH=new Set(['stir-crispy','salt-chicken','salt-chickenchips','salt-chips','egg-rice','coconut-rice']);
+const SMALL_FINISH=new Set(['stir-crispy','salt-chicken','egg-rice','coconut-rice']);
 const NO_RING=new Set(['beef-salad','papaya-salad','pork-salad','laab']);
-const LARGE=new Set(['pad-thai','chef-pad-thai','pad-kee-mao','pad-see-ew','fried-rice']);
+const LARGE=new Set(['pad-thai','chef-pad-thai','pad-kee-mao','pad-see-ew','fried-rice','salt-chickenchips','salt-chips']);
 function eligible(itemId){
  if(NO_RING.has(itemId))return ['cold-prep-1'];
  if(PAN.has(itemId))return PANS;
