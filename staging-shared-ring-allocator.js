@@ -1,11 +1,11 @@
 'use strict';
-// Review model: four small-wok positions or two large woks, with shared pan space.
+// Review model: two small and two large woks, with confirmed footprint limits.
 // Physical feasibility does not validate chef attention or approve bookings.
 const CURRIES=new Set(['massaman-curry','panang-curry','rung-curry','green-curry','red-curry']);
 const SMALL=new Set(['stir-basil','stir-ginger','stir-cashew','stir-sweetsour','stir-yellow','stir-chilli','stir-pepper']);
 const PAN=new Set(['tom-yum','tom-kha','coconut-rice']);
 const PANS=['pan-1','pan-2','pan-3','pan-4','pan-5'];
-const WOKS=['small-1','small-2','small-3','small-4','large-1','large-2'];
+const WOKS=['small-1','small-2','large-1','large-2'];
 const SMALL_FINISH=new Set(['stir-crispy','salt-chicken','egg-rice','coconut-rice']);
 const NO_RING=new Set(['beef-salad','papaya-salad','pork-salad','laab']);
 const LARGE=new Set(['pad-thai','chef-pad-thai','pad-kee-mao','pad-see-ew','fried-rice','salt-chickenchips','salt-chips']);

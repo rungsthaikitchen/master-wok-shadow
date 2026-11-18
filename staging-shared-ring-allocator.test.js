@@ -11,9 +11,15 @@ test('kitchen-confirmed Dave Style chips dishes share the two large wok spaces w
  assert.equal(allocateSharedRings([job('salt-chips'),job('salt-chickenchips')]).status,'PHYSICAL_FIT_PROTOTYPE');
  assert.equal(allocateSharedRings([job('salt-chips'),job('salt-chickenchips'),job('pad-thai')]).status,'UNVERIFIED');
 });
-test('four confirmed small wok dishes can occupy the four rings',()=>{
- const result=allocateSharedRings(['stir-basil','stir-pepper','stir-cashew','stir-crispy'].map(id=>job(id)));
- assert.equal(result.status,'PHYSICAL_FIT_PROTOTYPE');assert.equal(new Set(result.jobs.map(j=>j.vessel)).size,4);
+test('three small wok dishes use two small woks and one large; four cannot fit',()=>{
+ const dishes=['stir-basil','stir-pepper','stir-cashew','stir-crispy'];
+ const result=allocateSharedRings(dishes.slice(0,3).map(id=>job(id)));
+ assert.equal(result.status,'PHYSICAL_FIT_PROTOTYPE');
+ assert.equal(result.jobs.filter(j=>j.vessel.startsWith('small-')).length,2);
+ assert.equal(result.jobs.filter(j=>j.vessel.startsWith('large-')).length,1);
+ assert.equal(allocateSharedRings(dishes.map(id=>job(id))).status,'UNVERIFIED');
+ const mixed=allocateSharedRings([job('pad-thai'),job('stir-basil'),job('stir-pepper')]);
+ assert.equal(mixed.status,'PHYSICAL_FIT_PROTOTYPE');
 });
 test('two large woks exclude every small wok but allow two curry pans',()=>{
  assert.equal(allocateSharedRings([job('pad-thai'),job('fried-rice'),job('stir-basil')]).status,'UNVERIFIED');
@@ -200,11 +206,16 @@ test('indexed vessel occupancy matches interval checks including the reset minut
   const vessels=require('./staging-shared-ring-allocator').eligible(itemId);
   // Use a physically valid fixed baseline, rather than all six eligible
   // vessels simultaneously (which exceeds both rings and footprint).
-  const fixed=vessels.slice(0,4).map((vessel,i)=>({itemId,vessel,start:1020+i,finish:1030+i}));
+  const fixed=vessels.filter(v=>itemId!=='stir-pepper'||v!=='large-2').slice(0,4).map((vessel,i)=>({itemId,vessel,start:1020+i,finish:1030+i}));
   for(let start=1008;start<=1040;start++){
    const duration=5,finish=start+duration;
    const expected=vessels.some(vessel=>!fixed.some(j=>j.vessel===vessel&&start<j.finish+1&&finish+1>j.start)
-    &&(vessel==='cold-prep-1'||Array.from({length:duration},(_,i)=>start+i).every(t=>fixed.filter(j=>j.vessel!=='cold-prep-1'&&j.start<=t&&t<j.finish).length<4)));
+    &&(vessel==='cold-prep-1'||Array.from({length:duration},(_,i)=>start+i).every(t=>{
+     const active=fixed.filter(j=>j.start<=t&&t<j.finish);
+     const large=active.filter(j=>j.vessel.startsWith('large-')).length+(vessel.startsWith('large-')?1:0);
+     const small=active.filter(j=>j.vessel.startsWith('small-')).length+(vessel.startsWith('small-')?1:0);
+     return active.filter(j=>j.vessel!=='cold-prep-1').length<4&&!(large>=2&&small>0);
+    })));
    const result=allocateSharedRings([{itemId,portions:1,duration,earliest:start,latest:start,readyMinute:finish}],{fixedWok:fixed});
    assert.equal(result.status==='PHYSICAL_FIT_PROTOTYPE',expected,JSON.stringify({itemId,start}));
   }

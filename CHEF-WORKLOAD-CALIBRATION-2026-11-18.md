@@ -1,25 +1,24 @@
 # Kitchen confirmation, 18 November 2026
 
-David confirmed with Chef Rung:
+## Final confirmed hob inventory and combinations
 
-- At most two noodle, fried-rice, Dave Style salt-and-pepper chips or chicken-and-chips dishes simultaneously, because of large-wok hob space.
-- Four small-wok dishes can run simultaneously: Pad Kra Pao, Black Pepper, Cashew, Sweet and Sour, Dave Style Crispy Chicken.
+- Two small woks and two large woks physically available; five curry pans, four hob rings.
+- Small-wok dishes can also cook in a large wok. Maximum concurrent small-wok dishes is three: two small woks plus one large. This supersedes the earlier four-small-wok interpretation.
+- One large wok plus two small woks fits. Two large woks exclude every small wok.
+- Two curry pans can run alongside either two large or two small woks.
+- Noodles, fried rice, Dave Style chips and chicken-and-chips require large woks.
+- Confirmed small-wok dishes: Pad Kra Pao, Black Pepper, Cashew, Sweet and Sour, Dave Style Crispy Chicken.
 - A five-minute curry needs approximately three to four minutes of hands-on work.
-- Chef Rung performs all the mains and salad work. Do not treat cold preparation as another cook.
-- Follow-up: two large woks cannot run with even one small wok. Two curry saucepans can run alongside either two large woks or two small woks. The exact one-large-wok mixed combination has not been confirmed.
+- Chef Rung performs all mains and salad work. Cold preparation is not another cook.
 
-## Diagnostic branch changes
+## Review implementation and limits
 
-`salt-chips` and `salt-chickenchips` now require the two large wok vessels. The starter `salt-chicken` is a different item; its allocation is unchanged pending confirmation.
+The allocator uses the real two-small/two-large inventory. The footprint rule rejects two large plus any small wok in both allocation and independent validation, including protected work. Four hot vessels remains the overall ring limit. Dave Style chips and chicken-and-chips cannot use small woks; the salt-chicken starter remains separately classified.
 
-These facts do not establish the exact curry attention phase positions or the appropriate allowance for mixing active wok work, curries and salad preparation. Do not invent an exact staffing profile from the approximate curry total. Four small woks are explicitly achievable, so a one-active-job limit would contradict the kitchen.
+Thirty-four focused tests pass. The corrected offline replay rebuilds the historical collection baseline, then adds the matching delivery basket at 19:50, 20:00, 20:10 and 20:20, with fixed eight-minute routing. Equipment fits all four candidates. Holding warnings are absent at 19:50 and 26, 36, 41 minutes for the later candidates respectively. These are provisional physical-fit results, not validated chef workload or an exact live route replay.
 
-The saved 18 November fixture places `salt-chips` in a small wok. Under the corrected vessel rule, that protected reservation must be reported as invalid rather than silently moved. It is a historical replay fixture, not an active service to repair. A corrected from-scratch replay is needed before evaluating chef work and before qualifying a release. Previously saved plans may need compatibility handling at deployment.
+The original saved fixture contains now-invalid small-wok assignments for chips. It must not be silently rewritten as if historically valid. Production saved-plan compatibility and release qualification still need review.
 
-No production deployment or certificate changes are included here.
+Exact curry hands-on phase positions and mixed attention capacity remain uncalibrated. Approximate hands-on totals do not establish minute-by-minute staffing availability. No production deployment or certificate changes are included here.
 
-## Follow-up footprint implementation
-
-The review allocator and independent timeline validator now reject two occupied large woks plus any small wok, including protected reservations. Four small-wok positions are represented separately: using large-wok IDs as substitutes for the third and fourth small wok would incorrectly trigger the footprint restriction. Four total hot vessels remains the overall ring limit, so two large woks plus two pans and two small woks plus two pans remain possible.
-
-One large wok with small woks is not newly restricted because its exact limit has not been confirmed. Replay results using that mixed configuration therefore remain provisional, alongside the unfinished chef-attention model.
+Earlier evidence files retain the prior assumptions for comparison. chef-attention-final-inventory-20261118.json is the current replay evidence.
