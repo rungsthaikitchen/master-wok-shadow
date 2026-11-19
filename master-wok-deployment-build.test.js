@@ -27,13 +27,13 @@ test('approved availability package reads Legacy mode but refuses a mismatched r
  let built=execFileSync(process.execPath,['staging-tests/build-atomic-checkout-edge.cjs','--release-availability-certified'],{cwd:__dirname,encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:1024*1024});
  assert.equal(c.status,'CERTIFIED_FOR_PRODUCTION');assert.ok(Object.values(c.checks).every(v=>v==='PASS'));
  assert.equal(c.sourceSha256,require('./master-wok-release-candidate.staging.json').sourceSha256);
- // Simulate a certificate bound to this test build only. The persisted
- // production certificate is deliberately retained for its historical source.
- const historicalBuild=built;
+ // The committed certificate must bind the actual emitted runtime. A stale
+ // digest must refuse before opening a database connection.
  const runtimeHash=built.match(/sourceSha256:'([a-f0-9]{64})',projectRef/)[1];
+ assert.equal(c.sourceSha256,runtimeHash);
  const publishedMarker='module.exports='+JSON.stringify(c)+';';
  assert.ok(built.includes(publishedMarker));
- built=built.replace(publishedMarker,'module.exports='+JSON.stringify({...c,sourceSha256:runtimeHash})+';');
+ const historicalBuild=built.replace(publishedMarker,'module.exports='+JSON.stringify({...c,sourceSha256:'0'.repeat(64)})+';');
  for(const matching of [true,false,'staleSource']){
   let handler,queries=0;
   const env={SUPABASE_URL:'https://ubyjrrsvbbqomitpaidb.supabase.co',SUPABASE_DB_URL:'postgres://unused.invalid/db',
