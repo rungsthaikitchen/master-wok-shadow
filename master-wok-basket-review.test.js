@@ -71,3 +71,12 @@ test('diagnostic failure does not lose the customer review and browser assessmen
  assert.equal(JSON.parse(values[7]).status,'UNAVAILABLE');
  assert.ok(!values[7].includes('Fake capacity approval'));
 });
+test('explicit closure is authoritative even if the scheduling diagnostic fails',async()=>{
+ let statement;
+ const save=createBasketReviewStore({assessReview:async()=>{throw Error('offline');},pool:{query:async sql=>{statement=sql;return {rows:[{review_closed:true,id:null,status:null}]};}}});
+ assert.deepEqual(await save(input()),{success:false,statusCode:409,reason:'REVIEW_TIME_CLOSED',bookingApprovalAllowed:false});
+ assert.match(statement,/kind='closed'/);assert.match(statement,/active=true/);
+ assert.match(statement,/start_at <= \$5::timestamptz AND end_at > \$5::timestamptz/);
+ assert.match(statement,/SELECT \$1,\$2,\$3,\$4,\$5::timestamptz,\$6::jsonb,\$7,\$8::jsonb FROM closure WHERE NOT is_closed/);
+ assert.match(statement,/saved.request_key=\$1 AND saved.customer_name=\$2/);
+});
