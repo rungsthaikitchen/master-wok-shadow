@@ -1,0 +1,38 @@
+{
+  "date": "2026-11-19",
+  "status": "DEPLOYED_AND_MODE_VERIFIED",
+  "releaseId": "master-wok-availability-2026-11-17",
+  "sourceSha256": "67baa21d641423d4cd45962a364708a4c3badd481109cb002561ac8d45f02305",
+  "mergedCommit": "c4a78e57cd67c7e2839eb1de4c33ad0004790d6c",
+  "pullRequest": 26,
+  "production": {
+    "projectRef": "ubyjrrsvbbqomitpaidb",
+    "function": "master-wok-booking",
+    "version": 27,
+    "ezbrSha256": "d903db9e9e5443e315a63311ec5fadbb77741a407726efb0d07be3fd654b40cd",
+    "modeResponseStatus": 200,
+    "mode": "MASTER_WOK",
+    "installedSourceInspected": true,
+    "privateRehearsalAbsent": true
+  },
+  "staging": {
+    "version": 90,
+    "modeResponseStatus": 200,
+    "mode": "MASTER_WOK"
+  },
+  "preflight": {
+    "activeFutureOrders": 0,
+    "futureCookingReservations": 0,
+    "launchControlRevision": 11
+  },
+  "qualification": "HOB-QUALIFICATION-2026-11-19.json",
+  "tests": {
+    "fullRegressionPassed": 442,
+    "privateStagingTransactionChecks": 19,
+    "certificateBootstrapChecks": 18
+  },
+  "scope": "Confirmed vessel and hob footprint rules; offline chef attention remains advisory",
+  "rollback": "Previous v26 source remains in deployment history and pre-deployment readback; re-evaluate any reservations added under the new model before reverting.",
+  "notificationsSent": 0,
+  "testOrdersCreatedInProduction": 0
+}
