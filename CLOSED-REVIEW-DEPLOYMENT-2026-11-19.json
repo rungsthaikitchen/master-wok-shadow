@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-19",
+  "status": "DEPLOYED_AND_VERIFIED",
+  "productionVersion": 28,
+  "stagingVersion": 91,
+  "sourceSha256": "81bab047c8d65da1e683ae9fa6ecee3d5ab16b998e6f8be9d7ddb0614e65a0db",
+  "backendMerge": "8dfd0100c310d08fa3fcf5d90349badafc745c58",
+  "websiteMerge": "4fe98474beda7bce04fd7212b40ce335dc3fb93e",
+  "pagesDeployment": "258fd412-cd6d-4654-af1f-cce0b28e84e8",
+  "pagesCheckConclusion": "success",
+  "gatewayModeResponse": {
+    "httpStatus": 200,
+    "mode": "MASTER_WOK"
+  },
+  "tests": {
+    "backendPassed": 443,
+    "websitePassed": 106,
+    "stagingSqlPassed": 11
+  },
+  "realReviewModified": false,
+  "notificationsSent": 0,
+  "temporaryRehearsalDisabledVersion": 3,
+  "limitation": "Direct HTTP reads of customer website received Cloudflare 403; website deployment verified through Cloudflare's GitHub check for the merged main commit."
+}
