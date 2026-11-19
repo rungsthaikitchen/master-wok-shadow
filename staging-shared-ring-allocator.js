@@ -81,6 +81,7 @@ function allocateSharedRings(jobs,options={}){
    assigned.map(j=>[j.start,j.finish]).sort((a,b)=>a[0]-b[0])]));
  }
  for(const job of fixed)reserveRing(job,1);
+ if(ringOccupancy.some(n=>n>4))return fail('FIXED_RING_CAPACITY_EXCEEDED');
  if(largeOccupancy.some((n,t)=>n>=2&&smallOccupancy[t]>0))return fail('FIXED_HOB_FOOTPRINT_CONFLICT');
  function fits(vessel,start,finish){
   if(blackouts.some(b=>start<b.finish&&finish>b.start))return false;

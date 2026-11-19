@@ -36,6 +36,18 @@ test('protected large woks also exclude small wok additions and invalid fixed co
  assert.ok(validateRingOccupancy(invalid).some(i=>i.code==='HOB_FOOTPRINT_CONFLICT'));
  assert.equal(validateRingOccupancy([...fixed,{...job('red-curry'),start:1040,finish:1045,vessel:'pan-1',portions:1}]).length,0);
 });
+test('allocator and independent validator agree across all physical vessel subsets',()=>{
+ const {validateRingOccupancy}=require('./staging-kitchen-launch-validator');
+ const vessels=['small-1','small-2','large-1','large-2','pan-1','pan-2','pan-3','pan-4','pan-5'];
+ for(let mask=0;mask<2**vessels.length;mask++){
+  const active=vessels.filter((_,i)=>mask&(1<<i));
+  const large=active.filter(v=>v.startsWith('large-')).length,small=active.filter(v=>v.startsWith('small-')).length;
+  const expected=active.length<=4&&!(large===2&&small>0);
+  const fixed=active.map(vessel=>({...job(vessel.startsWith('pan-')?'red-curry':vessel.startsWith('large-')?'pad-thai':'stir-basil'),vessel,start:1040,finish:1045,portions:1}));
+  assert.equal(allocateSharedRings([],{fixedWok:fixed}).status==='PHYSICAL_FIT_PROTOTYPE',expected,active.join(','));
+  assert.equal(validateRingOccupancy(fixed).length===0,expected,active.join(','));
+ }
+});
 test('noodles, small stir fry and two curries can use four rings',()=>{
  const r=allocateSharedRings([
   job('pad-thai'),job('stir-basil'),job('panang-curry'),job('green-curry')
