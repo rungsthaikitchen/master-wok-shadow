@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-19",
+  "scope": "Explicit closure guard in basket review persistence",
+  "sourceSha256": "81bab047c8d65da1e683ae9fa6ecee3d5ab16b998e6f8be9d7ddb0614e65a0db",
+  "parentSourceSha256": "67baa21d641423d4cd45962a364708a4c3badd481109cb002561ac8d45f02305",
+  "parentQualification": "HOB-QUALIFICATION-2026-11-19.json",
+  "incident": {
+    "reviewId": "58c72831-3af2-46c2-ad2a-b60855f49223",
+    "submittedAt": "2026-11-18T19:05:55Z",
+    "requestedTime": "2026-11-18T20:00:00Z",
+    "storedAssessmentReason": "BLACKOUT",
+    "existingReviewModified": false
+  },
+  "change": "Authoritative active closed windows are checked in the review INSERT statement after diagnostics. End exclusive. Existing identical requests replay; conflicting identities remain rejected. Fully booked windows are not closures.",
+  "validation": {
+    "websiteTestsPassed": 106,
+    "stagingDatabaseChecksPassed": 11,
+    "notificationsSent": 0,
+    "persistentFixtureRows": 0,
+    "backendTestsPassed": 443
+  },
+  "evidence": {
+    "path": "staging-tests/evidence/closed-review-20261119.json",
+    "sha256": "22f0492ef8cfac723c07f8d464cdf1bacd3d674afff7a8861199fa631e6cce78"
+  },
+  "unchanged": [
+    "Authoritative booking writer and kitchen capacity rules",
+    "Prices and loyalty",
+    "Existing reviews and their statuses",
+    "Admin confirmation and notification flow"
+  ],
+  "frontend": "Full-date and partial-time closed messages, London DST conversion, saved basket retention; prior uncertain request keys remain protected."
+}

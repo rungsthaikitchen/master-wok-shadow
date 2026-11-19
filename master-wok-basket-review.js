@@ -22,6 +22,7 @@ function normalizeReview(input){
 function createBasketReviewStore({pool,schema='public',assessReview}){
  if(!pool||!['public','master_wok_rehearsal'].includes(schema))throw Error('INVALID_REVIEW_CONFIGURATION');
  const table='"'+schema+'".master_wok_basket_reviews';
+ const closures='"'+schema+'".booking_blackouts';
  return async input=>{
   const review=normalizeReview(input);
   let assessment={status:'UNAVAILABLE',message:'Scheduling analysis is unavailable. Discuss the basket before agreeing a time.'};
@@ -29,12 +30,25 @@ function createBasketReviewStore({pool,schema='public',assessReview}){
   // Compare the stored request on replay. A reused key cannot replace a basket.
   const values=[review.requestKey,review.customerName,review.customerPhone,review.orderType,
    review.preferredTime,JSON.stringify(review.basket),review.deliveryAddress,JSON.stringify(assessment)];
+  // Diagnostics are allowed to fail; an explicit closure is not. Read the
+  // authoritative closure in the INSERT statement, after any slow assessment.
+  // A committed identical request can still replay after service is closed.
+  const identity='saved.customer_name=$2 AND saved.customer_phone=$3 AND saved.order_type=$4 '
+   +'AND saved.preferred_time=$5::timestamptz AND saved.basket=$6::jsonb '
+   +'AND saved.delivery_address IS NOT DISTINCT FROM $7';
   const result=await pool.query(
-   'INSERT INTO '+table+' AS saved (request_key,customer_name,customer_phone,order_type,preferred_time,basket,delivery_address,assessment) '
-   +'VALUES($1,$2,$3,$4,$5,$6::jsonb,$7,$8::jsonb) ON CONFLICT(request_key) DO UPDATE SET request_key=saved.request_key '
+   'WITH closure AS (SELECT EXISTS(SELECT 1 FROM '+closures+" WHERE active=true AND kind='closed' "
+   +'AND start_at <= $5::timestamptz AND end_at > $5::timestamptz) AS is_closed), inserted AS ('
+   +'INSERT INTO '+table+' AS saved (request_key,customer_name,customer_phone,order_type,preferred_time,basket,delivery_address,assessment) '
+   +'SELECT $1,$2,$3,$4,$5::timestamptz,$6::jsonb,$7,$8::jsonb FROM closure WHERE NOT is_closed '
+   +'ON CONFLICT(request_key) DO UPDATE SET request_key=saved.request_key '
    +'WHERE saved.customer_name=excluded.customer_name AND saved.customer_phone=excluded.customer_phone '
    +'AND saved.order_type=excluded.order_type AND saved.preferred_time=excluded.preferred_time '
-   +'AND saved.basket=excluded.basket AND saved.delivery_address IS NOT DISTINCT FROM excluded.delivery_address RETURNING id,status',values);
+   +'AND saved.basket=excluded.basket AND saved.delivery_address IS NOT DISTINCT FROM excluded.delivery_address RETURNING id,status) '
+   +'SELECT id,status,false AS review_closed FROM inserted UNION ALL '
+   +'SELECT saved.id,saved.status,false FROM '+table+' saved,closure WHERE is_closed AND saved.request_key=$1 AND '+identity+' UNION ALL '
+   +'SELECT NULL::uuid,NULL::text,true FROM closure WHERE is_closed AND NOT EXISTS(SELECT 1 FROM '+table+' WHERE request_key=$1)',values);
+  if(result.rows[0]?.review_closed===true)return {success:false,statusCode:409,reason:'REVIEW_TIME_CLOSED',bookingApprovalAllowed:false};
   if(result.rows.length!==1)return {success:false,statusCode:409,reason:'REVIEW_REQUEST_KEY_CONFLICT'};
   return {success:true,reviewId:result.rows[0].id,status:result.rows[0].status,bookingApprovalAllowed:false};
  };
