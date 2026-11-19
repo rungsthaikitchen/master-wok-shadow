@@ -5,6 +5,49 @@ const {allocateSharedRings}=require('./staging-shared-ring-allocator');
 const job=(itemId,earliest=1040,latest=1040)=>({
  itemId,earliest,latest,duration:5,readyMinute:1050,holdingLimitMinutes:10
 });
+test('kitchen-confirmed Dave Style chips dishes share the two large wok spaces with noodles',()=>{
+ const {eligible}=require('./staging-shared-ring-allocator');
+ for(const id of ['salt-chickenchips','salt-chips'])assert.deepEqual(eligible(id),['large-1','large-2']);
+ assert.equal(allocateSharedRings([job('salt-chips'),job('salt-chickenchips')]).status,'PHYSICAL_FIT_PROTOTYPE');
+ assert.equal(allocateSharedRings([job('salt-chips'),job('salt-chickenchips'),job('pad-thai')]).status,'UNVERIFIED');
+});
+test('three small wok dishes use two small woks and one large; four cannot fit',()=>{
+ const dishes=['stir-basil','stir-pepper','stir-cashew','stir-crispy'];
+ const result=allocateSharedRings(dishes.slice(0,3).map(id=>job(id)));
+ assert.equal(result.status,'PHYSICAL_FIT_PROTOTYPE');
+ assert.equal(result.jobs.filter(j=>j.vessel.startsWith('small-')).length,2);
+ assert.equal(result.jobs.filter(j=>j.vessel.startsWith('large-')).length,1);
+ assert.equal(allocateSharedRings(dishes.map(id=>job(id))).status,'UNVERIFIED');
+ const mixed=allocateSharedRings([job('pad-thai'),job('stir-basil'),job('stir-pepper')]);
+ assert.equal(mixed.status,'PHYSICAL_FIT_PROTOTYPE');
+});
+test('two large woks exclude every small wok but allow two curry pans',()=>{
+ assert.equal(allocateSharedRings([job('pad-thai'),job('fried-rice'),job('stir-basil')]).status,'UNVERIFIED');
+ const r=allocateSharedRings([job('pad-thai'),job('salt-chips'),job('red-curry'),job('green-curry')]);
+ assert.equal(r.status,'PHYSICAL_FIT_PROTOTYPE');
+ assert.equal(allocateSharedRings([job('stir-basil'),job('stir-pepper'),job('red-curry'),job('green-curry')]).status,'PHYSICAL_FIT_PROTOTYPE');
+});
+test('protected large woks also exclude small wok additions and invalid fixed combinations',()=>{
+ const fixed=['large-1','large-2'].map((vessel,i)=>({...job('pad-thai'),start:1040,finish:1045,vessel,portions:1}));
+ assert.equal(allocateSharedRings([job('stir-basil')],{fixedWok:fixed}).status,'UNVERIFIED');
+ const invalid=[...fixed,{...job('stir-basil'),start:1040,finish:1045,vessel:'small-1',portions:1}];
+ assert.equal(allocateSharedRings([],{fixedWok:invalid}).reason,'FIXED_HOB_FOOTPRINT_CONFLICT');
+ const {validateRingOccupancy}=require('./staging-kitchen-launch-validator');
+ assert.ok(validateRingOccupancy(invalid).some(i=>i.code==='HOB_FOOTPRINT_CONFLICT'));
+ assert.equal(validateRingOccupancy([...fixed,{...job('red-curry'),start:1040,finish:1045,vessel:'pan-1',portions:1}]).length,0);
+});
+test('allocator and independent validator agree across all physical vessel subsets',()=>{
+ const {validateRingOccupancy}=require('./staging-kitchen-launch-validator');
+ const vessels=['small-1','small-2','large-1','large-2','pan-1','pan-2','pan-3','pan-4','pan-5'];
+ for(let mask=0;mask<2**vessels.length;mask++){
+  const active=vessels.filter((_,i)=>mask&(1<<i));
+  const large=active.filter(v=>v.startsWith('large-')).length,small=active.filter(v=>v.startsWith('small-')).length;
+  const expected=active.length<=4&&!(large===2&&small>0);
+  const fixed=active.map(vessel=>({...job(vessel.startsWith('pan-')?'red-curry':vessel.startsWith('large-')?'pad-thai':'stir-basil'),vessel,start:1040,finish:1045,portions:1}));
+  assert.equal(allocateSharedRings([],{fixedWok:fixed}).status==='PHYSICAL_FIT_PROTOTYPE',expected,active.join(','));
+  assert.equal(validateRingOccupancy(fixed).length===0,expected,active.join(','));
+ }
+});
 test('noodles, small stir fry and two curries can use four rings',()=>{
  const r=allocateSharedRings([
   job('pad-thai'),job('stir-basil'),job('panang-curry'),job('green-curry')
@@ -83,7 +126,10 @@ test('£50 customer basket and £100 mixed basket expose single-wok limits',()=>
   const options={allowFryerDependent:true,curryHoldMinutes:10};
   assert.equal(scheduleCrossOrderPanang(orders,rows,options).reason,'FIXED_BATCH_CAPACITY_EXCEEDED');
   const parallel=scheduleCrossOrderPanang(orders,rows,{...options,sharedRings:true});
-  assert.equal(parallel.status,'PHYSICAL_FIT_PROTOTYPE');
+  // The doubled basket depended on two large plus small wok overlap under
+  // the former ring-only model. That arrangement is now kitchen-confirmed invalid.
+  assert.equal(parallel.status,multiplier===1?'PHYSICAL_FIT_PROTOTYPE':'UNVERIFIED');
+  if(multiplier===2)assert.equal(parallel.reason,'NO_PHYSICAL_TIMELINE');
   assert.equal(parallel.bookingApprovalAllowed,false);
  }
 });
@@ -170,11 +216,18 @@ test('single cold-prep workload gets the same necessary interval bound as hob re
 test('indexed vessel occupancy matches interval checks including the reset minute',()=>{
  for(const itemId of ['pad-thai','stir-pepper','green-curry','beef-salad']){
   const vessels=require('./staging-shared-ring-allocator').eligible(itemId);
-  const fixed=vessels.map((vessel,i)=>({itemId,vessel,start:1020+i,finish:1030+i}));
+  // Use a physically valid fixed baseline, rather than all six eligible
+  // vessels simultaneously (which exceeds both rings and footprint).
+  const fixed=vessels.filter(v=>itemId!=='stir-pepper'||v!=='large-2').slice(0,4).map((vessel,i)=>({itemId,vessel,start:1020+i,finish:1030+i}));
   for(let start=1008;start<=1040;start++){
    const duration=5,finish=start+duration;
    const expected=vessels.some(vessel=>!fixed.some(j=>j.vessel===vessel&&start<j.finish+1&&finish+1>j.start)
-    &&(vessel==='cold-prep-1'||Array.from({length:duration},(_,i)=>start+i).every(t=>fixed.filter(j=>j.vessel!=='cold-prep-1'&&j.start<=t&&t<j.finish).length<4)));
+    &&(vessel==='cold-prep-1'||Array.from({length:duration},(_,i)=>start+i).every(t=>{
+     const active=fixed.filter(j=>j.start<=t&&t<j.finish);
+     const large=active.filter(j=>j.vessel.startsWith('large-')).length+(vessel.startsWith('large-')?1:0);
+     const small=active.filter(j=>j.vessel.startsWith('small-')).length+(vessel.startsWith('small-')?1:0);
+     return active.filter(j=>j.vessel!=='cold-prep-1').length<4&&!(large>=2&&small>0);
+    })));
    const result=allocateSharedRings([{itemId,portions:1,duration,earliest:start,latest:start,readyMinute:finish}],{fixedWok:fixed});
    assert.equal(result.status==='PHYSICAL_FIT_PROTOTYPE',expected,JSON.stringify({itemId,start}));
   }

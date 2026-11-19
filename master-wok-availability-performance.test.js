@@ -17,7 +17,8 @@ test('isolated hosted harness authenticates, bounds its fixed cases and never ac
  assert.equal((await call({kind:'heavy',start:0,count:61})).status,400);
  const response=await call({kind:'heavy',start:0,count:6});assert.equal(response.status,200);
  const result=await response.json();assert.equal(result.hints.length,6);
- assert.equal(result.hints.filter(h=>h.status==='VERIFIED_KITCHEN_CAPACITY').length,3);
+ assert.ok(result.hints.every(h=>h.status==='UNVERIFIED'&&h.reason==='FIXED_VESSEL_CAPACITY_EXCEEDED'));
+ // These opening slots depended on the former chips-in-small-woks model.
  assert.equal(result.databaseRequests+result.notifications+result.bookings,0);
  assert.ok(envReads.length>0);
  const fixture=JSON.stringify(require('./staging-tests/availability-service-fixture.json'));

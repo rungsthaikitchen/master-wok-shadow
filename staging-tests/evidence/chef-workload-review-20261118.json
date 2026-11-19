@@ -1,0 +1,1575 @@
+{
+  "scope": "OFFLINE_DIAGNOSTIC_ONLY",
+  "fixture": "Saved 18 November collection basket rebuilt under corrected vessel rules; second identical basket delivered with fixed eight-minute legs",
+  "liveRouteReplay": false,
+  "bookingApprovalAllowed": false,
+  "results": [
+    {
+      "arrival": "19:50",
+      "status": "VERIFIED_KITCHEN_CAPACITY",
+      "peakEquipmentOverlap": {
+        "start": "19:30",
+        "finish": "19:34",
+        "hotJobs": 4,
+        "coldJobs": 1,
+        "items": [
+          {
+            "itemId": "salt-chips",
+            "vessel": "large-1"
+          },
+          {
+            "itemId": "beef-salad",
+            "vessel": "cold-prep-1"
+          },
+          {
+            "itemId": "egg-rice",
+            "vessel": "small-1"
+          },
+          {
+            "itemId": "stir-basil",
+            "vessel": "small-2"
+          },
+          {
+            "itemId": "rung-curry",
+            "vessel": "pan-3"
+          }
+        ]
+      },
+      "workloadReview": {
+        "status": "KITCHEN_CALIBRATION_REQUIRED",
+        "bookingApprovalAllowed": false,
+        "chefAttentionModelValidated": false,
+        "exclusiveLabourCapacityAssumed": false,
+        "intervals": [
+          {
+            "start": 1170,
+            "finish": 1174,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 3,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1170,
+                "cookFinish": 1175,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1169,
+                "finish": 1174
+              },
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1170,
+                "finish": 1180
+              },
+              {
+                "itemId": "egg-rice",
+                "vessel": "small-1",
+                "start": 1170,
+                "finish": 1175
+              },
+              {
+                "itemId": "stir-basil",
+                "vessel": "small-2",
+                "start": 1170,
+                "finish": 1175
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-3",
+                "start": 1170,
+                "finish": 1175
+              }
+            ]
+          },
+          {
+            "start": 1174,
+            "finish": 1175,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1170,
+                "cookFinish": 1175,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1170,
+                "finish": 1180
+              },
+              {
+                "itemId": "egg-rice",
+                "vessel": "small-1",
+                "start": 1170,
+                "finish": 1175
+              },
+              {
+                "itemId": "stir-basil",
+                "vessel": "small-2",
+                "start": 1170,
+                "finish": 1175
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-3",
+                "start": 1170,
+                "finish": 1175
+              }
+            ]
+          },
+          {
+            "start": 1175,
+            "finish": 1180,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1175,
+                "cookFinish": 1180,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1170,
+                "finish": 1180
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1175,
+                "finish": 1180
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-2",
+                "start": 1175,
+                "finish": 1180
+              },
+              {
+                "itemId": "coconut-rice",
+                "vessel": "pan-1",
+                "start": 1175,
+                "finish": 1180
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-2",
+                "start": 1175,
+                "finish": 1180
+              }
+            ]
+          },
+          {
+            "start": 1190,
+            "finish": 1194,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 3,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1190,
+                "cookFinish": 1195,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1189,
+                "finish": 1194
+              },
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chicken",
+                "vessel": "small-1",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "stir-crispy",
+                "vessel": "small-2",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-3",
+                "start": 1190,
+                "finish": 1195
+              }
+            ]
+          },
+          {
+            "start": 1194,
+            "finish": 1195,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1190,
+                "cookFinish": 1195,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chicken",
+                "vessel": "small-1",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "stir-crispy",
+                "vessel": "small-2",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-3",
+                "start": 1190,
+                "finish": 1195
+              }
+            ]
+          },
+          {
+            "start": 1195,
+            "finish": 1200,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1195,
+                "cookFinish": 1200,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-2",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "tom-yum",
+                "vessel": "pan-1",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-2",
+                "start": 1195,
+                "finish": 1200
+              }
+            ]
+          }
+        ]
+      },
+      "holdingWarnings": [],
+      "attentionStatus": "INCOMPLETE_ATTENTION_MODEL",
+      "unprofiledRecipes": [
+        "auxiliary:coconut-rice",
+        "auxiliary:egg-rice",
+        "auxiliary:jasmine-rice",
+        "auxiliary:moo-ping",
+        "auxiliary:spare-ribs",
+        "auxiliary:sticky-rice",
+        "fryer:chips",
+        "fryer:crispyChicken",
+        "wok:beef-salad",
+        "wok:coconut-rice",
+        "wok:egg-rice",
+        "wok:rung-curry",
+        "wok:salt-chicken",
+        "wok:salt-chips",
+        "wok:stir-basil",
+        "wok:stir-crispy",
+        "wok:tom-yum"
+      ]
+    },
+    {
+      "arrival": "20:00",
+      "status": "VERIFIED_KITCHEN_CAPACITY",
+      "peakEquipmentOverlap": {
+        "start": "19:36",
+        "finish": "19:41",
+        "hotJobs": 4,
+        "coldJobs": 1,
+        "items": [
+          {
+            "itemId": "beef-salad",
+            "vessel": "cold-prep-1"
+          },
+          {
+            "itemId": "egg-rice",
+            "vessel": "small-1"
+          },
+          {
+            "itemId": "rung-curry",
+            "vessel": "pan-1"
+          },
+          {
+            "itemId": "rung-curry",
+            "vessel": "pan-2"
+          },
+          {
+            "itemId": "salt-chips",
+            "vessel": "large-1"
+          }
+        ]
+      },
+      "workloadReview": {
+        "status": "KITCHEN_CALIBRATION_REQUIRED",
+        "bookingApprovalAllowed": false,
+        "chefAttentionModelValidated": false,
+        "exclusiveLabourCapacityAssumed": false,
+        "intervals": [
+          {
+            "start": 1171,
+            "finish": 1175,
+            "chef": "Rung",
+            "curries": 0,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [],
+            "dishes": [
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1170,
+                "finish": 1175
+              },
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1171,
+                "finish": 1181
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-2",
+                "start": 1171,
+                "finish": 1176
+              },
+              {
+                "itemId": "tom-yum",
+                "vessel": "pan-3",
+                "start": 1171,
+                "finish": 1176
+              }
+            ]
+          },
+          {
+            "start": 1175,
+            "finish": 1176,
+            "chef": "Rung",
+            "curries": 0,
+            "salads": 1,
+            "woks": 1,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1171,
+                "finish": 1181
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-2",
+                "start": 1171,
+                "finish": 1176
+              },
+              {
+                "itemId": "tom-yum",
+                "vessel": "pan-3",
+                "start": 1171,
+                "finish": 1176
+              }
+            ]
+          },
+          {
+            "start": 1176,
+            "finish": 1181,
+            "chef": "Rung",
+            "curries": 2,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF",
+              "CONCURRENT_CURRY_ATTENTION_UNCALIBRATED"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1176,
+                "cookFinish": 1181,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              },
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1176,
+                "cookFinish": 1181,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1171,
+                "finish": 1181
+              },
+              {
+                "itemId": "egg-rice",
+                "vessel": "small-1",
+                "start": 1176,
+                "finish": 1181
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-1",
+                "start": 1176,
+                "finish": 1181
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-2",
+                "start": 1176,
+                "finish": 1181
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1176,
+                "finish": 1181
+              }
+            ]
+          },
+          {
+            "start": 1190,
+            "finish": 1194,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 3,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1190,
+                "cookFinish": 1195,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1189,
+                "finish": 1194
+              },
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chicken",
+                "vessel": "small-1",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "stir-crispy",
+                "vessel": "small-2",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-3",
+                "start": 1190,
+                "finish": 1195
+              }
+            ]
+          },
+          {
+            "start": 1194,
+            "finish": 1195,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1190,
+                "cookFinish": 1195,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chicken",
+                "vessel": "small-1",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "stir-crispy",
+                "vessel": "small-2",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-3",
+                "start": 1190,
+                "finish": 1195
+              }
+            ]
+          },
+          {
+            "start": 1195,
+            "finish": 1200,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1195,
+                "cookFinish": 1200,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-2",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "tom-yum",
+                "vessel": "pan-1",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-2",
+                "start": 1195,
+                "finish": 1200
+              }
+            ]
+          }
+        ]
+      },
+      "holdingWarnings": [
+        {
+          "estimatedMinutes": 26,
+          "dishes": [
+            {
+              "itemId": "moo-ping",
+              "minutes": 26
+            }
+          ]
+        }
+      ],
+      "attentionStatus": "INCOMPLETE_ATTENTION_MODEL",
+      "unprofiledRecipes": [
+        "auxiliary:coconut-rice",
+        "auxiliary:egg-rice",
+        "auxiliary:jasmine-rice",
+        "auxiliary:moo-ping",
+        "auxiliary:spare-ribs",
+        "auxiliary:sticky-rice",
+        "fryer:chips",
+        "fryer:crispyChicken",
+        "wok:beef-salad",
+        "wok:coconut-rice",
+        "wok:egg-rice",
+        "wok:rung-curry",
+        "wok:salt-chicken",
+        "wok:salt-chips",
+        "wok:stir-basil",
+        "wok:stir-crispy",
+        "wok:tom-yum"
+      ]
+    },
+    {
+      "arrival": "20:10",
+      "status": "VERIFIED_KITCHEN_CAPACITY",
+      "peakEquipmentOverlap": {
+        "start": "19:36",
+        "finish": "19:41",
+        "hotJobs": 4,
+        "coldJobs": 1,
+        "items": [
+          {
+            "itemId": "beef-salad",
+            "vessel": "cold-prep-1"
+          },
+          {
+            "itemId": "egg-rice",
+            "vessel": "small-1"
+          },
+          {
+            "itemId": "rung-curry",
+            "vessel": "pan-1"
+          },
+          {
+            "itemId": "rung-curry",
+            "vessel": "pan-2"
+          },
+          {
+            "itemId": "salt-chips",
+            "vessel": "large-1"
+          }
+        ]
+      },
+      "workloadReview": {
+        "status": "KITCHEN_CALIBRATION_REQUIRED",
+        "bookingApprovalAllowed": false,
+        "chefAttentionModelValidated": false,
+        "exclusiveLabourCapacityAssumed": false,
+        "intervals": [
+          {
+            "start": 1171,
+            "finish": 1175,
+            "chef": "Rung",
+            "curries": 0,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [],
+            "dishes": [
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1170,
+                "finish": 1175
+              },
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1171,
+                "finish": 1181
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-2",
+                "start": 1171,
+                "finish": 1176
+              },
+              {
+                "itemId": "tom-yum",
+                "vessel": "pan-3",
+                "start": 1171,
+                "finish": 1176
+              }
+            ]
+          },
+          {
+            "start": 1175,
+            "finish": 1176,
+            "chef": "Rung",
+            "curries": 0,
+            "salads": 1,
+            "woks": 1,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1171,
+                "finish": 1181
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-2",
+                "start": 1171,
+                "finish": 1176
+              },
+              {
+                "itemId": "tom-yum",
+                "vessel": "pan-3",
+                "start": 1171,
+                "finish": 1176
+              }
+            ]
+          },
+          {
+            "start": 1176,
+            "finish": 1181,
+            "chef": "Rung",
+            "curries": 2,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF",
+              "CONCURRENT_CURRY_ATTENTION_UNCALIBRATED"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1176,
+                "cookFinish": 1181,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              },
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1176,
+                "cookFinish": 1181,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1171,
+                "finish": 1181
+              },
+              {
+                "itemId": "egg-rice",
+                "vessel": "small-1",
+                "start": 1176,
+                "finish": 1181
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-1",
+                "start": 1176,
+                "finish": 1181
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-2",
+                "start": 1176,
+                "finish": 1181
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1176,
+                "finish": 1181
+              }
+            ]
+          },
+          {
+            "start": 1190,
+            "finish": 1194,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 3,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1190,
+                "cookFinish": 1195,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1189,
+                "finish": 1194
+              },
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chicken",
+                "vessel": "small-1",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "stir-crispy",
+                "vessel": "small-2",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-3",
+                "start": 1190,
+                "finish": 1195
+              }
+            ]
+          },
+          {
+            "start": 1194,
+            "finish": 1195,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1190,
+                "cookFinish": 1195,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chicken",
+                "vessel": "small-1",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "stir-crispy",
+                "vessel": "small-2",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-3",
+                "start": 1190,
+                "finish": 1195
+              }
+            ]
+          },
+          {
+            "start": 1195,
+            "finish": 1200,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1195,
+                "cookFinish": 1200,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-2",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "tom-yum",
+                "vessel": "pan-1",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-2",
+                "start": 1195,
+                "finish": 1200
+              }
+            ]
+          }
+        ]
+      },
+      "holdingWarnings": [
+        {
+          "estimatedMinutes": 36,
+          "dishes": [
+            {
+              "itemId": "jasmine-rice",
+              "minutes": 21
+            },
+            {
+              "itemId": "moo-ping",
+              "minutes": 36
+            },
+            {
+              "itemId": "salt-chicken",
+              "minutes": 29
+            },
+            {
+              "itemId": "salt-chips",
+              "minutes": 25
+            },
+            {
+              "itemId": "spare-ribs",
+              "minutes": 25
+            },
+            {
+              "itemId": "sticky-rice",
+              "minutes": 30
+            },
+            {
+              "itemId": "stir-basil",
+              "minutes": 29
+            },
+            {
+              "itemId": "stir-crispy",
+              "minutes": 30
+            },
+            {
+              "itemId": "tom-yum",
+              "minutes": 24
+            }
+          ]
+        }
+      ],
+      "attentionStatus": "INCOMPLETE_ATTENTION_MODEL",
+      "unprofiledRecipes": [
+        "auxiliary:coconut-rice",
+        "auxiliary:egg-rice",
+        "auxiliary:jasmine-rice",
+        "auxiliary:moo-ping",
+        "auxiliary:spare-ribs",
+        "auxiliary:sticky-rice",
+        "fryer:chips",
+        "fryer:crispyChicken",
+        "wok:beef-salad",
+        "wok:coconut-rice",
+        "wok:egg-rice",
+        "wok:rung-curry",
+        "wok:salt-chicken",
+        "wok:salt-chips",
+        "wok:stir-basil",
+        "wok:stir-crispy",
+        "wok:tom-yum"
+      ]
+    },
+    {
+      "arrival": "20:20",
+      "status": "VERIFIED_KITCHEN_CAPACITY",
+      "peakEquipmentOverlap": {
+        "start": "19:50",
+        "finish": "19:54",
+        "hotJobs": 4,
+        "coldJobs": 1,
+        "items": [
+          {
+            "itemId": "salt-chips",
+            "vessel": "large-1"
+          },
+          {
+            "itemId": "beef-salad",
+            "vessel": "cold-prep-1"
+          },
+          {
+            "itemId": "salt-chicken",
+            "vessel": "small-1"
+          },
+          {
+            "itemId": "stir-crispy",
+            "vessel": "small-2"
+          },
+          {
+            "itemId": "rung-curry",
+            "vessel": "pan-3"
+          }
+        ]
+      },
+      "workloadReview": {
+        "status": "KITCHEN_CALIBRATION_REQUIRED",
+        "bookingApprovalAllowed": false,
+        "chefAttentionModelValidated": false,
+        "exclusiveLabourCapacityAssumed": false,
+        "intervals": [
+          {
+            "start": 1171,
+            "finish": 1175,
+            "chef": "Rung",
+            "curries": 0,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [],
+            "dishes": [
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1170,
+                "finish": 1175
+              },
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1171,
+                "finish": 1181
+              },
+              {
+                "itemId": "stir-crispy",
+                "vessel": "small-1",
+                "start": 1171,
+                "finish": 1176
+              }
+            ]
+          },
+          {
+            "start": 1175,
+            "finish": 1176,
+            "chef": "Rung",
+            "curries": 0,
+            "salads": 1,
+            "woks": 1,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1171,
+                "finish": 1181
+              },
+              {
+                "itemId": "stir-crispy",
+                "vessel": "small-1",
+                "start": 1171,
+                "finish": 1176
+              }
+            ]
+          },
+          {
+            "start": 1176,
+            "finish": 1181,
+            "chef": "Rung",
+            "curries": 0,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1171,
+                "finish": 1181
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1176,
+                "finish": 1181
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-2",
+                "start": 1176,
+                "finish": 1181
+              }
+            ]
+          },
+          {
+            "start": 1190,
+            "finish": 1194,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 3,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1190,
+                "cookFinish": 1195,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1189,
+                "finish": 1194
+              },
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chicken",
+                "vessel": "small-1",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "stir-crispy",
+                "vessel": "small-2",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-3",
+                "start": 1190,
+                "finish": 1195
+              }
+            ]
+          },
+          {
+            "start": 1194,
+            "finish": 1195,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1190,
+                "cookFinish": 1195,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chicken",
+                "vessel": "small-1",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "stir-crispy",
+                "vessel": "small-2",
+                "start": 1190,
+                "finish": 1195
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-3",
+                "start": 1190,
+                "finish": 1195
+              }
+            ]
+          },
+          {
+            "start": 1195,
+            "finish": 1200,
+            "chef": "Rung",
+            "curries": 1,
+            "salads": 1,
+            "woks": 2,
+            "reviewReasons": [
+              "SALAD_AND_HOT_WORK_SHARE_CHEF"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1195,
+                "cookFinish": 1200,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "beef-salad",
+                "vessel": "cold-prep-1",
+                "start": 1190,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-1",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "salt-chips",
+                "vessel": "large-2",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "tom-yum",
+                "vessel": "pan-1",
+                "start": 1195,
+                "finish": 1200
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-2",
+                "start": 1195,
+                "finish": 1200
+              }
+            ]
+          },
+          {
+            "start": 1205,
+            "finish": 1210,
+            "chef": "Rung",
+            "curries": 2,
+            "salads": 0,
+            "woks": 1,
+            "reviewReasons": [
+              "CONCURRENT_CURRY_ATTENTION_UNCALIBRATED"
+            ],
+            "curryEstimates": [
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1205,
+                "cookFinish": 1210,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              },
+              {
+                "itemId": "rung-curry",
+                "cookStart": 1205,
+                "cookFinish": 1210,
+                "handsOnMinutes": {
+                  "minimum": 3,
+                  "maximum": 4
+                },
+                "estimateScope": "WHOLE_COOK",
+                "sharedEffortUnknown": true
+              }
+            ],
+            "dishes": [
+              {
+                "itemId": "coconut-rice",
+                "vessel": "pan-1",
+                "start": 1205,
+                "finish": 1210
+              },
+              {
+                "itemId": "egg-rice",
+                "vessel": "small-1",
+                "start": 1205,
+                "finish": 1210
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-2",
+                "start": 1205,
+                "finish": 1210
+              },
+              {
+                "itemId": "rung-curry",
+                "vessel": "pan-3",
+                "start": 1205,
+                "finish": 1210
+              }
+            ]
+          }
+        ]
+      },
+      "holdingWarnings": [
+        {
+          "estimatedMinutes": 41,
+          "dishes": [
+            {
+              "itemId": "beef-salad",
+              "minutes": 29
+            },
+            {
+              "itemId": "moo-ping",
+              "minutes": 41
+            },
+            {
+              "itemId": "salt-chicken",
+              "minutes": 21
+            },
+            {
+              "itemId": "salt-chips",
+              "minutes": 35
+            },
+            {
+              "itemId": "spare-ribs",
+              "minutes": 27
+            },
+            {
+              "itemId": "sticky-rice",
+              "minutes": 32
+            },
+            {
+              "itemId": "stir-crispy",
+              "minutes": 34
+            }
+          ]
+        }
+      ],
+      "attentionStatus": "INCOMPLETE_ATTENTION_MODEL",
+      "unprofiledRecipes": [
+        "auxiliary:coconut-rice",
+        "auxiliary:egg-rice",
+        "auxiliary:jasmine-rice",
+        "auxiliary:moo-ping",
+        "auxiliary:spare-ribs",
+        "auxiliary:sticky-rice",
+        "fryer:chips",
+        "fryer:crispyChicken",
+        "wok:beef-salad",
+        "wok:coconut-rice",
+        "wok:egg-rice",
+        "wok:rung-curry",
+        "wok:salt-chicken",
+        "wok:salt-chips",
+        "wok:stir-basil",
+        "wok:stir-crispy",
+        "wok:tom-yum"
+      ]
+    }
+  ]
+}

@@ -6,7 +6,7 @@
   "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
   "schema": "public",
   "modelVersion": "combined-kitchen-four-ring-staging-v1",
-  "sourceSha256": "482f6e92cfe2ec62d95c0be4b2a034ff95fb57c0dd5048dedc8ae6302c43eb9a",
+  "sourceSha256": "67baa21d641423d4cd45962a364708a4c3badd481109cb002561ac8d45f02305",
   "checks": {
     "atomicConcurrency": "PASS",
     "physicalCoverage": "PASS",
@@ -25,9 +25,9 @@
   "deliveryScheduling": 1,
   "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
   "evidence": {
-    "manifest": "AVAILABILITY-CERTIFICATION-2026-11-17.json",
-    "sha256": "429fac9142a39655f31483bd0236cb01d4cee6a4c76886b0647695dd5b6d0007",
-    "note": "Owner-approved controlled installation; qualifications and deployment/activation gates remain mandatory."
+    "manifest": "HOB-QUALIFICATION-2026-11-19.json",
+    "sha256": "b405d62270c262ce4f02a2e499f9877674e7d471d417612e748df59a33ef5346",
+    "note": "Owner-authorized hob correction; 442 regressions and 19 rolled-back private staging checks; inherited unchanged mechanisms retain parent qualification."
   },
   "holdingAdvisory": 1
 }

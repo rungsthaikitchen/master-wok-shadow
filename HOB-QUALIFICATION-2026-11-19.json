@@ -1,0 +1,50 @@
+{
+  "date": "2026-11-19",
+  "scope": "Confirmed hob inventory, vessel eligibility and physical footprint correction",
+  "sourceSha256": "67baa21d641423d4cd45962a364708a4c3badd481109cb002561ac8d45f02305",
+  "parentSourceSha256": "482f6e92cfe2ec62d95c0be4b2a034ff95fb57c0dd5048dedc8ae6302c43eb9a",
+  "parentQualification": "CHECKOUT-BOUNDED-QUALIFICATION-2026-11-18.json",
+  "runtimeChanges": [
+    "Dave Style chips and chicken-and-chips require a large wok",
+    "Two large woks exclude all small woks; pan occupancy still follows four-ring limit",
+    "Real inventory remains two small woks and two large; three concurrent small-wok recipes can use one large plus two small",
+    "Allocator and independent validator reject invalid fixed footprint/ring occupancy",
+    "Large-only jobs are searched before flexible wok jobs"
+  ],
+  "tests": {
+    "fullRegressionPassed": 442,
+    "fullRegressionFailed": 0,
+    "physicalVesselSubsets": 512,
+    "pairedStagingChecksPassed": 19,
+    "persistentOrders": 0,
+    "notificationsSent": 0
+  },
+  "evidence": [
+    {
+      "path": "HOB-REVIEW-READINESS-2026-11-19.json",
+      "sha256": "25a0a9871b8d00e495f0ef28c2065bbc237a5a50c148e6e2e92111ab5639ceb2"
+    },
+    {
+      "path": "staging-tests/evidence/hob-paired-checkout-20261119.json",
+      "sha256": "bbd57b28caf5604beb9708156570ebf61eab1bdf8084a7f149d6d57b39a1da70"
+    }
+  ],
+  "unchanged": [
+    "Transaction locks, fresh booking snapshots and receipt idempotency",
+    "Pricing and loyalty settlement",
+    "Driver routing and arrival promises",
+    "Mandatory staff holding acknowledgement",
+    "Notification providers and dispatch paths"
+  ],
+  "limitations": [
+    "Chef hands-on calibration remains offline advisory",
+    "Large basket 17:00 search remains unverified rather than approved",
+    "Hosted rehearsal used fixed synthetic routing"
+  ],
+  "productionPreflight": {
+    "activeFutureOrders": 0,
+    "futureCookingReservations": 0,
+    "mode": "MASTER_WOK",
+    "revision": 11
+  }
+}

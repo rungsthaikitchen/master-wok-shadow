@@ -7,7 +7,9 @@ require('./master-wok-delivery-quote').createDeliveryQuoter=()=>async()=>({strai
 require('./master-wok-route-duration').createRouteDurationQuoter=()=>async()=>({durationSeconds:480});
 const {createDeploymentRuntime}=require('./master-wok-deployment');
 const pairedFixture=require('./staging-tests/current-overlap-replay-20261118.json');
-const certificate=require('./master-wok-release-candidate.staging.json');
+// The expiring rehearsal binds the tested candidate digest in memory only;
+// it does not amend or certify the production release artifact.
+const certificate={...require('./master-wok-release-candidate.staging.json'),sourceSha256:'__TESTED_RELEASE_SOURCE_SHA256__'};
 const {priceBasket}=require('./master-wok-commercial');
 const TOKEN_HASH='__CERTIFICATION_TOKEN__',EXPIRES='__BROWSER_EXPIRES__';
 const settings=__PRIVATE_CONFIGURATION__;

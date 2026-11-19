@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-19",
+  "status": "QUALIFIED_IN_PRIVATE_STAGING_NOT_DEPLOYED",
+  "scope": "Confirmed hob inventory and footprint rules; offline chef workload review",
+  "sourceParent": "494007ae6731d6526ffe9d5b5722230965e4dcbf",
+  "fullRegressionBeforeAdditionalFixedRingGuard": {
+    "tests": 439,
+    "passed": 430,
+    "failed": 9,
+    "failures": [
+      "isolated hosted harness authenticates, bounds its fixed cases and never accesses providers or a database",
+      "authoritative checkout matches the bounded hint around the existing 20:00 collection without moving its reserved jobs",
+      "mixed delivery basket checks a full service without repeating independent appliance searches",
+      "approved availability package reads Legacy mode but refuses a mismatched release configuration",
+      "two customer \u00a3150 plans retain started work when adding or cancelling orders",
+      "opening delivery validates the complete meal; the three collection conflicts are proved around the saved reservations",
+      "customer \u00a3150 examples coordinate rings, fryer and microwave with independent coverage checks",
+      "original \u00a350, \u00a3100 and tripled \u00a3150 baskets fit with independently validated coverage",
+      "large mixed and starter/curry baskets fit the bounded suggestion search with the approved 20-minute maximum"
+    ]
+  },
+  "focusedAfterFixedRingGuard": {
+    "tests": 40,
+    "passed": 40,
+    "failed": 0,
+    "exhaustiveVesselSubsets": 512
+  },
+  "productionReadOnlySnapshot": {
+    "futurePlanDates": [
+      "2026-11-19"
+    ],
+    "futureCookingJobs": 0,
+    "changesMade": false
+  },
+  "blockers": [],
+  "deployment": {
+    "stagingBookingServiceChanged": false,
+    "temporaryRehearsalUsed": true,
+    "productionChanged": false,
+    "productionCertificateChanged": false
+  },
+  "nextWork": [
+    "Qualify corrected baseline fixtures while retaining explicit rejection tests for invalid historical plans.",
+    "Investigate remaining large-basket solver regressions and measure bounded availability performance.",
+    "Regenerate source-bound qualification only after the required regression and transaction checks pass."
+  ],
+  "runtimeSourceSha256": "67baa21d641423d4cd45962a364708a4c3badd481109cb002561ac8d45f02305",
+  "fullRegression": {
+    "tests": 442,
+    "passed": 442,
+    "failed": 0
+  },
+  "privateStaging": {
+    "checks": 19,
+    "passed": 19,
+    "persistentOrders": 0,
+    "notificationsSent": 0,
+    "endpointDisabled": true
+  },
+  "localAvailabilityPerformance": {
+    "slots": 61,
+    "verified": 60,
+    "unverified": 1,
+    "unverifiedTime": "17:00",
+    "unverifiedReason": "SEARCH_LIMIT",
+    "observedWallMsApproximately": 400,
+    "cpuBoundMs": 5000
+  },
+  "resolved": [
+    "Separate rebuilt corrected-hob fixtures preserve original historical evidence.",
+    "Old invalid saved-plan fixture explicitly rejected; rebuilt baseline retains original order IDs and items.",
+    "Raw twenty-minute plan failures stay unverified; all four supplied \u00a3150 examples pass through scoped holding review with independent physical and food-age checks.",
+    "Unit certificate fixture is bound in memory to current source; historical production artifact is unchanged and tested to refuse the new digest."
+  ],
+  "remainingBeforeProduction": [
+    "Issue a new source-bound production release artifact; the historical certificate remains unchanged.",
+    "Recheck active production reservations before deployment and explicitly address any incompatible saved plan."
+  ],
+  "limitations": [
+    "Chef attention remains offline advisory, with unquantified shared curry effort.",
+    "The opening 17:00 large delivery search is unverified, not proved physically impossible.",
+    "Synthetic route durations are not real address timing evidence."
+  ]
+}
