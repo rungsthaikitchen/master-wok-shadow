@@ -1,6 +1,6 @@
 {
   "date": "2026-11-19",
-  "status": "NOT_READY_FOR_STAGING_OR_PRODUCTION",
+  "status": "QUALIFIED_IN_PRIVATE_STAGING_NOT_DEPLOYED",
   "scope": "Confirmed hob inventory and footprint rules; offline chef workload review",
   "sourceParent": "494007ae6731d6526ffe9d5b5722230965e4dcbf",
   "fullRegressionBeforeAdditionalFixedRingGuard": {
@@ -32,19 +32,53 @@
     "futureCookingJobs": 0,
     "changesMade": false
   },
-  "blockers": [
-    "Historical saved-plan fixtures contain now-invalid small-wok assignments for chips or large/small overlap; preserve that evidence and qualify a separate rebuilt baseline.",
-    "Some former large-basket fits fail under corrected physical rules; distinguish physical impossibility from bounded-search exhaustion before changing assertions.",
-    "Source-bound release and hosted harness checks require qualification of the changed runtime.",
-    "Approximate/shared curry attention is not calibrated for hard booking decisions."
-  ],
+  "blockers": [],
   "deployment": {
-    "stagingChanged": false,
-    "productionChanged": false
+    "stagingBookingServiceChanged": false,
+    "temporaryRehearsalUsed": true,
+    "productionChanged": false,
+    "productionCertificateChanged": false
   },
   "nextWork": [
     "Qualify corrected baseline fixtures while retaining explicit rejection tests for invalid historical plans.",
     "Investigate remaining large-basket solver regressions and measure bounded availability performance.",
     "Regenerate source-bound qualification only after the required regression and transaction checks pass."
+  ],
+  "runtimeSourceSha256": "67baa21d641423d4cd45962a364708a4c3badd481109cb002561ac8d45f02305",
+  "fullRegression": {
+    "tests": 442,
+    "passed": 442,
+    "failed": 0
+  },
+  "privateStaging": {
+    "checks": 19,
+    "passed": 19,
+    "persistentOrders": 0,
+    "notificationsSent": 0,
+    "endpointDisabled": true
+  },
+  "localAvailabilityPerformance": {
+    "slots": 61,
+    "verified": 60,
+    "unverified": 1,
+    "unverifiedTime": "17:00",
+    "unverifiedReason": "SEARCH_LIMIT",
+    "observedWallMsApproximately": 400,
+    "cpuBoundMs": 5000
+  },
+  "resolved": [
+    "Separate rebuilt corrected-hob fixtures preserve original historical evidence.",
+    "Old invalid saved-plan fixture explicitly rejected; rebuilt baseline retains original order IDs and items.",
+    "Raw twenty-minute plan failures stay unverified; all four supplied \u00a3150 examples pass through scoped holding review with independent physical and food-age checks.",
+    "Unit certificate fixture is bound in memory to current source; historical production artifact is unchanged and tested to refuse the new digest."
+  ],
+  "remainingBeforeProduction": [
+    "Issue a new source-bound production release artifact; the historical certificate remains unchanged.",
+    "Recheck active production reservations before deployment and explicitly address any incompatible saved plan."
+  ],
+  "limitations": [
+    "Chef attention remains offline advisory, with unquantified shared curry effort.",
+    "The opening 17:00 large delivery search is unverified, not proved physically impossible.",
+    "Synthetic route durations are not real address timing evidence."
   ]
 }

@@ -24,21 +24,28 @@ test('actual release bundle serves no booking endpoint with an explicit draft an
 
 test('approved availability package reads Legacy mode but refuses a mismatched release configuration',async()=>{
  const c=require('./master-wok-release.availability.production.json');
- const built=execFileSync(process.execPath,['staging-tests/build-atomic-checkout-edge.cjs','--release-availability-certified'],{cwd:__dirname,encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:1024*1024});
+ let built=execFileSync(process.execPath,['staging-tests/build-atomic-checkout-edge.cjs','--release-availability-certified'],{cwd:__dirname,encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:1024*1024});
  assert.equal(c.status,'CERTIFIED_FOR_PRODUCTION');assert.ok(Object.values(c.checks).every(v=>v==='PASS'));
  assert.equal(c.sourceSha256,require('./master-wok-release-candidate.staging.json').sourceSha256);
- for(const matching of [true,false]){
+ // Simulate a certificate bound to this test build only. The persisted
+ // production certificate is deliberately retained for its historical source.
+ const historicalBuild=built;
+ const runtimeHash=built.match(/sourceSha256:'([a-f0-9]{64})',projectRef/)[1];
+ const publishedMarker='module.exports='+JSON.stringify(c)+';';
+ assert.ok(built.includes(publishedMarker));
+ built=built.replace(publishedMarker,'module.exports='+JSON.stringify({...c,sourceSha256:runtimeHash})+';');
+ for(const matching of [true,false,'staleSource']){
   let handler,queries=0;
   const env={SUPABASE_URL:'https://ubyjrrsvbbqomitpaidb.supabase.co',SUPABASE_DB_URL:'postgres://unused.invalid/db',
    MASTER_WOK_RELEASE_ID:matching?c.releaseId:'wrong-release-2026',MASTER_WOK_BOOKING_SECRET:'a'.repeat(64),
    MASTER_WOK_NOTIFICATION_SECRET:'b'.repeat(64),MASTER_WOK_DELIVERY_PUBLIC_KEY:'sb_publishable_fixture',MASTER_WOK_PAYMENTS:'enabled',MASTER_WOK_REVIEW_APPROVALS:'enabled'};
-  vm.runInNewContext(built.replace("import pg from 'npm:pg@8.23.1';",'const pg=pgFixture;'),{
+  vm.runInNewContext((matching==='staleSource'?historicalBuild:built).replace("import pg from 'npm:pg@8.23.1';",'const pg=pgFixture;'),{
    Response,Request,URL,TextEncoder,TextDecoder,Date,Intl,Map,Set,crypto:globalThis.crypto,structuredClone,atob,AbortSignal,
    fetch:()=>assert.fail('bootstrap must not contact providers'),Deno:{env:{get:key=>env[key]},serve:fn=>{handler=fn;}},
    pgFixture:{Pool:class{connect(){throw Error('mode must not open transaction');}async query(sql){queries++;assert.match(sql,/SELECT mode,approved_release_id,revision/);return {rows:[{mode:'LEGACY',approved_release_id:'previous-release',revision:10}]};}}}},{timeout:1000});
   const response=await handler(new Request('https://candidate.invalid/',{method:'POST',headers:{'Content-Type':'application/json','x-master-wok-secret':'a'.repeat(64)},body:JSON.stringify({operation:'mode'})}));
-  assert.equal(response.status,matching?200:503);assert.equal(queries,matching?1:0);
-  if(matching)assert.equal((await response.json()).mode,'LEGACY');
+  assert.equal(response.status,matching===true?200:503);assert.equal(queries,matching===true?1:0);
+  if(matching===true)assert.equal((await response.json()).mode,'LEGACY');
  }
 });
 

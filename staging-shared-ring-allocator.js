@@ -42,7 +42,11 @@ function allocateSharedRings(jobs,options={}){
     job.earliest>job.latest)return fail('INVALID_WINDOW');
   pending.push({...job,vessels});
  }
- pending.sort((a,b)=>(a.latest-a.earliest)-(b.latest-b.earliest)||
+ // Large-only dishes determine whether small-wok space exists. Place these
+ // constrained jobs before flexible dishes instead of exhausting permutations
+ // of small-wok placements that later leave no physical large-wok slot.
+ const largeOnly=job=>job.vessels.every(v=>v.startsWith('large-'));
+ pending.sort((a,b)=>Number(largeOnly(b))-Number(largeOnly(a))||(a.latest-a.earliest)-(b.latest-b.earliest)||
   a.readyMinute-b.readyMinute||(options.originalJobOrder===true?0:a.vessels.length-b.vessels.length));
  // Necessary workload bounds for this fixed batch partition. Reject an
  // overloaded interval before enumerating equivalent vessel permutations.

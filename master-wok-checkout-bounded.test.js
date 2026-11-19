@@ -5,7 +5,7 @@ const {expandCommitments}=require('./master-wok-commitment-reader'),{normalizeSt
 const {relativePlacement}=require('./master-wok-clock'),{prepareStagingBasket}=require('./staging-canonical-basket');
 const {createDeliveryCapacity}=require('./master-wok-delivery-capacity'),{warnings}=require('./master-wok-holding-advisory');
 const {createMutationAssessment}=require('./master-wok-mutation-assessment');
-const fixture=require('./staging-tests/current-overlap-replay-20261118.json');
+const fixture=require('./staging-tests/current-overlap-replay-20261118-corrected-hob.json');
 test('authoritative checkout matches the bounded hint around the existing 20:00 collection without moving its reserved jobs',async()=>{
  const model=globalThis.MasterWokModelV1,date='2026-11-18',now=date+'T12:15:00Z';
  const rows=expandCommitments(fixture.orders,date),orders=normalizeStagingOrders({rows,model,serviceDate:date}).map(o=>({...o,placedAt:relativePlacement(o.placedAt,date)}));

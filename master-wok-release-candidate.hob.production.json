@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "status": "DRAFT",
+  "releaseId": "master-wok-availability-2026-11-17",
+  "projectRef": "ubyjrrsvbbqomitpaidb",
+  "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
+  "schema": "public",
+  "modelVersion": "combined-kitchen-four-ring-staging-v1",
+  "sourceSha256": "67baa21d641423d4cd45962a364708a4c3badd481109cb002561ac8d45f02305",
+  "checks": {
+    "atomicConcurrency": "PENDING",
+    "physicalCoverage": "PENDING",
+    "lifecycle": "PENDING",
+    "writeFence": "PENDING",
+    "commercial": "PENDING",
+    "delivery": "PENDING",
+    "notifications": "PENDING",
+    "wholeService": "PENDING",
+    "rollback": "PENDING",
+    "driverReservations": "PENDING",
+    "combinedTrips": "PENDING",
+    "deliveryCheckout": "PENDING",
+    "deliveryRollback": "PENDING"
+  },
+  "deliveryScheduling": 1,
+  "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
+  "evidence": {
+    "manifest": "AVAILABILITY-CERTIFICATION-2026-11-17.json",
+    "sha256": "429fac9142a39655f31483bd0236cb01d4cee6a4c76886b0647695dd5b6d0007",
+    "note": "Owner-approved controlled installation; qualifications and deployment/activation gates remain mandatory."
+  },
+  "holdingAdvisory": 1,
+  "qualificationEvidence": "HOB-REVIEW-READINESS-2026-11-19.json"
+}
