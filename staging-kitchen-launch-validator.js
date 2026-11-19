@@ -18,6 +18,11 @@ function validateRingOccupancy(wok,auxiliary=[]){
  const ringJobs=wok.filter(j=>j.vessel!=='cold-prep-1');
   for(const j of ringJobs)if(ringJobs.filter(k=>k.start<=j.start&&k.finish>j.start).length>4)
    issues.push({code:'RING_CAPACITY_EXCEEDED'});
+  for(const j of ringJobs){
+   const active=ringJobs.filter(k=>k.start<=j.start&&k.finish>j.start);
+   if(active.filter(k=>k.vessel?.startsWith('large-')).length>=2&&active.some(k=>k.vessel?.startsWith('small-')))
+    issues.push({code:'HOB_FOOTPRINT_CONFLICT'});
+  }
   for(let i=0;i<wok.length;i++)for(let j=i+1;j<wok.length;j++)
    if(wok[i].vessel===wok[j].vessel&&wok[i].start<wok[j].finish+1&&wok[j].start<wok[i].finish+1)
     issues.push({code:'VESSEL_RESET_REQUIRED'});
@@ -47,7 +52,7 @@ function validateKitchenTimeline(orders,plan,rows,options={}){
   issues.push(...validateRingOccupancy([...wok,...(options.fixedWok||[])],
    [...(plan.auxiliary?.jobs||[]),...(options.fixedAuxiliary||[])]));
   if(!validateAuxiliaryWork(orders,options.auxiliaryRows||rows,plan.auxiliary?.jobs||[],{
-   ...options,holdExceptions:plan.holdExceptions,holdingLimitMinutes:plan.holdingLimitMinutes,mainJobs:[...wok,...(options.fixedWok||[])]}))issues.push({code:'AUXILIARY_COVERAGE_INVALID'});
+   ...options,holdExceptions:plan.holdExceptions,holdingAdvisories:plan.holdingAdvisories,holdingLimitMinutes:plan.holdingLimitMinutes,mainJobs:[...wok,...(options.fixedWok||[])]}))issues.push({code:'AUXILIARY_COVERAGE_INVALID'});
   const inventory=diagnoseFryer(orders,rows,{confirmedStarterRecipes:true,standaloneSpringRolls:true});
   const expected=new Map(),actual=new Map(),deadlineExpected=new Map(),deadlineActual=new Map();
   const key=(id,item,type,recipe)=>JSON.stringify([String(id),item,type,recipe]);

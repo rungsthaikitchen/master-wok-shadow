@@ -24,7 +24,7 @@ function createOrderStore({schema='public'}={}){
    const r=await connection.query(`SELECT fingerprint, response FROM ${receipts} WHERE key=$1`,[key]);
    return r.rows[0]||null;
   },
-  async persist(connection,{key,serviceDate,candidate,fingerprint}){
+  async persist(connection,{key,serviceDate,candidate,fingerprint,assessment}){
    const header=candidate.validatedHeader,lines=candidate.validatedItems;
    if(!header||!Array.isArray(lines)||!lines.length||lines.length>100||
       Object.keys(header).some(k=>!HEADER_FIELDS.has(k))||
@@ -52,7 +52,7 @@ function createOrderStore({schema='public'}={}){
    const response={orderId:id,serviceDate,status:'pending',orderRef:header.order_ref,customerId:header.customer_id,
     totals:Object.fromEntries(['subtotal','discount','discount_amount','delivery_fee','total','loyalty_discount',
      'loyalty_points_redeem_pending','loyalty_points_earned_pending','loyalty_reward_applied','loyalty_expected_balance']
-     .filter(k=>header[k]!==undefined).map(k=>[k,header[k]])),notification_status:'queued'};
+     .filter(k=>header[k]!==undefined).map(k=>[k,header[k]])),notification_status:'queued',...(assessment?.plan&&require('./master-wok-holding-advisory').warnings(assessment.plan).some(w=>w.id===String(candidate.orderId))?{holdingReviewRequired:true}:{})};
    await connection.query(`INSERT INTO ${receipts} (key,service_date,order_id,fingerprint,response)
     VALUES ($1,$2,$3,$4,$5::jsonb)`,[key,serviceDate,id,fingerprint,JSON.stringify(response)]);
    return response;

@@ -1,0 +1,302 @@
+{
+  "scope": "OFFLINE_DIAGNOSTIC_ONLY",
+  "fixture": "Saved 18 November collection basket rebuilt under corrected vessel rules; second identical basket delivered with fixed eight-minute legs",
+  "liveRouteReplay": false,
+  "bookingApprovalAllowed": false,
+  "results": [
+    {
+      "arrival": "19:50",
+      "status": "VERIFIED_KITCHEN_CAPACITY",
+      "peakEquipmentOverlap": {
+        "start": "19:30",
+        "finish": "19:35",
+        "hotJobs": 4,
+        "coldJobs": 1,
+        "items": [
+          {
+            "itemId": "salt-chips",
+            "vessel": "large-1"
+          },
+          {
+            "itemId": "salt-chips",
+            "vessel": "large-2"
+          },
+          {
+            "itemId": "stir-basil",
+            "vessel": "small-2"
+          },
+          {
+            "itemId": "tom-yum",
+            "vessel": "pan-4"
+          },
+          {
+            "itemId": "beef-salad",
+            "vessel": "cold-prep-1"
+          }
+        ]
+      },
+      "holdingWarnings": [],
+      "attentionStatus": "INCOMPLETE_ATTENTION_MODEL",
+      "unprofiledRecipes": [
+        "auxiliary:coconut-rice",
+        "auxiliary:egg-rice",
+        "auxiliary:jasmine-rice",
+        "auxiliary:moo-ping",
+        "auxiliary:spare-ribs",
+        "auxiliary:sticky-rice",
+        "fryer:chips",
+        "fryer:crispyChicken",
+        "wok:beef-salad",
+        "wok:coconut-rice",
+        "wok:egg-rice",
+        "wok:rung-curry",
+        "wok:salt-chicken",
+        "wok:salt-chips",
+        "wok:stir-basil",
+        "wok:stir-crispy",
+        "wok:tom-yum"
+      ]
+    },
+    {
+      "arrival": "20:00",
+      "status": "VERIFIED_KITCHEN_CAPACITY",
+      "peakEquipmentOverlap": {
+        "start": "19:31",
+        "finish": "19:35",
+        "hotJobs": 4,
+        "coldJobs": 1,
+        "items": [
+          {
+            "itemId": "salt-chips",
+            "vessel": "large-1"
+          },
+          {
+            "itemId": "beef-salad",
+            "vessel": "cold-prep-1"
+          },
+          {
+            "itemId": "salt-chips",
+            "vessel": "large-2"
+          },
+          {
+            "itemId": "stir-basil",
+            "vessel": "small-2"
+          },
+          {
+            "itemId": "tom-yum",
+            "vessel": "pan-3"
+          }
+        ]
+      },
+      "holdingWarnings": [
+        {
+          "estimatedMinutes": 26,
+          "dishes": [
+            {
+              "itemId": "moo-ping",
+              "minutes": 26
+            }
+          ]
+        }
+      ],
+      "attentionStatus": "INCOMPLETE_ATTENTION_MODEL",
+      "unprofiledRecipes": [
+        "auxiliary:coconut-rice",
+        "auxiliary:egg-rice",
+        "auxiliary:jasmine-rice",
+        "auxiliary:moo-ping",
+        "auxiliary:spare-ribs",
+        "auxiliary:sticky-rice",
+        "fryer:chips",
+        "fryer:crispyChicken",
+        "wok:beef-salad",
+        "wok:coconut-rice",
+        "wok:egg-rice",
+        "wok:rung-curry",
+        "wok:salt-chicken",
+        "wok:salt-chips",
+        "wok:stir-basil",
+        "wok:stir-crispy",
+        "wok:tom-yum"
+      ]
+    },
+    {
+      "arrival": "20:10",
+      "status": "VERIFIED_KITCHEN_CAPACITY",
+      "peakEquipmentOverlap": {
+        "start": "19:31",
+        "finish": "19:35",
+        "hotJobs": 4,
+        "coldJobs": 1,
+        "items": [
+          {
+            "itemId": "salt-chips",
+            "vessel": "large-1"
+          },
+          {
+            "itemId": "beef-salad",
+            "vessel": "cold-prep-1"
+          },
+          {
+            "itemId": "salt-chips",
+            "vessel": "large-2"
+          },
+          {
+            "itemId": "stir-basil",
+            "vessel": "small-2"
+          },
+          {
+            "itemId": "tom-yum",
+            "vessel": "pan-3"
+          }
+        ]
+      },
+      "holdingWarnings": [
+        {
+          "estimatedMinutes": 36,
+          "dishes": [
+            {
+              "itemId": "moo-ping",
+              "minutes": 36
+            },
+            {
+              "itemId": "salt-chicken",
+              "minutes": 29
+            },
+            {
+              "itemId": "salt-chips",
+              "minutes": 25
+            },
+            {
+              "itemId": "spare-ribs",
+              "minutes": 25
+            },
+            {
+              "itemId": "sticky-rice",
+              "minutes": 30
+            },
+            {
+              "itemId": "stir-basil",
+              "minutes": 24
+            },
+            {
+              "itemId": "stir-crispy",
+              "minutes": 30
+            },
+            {
+              "itemId": "tom-yum",
+              "minutes": 24
+            }
+          ]
+        }
+      ],
+      "attentionStatus": "INCOMPLETE_ATTENTION_MODEL",
+      "unprofiledRecipes": [
+        "auxiliary:coconut-rice",
+        "auxiliary:egg-rice",
+        "auxiliary:jasmine-rice",
+        "auxiliary:moo-ping",
+        "auxiliary:spare-ribs",
+        "auxiliary:sticky-rice",
+        "fryer:chips",
+        "fryer:crispyChicken",
+        "wok:beef-salad",
+        "wok:coconut-rice",
+        "wok:egg-rice",
+        "wok:rung-curry",
+        "wok:salt-chicken",
+        "wok:salt-chips",
+        "wok:stir-basil",
+        "wok:stir-crispy",
+        "wok:tom-yum"
+      ]
+    },
+    {
+      "arrival": "20:20",
+      "status": "VERIFIED_KITCHEN_CAPACITY",
+      "peakEquipmentOverlap": {
+        "start": "19:50",
+        "finish": "19:54",
+        "hotJobs": 4,
+        "coldJobs": 1,
+        "items": [
+          {
+            "itemId": "egg-rice",
+            "vessel": "small-1"
+          },
+          {
+            "itemId": "beef-salad",
+            "vessel": "cold-prep-1"
+          },
+          {
+            "itemId": "stir-crispy",
+            "vessel": "small-2"
+          },
+          {
+            "itemId": "stir-basil",
+            "vessel": "large-1"
+          },
+          {
+            "itemId": "salt-chips",
+            "vessel": "large-2"
+          }
+        ]
+      },
+      "holdingWarnings": [
+        {
+          "estimatedMinutes": 40,
+          "dishes": [
+            {
+              "itemId": "beef-salad",
+              "minutes": 29
+            },
+            {
+              "itemId": "moo-ping",
+              "minutes": 40
+            },
+            {
+              "itemId": "salt-chicken",
+              "minutes": 21
+            },
+            {
+              "itemId": "salt-chips",
+              "minutes": 29
+            },
+            {
+              "itemId": "spare-ribs",
+              "minutes": 26
+            },
+            {
+              "itemId": "sticky-rice",
+              "minutes": 31
+            },
+            {
+              "itemId": "stir-crispy",
+              "minutes": 29
+            }
+          ]
+        }
+      ],
+      "attentionStatus": "INCOMPLETE_ATTENTION_MODEL",
+      "unprofiledRecipes": [
+        "auxiliary:coconut-rice",
+        "auxiliary:egg-rice",
+        "auxiliary:jasmine-rice",
+        "auxiliary:moo-ping",
+        "auxiliary:spare-ribs",
+        "auxiliary:sticky-rice",
+        "fryer:chips",
+        "fryer:crispyChicken",
+        "wok:beef-salad",
+        "wok:coconut-rice",
+        "wok:egg-rice",
+        "wok:rung-curry",
+        "wok:salt-chicken",
+        "wok:salt-chips",
+        "wok:stir-basil",
+        "wok:stir-crispy",
+        "wok:tom-yum"
+      ]
+    }
+  ]
+}

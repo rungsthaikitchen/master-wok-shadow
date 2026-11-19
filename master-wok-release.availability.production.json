@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "status": "CERTIFIED_FOR_PRODUCTION",
+  "releaseId": "master-wok-availability-2026-11-17",
+  "projectRef": "ubyjrrsvbbqomitpaidb",
+  "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
+  "schema": "public",
+  "modelVersion": "combined-kitchen-four-ring-staging-v1",
+  "sourceSha256": "81bab047c8d65da1e683ae9fa6ecee3d5ab16b998e6f8be9d7ddb0614e65a0db",
+  "checks": {
+    "atomicConcurrency": "PASS",
+    "physicalCoverage": "PASS",
+    "lifecycle": "PASS",
+    "writeFence": "PASS",
+    "commercial": "PASS",
+    "delivery": "PASS",
+    "notifications": "PASS",
+    "wholeService": "PASS",
+    "rollback": "PASS",
+    "driverReservations": "PASS",
+    "combinedTrips": "PASS",
+    "deliveryCheckout": "PASS",
+    "deliveryRollback": "PASS"
+  },
+  "deliveryScheduling": 1,
+  "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
+  "evidence": {
+    "manifest": "CLOSED-REVIEW-QUALIFICATION-2026-11-19.json",
+    "sha256": "e12e13017c17d321b4fef91db02104e8c807148b8e2f205051e10a31ff4df3f6",
+    "note": "Closure-specific change qualified by regression, client tests and rolled-back private SQL rehearsal; unchanged components inherit hob qualification."
+  },
+  "holdingAdvisory": 1
+}

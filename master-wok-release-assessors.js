@@ -23,6 +23,7 @@ function validateCertificate(c,{releaseId,sourceSha256,projectRef,schema}={}){
   REQUIRED_CHECKS.some(key=>candidate?!['PASS','PENDING'].includes(c.checks?.[key]):c.checks?.[key]!=='PASS')||
   (candidate&&!/^[A-Za-z0-9-]{8,100}-$/.test(c.fixturePrefix||''))||
   (production&&c.fixturePrefix)||
+  (c.holdingAdvisory!==undefined&&c.holdingAdvisory!==1)||
   (c.deliveryScheduling!==undefined&&c.deliveryScheduling!==1)||
   (c.deliveryScheduling===1&&DELIVERY_CHECKS.some(key=>candidate?!['PASS','PENDING'].includes(c.checks?.[key]):c.checks?.[key]!=='PASS')))throw Error('RELEASE_CERTIFICATION_REQUIRED');
  return true;
@@ -43,7 +44,7 @@ function createReleaseAssessors({certificate,releaseId,sourceSha256,projectRef,s
   assessBooking(context){
    // Suggestions and explanatory reviews are read-only, bounded searches.
    // An exhausted search is unverified, never a rejection of physical ability.
-   // Only the locked checkout receives the full booking search budget.
+   // The delivery component also bounds checkout while using its fresh locked snapshot.
    const searchOptions=['AVAILABILITY_HINT','BASKET_REVIEW'].includes(context.assessmentPurpose)
     ?{maxSearchNodes:1000,maxCompleteChecks:8,preserveOnly:true}:{};
    // Call the complete validator directly, not an injected prototype assessor.
@@ -67,6 +68,7 @@ function createReleaseAssessors({certificate,releaseId,sourceSha256,projectRef,s
   },
   async assessMutation(context){
    const r=await mutation(context);
+   if(r.reason==='EXTENDED_HOLDING_REVIEW_REQUIRED')return {...fail(),reason:r.reason,holdingWarnings:r.holdingWarnings,warningToken:r.warningToken};
    if(r.status!=='VALIDATED_LIFECYCLE_ASSESSMENT'||
     Object.keys(r.plansByDate||{}).sort().join()!==[...new Set(context.dates)].sort().join())return fail();
    try{for(const p of Object.values(r.plansByDate)){

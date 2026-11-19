@@ -70,7 +70,15 @@ test('scheduler model changes require a drain in both directions',()=>{
 test('two customer £150 plans retain started work when adding or cancelling orders',()=>{
  const examples=require('./staging-tests/large-basket-examples');
  for(const name of ['mixed','startersAndCurries']){
-  const a=fixture('a',examples[name]),plan=initial(a),b=fixture('b',[line('green-curry')],1260);
+  const a=fixture('a',examples[name]),b=fixture('b',[line('green-curry')],1260);
+  // The mixed basket now needs a holding review under the corrected hob
+  // footprint. Keep that allowance scoped to this order, then clamp it to
+  // the actual plan exactly as the authoritative advisory path does.
+  const first=planWithProtectedWork({...options,orders:[a.order],rows:[a.row],now:instant(900),
+   holdingAdvisories:name==='mixed'?{a:{kind:'staff_review_required',maxMinutes:330}}:{}});
+  assert.equal(first.status,'VALIDATED_PROTECTED_PLAN',first.reason);
+  const plan=first.plan;
+  if(name==='mixed')require('./master-wok-holding-advisory').clampAdvisory(plan,'a');
   const minute=Math.min(...[...plan.wok.jobs,...plan.fryer.jobs,...plan.auxiliary.jobs].map(j=>j.start))+1;
   const fixed=protectStartedWork(plan,minute);
   for(const cancel of [false,true]){

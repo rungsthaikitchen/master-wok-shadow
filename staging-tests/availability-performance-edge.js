@@ -8,7 +8,7 @@ const {priceBasket}=require('./master-wok-commercial');
 const {relativePlacement}=require('./master-wok-clock');
 const {createDeliveryCapacity}=require('./master-wok-delivery-capacity');
 const {RESTAURANT}=require('./master-wok-delivery-quote');
-const fixture=require('./staging-tests/availability-service-fixture.json');
+const fixture=require('./staging-tests/availability-service-fixture-corrected-hob.json');
 const TOKEN_HASH='__CERTIFICATION_TOKEN__',EXPIRES='__BROWSER_EXPIRES__';
 const date='2026-11-14',now=new Date(date+'T16:20:00Z');
 const line=(item_id,qty,protein=null,spice=0)=>({item_id,qty,modifiers:protein?[{id:protein}]:[],spice});

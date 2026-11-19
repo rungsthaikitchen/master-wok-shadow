@@ -1,0 +1,161 @@
+{
+  "date": "2026-11-17",
+  "runtimeSourceSha256": "1c37c69c0b3542a4a21d1e301eade749da01d3500c9f2ef5eea1a7fef67c2d80",
+  "scope": "SOURCE_REVIEW_FOR_OWNER_APPROVED_CONTROLLED_PRODUCTION_INSTALLATION",
+  "ownerApproval": "Yeah sounds good \u2014 17 November, approving pause, coordinated setting/deployment, verification and activation",
+  "checks": {
+    "atomicConcurrency": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-CURRENT-CONCURRENCY-2026-11-17.json",
+          "sha256": "f571a72a386e1c839aca43e5f0f827c91cac3f002b05e0b2ccd53a69607f916a"
+        },
+        {
+          "path": "STAGING-CURRENT-SERVICE-2026-11-17.json",
+          "sha256": "66d360b3d76cfb428077a58a6267f4fedfef1b4ba8d314b0aec9aea933c714db"
+        }
+      ]
+    },
+    "physicalCoverage": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-CURRENT-PHYSICAL-2026-11-17.json",
+          "sha256": "a206c8ff546e8ab5229ced35ac6f06b3f46e231d0e592b74b6088e5b6fefa744"
+        }
+      ]
+    },
+    "lifecycle": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-CURRENT-SERVICE-2026-11-17.json",
+          "sha256": "66d360b3d76cfb428077a58a6267f4fedfef1b4ba8d314b0aec9aea933c714db"
+        }
+      ]
+    },
+    "writeFence": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "PRODUCTION-BINDING-REVIEW-2026-11-17.json",
+          "sha256": "c211c6af6b26e3ba78f2111e2aadfeb378edd327225ec8450ded545c271d5d9d"
+        }
+      ]
+    },
+    "commercial": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-CURRENT-SERVICE-2026-11-17.json",
+          "sha256": "66d360b3d76cfb428077a58a6267f4fedfef1b4ba8d314b0aec9aea933c714db"
+        },
+        {
+          "path": "AVAILABILITY-READINESS-2026-11-17.json",
+          "sha256": "c525137e88fb34640efb60bc8a6df5260bc7568cc7126bdf6f2558b2b03e7bc0"
+        }
+      ]
+    },
+    "delivery": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-CURRENT-SERVICE-2026-11-17.json",
+          "sha256": "66d360b3d76cfb428077a58a6267f4fedfef1b4ba8d314b0aec9aea933c714db"
+        },
+        {
+          "path": "STAGING-CURRENT-PHYSICAL-2026-11-17.json",
+          "sha256": "a206c8ff546e8ab5229ced35ac6f06b3f46e231d0e592b74b6088e5b6fefa744"
+        }
+      ]
+    },
+    "notifications": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-NOTIFICATION-FLOW-2026-11-17.json",
+          "sha256": "47f2f96c090e2801ea1eb23cdfa0374c7017bae01fa395ac1b3e577ad8427e23"
+        },
+        {
+          "path": "PRODUCTION-BINDING-REVIEW-2026-11-17.json",
+          "sha256": "c211c6af6b26e3ba78f2111e2aadfeb378edd327225ec8450ded545c271d5d9d"
+        }
+      ]
+    },
+    "wholeService": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-CURRENT-SERVICE-2026-11-17.json",
+          "sha256": "66d360b3d76cfb428077a58a6267f4fedfef1b4ba8d314b0aec9aea933c714db"
+        },
+        {
+          "path": "STAGING-CURRENT-PHYSICAL-2026-11-17.json",
+          "sha256": "a206c8ff546e8ab5229ced35ac6f06b3f46e231d0e592b74b6088e5b6fefa744"
+        }
+      ]
+    },
+    "rollback": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-ROLLBACK-REVIEW-2026-11-17.json",
+          "sha256": "7c427b3642d60345a2302829082f7d8cfaed281b80c1b3ab531b23c9cc5c021a"
+        }
+      ]
+    },
+    "driverReservations": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-CURRENT-PHYSICAL-2026-11-17.json",
+          "sha256": "a206c8ff546e8ab5229ced35ac6f06b3f46e231d0e592b74b6088e5b6fefa744"
+        }
+      ]
+    },
+    "combinedTrips": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-FOUR-RING-REAL-DELIVERY-RESULT.json",
+          "sha256": "ef8f468cd633da815165af2754a43cbf62a7ab1450594fb67544e6c4dd48abea"
+        }
+      ]
+    },
+    "deliveryCheckout": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "AVAILABILITY-READINESS-2026-11-17.json",
+          "sha256": "c525137e88fb34640efb60bc8a6df5260bc7568cc7126bdf6f2558b2b03e7bc0"
+        },
+        {
+          "path": "STAGING-CURRENT-SERVICE-2026-11-17.json",
+          "sha256": "66d360b3d76cfb428077a58a6267f4fedfef1b4ba8d314b0aec9aea933c714db"
+        }
+      ]
+    },
+    "deliveryRollback": {
+      "status": "PASS",
+      "evidence": [
+        {
+          "path": "STAGING-ROLLBACK-REVIEW-2026-11-17.json",
+          "sha256": "7c427b3642d60345a2302829082f7d8cfaed281b80c1b3ab531b23c9cc5c021a"
+        }
+      ]
+    }
+  },
+  "qualifications": {
+    "notifications": "Separate owner-received provider probes, current durable flow with fixture providers, identical live worker/renderer blobs and successful existing production transport polling; final installed-candidate polling/smoke remains a cutover gate.",
+    "combinedTrips": "Prior hosted combine/split evidence is retained only with unchanged driver-planner and delivery-admin implementations plus current regression tests; no new browser combine/split exercise is claimed.",
+    "rollback": "Current-source ten-case TEMP-copy guards and record preservation; no live production rollback was executed.",
+    "coldSearch": "Owner-observed cold search 10\u201315 seconds, repeat 4\u20135 seconds."
+  },
+  "deploymentGates": [
+    "Coordinate new release setting with candidate function while ordering is paused and durable mode stays LEGACY.",
+    "Read back deployed source/certificate/config and authenticated mode/writer refusal; retain current payment/amendment paths.",
+    "Recheck future orders/plans, then activate with authoritative lock and expected live revision.",
+    "Run controlled owner smoke, reconcile uncertain outcomes without new keys, clear capacity and restore service."
+  ]
+}

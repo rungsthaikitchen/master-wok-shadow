@@ -1,0 +1,90 @@
+{
+  "date": "2026-11-17",
+  "productionReady": false,
+  "runtimeSourceSha256": "1c37c69c0b3542a4a21d1e301eade749da01d3500c9f2ef5eea1a7fef67c2d80",
+  "stagingVersion": 85,
+  "productionMode": "LEGACY",
+  "productionRevision": 10,
+  "websiteCommit": "f48d4d237e83456efec2d1169fcf0891d29345f9",
+  "websiteBase": "79b1a1ed4c78013609c6987265220b60061b6168",
+  "websiteBehindProductionBy": 0,
+  "validation": {
+    "backendAndPackagingTests": 414,
+    "websiteTests": 92,
+    "ownerJourney": {
+      "orderRef": "RTK-213",
+      "type": "delivery",
+      "serviceDate": "2026-11-25",
+      "arrival": "18:30",
+      "foodSubtotal": 29,
+      "deliveryFee": 3,
+      "loyaltyReward": 5,
+      "total": 27,
+      "submitted": true,
+      "adminAccepted": true,
+      "cleanupStatus": "cancelled",
+      "remainingKitchenJobs": 0,
+      "remainingDriverTrips": 0,
+      "receiptRetained": true,
+      "notificationEventsSkipped": 3,
+      "notificationAttempts": 0
+    },
+    "rollbackTemporaryCopy": {
+      "status": "PASS",
+      "cases": 10,
+      "permanentMutations": 0,
+      "evidence": "STAGING-ROLLBACK-REVIEW-2026-11-17.json"
+    },
+    "productionDraftBootstrap": {
+      "status": "PASS",
+      "bookingHttpStatus": 503,
+      "databaseConnections": 0,
+      "certificateStatus": "DRAFT"
+    },
+    "smsProviderHandsetReceipt": {
+      "status": "PASS",
+      "date": "2026-11-17",
+      "scope": "ONE_OFF_PROVIDER_PROBE_NOT_ORDER_OUTBOX",
+      "evidence": "STAGING-SMS-RECEIPT-2026-11-17.json"
+    },
+    "notificationVerification": {
+      "providerReceipt": "SMS_EMAIL_PUSH_OWNER_CONFIRMED",
+      "durableQueueFlow": "PASS_FIXTURE_PROVIDERS",
+      "evidence": "STAGING-NOTIFICATION-FLOW-2026-11-17.json",
+      "productionWorkerBinding": "EXISTING_PRODUCTION_TRANSPORT_POLLING_SUCCESSFULLY_SAME_WORKER_AND_RENDERER_BLOBS"
+    },
+    "productionReadOnlyBinding": {
+      "status": "PASS_WITH_COORDINATE_TYPE_QUALIFICATION",
+      "evidence": "PRODUCTION-BINDING-REVIEW-2026-11-17.json"
+    },
+    "freshWholeService": {
+      "status": "PASS",
+      "checks": 27,
+      "mixedBaskets": 12,
+      "coldStartBasket": 1,
+      "evidence": "STAGING-CURRENT-SERVICE-2026-11-17.json"
+    },
+    "freshConcurrentCapacity": {
+      "status": "PASS",
+      "competingRequests": 2,
+      "commits": 1,
+      "refusals": 1,
+      "evidence": "STAGING-CURRENT-CONCURRENCY-2026-11-17.json"
+    },
+    "freshPhysicalValidation": {
+      "status": "PASS",
+      "evidence": "STAGING-CURRENT-PHYSICAL-2026-11-17.json"
+    }
+  },
+  "remainingBeforeActivation": [
+    "During the approved paused installation, reconcile the certificate checks to this source-bound evidence and coordinate the production MASTER_WOK_RELEASE_ID setting with the new runtime; keep durable mode LEGACY until readback passes.",
+    "Read back the new production runtime/configuration, notification polling and current website/main changes, preserving separately developed customer-review highlights.",
+    "Obtain explicit production cutover authorization, then use locked revision-checked activation and a controlled smoke order; on failure follow the guarded drain/rollback protocol."
+  ],
+  "knownLimitations": [
+    "Cold initial availability searches were observed by the owner at 10\u201315 seconds; repeat searches were 4\u20135 seconds.",
+    "The successful staging checkout used a synthetic email; prior failed attempts required a manual pending-key reset after the staging-only email rejection.",
+    "Offline/hosted control diagnostics used public landmarks or synthetic route durations rather than an additional direct routing diagnostic for the private customer address."
+  ],
+  "reviewReadyForControlledInstallation": true
+}

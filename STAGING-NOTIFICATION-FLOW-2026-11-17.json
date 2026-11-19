@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "workerSource": "42a1051cf5b960910f67e6ad9f14f91cb1d22977",
+  "realHttpAndDatabase": true,
+  "providerMode": "FIXTURE_ONLY",
+  "realProviderCalls": 0,
+  "fixtureChannels": [
+    "email",
+    "pushover"
+  ],
+  "actions": [
+    "claim",
+    "prepare",
+    "next",
+    "result",
+    "next",
+    "result",
+    "next",
+    "claim"
+  ],
+  "eventStatus": "sent",
+  "emptyReplay": {
+    "processed": false
+  },
+  "productionMutations": 0,
+  "date": "2026-11-17",
+  "scope": "CURRENT_WORKER_AND_RENDERER_TO_CURRENT_DISPATCHER_OVER_HTTP_WITH_FIXTURE_PROVIDERS",
+  "orderRef": "RTK-214",
+  "orderId": "84bc26c3-3edc-4880-b1c6-519088ecc80a",
+  "checkoutReplaySameOrder": true,
+  "orderCreatedEvents": 1,
+  "customerDeliveryAttempts": 1,
+  "staffDeliveryAttempts": 1,
+  "cleanup": {
+    "orderStatus": "cancelled",
+    "cancellationNotification": "skipped",
+    "rehearsalEndpoint": "disabled-v2-jwt-required-410"
+  },
+  "limitations": [
+    "Separate prefix-scoped staging transport exercised the unchanged current dispatcher; the normal worker deployment was not enabled.",
+    "Real providers were tested separately, not as part of this order-outbox rehearsal.",
+    "Production worker command, transport secret binding and current-source certification remain required."
+  ],
+  "ownerConfirmedProviderReceipt": {
+    "sms": true,
+    "email": true,
+    "pushover": true
+  },
+  "emailProviderHttpStatus": 201,
+  "emailReceiptDeployment": "07bb1742-196d-4a7a-8d90-a6dc7cc49609"
+}

@@ -43,16 +43,22 @@ function planAuxiliaryWork(orders,rows,wokJobs,options={}){
   if(portions.length>100)return {status:'UNVERIFIED',reason:'AUXILIARY_SEARCH_SIZE_LIMIT'};
   const buckets=new Map();
   for(const p of portions){const k=JSON.stringify([p.itemId,p.sourceRecipeKey,p.deadline??null]);if(!buckets.has(k))buckets.set(k,[]);buckets.get(k).push(p);}
-  const groups=[...buckets.values()].sort((a,b)=>(a[0].deadline??a[0].readyMinute)-(b[0].deadline??b[0].readyMinute));
+  // Finish constrained wok tasks before enumerating independent microwave
+  // arrangements. Otherwise an impossible wok finish repeats the entire
+  // microwave search for every placement of a different appliance.
+  const groups=[...buckets.values()].sort((a,b)=>
+   Number(AUXILIARY[b[0].itemId].resource==='wok')-Number(AUXILIARY[a[0].itemId].resource==='wok')||
+   (a[0].deadline??a[0].readyMinute)-(b[0].deadline??b[0].readyMinute));
   const jobs=[],occupied=[...[...wokJobs,...(options.fixedWok||[])].map(j=>({...j,resource:'wok'})),...(options.fixedAuxiliary||[])];
-  let nodes=0;
+  let nodes=0,exhausted=false;
   function search(index,remaining){
-   if(++nodes>20000)return false;if(index===groups.length)return true;
+   if(exhausted)return false;
+   if(++nodes>20000){exhausted=true;return false;}if(index===groups.length)return true;
    if(!remaining.length)return search(index+1,groups[index+1]||[]);
    const first=remaining[0],deadline=first.deadline??first.readyMinute,rule=AUXILIARY[first.itemId],reset=rule.resource==='wok'?1:0;
    for(let size=Math.min(rule.capacity,remaining.length);size>=1;size--){
     const minutes=rule.batchMinutes?.[size]??rule.minutes;
-    for(let start=deadline-minutes;start>=Math.max(990,first.notBefore,deadline-minutes-holdFor(options,remaining.slice(0,size).map(p=>p.orderId),options.holdingLimitMinutes===20?20:10));start--){
+    for(let start=deadline-minutes;start>=Math.max(990,first.notBefore,deadline-minutes-holdFor(rule.beforeMain?{...options,holdingAdvisories:{}}:options,remaining.slice(0,size).map(p=>p.orderId),options.holdingLimitMinutes===20?20:10));start--){
      const finish=start+minutes;
      if([...(options.kitchenBlackouts||options.blackouts||[])].some(b=>start<b.finish&&finish>b.start)||
       [...occupied,...jobs].some(j=>j.resource===rule.resource&&start<j.finish+reset&&finish+reset>j.start))continue;
@@ -60,6 +66,7 @@ function planAuxiliaryWork(orders,rows,wokJobs,options={}){
      jobs.push({resource:rule.resource,appliance:rule.appliance,itemId:first.itemId,sourceRecipeKey:first.sourceRecipeKey,
       start,finish,readyMinute:first.readyMinute,portions:size,orderIds:[...new Set(assigned.map(p=>p.orderId))],allocations:assigned});
      if(search(index,remaining.slice(size)))return true;jobs.pop();
+     if(exhausted)return false;
     }
    }
    return false;
@@ -75,7 +82,7 @@ function validateAuxiliaryWork(orders,rows,jobs,options={}){
   for(const j of jobs){
    const rule=AUXILIARY[j.itemId];
    if(!rule||j.resource!==rule.resource||j.finish-j.start!==(rule.batchMinutes?.[j.portions]??rule.minutes)||!Number.isInteger(j.portions)||j.portions<1||j.portions>rule.capacity||
-    j.allocations?.length!==j.portions||j.start<990||j.finish>1320||j.finish>Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))||Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))-j.finish>holdFor(options,j.orderIds,options.holdingLimitMinutes===20?20:10))return false;
+    j.allocations?.length!==j.portions||j.start<990||j.finish>1320||j.finish>Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))||Math.min(...j.allocations.map(a=>a.deadline??j.readyMinute))-j.finish>holdFor(rule.beforeMain?{...options,holdingAdvisories:{}}:options,j.orderIds,options.holdingLimitMinutes===20?20:10))return false;
    for(const p of j.allocations){const original=bounds.get(key(p));
     if(!original||p.qty!==1||p.itemId!==j.itemId||p.sourceRecipeKey!==j.sourceRecipeKey||j.readyMinute!==original.readyMinute||j.finish>(original.deadline??original.readyMinute)||j.start<original.notBefore||j.start<p.notBefore||!j.orderIds.includes(p.orderId))return false;
     actual.set(key(p),(actual.get(key(p))||0)+1);}

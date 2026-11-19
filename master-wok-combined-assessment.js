@@ -66,7 +66,9 @@ function verifyCombinedCapacity({acceptedOrders,proposedOrder,rawRows,serviceDat
   const id=String(proposedOrder.orderId),warmup=5,buffer=10+extraLead;
   const holdExceptions=validateExceptions({...state.previousPlan?.holdExceptions,
    ...(proposedOrder.staffHoldException?{[id]:proposedOrder.staffHoldException}:{})});
-  const planInput={orders,rows,serviceDate,now,previousPlan:state.previousPlan,
+  const holdingAdvisories=require('./master-wok-holding-advisory').validateAdvisories({...state.previousPlan?.holdingAdvisories,
+   ...(proposedOrder.planningHoldMinutes?{[id]:{kind:'staff_review_required',maxMinutes:proposedOrder.planningHoldMinutes}}:{})});
+  const planInput={orders,rows,serviceDate,now,previousPlan:state.previousPlan,holdingAdvisories,
    ...(typeof options.validateCompletePlan==='function'?{validateCompletePlan:options.validateCompletePlan}:{}),
    ...(options.earliestFinishByOrder?{earliestFinishByOrder:options.earliestFinishByOrder}:{}),
    maxSearchNodes:options.maxSearchNodes,maxCompleteChecks:options.maxCompleteChecks,

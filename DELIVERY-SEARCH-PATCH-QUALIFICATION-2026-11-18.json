@@ -1,0 +1,77 @@
+{
+  "date": "2026-11-18",
+  "scope": "DELTA_QUALIFICATION_OF_APPLIANCE_SEARCH_PERFORMANCE_ONLY",
+  "parentSourceSha256": "1c37c69c0b3542a4a21d1e301eade749da01d3500c9f2ef5eea1a7fef67c2d80",
+  "runtimeSourceSha256": "609238f27b712136bfbb30ab145ba230437151ed38c0155e2baacc4a54992414",
+  "parentQualification": "AVAILABILITY-CERTIFICATION-2026-11-17.json",
+  "runtimeChange": [
+    "master-wok-auxiliary-work.js: visit constrained wok appliance groups before independent microwave groups",
+    "master-wok-auxiliary-work.js: propagate search exhaustion immediately"
+  ],
+  "policyChanges": [],
+  "sourceBoundRegressionTests": {
+    "passed": 416,
+    "failed": 0
+  },
+  "websiteTests": {
+    "passed": 95,
+    "failed": 0
+  },
+  "stagingVersion": 86,
+  "stagingModeProbe": "MASTER_WOK",
+  "stagingAvailabilityProbe": {
+    "status": 200,
+    "body": {
+      "success": true,
+      "hints": [
+        {
+          "time": "2026-11-18T18:30:00Z",
+          "available": true,
+          "unverified": false
+        },
+        {
+          "time": "2026-11-18T18:35:00Z",
+          "available": true,
+          "unverified": false
+        }
+      ],
+      "bookingApprovalAllowed": false
+    },
+    "wallMs": 5111
+  },
+  "hostedCpuCases": 17,
+  "hostedCpuCasesPassed": 17,
+  "hostedDatabaseRequests": 0,
+  "hostedBookings": 0,
+  "hostedNotifications": 0,
+  "unchangedDomains": [
+    "transaction locking and write fences",
+    "commercial pricing and loyalty",
+    "notification lifecycle",
+    "driver promises and food-age validation",
+    "release controls and rollback guards",
+    "equipment capacity and recipe durations"
+  ],
+  "qualificationBasis": "Prior full qualification retained for unchanged domains; complete local regression suite rebuilt with new source binding; real staging deployment/bootstrap and read-only availability query; exact problematic delivery basket CPU rehearsal on hosted Edge. Not a claim of a new full service or notification-provider replay.",
+  "knownRemainingIssue": "Exact mixed basket remains SEARCH_LIMIT for delivery in empty-service synthetic-route replay. This patch reduces computation; it does not assert those delivery times are feasible.",
+  "evidence": [
+    {
+      "path": "staging-tests/evidence/delivery-search-hosted-20261118.json",
+      "sha256": "3de791293651ee964ce33a1baf6ba095e626d31a38ca3bbd987ceefb6d78bd4c"
+    },
+    {
+      "path": "staging-tests/evidence/delivery-search-runtime-20261118.json",
+      "sha256": "0d8a2b6dd352cea4236b7531d0217e978745d0ea864603aaea6392c6e5323f71"
+    },
+    {
+      "path": "master-wok-delivery-search-cost.test.js",
+      "sha256": "0bbbfce8024f459346b4158aa17529c6c57b1508dfc55408ff4704c8dcf3a5d8"
+    }
+  ],
+  "deployment": {
+    "productionVersion": 24,
+    "stagingVersion": 86,
+    "websiteMergeSha": "1c3118b7f5da98a896fe83e8f2fd9892beb7f4f5",
+    "cpuRehearsalDisabledVersion": 2
+  }
+}

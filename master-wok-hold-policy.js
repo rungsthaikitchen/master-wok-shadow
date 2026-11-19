@@ -11,7 +11,8 @@ function validateExceptions(map={}){
 }
 function holdFor(options,ids,fallback=20){
  const map=validateExceptions(options?.holdExceptions||{});
+ const advisory=require('./master-wok-holding-advisory').validateAdvisories(options?.holdingAdvisories||{});
  if(!Array.isArray(ids)||!ids.length)return fallback;
- return Math.min(...ids.map(id=>map[String(id)]?.maxMinutes??fallback));
+ return Math.min(...ids.map(id=>map[String(id)]?.maxMinutes??advisory[String(id)]?.maxMinutes??fallback));
 }
 module.exports={validateExceptions,holdFor};

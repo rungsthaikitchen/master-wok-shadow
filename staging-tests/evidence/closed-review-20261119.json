@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "checks": [
+    "closure_rejected_despite_diagnostic_failure",
+    "closed_review_not_saved",
+    "closure_start_inclusive",
+    "closure_end_exclusive",
+    "fully_booked_review_allowed",
+    "existing_identical_review_replays_after_closure",
+    "closed_replay_still_checks_identity",
+    "inactive_closure_ignored",
+    "closure_rechecked_after_assessment",
+    "no_reviews_persisted",
+    "no_closures_persisted"
+  ],
+  "notificationsSent": 0,
+  "persistentReviews": 0,
+  "temporaryEndpointDisabledVersion": 3
+}

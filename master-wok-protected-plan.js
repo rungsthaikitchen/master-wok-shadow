@@ -16,6 +16,7 @@ function protectStartedWork(previous,asOfMinute){
  if(!Number.isFinite(asOfMinute)||asOfMinute<0||asOfMinute>1440)throw Error('INVALID_PLAN_CLOCK');
  if(!previous)return {wok:[],fryer:[],auxiliary:[]};
  validateExceptions(previous.holdExceptions||{});
+ require('./master-wok-holding-advisory').validateAdvisories(previous.holdingAdvisories||{});
  const shared=previous.modelVersion===RING_MODEL_VERSION;
  if((previous.resourceModel==='FOUR_SHARED_RINGS')!==shared)throw Error('INVALID_COMMITTED_PLAN');
  if(previous.schemaVersion!==1||![RING_MODEL_VERSION,MODEL_VERSION,'combined-kitchen-protected-v2','combined-kitchen-protected-v1'].includes(previous.modelVersion)||!Array.isArray(previous.wok?.jobs)||!Array.isArray(previous.fryer?.jobs)||
@@ -121,6 +122,8 @@ function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...opti
  if(previousPlan&&((previousPlan.modelVersion===RING_MODEL_VERSION)!==shared))return fail('SCHEDULER_MODEL_CHANGE_REQUIRES_DRAIN');
  try{
   options.holdExceptions=validateExceptions({...previousPlan?.holdExceptions,...options.holdExceptions});
+  options.holdingAdvisories=require('./master-wok-holding-advisory').validateAdvisories({...previousPlan?.holdingAdvisories,...options.holdingAdvisories});
+  options.holdingAcknowledgements={...previousPlan?.holdingAcknowledgements,...options.holdingAcknowledgements};
   const asOfMinute=serviceMinute(now,serviceDate);
   if(!previousPlan&&asOfMinute>=990&&orders.some(o=>String(o.orderId)!==options.newOrderId))
    return fail('COMMITTED_PLAN_REQUIRED_DURING_SERVICE');
@@ -147,7 +150,7 @@ function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...opti
    auxiliary:{...previousPlan.auxiliary,jobs:(previousPlan.auxiliary?.jobs||[]).filter(j=>!fixed.auxiliary.includes(j))}};
   const retainedOptions=shared?{auxiliaryRows:rows,fixedWok:fixed.wok,fixedAuxiliary:fixed.auxiliary,fixedFryer:fixed.fryer,notBeforeByOrder,blackouts:options.blackouts||[]} : {};
   const retainedValid=retained&&validateKitchenTimeline(remaining.orders,retained,remaining.rows,retainedOptions).status==='VALIDATED_STAGING_TIMELINE'&&
-   (!options.confirmedStarterRecipes||validateAuxiliaryWork(orders,rows,retained.auxiliary.jobs,{holdExceptions:retained.holdExceptions,holdingLimitMinutes:retained.holdingLimitMinutes,notBeforeByOrder,fixedAuxiliary:fixed.auxiliary,mainJobs:[...fixed.wok,...retained.wok.jobs]}));
+   (!options.confirmedStarterRecipes||validateAuxiliaryWork(orders,rows,retained.auxiliary.jobs,{holdExceptions:retained.holdExceptions,holdingAdvisories:retained.holdingAdvisories,holdingLimitMinutes:retained.holdingLimitMinutes,notBeforeByOrder,fixedAuxiliary:fixed.auxiliary,mainJobs:[...fixed.wok,...retained.wok.jobs]}));
   const future=retainedValid?retained:planCoordinatedKitchen(remaining.orders,remaining.rows,{...options,
    blackouts:wokBlackouts,kitchenBlackouts:options.blackouts||[],fryerBlackouts,notBeforeByOrder,
    auxiliaryRows:rows,fixedAuxiliary:fixed.auxiliary,fixedWok:fixed.wok,fixedFryer:fixed.fryer});
@@ -156,11 +159,15 @@ function planWithProtectedWork({orders,rows,previousPlan,now,serviceDate,...opti
    auxiliaryRows:rows,fixedWok:fixed.wok,fixedAuxiliary:fixed.auxiliary,fixedFryer:fixed.fryer,notBeforeByOrder,
    blackouts:options.blackouts||[]}:{});
   if(validation.status!=='VALIDATED_STAGING_TIMELINE')return fail('REMAINING_PLAN_COVERAGE_INVALID',{issues:validation.issues});
-  if(options.confirmedStarterRecipes&&!validateAuxiliaryWork(orders,rows,future.auxiliary.jobs,{holdExceptions:future.holdExceptions,holdingLimitMinutes:future.holdingLimitMinutes,notBeforeByOrder,fixedAuxiliary:fixed.auxiliary,mainJobs:[...fixed.wok,...future.wok.jobs]}))
+  if(options.confirmedStarterRecipes&&!validateAuxiliaryWork(orders,rows,future.auxiliary.jobs,{holdExceptions:future.holdExceptions,holdingAdvisories:future.holdingAdvisories,holdingLimitMinutes:future.holdingLimitMinutes,notBeforeByOrder,fixedAuxiliary:fixed.auxiliary,mainJobs:[...fixed.wok,...future.wok.jobs]}))
    return fail('AUXILIARY_COVERAGE_INVALID');
   // Keep the original immutable job objects in the persisted full plan. Future
   // allocations are independently validated against exactly the unstarted lines.
-  const plan={...future,schemaVersion:1,modelVersion:shared?RING_MODEL_VERSION:MODEL_VERSION,
+  // A new basket's preferred ten-minute plan must not lower the default
+  // holding allowance of reservations already saved under the twenty-minute
+  // policy. Their exact jobs remain valid and must validate on later Accept.
+  const combinedHoldingLimit=Math.max(future.holdingLimitMinutes||10,previousPlan?.holdingLimitMinutes||10);
+  const plan={...future,holdingLimitMinutes:combinedHoldingLimit,schemaVersion:1,modelVersion:shared?RING_MODEL_VERSION:MODEL_VERSION,
    wok:{...future.wok,jobs:[...fixed.wok,...future.wok.jobs].sort((a,b)=>a.start-b.start)},
    fryer:{...future.fryer,jobs:[...fixed.fryer,...future.fryer.jobs].sort((a,b)=>a.start-b.start)},
    auxiliary:{...future.auxiliary,jobs:[...fixed.auxiliary,...future.auxiliary.jobs].sort((a,b)=>a.start-b.start)}};

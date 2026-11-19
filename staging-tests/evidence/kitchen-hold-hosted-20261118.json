@@ -1,0 +1,493 @@
+[
+  {
+    "type": "delivery",
+    "start": 0,
+    "count": 16,
+    "routeMinutes": 8,
+    "status": 200,
+    "wallMs": 4161,
+    "result": {
+      "results": [
+        {
+          "time": "2026-11-18T17:00:00.000Z",
+          "status": "UNVERIFIED",
+          "reason": "SEARCH_LIMIT",
+          "maxKitchenHold": null,
+          "maxDoorAge": null
+        },
+        {
+          "time": "2026-11-18T17:05:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T17:10:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T17:15:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T17:20:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T17:25:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T17:30:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T17:35:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T17:40:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T17:45:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T17:50:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T17:55:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T18:00:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T18:05:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T18:10:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T18:15:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        }
+      ],
+      "elapsedMs": 209,
+      "databaseRequests": 0,
+      "notifications": 0,
+      "bookings": 0
+    }
+  },
+  {
+    "type": "delivery",
+    "start": 16,
+    "count": 16,
+    "routeMinutes": 8,
+    "status": 200,
+    "wallMs": 4168,
+    "result": {
+      "results": [
+        {
+          "time": "2026-11-18T18:20:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T18:25:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T18:30:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T18:35:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T18:40:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T18:45:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T18:50:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T18:55:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T19:00:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T19:05:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T19:10:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T19:15:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T19:20:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T19:25:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T19:30:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T19:35:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        }
+      ],
+      "elapsedMs": 208,
+      "databaseRequests": 0,
+      "notifications": 0,
+      "bookings": 0
+    }
+  },
+  {
+    "type": "delivery",
+    "start": 32,
+    "count": 16,
+    "routeMinutes": 8,
+    "status": 200,
+    "wallMs": 5241,
+    "result": {
+      "results": [
+        {
+          "time": "2026-11-18T19:40:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T19:45:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T19:50:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T19:55:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:00:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:05:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:10:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:15:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:20:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:25:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:30:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:35:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:40:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:45:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:50:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T20:55:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        }
+      ],
+      "elapsedMs": 95,
+      "databaseRequests": 0,
+      "notifications": 0,
+      "bookings": 0
+    }
+  },
+  {
+    "type": "delivery",
+    "start": 48,
+    "count": 16,
+    "routeMinutes": 8,
+    "status": 200,
+    "wallMs": 5136,
+    "result": {
+      "results": [
+        {
+          "time": "2026-11-18T21:00:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T21:05:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T21:10:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T21:15:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T21:20:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T21:25:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T21:30:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T21:35:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T21:40:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T21:45:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T21:50:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T21:55:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        },
+        {
+          "time": "2026-11-18T22:00:00.000Z",
+          "status": "VERIFIED_KITCHEN_CAPACITY",
+          "reason": "COMPLETE_LOCKED_STATE_VALIDATED",
+          "maxKitchenHold": 17,
+          "maxDoorAge": 27
+        }
+      ],
+      "elapsedMs": 77,
+      "databaseRequests": 0,
+      "notifications": 0,
+      "bookings": 0
+    }
+  }
+]

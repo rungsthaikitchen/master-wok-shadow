@@ -1,0 +1,58 @@
+{
+  "date": "2026-11-17",
+  "scope": "READ_ONLY_PRODUCTION_DATABASE_AND_WORKER_BINDING",
+  "productionMutations": 0,
+  "runtimeSourceSha256": "1c37c69c0b3542a4a21d1e301eade749da01d3500c9f2ef5eea1a7fef67c2d80",
+  "productionMode": "LEGACY",
+  "productionRevision": 10,
+  "database": {
+    "productionColumns": 197,
+    "stagingColumns": 182,
+    "missingInProduction": [],
+    "typeMismatches": [
+      {
+        "table_name": "orders",
+        "column_name": "customer_lat",
+        "data_type": "numeric",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "orders",
+        "column_name": "customer_lng",
+        "data_type": "numeric",
+        "is_nullable": "YES"
+      }
+    ],
+    "coordinateTypeDifference": "Production floating-point versus staging numeric is covered by numeric-string and round-trip regression tests",
+    "requiredTablesRlsEnabled": true,
+    "writeFenceTriggersEnabled": 8,
+    "unsafeDirectSchedulingTableGrants": 0
+  },
+  "worker": {
+    "serviceId": "c92f1458-4011-4872-9121-5c827c64b0c0",
+    "deploymentId": "f9ec0920-dd4c-41cd-b4f6-35f1517fcb5c",
+    "status": "SUCCESS",
+    "loop": "master_wok_notification_worker.py --loop",
+    "workerBlob": "a5ab218cb062fe918fcaaf0353545451a6552229",
+    "rendererBlob": "e94e558b897dc5ab64b9d8c5c9bd7c7f14eebc75",
+    "sameBlobsAsStagingRehearsal": true,
+    "livePolling": "idle-success-no-authentication-error",
+    "outbox": {
+      "sent": 62,
+      "pending": 0
+    },
+    "noWorkerConfigurationChanges": true,
+    "variableValuesWithheld": true
+  },
+  "productionEdge": {
+    "version": 21,
+    "releaseId": "master-wok-four-ring-2026-11-10",
+    "sourceSha256": "cfe3eb5bd705f6eebf94945fad2f733c215de6dd0c50926942831403165eb817",
+    "unchanged": true
+  },
+  "limits": [
+    "Existing live worker is bound to the existing production transport; exact new-candidate post-deployment readback is still a cutover step.",
+    "Real provider probes and durable order-outbox rehearsal were separate tests; no new production order was created.",
+    "No secret values were read from Railway or changed."
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "status": "DRAFT",
+  "releaseId": "master-wok-availability-2026-11-17",
+  "projectRef": "ubyjrrsvbbqomitpaidb",
+  "deliveryProjectRef": "ubyjrrsvbbqomitpaidb",
+  "schema": "public",
+  "modelVersion": "combined-kitchen-four-ring-staging-v1",
+  "sourceSha256": "81bab047c8d65da1e683ae9fa6ecee3d5ab16b998e6f8be9d7ddb0614e65a0db",
+  "checks": {
+    "atomicConcurrency": "PENDING",
+    "physicalCoverage": "PENDING",
+    "lifecycle": "PENDING",
+    "writeFence": "PENDING",
+    "commercial": "PENDING",
+    "delivery": "PENDING",
+    "notifications": "PENDING",
+    "wholeService": "PENDING",
+    "rollback": "PENDING",
+    "driverReservations": "PENDING",
+    "combinedTrips": "PENDING",
+    "deliveryCheckout": "PENDING",
+    "deliveryRollback": "PENDING"
+  },
+  "deliveryScheduling": 1,
+  "kitchenConfiguration": "FOUR_RING_ONE_PORTION_V1",
+  "evidence": {
+    "manifest": "AVAILABILITY-READINESS-2026-11-17.json",
+    "note": "Staging functional and temporary-copy rollback evidence only. Current production binding, notification verification and explicit activation approval remain required. Historical certification is not transferred."
+  },
+  "holdingAdvisory": 1
+}
