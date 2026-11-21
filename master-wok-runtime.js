@@ -50,7 +50,8 @@ function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,sc
  const paymentWriter=paymentsEnabled?createPaymentWriter({...shared,schema,completeOrder:createPaymentCompletion({schema,assessMutation})}):undefined;
  const amendmentWriter=paymentsEnabled&&quoteDelivery?createAmendmentWriter({...shared,schema,assessMutation,quoteDelivery}):undefined;
  const holdingAdmin=require('./master-wok-holding-admin').createHoldingAdmin({...shared,schema});
- const payments=paymentWriter?input=>input?.action==='holding_list'?holdingAdmin(input):input?.action==='holding_accept'?
+ const historicalReconcile=paymentsEnabled?require('./historical_order_reconciliation_writer.cjs').createHistoricalReconciliationWriter({...shared,schema,beginBookingTransaction:require('./master-wok-transaction-writer').beginBookingTransaction,settleLoyalty:require('./master-wok-loyalty-settlement').settleMasterWokLoyalty}):undefined;
+ const payments=paymentWriter?input=>input?.action==='historical_reconcile'?historicalReconcile(input):input?.action==='holding_list'?holdingAdmin(input):input?.action==='holding_accept'?
    lifecycle.adminAction({...input,action:'accept'},{staffActor:input.staffActor}):input?.action?.startsWith('amend_')?(amendmentWriter?amendmentWriter(input):Promise.resolve({success:false,reason:'AMENDMENTS_DISABLED',statusCode:503})):paymentWriter(input):undefined;
  const booking=createBookingHttpHandler({secret,payments,checkout,lifecycle,serviceControl,availability,basketReview,basketReviewAdmin:createBasketReviewAdmin({pool,schema,reviewApproval}),
   readPreviewOrders:readPreviewOrders?async()=>{
