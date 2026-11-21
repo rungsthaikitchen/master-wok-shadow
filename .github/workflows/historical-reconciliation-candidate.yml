@@ -16,3 +16,12 @@ jobs:
       - run: node --test master-wok-http.test.js master-wok-transaction-writer.test.js master-wok-lifecycle.test.js
 
       - run: node --test historical-reconciliation-http.test.cjs
+      - name: Record candidate source digest
+        run: |
+          node staging-tests/build-atomic-checkout-edge.cjs --release-staging > /tmp/candidate.ts 2> /tmp/digest.json
+          cat /tmp/digest.json >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/digest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candidate-digest
+          path: /tmp/digest.json
