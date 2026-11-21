@@ -1,0 +1,16 @@
+name: Historical reconciliation candidate
+on:
+  push:
+    branches: [fix/historical-reconciliation-2026-11-21]
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: node staging-tests/build-atomic-checkout-edge.cjs --release-staging > /tmp/candidate.ts
+      - run: node --test master-wok-http.test.js master-wok-transaction-writer.test.js master-wok-lifecycle.test.js
