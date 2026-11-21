@@ -14,3 +14,5 @@ jobs:
       - run: npm ci
       - run: node staging-tests/build-atomic-checkout-edge.cjs --release-staging > /tmp/candidate.ts
       - run: node --test master-wok-http.test.js master-wok-transaction-writer.test.js master-wok-lifecycle.test.js
+
+      - run: node --test historical-reconciliation-http.test.cjs
