@@ -19,7 +19,7 @@ const token=process.env.MASTER_WOK_CERTIFICATION_TOKEN;
 if(!releaseBuild&&!/^[a-f0-9]{64}$/.test(token||''))throw Error('TEMPORARY_64_HEX_TOKEN_REQUIRED');
 function add(name){
  if(seen.has(name))return;
- const filename=name.endsWith('.json')?name.slice(2):name.slice(2)+'.js';
+ const filename=/\.(json|cjs)$/.test(name)?name.slice(2):name.slice(2)+'.js';
  const raw=fs.readFileSync(path.join(root,releaseBuild&&name==='./master-wok-release-candidate.json'?certificateFile:filename),'utf8').replace(/^\uFEFF/,'');
  const source=name.endsWith('.json')?'module.exports='+JSON.stringify(JSON.parse(raw))+';':raw;
  seen.set(name,source);
