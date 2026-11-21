@@ -1,8 +1,8 @@
 'use strict';
-const {createHash}=require('node:crypto');
+
 const {validateHistoricalCorrection}=require('./historical_order_reconciliation_policy.cjs');
 const UUID=/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
-const fingerprint=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex');
+const fingerprint=async x=>Array.from(new Uint8Array(await globalThis.crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(x)))),b=>b.toString(16).padStart(2,'0')).join('');
 
 /**
  * This writer must be wired ONLY into the existing authenticated Master Wok
@@ -28,7 +28,7 @@ function createHistoricalReconciliationWriter({pool,schema='master_wok_rehearsal
    if(!order){await c.query('ROLLBACK');closed=true;return fail('ORDER_NOT_FOUND',404);}
    const prior=(await c.query(`SELECT * FROM ${t('order_payments')} WHERE order_id=$1`,[input.orderId])).rows[0];
    const previous=(await c.query(`SELECT response,request_fingerprint FROM ${t('order_amendments')} WHERE idempotency_key=$1`,[input.idempotencyKey])).rows[0];
-   const fp=fingerprint([input.orderId,input.idempotencyKey,input.staffActor,input.reason,input.agreedTime,input.amountPence,input.method,input.fulfilled]);
+   const fp=await fingerprint([input.orderId,input.idempotencyKey,input.staffActor,input.reason,input.agreedTime,input.amountPence,input.method,input.fulfilled]);
    if(previous){await c.query('ROLLBACK');closed=true;return previous.request_fingerprint===fp?{...previous.response,replayed:true,committed:false}:fail('RECONCILIATION_IDEMPOTENCY_CONFLICT');}
    const now=(await c.query('SELECT clock_timestamp() AS now')).rows[0].now;
    const eligible=validateHistoricalCorrection({order,existingPayment:prior,now,agreedTime:input.agreedTime,
