@@ -1,0 +1,44 @@
+name: Availability diagnostics regression
+
+on:
+  pull_request:
+    paths:
+      - 'master-wok-availability.js'
+      - 'master-wok-runtime.js'
+      - 'master-wok-deployment.js'
+      - 'staging-secure-bootstrap-config.js'
+      - 'staging-secure-edge-entry.js'
+      - 'scripts/verify-staging-source-manifest.cjs'
+      - 'scripts/inventory-staging-module-graph.cjs'
+      - 'tests/staging-module-graph.test.cjs'
+      - 'scripts/package-staging-sources.cjs'
+      - 'tests/staging-source-package.test.cjs'
+      - 'scripts/link-staging-review-bundle.cjs'
+      - 'tests/staging-review-linker.test.cjs'
+      - 'staging-edge-adapter-contract.js'
+      - 'tests/staging-edge-adapter-contract.test.cjs'
+      - 'staging-pg-pool-adapter.js'
+      - 'tests/staging-pg-pool-adapter.test.cjs'
+      - 'tests/staging-source-manifest.test.cjs'
+      - 'tests/staging-secure-edge-entry.test.cjs'
+      - 'tests/staging-secure-bootstrap-config.test.cjs'
+      - 'scripts/assert-secure-staging-bundle.cjs'
+      - 'tests/staging-secure-bundle.test.cjs'
+      - 'tests/master-wok-availability-diagnostics.test.cjs'
+      - '.github/workflows/availability-diagnostics.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  availability-diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify diagnostics regression tests
+        run: node --test tests/master-wok-availability-diagnostics.test.cjs tests/staging-secure-bootstrap-config.test.cjs tests/staging-secure-bundle.test.cjs tests/staging-secure-edge-entry.test.cjs tests/staging-source-manifest.test.cjs tests/staging-module-graph.test.cjs tests/staging-source-package.test.cjs tests/staging-review-linker.test.cjs tests/staging-edge-adapter-contract.test.cjs tests/staging-pg-pool-adapter.test.cjs
