@@ -16,7 +16,7 @@ Status: **PREPARATION ONLY — NOT APPROVED OR DEPLOYED** (22 November 2026).
 
 ## Required before any staging deployment
 
-1. Reconstruct or locate the exact source/build inputs corresponding to staging version 92. Compare its deployed modules with this PR's base, not just filenames or the embedded digest.
+1. **PARTIALLY VERIFIED (22 November):** the deployed staging version 92 modules `master-wok-availability.js`, `master-wok-runtime.js`, and `master-wok-deployment.js` match the complete contents of the GitHub base branch `review/availability-readiness-2026-11-17` byte-for-byte after trimming the bundle wrapper/outer whitespace. Other bundled modules and build inputs are not yet fully reconciled; do not assume the entire bundle matches.
 2. Apply only the diagnostics patch to the correct staging baseline. Verify no accidental changes to assessment, release fences, payment, booking, notification, or delivery behavior.
 3. Generate the new source digest using the existing certified build procedure. The changed source must not retain the previous source digest.
 4. Create a **staging-only** certificate for that new digest, retaining the candidate status, private schema, model, project, approved fixture policy, and the existing check semantics. Do not promote pending checks to PASS without evidence.
