@@ -43,7 +43,7 @@ function inventoryGraph(entry,{root=process.cwd()}={}){
    if(all!==calls.length)throw Error('DYNAMIC_REQUIRE_UNSUPPORTED: '+relative);
   }
   visited.set(relative,{path:relative,sha256:crypto.createHash('sha256').update(bytes).digest('hex'),dependencies});
-  for(const dep of dependencies)if(dep.startsWith('./')||!dep.includes(':')&&dep.endsWith('.js')){
+  for(const dep of dependencies)if(dep.startsWith('./')||!dep.includes(':')&&/\.(?:js|json|cjs)$/.test(dep)){
    const normalized=dep.startsWith('./')?dep.slice(2):dep;
    visit(normalized);
   }
