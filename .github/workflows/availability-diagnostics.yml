@@ -1,0 +1,24 @@
+name: Availability diagnostics regression
+
+on:
+  pull_request:
+    paths:
+      - 'master-wok-availability.js'
+      - 'tests/master-wok-availability-diagnostics.test.cjs'
+      - '.github/workflows/availability-diagnostics.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  availability-diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify diagnostics regression tests
+        run: node --test tests/master-wok-availability-diagnostics.test.cjs
