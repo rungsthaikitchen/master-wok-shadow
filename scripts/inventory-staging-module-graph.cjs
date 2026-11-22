@@ -14,9 +14,16 @@ function inventoryGraph(entry,{root=process.cwd()}={}){
   const full=path.resolve(base,relative);
   if(!full.startsWith(base+path.sep))throw Error('MODULE_OUTSIDE_ROOT');
   if(visited.has(relative))return;
+  // Reject symlinks in every path component, not just the final source file.
+  let cursor=base;
+  for(const segment of relative.split('/')){
+   cursor=path.join(cursor,segment);
+   if(fs.lstatSync(cursor).isSymbolicLink())throw Error('MODULE_SYMLINK_FORBIDDEN');
+  }
   const stat=fs.lstatSync(full);
-  if(!stat.isFile()||stat.isSymbolicLink())throw Error('MODULE_NOT_REGULAR_FILE');
-  const source=fs.readFileSync(full,'utf8');
+  if(!stat.isFile())throw Error('MODULE_NOT_REGULAR_FILE');
+  const bytes=fs.readFileSync(full);
+  const source=bytes.toString('utf8');
   const dependencies=[];
   if(relative.endsWith('.json'))JSON.parse(source);
   else{
@@ -35,7 +42,7 @@ function inventoryGraph(entry,{root=process.cwd()}={}){
    const all=(source.match(/\brequire\s*\(/g)||[]).length;
    if(all!==calls.length)throw Error('DYNAMIC_REQUIRE_UNSUPPORTED: '+relative);
   }
-  visited.set(relative,{path:relative,sha256:crypto.createHash('sha256').update(fs.readFileSync(full)).digest('hex'),dependencies});
+  visited.set(relative,{path:relative,sha256:crypto.createHash('sha256').update(bytes).digest('hex'),dependencies});
   for(const dep of dependencies)if(dep.startsWith('./')||!dep.includes(':')&&dep.endsWith('.js')){
    const normalized=dep.startsWith('./')?dep.slice(2):dep;
    visit(normalized);
