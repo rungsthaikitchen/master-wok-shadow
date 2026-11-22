@@ -55,3 +55,11 @@ test('diagnostics callback failures cannot alter availability response',async()=
  const result=await handler(input);
  assert.equal(JSON.stringify(result),JSON.stringify({success:false,statusCode:503,reason:'AVAILABILITY_UNAVAILABLE'}));
 });
+
+test('deployment wiring enables diagnostics only for private staging schema',()=>{
+ const deployment=fs.readFileSync(path.join(__dirname,'..','master-wok-deployment.js'),'utf8');
+ const runtime=fs.readFileSync(path.join(__dirname,'..','master-wok-runtime.js'),'utf8');
+ assert.match(deployment,/onAvailabilityFailure=schema==='master_wok_rehearsal'\?event=>console\.warn/);
+ assert.match(deployment,/createBookingRuntime\(\{pool,model,paymentsEnabled,reviewApprovalsEnabled,onAvailabilityFailure,/);
+ assert.match(runtime,/onFailure:onAvailabilityFailure/);
+});
