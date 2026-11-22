@@ -8,6 +8,8 @@ on:
       - 'master-wok-deployment.js'
       - 'staging-secure-bootstrap-config.js'
       - 'tests/staging-secure-bootstrap-config.test.cjs'
+      - 'scripts/assert-secure-staging-bundle.cjs'
+      - 'tests/staging-secure-bundle.test.cjs'
       - 'tests/master-wok-availability-diagnostics.test.cjs'
       - '.github/workflows/availability-diagnostics.yml'
   workflow_dispatch:
@@ -25,4 +27,4 @@ jobs:
         with:
           node-version: '22'
       - name: Verify diagnostics regression tests
-        run: node --test tests/master-wok-availability-diagnostics.test.cjs tests/staging-secure-bootstrap-config.test.cjs
+        run: node --test tests/master-wok-availability-diagnostics.test.cjs tests/staging-secure-bootstrap-config.test.cjs tests/staging-secure-bundle.test.cjs
