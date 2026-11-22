@@ -63,3 +63,42 @@ test('deployment wiring enables diagnostics only for private staging schema',()=
  assert.match(deployment,/createBookingRuntime\(\{pool,model,paymentsEnabled,reviewApprovalsEnabled,onAvailabilityFailure,/);
  assert.match(runtime,/onFailure:onAvailabilityFailure/);
 });
+
+test('snapshot read failure emits only stage metadata and releases connection',async()=>{
+ let releases=0,rollbacks=0;
+ const connection={query:async sql=>{if(sql==='ROLLBACK')rollbacks++;return {rows:[]};},release:()=>{releases++;}};
+ const {handler,events}=build({connect:async()=>connection,readSnapshot:async()=>{throw Error('PRIVATE_SNAPSHOT_ROW');}});
+ const result=await handler(input);
+ assert.deepEqual(JSON.parse(JSON.stringify(result)),{success:false,statusCode:503,reason:'AVAILABILITY_UNAVAILABLE'});
+ assert.deepEqual(JSON.parse(JSON.stringify(events)),[{operation:'availability',stage:'SNAPSHOT_READ',category:'UNEXPECTED_FAILURE'}]);
+ assert.equal(rollbacks,1);
+ assert.equal(releases,1);
+});
+test('delivery quote failure emits only stage metadata without opening DB',async()=>{
+ const events=[];
+ const mocks={
+  './master-wok-transaction-writer':{beginBookingTransaction:async()=>{}},
+  './master-wok-hint-snapshot':{beginHintSnapshot:async()=>{}},
+  './master-wok-commitment-reader':{readCapacityCommitments:async()=>[]},
+  './staging-order-snapshot':{normalizeStagingOrders:()=>[]},
+  './staging-canonical-basket':{prepareStagingBasket:()=>({status:'PREPARED',candidate:{},rawRow:{items:[]}})},
+  './master-wok-commercial':{priceBasket:()=>({items:[],subtotalCents:0})},
+  './master-wok-service-plan-store':{createServicePlanStore:()=>({read:async()=>null})},
+  './master-wok-clock':{localDate:()=> '2026-11-25',relativePlacement:()=>0},
+  './staging-booking-integration':{londonPlacement:()=>new Date('2026-11-25T18:30:00Z')}
+ };
+ const module={exports:{}};
+ vm.runInNewContext(source,{module,require:id=>mocks[id],console});
+ let connects=0;
+ const handler=module.exports.createBasketAvailability({
+  pool:{connect:async()=>{connects++;throw Error('UNEXPECTED_DB_CONNECT');}},
+  model:{},readAvailability:async()=>[],assessBooking:async()=>({status:'GREEN',bookingApprovalAllowed:true}),
+  assertWriteAllowed:async()=>{},readSnapshot:async()=>({}),
+  quoteDelivery:async()=>{throw Error('PRIVATE_DELIVERY_ADDRESS');},
+  onFailure:event=>events.push(event)
+ });
+ const result=await handler({...input,orderType:'delivery',address:'PRIVATE_DELIVERY_ADDRESS'});
+ assert.deepEqual(JSON.parse(JSON.stringify(result)),{success:false,statusCode:503,reason:'AVAILABILITY_UNAVAILABLE'});
+ assert.deepEqual(JSON.parse(JSON.stringify(events)),[{operation:'availability',stage:'DELIVERY_QUOTE',category:'UNEXPECTED_FAILURE'}]);
+ assert.equal(connects,0);
+});
