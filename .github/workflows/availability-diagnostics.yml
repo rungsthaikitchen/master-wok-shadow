@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'master-wok-availability.js'
+      - 'master-wok-runtime.js'
+      - 'master-wok-deployment.js'
       - 'tests/master-wok-availability-diagnostics.test.cjs'
       - '.github/workflows/availability-diagnostics.yml'
   workflow_dispatch:
