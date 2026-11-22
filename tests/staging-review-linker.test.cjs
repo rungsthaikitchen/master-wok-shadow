@@ -25,3 +25,13 @@ test('refuses external dependencies until a reviewed Edge adapter exists',()=>fi
  fs.writeFileSync(path.join(root,'entry.js'),"module.exports=require('pg')");
  assert.throws(()=>linkReviewBundle('entry.js',{root}),/EXTERNAL_DEPENDENCY_REQUIRES_EDGE_ADAPTER/);
 }));
+
+test('links the real deployment graph deterministically without a database adapter',()=>{
+ const root=path.resolve(__dirname,'..');
+ const first=linkReviewBundle('master-wok-deployment.js',{root});
+ const second=linkReviewBundle('master-wok-deployment.js',{root});
+ assert.equal(first.source,second.source);
+ assert.ok(first.fileCount>15);
+ assert.match(first.source,/REVIEW ONLY - NOT DEPLOYABLE/);
+ assert.doesNotMatch(first.source,/privateStagingConfiguration/);
+});
