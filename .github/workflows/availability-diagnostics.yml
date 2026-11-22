@@ -13,6 +13,8 @@ on:
       - 'tests/staging-module-graph.test.cjs'
       - 'scripts/package-staging-sources.cjs'
       - 'tests/staging-source-package.test.cjs'
+      - 'scripts/link-staging-review-bundle.cjs'
+      - 'tests/staging-review-linker.test.cjs'
       - 'tests/staging-source-manifest.test.cjs'
       - 'tests/staging-secure-edge-entry.test.cjs'
       - 'tests/staging-secure-bootstrap-config.test.cjs'
@@ -35,4 +37,4 @@ jobs:
         with:
           node-version: '22'
       - name: Verify diagnostics regression tests
-        run: node --test tests/master-wok-availability-diagnostics.test.cjs tests/staging-secure-bootstrap-config.test.cjs tests/staging-secure-bundle.test.cjs tests/staging-secure-edge-entry.test.cjs tests/staging-source-manifest.test.cjs tests/staging-module-graph.test.cjs tests/staging-source-package.test.cjs
+        run: node --test tests/master-wok-availability-diagnostics.test.cjs tests/staging-secure-bootstrap-config.test.cjs tests/staging-secure-bundle.test.cjs tests/staging-secure-edge-entry.test.cjs tests/staging-source-manifest.test.cjs tests/staging-module-graph.test.cjs tests/staging-source-package.test.cjs tests/staging-review-linker.test.cjs
