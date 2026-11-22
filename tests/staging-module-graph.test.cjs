@@ -31,7 +31,7 @@ test('rejects symlink source and unsupported external dependencies',()=>fixture(
  assert.throws(()=>inventoryGraph('entry.js',{root}),/UNSUPPORTED_DEPENDENCY/);
  fs.writeFileSync(path.join(root,'child.js'),'module.exports=1');
  fs.symlinkSync(path.join(root,'child.js'),path.join(root,'linked.js'));
- assert.throws(()=>inventoryGraph('linked.js',{root}),/MODULE_NOT_REGULAR_FILE/);
+ assert.throws(()=>inventoryGraph('linked.js',{root}),/MODULE_SYMLINK_FORBIDDEN/);
 }));
 
 test('inventories the real staging deployment module graph',()=>{
@@ -43,3 +43,12 @@ test('inventories the real staging deployment module graph',()=>{
  assert.ok(files.size>15,'expected transitive deployment dependencies');
  assert.equal(files.size,graph.files.length,'inventory must not duplicate files');
 });
+
+test('rejects symlinked parent directories in the module graph',()=>fixture(root=>{
+ const actual=path.join(root,'actual');
+ fs.mkdirSync(actual);
+ fs.writeFileSync(path.join(actual,'child.js'),'module.exports=1;');
+ fs.symlinkSync(actual,path.join(root,'alias'),'dir');
+ fs.writeFileSync(path.join(root,'entry.js'),"require('./alias/child')");
+ assert.throws(()=>inventoryGraph('entry.js',{root}),/MODULE_SYMLINK_FORBIDDEN/);
+}));
