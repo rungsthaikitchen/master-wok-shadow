@@ -14,4 +14,4 @@ The deployed staging `master-wok-booking` v92 bootstrap wrapper includes an inli
 
 ## Current gate
 
-**Design documented; not implemented or deployed.** Build tooling and the exact certificate/source-digest derivation still need to be recovered and verified. Do not deploy PR #28 as-is. Production must remain unchanged.
+**Configuration validator and preliminary static bundle checker implemented and covered by draft PR tests; generated Edge Function integration is not implemented or deployed.** The static checker is heuristic and cannot prove the absence of all secret literals. Build tooling and the exact certificate/source-digest derivation still need to be recovered and verified. Do not deploy PR #28 as-is. Production must remain unchanged.
