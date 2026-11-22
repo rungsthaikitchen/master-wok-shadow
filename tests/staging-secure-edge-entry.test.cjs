@@ -52,3 +52,27 @@ test('fails closed on runtime constructor error without exposing exception',asyn
  assert.equal(response.status,503);
  assert.doesNotMatch(await response.text(),/PRIVATE_DATABASE_ERROR/);
 });
+
+test('fails closed if environment access throws',async()=>{
+ let created=false;
+ const handler=createStagingEdgeHandler({
+  getEnv:()=>{throw Error('PRIVATE_ENVIRONMENT_ERROR');},
+  certificate,sourceSha256:digest,
+  createPool:()=>{created=true;return {};},
+  createDeploymentRuntime:()=>()=>{}
+ });
+ const response=await handler();
+ assert.equal(response.status,503);
+ assert.equal(created,false);
+ assert.doesNotMatch(await response.text(),/PRIVATE_ENVIRONMENT_ERROR/);
+});
+test('fails closed if pool construction throws without exposing connection details',async()=>{
+ const handler=createStagingEdgeHandler({
+  getEnv:key=>vars[key],certificate,sourceSha256:digest,
+  createPool:()=>{throw Error('PRIVATE_DATABASE_CONNECTION_STRING');},
+  createDeploymentRuntime:()=>()=>{}
+ });
+ const response=await handler();
+ assert.equal(response.status,503);
+ assert.doesNotMatch(await response.text(),/PRIVATE_DATABASE_CONNECTION_STRING/);
+});
