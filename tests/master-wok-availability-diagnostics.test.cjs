@@ -26,7 +26,7 @@ function build(overrides={}){
   readAvailability:async()=>[],assessBooking:overrides.assessBooking|| (async()=>({status:'GREEN',bookingApprovalAllowed:true})),
   assertWriteAllowed:overrides.assertWriteAllowed|| (async()=>{}),
   readSnapshot:overrides.readSnapshot|| (async()=>({now:'2026-11-25T17:00:00Z',rows:[],availability:{},previousPlan:null})),
-  onFailure:event=>events.push(event)});
+  onFailure:overrides.onFailure|| (event=>events.push(event))});
  return {handler,events};
 }
 const input={times:['2026-11-25T18:30:00Z'],items:[],orderType:'collection'};
@@ -51,7 +51,7 @@ test('successful availability does not emit diagnostics',async()=>{
  assert.equal(events.length,0);
 });
 test('diagnostics callback failures cannot alter availability response',async()=>{
- const {handler}=build({connect:async()=>{throw Error('DB_FAILED');}});
+ const {handler}=build({connect:async()=>{throw Error('DB_FAILED');},onFailure:()=>{throw Error('DIAGNOSTICS_CALLBACK_FAILED');}});
  const result=await handler(input);
- assert.equal(result.statusCode,503);
+ assert.equal(JSON.stringify(result),JSON.stringify({success:false,statusCode:503,reason:'AVAILABILITY_UNAVAILABLE'}));
 });
