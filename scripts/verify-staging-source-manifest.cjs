@@ -6,7 +6,6 @@ function verifySourceManifest(manifest,{root=process.cwd()}={}){
  if(!manifest||manifest.schemaVersion!==1||!Array.isArray(manifest.files)||!manifest.files.length)
   throw Error('SOURCE_MANIFEST_INVALID');
  const seen=new Set();
- const verified=[];
  for(const entry of manifest.files){
   if(typeof entry.path!=='string'||!entry.path||
    entry.path.startsWith('/')||entry.path.split('/').includes('..')||
@@ -14,6 +13,9 @@ function verifySourceManifest(manifest,{root=process.cwd()}={}){
    !/^[a-f0-9]{64}$/.test(entry.sha256||''))
    throw Error('SOURCE_MANIFEST_ENTRY_INVALID');
   seen.add(entry.path);
+ }
+ const verified=[];
+ for(const entry of manifest.files){
   const bytes=fs.readFileSync(require('node:path').join(root,entry.path));
   const actual=crypto.createHash('sha256').update(bytes).digest('hex');
   if(actual!==entry.sha256)throw Error('SOURCE_MANIFEST_MISMATCH: '+entry.path);
