@@ -24,7 +24,7 @@ test('rejects tampered package bytes and incorrect hashes',()=>fixture(root=>{
  fs.writeFileSync(path.join(root,'entry.js'),'module.exports=1');
  const result=createSourcePackage('entry.js',{root});
  assert.throws(()=>verifySourcePackage(result.canonical,'0'.repeat(64)),/PACKAGE_HASH_MISMATCH/);
- const changed=result.canonical.replace('module','MODULE');
+ const changed=result.canonical.replace('MASTER_WOK_SOURCE_PACKAGE_NOT_DEPLOYABLE','TAMPERED_SOURCE_PACKAGE');
  assert.throws(()=>verifySourcePackage(changed,result.packageSha256),/PACKAGE_HASH_MISMATCH/);
  const payload=JSON.parse(result.canonical);
  payload.files[0].base64=Buffer.from('tampered').toString('base64');
