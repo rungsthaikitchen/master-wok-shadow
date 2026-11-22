@@ -5,7 +5,8 @@ const {readStagingBootstrapConfig}=require('./staging-secure-bootstrap-config');
 function createStagingEdgeHandler({getEnv,certificate,sourceSha256,createDeploymentRuntime,
  createPool,model}={}){
  try{
-  if(typeof createDeploymentRuntime!=='function'||typeof createPool!=='function')
+  if(typeof createDeploymentRuntime!=='function'||typeof createPool!=='function'||
+   !model||typeof model!=='object')
    throw Error('STAGING_RUNTIME_REQUIRED');
   const config=readStagingBootstrapConfig({getEnv,certificate,sourceSha256});
   const pool=createPool({connectionString:config.databaseUrl,max:3,connectionTimeoutMillis:10000});
