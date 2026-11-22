@@ -7,6 +7,8 @@ on:
       - 'master-wok-runtime.js'
       - 'master-wok-deployment.js'
       - 'staging-secure-bootstrap-config.js'
+      - 'staging-secure-edge-entry.js'
+      - 'tests/staging-secure-edge-entry.test.cjs'
       - 'tests/staging-secure-bootstrap-config.test.cjs'
       - 'scripts/assert-secure-staging-bundle.cjs'
       - 'tests/staging-secure-bundle.test.cjs'
@@ -27,4 +29,4 @@ jobs:
         with:
           node-version: '22'
       - name: Verify diagnostics regression tests
-        run: node --test tests/master-wok-availability-diagnostics.test.cjs tests/staging-secure-bootstrap-config.test.cjs tests/staging-secure-bundle.test.cjs
+        run: node --test tests/master-wok-availability-diagnostics.test.cjs tests/staging-secure-bootstrap-config.test.cjs tests/staging-secure-bundle.test.cjs tests/staging-secure-edge-entry.test.cjs
