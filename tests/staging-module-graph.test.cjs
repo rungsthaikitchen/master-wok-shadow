@@ -33,3 +33,13 @@ test('rejects symlink source and unsupported external dependencies',()=>fixture(
  fs.symlinkSync(path.join(root,'child.js'),path.join(root,'linked.js'));
  assert.throws(()=>inventoryGraph('linked.js',{root}),/MODULE_NOT_REGULAR_FILE/);
 }));
+
+test('inventories the real staging deployment module graph',()=>{
+ const root=path.resolve(__dirname,'..');
+ const graph=inventoryGraph('master-wok-deployment.js',{root});
+ const files=new Set(graph.files.map(x=>x.path));
+ for(const required of ['master-wok-deployment.js','master-wok-runtime.js','master-wok-availability.js','master-wok-release-assessors.js'])
+  assert.equal(files.has(required),true,required+' missing from graph');
+ assert.ok(files.size>15,'expected transitive deployment dependencies');
+ assert.equal(files.size,graph.files.length,'inventory must not duplicate files');
+});
