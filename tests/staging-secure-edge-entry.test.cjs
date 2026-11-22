@@ -76,3 +76,15 @@ test('fails closed if pool construction throws without exposing connection detai
  assert.equal(response.status,503);
  assert.doesNotMatch(await response.text(),/PRIVATE_DATABASE_CONNECTION_STRING/);
 });
+
+test('fails closed if kitchen model is missing',async()=>{
+ let poolCreated=false;
+ const handler=createStagingEdgeHandler({
+  getEnv:key=>vars[key],certificate,sourceSha256:digest,
+  createPool:()=>{poolCreated=true;return {};},
+  createDeploymentRuntime:()=>()=>{}
+ });
+ const response=await handler();
+ assert.equal(response.status,503);
+ assert.equal(poolCreated,false);
+});
