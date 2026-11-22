@@ -18,7 +18,7 @@ const {createReviewApproval}=require('./master-wok-review-approval');
 const {createBasketReviewStore,createBasketReviewAdmin}=require('./master-wok-basket-review');
 const {createBasketAvailability}=require('./master-wok-availability');
 function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,schema='public',
- validateCommercialOrder,deliveryService,readAvailability,readOrders,readHintSnapshot,assessBooking,assessMutation,notificationOrderKeyPrefix,readPreviewOrders,deliveryCapacity,quoteDelivery,reviewApprovalsEnabled=false,paymentsEnabled=false}={}){
+ validateCommercialOrder,deliveryService,readAvailability,readOrders,readHintSnapshot,assessBooking,assessMutation,notificationOrderKeyPrefix,readPreviewOrders,deliveryCapacity,quoteDelivery,reviewApprovalsEnabled=false,paymentsEnabled=false,onAvailabilityFailure}={}){
  if(typeof assessMutation!=='function')throw Error('CERTIFIED_LIFECYCLE_ASSESSOR_REQUIRED');
  const gate=createLaunchControl({schema,releaseId});
  const reviewApproval=reviewApprovalsEnabled?createReviewApproval({pool,schema,assertWriteAllowed:gate.assertWriteAllowed}):undefined;
@@ -34,7 +34,7 @@ function createBookingRuntime({pool,model,secret,notificationSecret,releaseId,sc
    ?deliveryAdmin(input):admin(input,auth);
  }
  const serviceControl=createServiceControlWriter({...shared,schema});
- const availability=createBasketAvailability({pool,model,readAvailability,assessBooking,readSnapshot:readHintSnapshot,
+ const availability=createBasketAvailability({pool,model,readAvailability,assessBooking,readSnapshot:readHintSnapshot,onFailure:onAvailabilityFailure,
   quoteDelivery,assertWriteAllowed:gate.assertWriteAllowed,...(readOrders?{readOrders}:{}),planStore:createServicePlanStore({schema})});
  // Review diagnostics use the same inputs in a rolled-back transaction. They
  // remain available in LEGACY mode and cannot authorize or reserve a booking.
